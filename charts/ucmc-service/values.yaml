@@ -1,0 +1,6 @@
+java:
+  applicationPort: 4000
+  image: 'hmctspublic.azurecr.io/ucmc/service:latest'
+  ingressHost: ucmc-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: ucmc
+  environment:

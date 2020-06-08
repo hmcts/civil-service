@@ -1,0 +1,4 @@
+java:
+  environment:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}

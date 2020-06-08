@@ -1,0 +1,17 @@
+server:
+  port: 4000
+
+management:
+  endpoint:
+    health:
+      show-details: "always"
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info, prometheus
+
+#If you use a database then uncomment below lines and update db properties accordingly
+spring:
+  application:
+    name: ucmc-service
