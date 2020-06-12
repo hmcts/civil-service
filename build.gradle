@@ -113,7 +113,7 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 sonarqube {
   properties {
     property "sonar.projectName", "UCMC :: service"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:HMCTS_UCMC_ucmc-service_master"
+    property "sonar.projectKey", "ucmc-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
   }
 }
