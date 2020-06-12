@@ -13,7 +13,7 @@ variable "subscription" {}
 variable "deployment_namespace" {}
 
 variable "common_tags" {
-  type = "map"
+  type = map(string)
 }
 
 variable "tenant_id" {
@@ -29,7 +29,7 @@ variable "managed_identity_object_id" {
 }
 
 variable "appinsights_location" {
-  type        = "string"
+  type        = string
   default     = "West Europe"
   description = "Location for Application Insights"
 }

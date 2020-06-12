@@ -7,5 +7,12 @@ def product = "ucmc"
 def component = "service"
 
 withPipeline(type, product, component) {
-    disableLegacyDeployment()
+  disableLegacyDeployment()
+
+  enableAksStagingDeployment()
+  enableSlackNotifications('#ucmc_notification')
+
+  after('functionalTest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
 }
