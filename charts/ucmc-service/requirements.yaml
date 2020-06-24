@@ -2,3 +2,12 @@ dependencies:
   - name: java
     version: ~2.16.1
     repository: '@hmctspublic'
+  - name: ccd
+    version: 4.2.4
+    repository: '@hmctspublic'
+    tags:
+      - ucmc-ccd-stack
+  - name: xui-webapp
+    version: ~0.2.1
+    repository: '@hmctspublic'
+    condition: xui-webapp.enabled
