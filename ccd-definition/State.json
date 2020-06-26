@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "ID": "CREATED",
+    "Name": "Claim created",
+    "Description": "Case is created",
+    "DisplayOrder": 1
+  }
+]

@@ -23,6 +23,10 @@ def otherSecrets = [
   'ccd-${env}': [
     secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
     secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN')
+  ],
+  'ucmc-${env}': [
+    secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
+    secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD')
   ]
 ]
 
@@ -34,6 +38,18 @@ withPipeline(type, product, component) {
 
   onPR {
     loadVaultSecrets(otherSecrets)
+  }
+
+  after('checkout') {
+    sh """ git submodule update --init """
+  }
+
+  before('smoketest:preview') {
+    sh """
+      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/add-roles-preview.sh
+      ./bin/import-ccd-definition.sh
+    """
   }
 
   after('functionalTest:preview') {

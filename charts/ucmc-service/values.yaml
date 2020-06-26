@@ -1,6 +1,9 @@
 tags:
   ucmc-ccd-stack: false
 
+idam-pr:
+  enabled: false
+
 xui-webapp:
   enabled: false
 
@@ -21,3 +24,9 @@ java:
     SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  keyVaults:
+    ucmc:
+      resourceGroup: ucmc
+      secrets:
+        - ucmc-idam-client-secret
+        - microservicekey-ucmc-service

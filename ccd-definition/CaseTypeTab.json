@@ -1,0 +1,12 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "Channel": "CaseWorker",
+    "TabID": "CaseHistory",
+    "TabLabel": "History",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "caseHistory",
+    "TabFieldDisplayOrder": 1
+  }
+]

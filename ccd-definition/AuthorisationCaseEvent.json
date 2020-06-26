@@ -1,0 +1,9 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseEventID": "CREATE_CLAIM",
+    "UserRole": "caseworker-cmc-solicitor",
+    "CRUD": "CRU"
+  }
+]
