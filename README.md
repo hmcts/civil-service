@@ -2,11 +2,45 @@
 
 [![Build Status](https://travis-ci.org/hmcts/ucmc-service.svg?branch=master)](https://travis-ci.org/hmcts/ucmc-service)
 
-## Notes
+Civil Unspecified's CCD Callback Service.
 
-Since Spring Boot 2.1 bean overriding is disabled. If you want to enable it you will need to set `spring.main.allow-bean-definition-overriding` to `true`.
+### Contents:
+- [Prerequisites](#prerequisites)
+- [Building and deploying application](#building-and-deploying-the-application)
 
-JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation
+## Prerequisites:
+- [Docker](https://www.docker.com)
+- [realpath-osx](https://github.com/harto/realpath-osx) (Mac OS only)
+- [jq](https://stedolan.github.io/jq/)
+
+Run command:
+```
+git submodule init
+git submodule update
+```
+
+Add services, roles and users (in this order) from civil-unspecified-docker repository using scripts located in bin directory.
+
+Load CCD definition:
+
+CCD definition is stored in JSON format. To load it into CCD instance run:
+
+```bash
+$ ./bin/import-ccd-definition.sh
+```
+
+Note: Above script will export JSON content into XLSX file and upload it into instance of CCD definition store.
+
+Additional note:
+
+You can skip some of the files by using -e option on the import-ccd-definitions, i.e.
+
+```bash
+$ ./bin/import-ccd-definition.sh -e UserProfile.json,*-nonprod.json
+```
+
+The command above will skip UserProfile.json and all files with -nonprod suffix (from the folders).
+
 
 ## Building and deploying the application
 
