@@ -50,6 +50,8 @@ withPipeline(type, product, component) {
       ./bin/add-roles-preview.sh
       ./bin/import-ccd-definition.sh
     """
+
+    env.URL="https://xui-ucmc-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   after('functionalTest:preview') {

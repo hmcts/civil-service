@@ -78,10 +78,35 @@ task integration(type: Test) {
   failFast = true
 }
 
-task smoke(type: Test) {
-  description = "Runs Smoke Tests"
-  testClassesDirs = sourceSets.smokeTest.output.classesDirs
-  classpath = sourceSets.smokeTest.runtimeClasspath
+task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
+  commandLine '/usr/bin/yarn', '--mutex', 'network', '--frozen-lockfile', '--silent', 'install'
+}
+
+task checkDependenciesIntegrity(type: Exec, description: 'Checks integrity of Yarn dependencies.') {
+  commandLine '/usr/bin/yarn', '--mutex', 'network', '--frozen-lockfile', '--silent', 'check', '--integrity'
+}
+
+task lintUserInterfaceTests(type: Exec, description: 'Runs linting of E2E tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'lint'
+}
+
+task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
+  commandLine './bin/wait-for.sh', System.env.URL
+}
+
+task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
+}
+
+def inStrictOrder(Task... tasks) {
+  for (int i = 0; i < tasks.size() - 1; i++) {
+    tasks[i + 1].mustRunAfter(tasks[i])
+  }
+  return tasks
+}
+
+task smoke(description: 'Runs the smoke tests.') {
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, lintUserInterfaceTests, runSmokeTests))
 }
 
 checkstyle {

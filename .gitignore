@@ -20,3 +20,12 @@ bin/main/application.yaml
 *.ipr
 
 .DS_Store
+
+
+# node_modules
+package-lock.json
+node_modules/
+
+# test_output
+output/
+test-results/

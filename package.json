@@ -1,0 +1,25 @@
+{
+  "name": "ucmc-service",
+  "version": "1.0.0",
+  "description": "Civil Unspecified e2e tests",
+  "scripts": {
+    "lint": "eslint e2e",
+    "test": "npx codeceptjs run --steps",
+    "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "codeceptjs": "^2.6.6",
+    "eslint": "^7.3.1",
+    "eslint-plugin-codeceptjs": "^1.3.0",
+    "husky": "^4.2.5",
+    "mocha-multi": "^1.1.3",
+    "mochawesome": "^6.1.1",
+    "puppeteer": "^4.0.1"
+  }
+}
