@@ -6,6 +6,7 @@ Civil Unspecified's CCD Callback Service.
 
 ### Contents:
 - [Prerequisites](#prerequisites)
+- [Testing](#testing)
 - [Building and deploying application](#building-and-deploying-the-application)
 
 ## Prerequisites:
@@ -41,6 +42,20 @@ $ ./bin/import-ccd-definition.sh -e UserProfile.json,*-nonprod.json
 
 The command above will skip UserProfile.json and all files with -nonprod suffix (from the folders).
 
+## Testing
+The repo uses codeceptjs framework for e2e tests.
+
+To install dependencies enter `yarn install`.
+
+To run e2e tests enter `yarn test` in the command line.
+
+### Optional configuration
+
+To run tests with browser window open set `SHOW_BROWSER_WINDOW=true`. By default, the browser window is hidden.
+
+### Smoke test
+
+To run smoke tests enter `yarn test:smoke`.
 
 ## Building and deploying the application
 
