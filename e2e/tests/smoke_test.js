@@ -4,8 +4,8 @@ const baseUrl = process.env.URL || 'http://localhost:3333';
 
 Feature('Smoke tests @smoke-tests');
 
-Scenario('Sign in as solicitor user', (I, loginPage) => {
+Scenario('Sign in as solicitor user', async (I, loginPage) => {
   I.amOnPage(baseUrl);
   loginPage.signIn(config.solicitorUser);
-  I.see('Case List');
+  await I.see('Case List');
 });

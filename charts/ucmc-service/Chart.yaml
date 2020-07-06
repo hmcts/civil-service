@@ -1,7 +1,7 @@
-apiVersion: v1
+apiVersion: v2
 description: A Helm chart for ucmc-service App
 name: ucmc-service
 home: https://github.com/hmcts/ucmc-service
-version: 0.0.3
+version: 0.1.0
 maintainers:
   - name: HMCTS Unspecified CMC team
