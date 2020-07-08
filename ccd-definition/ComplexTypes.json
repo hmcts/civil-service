@@ -151,5 +151,26 @@
     "FieldType": "MoneyGBP",
     "ElementLabel": "Higher value",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "The claimant believes that the facts in this claim form are true. I'm duly authorised by the claimant to sign this statement.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "ListElementCode": "name",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "ListElementCode": "role",
+    "FieldType": "Text",
+    "ElementLabel": "Role",
+    "SecurityClassification": "Public"
   }
 ]

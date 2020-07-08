@@ -12,10 +12,12 @@ const chooseCourtPage = require('./pages/createClaim/chooseCourt.page');
 const claimantDetailsPage = require('./pages/createClaim/claimantDetails.page');
 const claimValuePage = require('./pages/createClaim/claimValue.page');
 
+const statementOfTruth = require('./fragments/statementOfTruth');
+
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
 
-module.exports = function () {
+module.exports = function() {
   return actor({
     // Define custom steps here, use 'this' to access default methods of I.
     // It is recommended to place a general 'login' function here.
@@ -47,6 +49,7 @@ module.exports = function () {
       await chooseCourtPage.enterCourt();
       await claimantDetailsPage.enterClaimant(config.address);
       await claimValuePage.enterClaimValue();
+      await statementOfTruth.enterNameAndRole();
       await this.retryUntilExists(() => this.click('Issue claim'), 'ccd-markdown');
       this.see('Your claim has been issued');
       await this.retryUntilExists(() =>

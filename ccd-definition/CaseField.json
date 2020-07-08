@@ -46,5 +46,13 @@
     "Label": "Enter expected claim value",
     "FieldType": "ClaimValue",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "ID": "statementOfTruth",
+    "Label": "Statement of truth",
+    "FieldType": "StatementOfTruth",
+    "SecurityClassification": "Public"
   }
 ]
