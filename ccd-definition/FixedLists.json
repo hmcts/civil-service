@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ApplicantType",
+    "ListElementCode": "INDIVIDUAL",
+    "ListElement": "Individual",
+    "DisplayOrder": 1
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ApplicantType",
+    "ListElementCode": "COMPANY",
+    "ListElement": "Company",
+    "DisplayOrder": 2
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ApplicantType",
+    "ListElementCode": "ORGANISATION",
+    "ListElement": "Organisation",
+    "DisplayOrder": 3
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ApplicantType",
+    "ListElementCode": "SOLE_TRADER",
+    "ListElement": "Sole trader",
+    "DisplayOrder": 4
+  }
+]

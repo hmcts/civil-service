@@ -1,1 +1,155 @@
-[]
+[
+  {
+    "ID": "SolicitorReferences",
+    "ListElementCode": "solicitorReference",
+    "FieldType": "Text",
+    "ElementLabel": "Claimant's legal representative's reference",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorReferences",
+    "ListElementCode": "defendantReference",
+    "FieldType": "Text",
+    "ElementLabel": "Defendant's legal representative's reference",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "preferredCourt",
+    "FieldType": "Text",
+    "ElementLabel": "Court name",
+    "HintText": "This should be your preferred County Court hearing centre.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "labelPreferredCourt",
+    "FieldType": "Label",
+    "ElementLabel": "<a target=\"_blank\" href=\"https://courttribunalfinder.service.gov.uk/search/postcode?aol=Money+claims&amp;spoe=nearest\">Find a hearing centre</a> (opens in a new window)",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ApplicantType",
+    "ElementLabel": "Claimant type",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "individualTitle",
+    "FieldType": "Text",
+    "ElementLabel": "Title",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "individualFirstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "individualLastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "individualDateOfBirth",
+    "FieldType": "Date",
+    "ElementLabel": "Date of birth",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "companyName",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "FieldShowCondition": "type = \"COMPANY\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "organisationName",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "FieldShowCondition": "type = \"ORGANISATION\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "soleTraderTitle",
+    "FieldType": "Text",
+    "ElementLabel": "Title",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "soleTraderFirstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "soleTraderLastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "soleTraderTradingAs",
+    "FieldType": "Text",
+    "ElementLabel": "Trading as",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "FieldType": "Date",
+    "ElementLabel": "Date of birth",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Applicant",
+    "ListElementCode": "applicantAddress",
+    "FieldType": "AddressUK",
+    "ElementLabel": "Address",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "Your fee will be calculated based on the higher value. <br />If you do not enter a higher value, you will be charged the maximum fee of £10,000.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "lowerValue",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Lower value",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "higherValue",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Higher value",
+    "SecurityClassification": "Public"
+  }
+]

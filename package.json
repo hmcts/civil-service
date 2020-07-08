@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "eslint e2e",
     "test": "npx codeceptjs run --steps",
-    "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi"
+    "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi",
+    "test:functional": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --invert --grep @smoke-tests --reporter mocha-multi"
   },
   "husky": {
     "hooks": {

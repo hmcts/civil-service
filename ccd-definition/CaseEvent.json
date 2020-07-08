@@ -8,6 +8,7 @@
     "DisplayOrder": 1,
     "PostConditionState": "CREATED",
     "SecurityClassification": "Public",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/create-claim/submitted",
     "ShowSummary": "Y",
     "ShowEventNotes": "N",
     "EndButtonLabel": "Issue claim"

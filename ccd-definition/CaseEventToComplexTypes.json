@@ -1,1 +1,191 @@
-[]
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "CourtLocation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "courtLocation",
+    "ListElementCode": "preferredCourt",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "CourtLocation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "courtLocation",
+    "ListElementCode": "labelPreferredCourt",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "individualTitle",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "individualFirstName",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "individualLastName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "individualDateOfBirth",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "companyName",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "organisationName",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "soleTraderTitle",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "soleTraderFirstName",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "soleTraderLastName",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "soleTraderTradingAs",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.AddressLine1",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.AddressLine2",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.AddressLine3",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.PostTown",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.County",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.Country",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Claimant",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimant",
+    "ListElementCode": "applicantAddress.PostCode",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "MANDATORY"
+  }
+]

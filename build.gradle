@@ -63,13 +63,6 @@ test {
   failFast = true
 }
 
-task functional(type: Test) {
-  description = "Runs functional tests"
-  group = "Verification"
-  testClassesDirs = sourceSets.functionalTest.output.classesDirs
-  classpath = sourceSets.functionalTest.runtimeClasspath
-}
-
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
@@ -99,6 +92,10 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
+task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:functional'
+}
+
 def inStrictOrder(Task... tasks) {
   for (int i = 0; i < tasks.size() - 1; i++) {
     tasks[i + 1].mustRunAfter(tasks[i])
@@ -108,6 +105,10 @@ def inStrictOrder(Task... tasks) {
 
 task smoke(description: 'Runs the smoke tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, lintUserInterfaceTests, runSmokeTests))
+}
+
+task functional(description: 'Runs the functional tests.') {
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, lintUserInterfaceTests, runFunctionalTests))
 }
 
 checkstyle {
@@ -132,6 +133,7 @@ sonarqube {
     property "sonar.projectName", "UCMC :: service"
     property "sonar.projectKey", "ucmc-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.coverage.exclusions", "**/model/**"
   }
 }
 
@@ -196,6 +198,9 @@ ext.libraries = [
 ]
 
 dependencies {
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -212,9 +217,6 @@ dependencies {
   implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: 'v4.7.1'
-
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
   compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.2'

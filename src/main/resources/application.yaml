@@ -11,7 +11,10 @@ management:
       exposure:
         include: health, info, prometheus
 
-#If you use a database then uncomment below lines and update db properties accordingly
 spring:
   application:
     name: ucmc-service
+
+idam:
+  s2s-auth:
+    microservice: ucmc-service

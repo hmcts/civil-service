@@ -12,5 +12,33 @@
     "CaseFieldID": "eligibilityQuestions",
     "UserRole": "caseworker-cmc-solicitor",
     "CRUD": "CR"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseFieldID": "solicitorReferences",
+    "UserRole": "caseworker-cmc-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseFieldID": "courtLocation",
+    "UserRole": "caseworker-cmc-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseFieldID": "claimant",
+    "UserRole": "caseworker-cmc-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseFieldID": "claimValue",
+    "UserRole": "caseworker-cmc-solicitor",
+    "CRUD": "CRU"
   }
 ]
