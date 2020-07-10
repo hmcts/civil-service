@@ -3,12 +3,12 @@ const {I} = inject();
 module.exports = {
 
   fields: {
-    solicitorReference: '#solicitorReferences_solicitorReference',
+    claimantReference: '#solicitorReferences_claimantReference',
     defendantReference: '#solicitorReferences_defendantReference',
   },
 
   async enterReferences() {
-    I.fillField(this.fields.solicitorReference, 'Solicitor Reference');
+    I.fillField(this.fields.claimantReference, 'Claimant Reference');
     I.fillField(this.fields.defendantReference, 'Defendant Reference');
     await I.clickContinue();
   }
