@@ -2,6 +2,9 @@ server:
   port: 4000
 
 management:
+  health:
+    probes:
+      enabled: true
   endpoint:
     health:
       show-details: "always"
@@ -14,7 +17,29 @@ management:
 spring:
   application:
     name: ucmc-service
+  cache:
+    cache-names: userInfoCache
+    caffeine:
+      spec: expireAfterAccess=3600s
+
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${idam.web.url}/o
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+
+oidc:
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 idam:
+  web:
+    url: "http://localhost:9002"
+  api:
+    url: "http://localhost:5000"
   s2s-auth:
     microservice: ucmc-service
