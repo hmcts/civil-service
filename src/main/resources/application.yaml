@@ -43,3 +43,6 @@ idam:
     url: "http://localhost:5000"
   s2s-auth:
     microservice: ucmc-service
+
+unspecified:
+  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf

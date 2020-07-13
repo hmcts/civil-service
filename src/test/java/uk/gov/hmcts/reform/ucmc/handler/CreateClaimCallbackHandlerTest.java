@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ucmc.handler;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -25,6 +26,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CreateClaimCallbackHandler handler;
+    @Value("${unspecified.response-pack-url}")
+    private String responsePackLink;
 
     @Test
     void shouldReturnExpectedErrorInMidEventWhenValuesAreInvalid() {
@@ -67,15 +70,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
         String documentLink = "https://www.google.com";
-        String responsePackLink = "https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf";
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         String body = format(
             "<br />Follow these steps to serve a claim:"
                 + "\n* [Download the sealed claim form](%s) (PDF, 123KB)"
-                + "\n* Send the form, particulars of claim and [a response pack](%s) (PDF, 266 KB) "
-                + "to the defendant by %s"
+                + "\n* Send the form, particulars of claim and "
+                + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
                 + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
                 + " 4pm if you're doing this on the due day", documentLink, responsePackLink, formattedServiceDeadline);
 
