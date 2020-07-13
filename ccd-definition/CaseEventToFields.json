@@ -1,7 +1,7 @@
 [
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "eligibilityQuestions",
     "PageFieldDisplayOrder": 1,
@@ -14,7 +14,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "solicitorReferences",
     "PageFieldDisplayOrder": 1,
@@ -27,7 +27,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "courtLocation",
     "PageFieldDisplayOrder": 1,
@@ -40,7 +40,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimant",
     "PageFieldDisplayOrder": 1,
@@ -53,7 +53,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimValue",
     "PageFieldDisplayOrder": 1,
@@ -67,7 +67,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "statementOfTruth",
     "PageFieldDisplayOrder": 1,

@@ -62,7 +62,7 @@ public abstract class BaseIntegrationTest {
 
     private static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
-        .roles(of("caseworker-cmc-solicitor"))
+        .roles(of("caseworker-civil-solicitor"))
         .build();
 
     @Autowired

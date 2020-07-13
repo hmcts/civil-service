@@ -1,9 +1,9 @@
 [
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "PERSONAL_INJURY",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseStateID": "CREATED",
-    "UserRole": "caseworker-cmc-solicitor",
+    "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRUD"
   }
 ]

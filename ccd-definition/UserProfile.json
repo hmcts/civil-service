@@ -2,8 +2,8 @@
   {
     "LiveFrom": "01/01/2017",
     "UserIDAMId": "solicitor@example.com",
-    "WorkBasketDefaultJurisdiction": "CMC",
-    "WorkBasketDefaultCaseType": "PERSONAL_INJURY",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "UNSPECIFIED_CLAIMS",
     "WorkBasketDefaultState": "CREATED"
   }
 ]

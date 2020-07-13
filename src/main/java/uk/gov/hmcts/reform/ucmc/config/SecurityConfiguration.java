@@ -26,8 +26,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTHORITIES = {
-        "caseworker-cmc",
-        "caseworker-cmc-solicitor",
+        "caseworker-civil",
+        "caseworker-civil-solicitor",
         "caseworker"
     };
 

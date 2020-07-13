@@ -1,8 +1,9 @@
 [
   {
     "LiveFrom": "01/01/2017",
-    "ID": "CMC",
-    "Name": "Civil Money Claims",
-    "Description": "Civil Money Claims"
+    "ID": "CIVIL",
+    "Name": "Civil",
+    "Description": "Civil Jurisdiction",
+    "Shuttered": false
   }
 ]
