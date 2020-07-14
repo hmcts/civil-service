@@ -36,7 +36,15 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimant",
     "Label": "Claimant details",
-    "FieldType": "Applicant",
+    "FieldType": "Party",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent",
+    "Label": "Defendant details",
+    "FieldType": "Party",
     "SecurityClassification": "Public"
   },
   {

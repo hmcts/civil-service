@@ -37,6 +37,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondent",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "claimValue",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
