@@ -156,8 +156,9 @@
     "ID": "StatementOfTruth",
     "ListElementCode": "label",
     "FieldType": "Label",
-    "ElementLabel": "The claimant believes that the facts in this claim form are true. I'm duly authorised by the claimant to sign this statement.",
-    "SecurityClassification": "Public"
+    "ElementLabel": "Label",
+    "SecurityClassification": "Public",
+    "Comment": "This label should be set in caseEventToComplexTypes"
   },
   {
     "ID": "StatementOfTruth",
@@ -172,5 +173,74 @@
     "FieldType": "Text",
     "ElementLabel": "Role",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "## Content TBC",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "particularsOfClaim",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Particulars of claim",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "medicalReports",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Medical reports",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "scheduleOfLoss",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Schedule of loss",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Certificate of suitability",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "other",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Other documents",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServiceLocation",
+    "ListElementCode": "location",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ServiceLocation",
+    "ElementLabel": "I served to their:",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServiceLocation",
+    "ListElementCode": "other",
+    "FieldType": "Text",
+    "ElementLabel": "Enter place of service",
+    "HintText": "This should be the type of location you served to, not and address.",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "location = \"OTHER\""
   }
 ]

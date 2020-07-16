@@ -58,9 +58,83 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "statementOfTruth",
+    "ID": "claimStatementOfTruth",
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "servedDocuments",
+    "Label": "Which documents did you serve?",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ServedDocuments",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "servedDocumentsOther",
+    "Label": "List them here:",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "servedDocumentFiles",
+    "Label": "Upload your documents",
+    "FieldType": "ServedDocumentFiles",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "serviceMethod",
+    "Label": "How did you serve the documents?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ServiceMethod",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "serviceLocation",
+    "Label": "Where did you serve the documents?",
+    "FieldType": "ServiceLocation",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "serviceDate",
+    "Label": "When did you serve the documents?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "serviceStatementOfTruth",
+    "Label": "Statement of truth",
+    "FieldType": "StatementOfTruth",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "deemedDateOfService",
+    "Label": "Deemed date of service",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "responseDeadline",
+    "Label": "Response deadline",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   }
 ]

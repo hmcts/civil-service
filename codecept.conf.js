@@ -5,6 +5,8 @@ exports.config = {
   output: './output',
   helpers: {
     Puppeteer: {
+      restart: false,
+      keepCookies: true,
       show: process.env.SHOW_BROWSER_WINDOW || false,
       windowSize: '1200x900',
       waitForTimeout: 20000,
@@ -29,6 +31,7 @@ exports.config = {
         'fillField',
         'checkOption',
         'selectOption',
+        'attachFile',
       ],
     },
     screenshotOnFail: {

@@ -2,14 +2,16 @@ const {I} = inject();
 
 module.exports = {
 
-  fields: {
-    name: 'input[id$="statementOfTruth_name"]',
-    role: 'input[id$="statementOfTruth_role"]',
+  fields: function (id) {
+    return {
+      name: `input[id$="${id}StatementOfTruth_name"]`,
+      role: `input[id$="${id}StatementOfTruth_role"]`,
+    };
   },
 
-  async enterNameAndRole(name = 'John Smith', role = 'Solicitor') {
-    I.fillField(this.fields.name, name);
-    I.fillField(this.fields.role, role);
+  async enterNameAndRole(fieldID = '', name = 'John Smith', role = 'Solicitor') {
+    I.fillField(this.fields(fieldID).name, name);
+    I.fillField(this.fields(fieldID).role, role);
     await I.clickContinue();
   }
 };

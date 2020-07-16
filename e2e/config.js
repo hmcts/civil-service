@@ -19,5 +19,6 @@ module.exports = {
     county: 'Kent',
     country: 'United Kingdom',
     postcode: 'RG4 7AA',
-  }
+  },
+  testFile: './e2e/fixtures/examplePDF.pdf'
 };

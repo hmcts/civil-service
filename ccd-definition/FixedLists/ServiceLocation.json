@@ -1,0 +1,23 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ServiceLocation",
+    "ListElementCode": "RESIDENCE",
+    "ListElement": "Usual residence",
+    "DisplayOrder": 1
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ServiceLocation",
+    "ListElementCode": "BUSINESS",
+    "ListElement": "Place of business",
+    "DisplayOrder": 2
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ServiceLocation",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  }
+]

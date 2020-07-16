@@ -342,5 +342,33 @@
     "ListElementCode": "primaryAddress.PostCode",
     "FieldDisplayOrder": 17,
     "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "StatementOfTruth",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimStatementOfTruth",
+    "ListElementCode": "label",
+    "EventElementLabel": "The claimant believes that the facts in this claim form are true. I'm duly authorised by the claimant to sign this statement.",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "StatementOfTruth",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimStatementOfTruth",
+    "ListElementCode": "name",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "StatementOfTruth",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimStatementOfTruth",
+    "ListElementCode": "role",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
   }
 ]
