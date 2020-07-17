@@ -236,7 +236,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.37'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.2'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.0'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.3'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
