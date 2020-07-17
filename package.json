@@ -1,5 +1,5 @@
 {
-  "name": "ucmc-service",
+  "name": "unspec-service",
   "version": "1.0.0",
   "description": "Civil Unspecified e2e tests",
   "scripts": {

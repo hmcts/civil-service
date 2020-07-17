@@ -1,6 +1,6 @@
-# ucmc-service
+# unspec-service
 
-[![Build Status](https://travis-ci.org/hmcts/ucmc-service.svg?branch=master)](https://travis-ci.org/hmcts/ucmc-service)
+[![Build Status](https://travis-ci.org/hmcts/unspec-service.svg?branch=master)](https://travis-ci.org/hmcts/unspec-service)
 
 Civil Unspecified's CCD Callback Service.
 
@@ -84,7 +84,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/ucmc-service` directory)
+Run the distribution (created in `build/install/unspec-service` directory)
 by executing the following command:
 
 ```bash

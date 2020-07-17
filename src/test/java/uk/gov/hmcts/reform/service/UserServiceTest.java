@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.ucmc.service.UserService;
+import uk.gov.hmcts.reform.unspec.service.UserService;
 
 import java.util.List;
 

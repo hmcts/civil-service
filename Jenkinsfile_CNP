@@ -3,7 +3,7 @@
 @Library("Infrastructure")
 
 def type = "java"
-def product = "ucmc"
+def product = "unspec"
 def component = "service"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -24,7 +24,7 @@ def otherSecrets = [
     secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
     secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN')
   ],
-  'ucmc-${env}': [
+  'unspec-${env}': [
     secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD')
   ]
@@ -34,7 +34,7 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
 
   enableAksStagingDeployment()
-  enableSlackNotifications('#ucmc_notification')
+  enableSlackNotifications('#unspec_notification')
 
   onPR {
     loadVaultSecrets(otherSecrets)
@@ -51,7 +51,7 @@ withPipeline(type, product, component) {
       ./bin/import-ccd-definition.sh
     """
 
-    env.URL="https://xui-ucmc-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.URL="https://xui-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   after('functionalTest:preview') {

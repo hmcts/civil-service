@@ -16,7 +16,7 @@ management:
 
 spring:
   application:
-    name: ucmc-service
+    name: unspec-service
   cache:
     cache-names: userInfoCache
     caffeine:
@@ -42,7 +42,7 @@ idam:
   api:
     url: "http://localhost:5000"
   s2s-auth:
-    microservice: ucmc-service
+    microservice: unspec-service
 
 unspecified:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf

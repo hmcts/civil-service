@@ -130,8 +130,8 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 
 sonarqube {
   properties {
-    property "sonar.projectName", "UCMC :: service"
-    property "sonar.projectKey", "ucmc-service"
+    property "sonar.projectName", "UNSPEC :: service"
+    property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**"
   }
@@ -255,11 +255,11 @@ dependencies {
   smokeTestImplementation sourceSets.main.runtimeClasspath
 }
 
-mainClassName = 'uk.gov.hmcts.reform.ucmc.Application'
+mainClassName = 'uk.gov.hmcts.reform.unspec.Application'
 
 bootJar {
   getArchiveFileName().set(provider {
-    'ucmc-service.jar'
+    'unspec-service.jar'
   })
 
   manifest {

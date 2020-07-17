@@ -10,16 +10,16 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "key-vault" {
-  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=master"
-  name                    = "ucmc-${var.env}"
+  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=azurermv2"
+  name                    = "unspec-${var.env}"
   product                 = var.product
   env                     = var.env
   tenant_id               = var.tenant_id
   object_id               = var.jenkins_AAD_objectId
   resource_group_name     = azurerm_resource_group.rg.name
-  product_group_object_id = "294f60bc-f8a2-4be3-8bb8-84975444d4a0"
+  product_group_object_id = "40c33f5a-24d0-4b22-a923-df8a80a59cd9"
   common_tags             = var.common_tags
-  managed_identity_object_id = var.managed_identity_object_id
+  create_managed_identity = true
 }
 
 resource "azurerm_application_insights" "appinsights" {

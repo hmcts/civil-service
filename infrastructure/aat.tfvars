@@ -1,1 +1,1 @@
-managed_identity_object_id="5e63306d-f6c3-4d15-934e-f0a9e48bbaf1"
+managed_identity_object_id="788d7618-8ab7-4677-8fab-5f1749ee41e5"
