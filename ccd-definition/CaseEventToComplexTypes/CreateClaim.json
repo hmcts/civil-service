@@ -345,6 +345,33 @@
   },
   {
     "LiveFrom": "01/01/2017",
+    "ID": "ClaimValue",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimValue",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimValue",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimValue",
+    "ListElementCode": "lowerValue",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimValue",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "claimValue",
+    "ListElementCode": "higherValue",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
     "ID": "StatementOfTruth",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimStatementOfTruth",

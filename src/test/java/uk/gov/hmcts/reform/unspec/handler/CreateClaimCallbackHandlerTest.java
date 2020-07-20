@@ -18,6 +18,8 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.unspec.enums.ClaimType.PERSONAL_INJURY_WORK;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -46,21 +48,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnNoErrorInMidEventWhenValuesAreValid() {
         Map<String, Object> data = new HashMap<>();
         data.put("claimValue", ClaimValue.builder().higherValue(10).lowerValue(1).build());
+        data.put("claimType", PERSONAL_INJURY_WORK);
 
         CallbackParams params = callbackParamsOf(data, CallbackType.MID);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void shouldReturnNoErrorInMidEventWhenNoValues() {
-        CallbackParams params = callbackParamsOf(new HashMap<>(), CallbackType.MID);
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData())
+            .isEqualTo(
+                Map.of(
+                "claimValue", ClaimValue.builder().higherValue(10).lowerValue(1).build(),
+                "claimType", PERSONAL_INJURY_WORK,
+                "allocatedTrack", SMALL_CLAIM
+            ));
     }
 
     @Test

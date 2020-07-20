@@ -58,6 +58,24 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimType",
+    "Label": "CONTENT TBC: Enter the type of claim",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ClaimType",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "allocatedTrack",
+    "Label": "Allocated track",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "Track",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimStatementOfTruth",
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",

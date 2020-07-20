@@ -11,7 +11,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.enums.ClaimType;
+import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
+import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -55,17 +57,23 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateClaimValues(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        CaseData caseData = mapper.convertValue(data, CaseData.class);
+        ClaimValue claimValue = mapper.convertValue(data.get("claimValue"), ClaimValue.class);
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getClaimValue() != null && caseData.getClaimValue().hasLargerLowerValue()) {
+        if (claimValue.hasLargerLowerValue()) {
             errors.add("CONTENT TBC: Higher value must not be lower than the lower value.");
         }
 
+        if (errors.isEmpty()) {
+            ClaimType claimType = mapper.convertValue(data.get("claimType"), ClaimType.class);
+
+            data.put("allocatedTrack", getAllocatedTrack(claimValue, claimType));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
-            .errors(errors)
-            .build();
+                   .data(data)
+                   .errors(errors)
+                   .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -83,8 +91,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
                 + " 4pm if you're doing this on the due day", documentLink, responsePackLink, formattedServiceDeadline);
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# Your claim has been issued\n## Claim number: %s", claimNumber))
-            .confirmationBody(body)
-            .build();
+                   .confirmationHeader(format("# Your claim has been issued\n## Claim number: %s", claimNumber))
+                   .confirmationBody(body)
+                   .build();
     }
 }

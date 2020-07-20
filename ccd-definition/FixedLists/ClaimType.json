@@ -1,0 +1,72 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_ROAD",
+    "ListElement": "Personal injury - road accident",
+    "DisplayOrder": 1
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_WORK",
+    "ListElement": "Personal injury - work accident",
+    "DisplayOrder": 2
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_PUBLIC",
+    "ListElement": "Personal injury - public liability accident",
+    "DisplayOrder": 3
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_HOLIDAY",
+    "ListElement": "Personal Injury - holiday illness",
+    "DisplayOrder": 4
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_DISEASE",
+    "ListElement": "Personal Injury - disease claim",
+    "DisplayOrder": 5
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY_OTHER",
+    "ListElement": "Personal Injury - other",
+    "DisplayOrder": 6
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "CLINICAL_NEGLIGENCE",
+    "ListElement": "Clinical negligence",
+    "DisplayOrder": 7
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "BREACH_OF_CONTRACT",
+    "ListElement": "Breach of contract",
+    "DisplayOrder": 8
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "CONSUMER_CREDIT",
+    "ListElement": "Consumer credit",
+    "DisplayOrder": 9
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ClaimType",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 10
+  }
+]

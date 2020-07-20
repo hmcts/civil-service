@@ -10,6 +10,7 @@ const caseViewPage = require('./pages/caseView.page');
 const createCasePage = require('./pages/createClaim/createCase.page');
 const solicitorReferencesPage = require('./pages/createClaim/solicitorReferences.page');
 const chooseCourtPage = require('./pages/createClaim/chooseCourt.page');
+const claimTypePage = require('./pages/createClaim/claimType.page');
 const claimValuePage = require('./pages/createClaim/claimValue.page');
 
 const servedDocumentsPage = require('./pages/confirmService/servedDocuments.page');
@@ -56,6 +57,7 @@ module.exports = function() {
       await chooseCourtPage.enterCourt();
       await party.enterParty('claimant', config.address);
       await party.enterParty('respondent', config.address);
+      await claimTypePage.selectClaimType();
       await claimValuePage.enterClaimValue();
       await statementOfTruth.enterNameAndRole('claim');
       await this.retryUntilExists(() => this.click('Issue claim'), 'ccd-markdown');
