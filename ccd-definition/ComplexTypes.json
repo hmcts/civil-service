@@ -15,7 +15,7 @@
   },
   {
     "ID": "CourtLocation",
-    "ListElementCode": "preferredCourt",
+    "ListElementCode": "applicantPreferredCourt",
     "FieldType": "Text",
     "ElementLabel": "Court name",
     "HintText": "This should be your preferred County Court hearing centre.",

@@ -3,7 +3,7 @@ const { I } = inject();
 module.exports = {
 
   fields: {
-    courtLocation: '#courtLocation_preferredCourt'
+    courtLocation: '#courtLocation_applicantPreferredCourt'
   },
 
   async enterCourt() {
