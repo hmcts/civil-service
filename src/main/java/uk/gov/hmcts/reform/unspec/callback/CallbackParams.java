@@ -9,6 +9,7 @@ import java.util.Map;
 @Builder
 @Getter
 public class CallbackParams {
+
     private CallbackType type;
     private CallbackRequest request;
     private Map<Params, Object> params;

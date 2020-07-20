@@ -15,7 +15,7 @@ class DateFormatHelperTest {
 
     @Test
     void shouldFormatDateTimeToExpectedFormat() {
-        LocalDateTime now = LocalDateTime.of(2999, 1, 1, 9, 0,0);
+        LocalDateTime now = LocalDateTime.of(2999, 1, 1, 9, 0, 0);
 
         assertThat(formatLocalDateTime(now, DATE_TIME_AT))
             .isEqualTo("9:00am on 1 January 2999");

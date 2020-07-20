@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClaimValueTest {
+
     public static final int HIGHER_VALUE = 1000;
     public static final int LOWER_VALUE = 10;
 

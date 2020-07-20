@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class ClaimValue {
+
     private final Integer lowerValue;
     private final Integer higherValue;
 

@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 
 @Service
 public class CreateClaimCallbackHandler extends CallbackHandler {
+
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CASE);
 
     private final ObjectMapper mapper;

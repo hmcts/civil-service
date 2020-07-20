@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @Builder
 public class CaseData {
+
     private final ClaimValue claimValue;
     private final ServiceMethod serviceMethod;
     private final LocalDate serviceDate;

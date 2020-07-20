@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 @Service
 @RequiredArgsConstructor
 public class ConfirmServiceCallbackHandler extends CallbackHandler {
+
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CONFIRM_SERVICE);
 
     private final ObjectMapper mapper;
