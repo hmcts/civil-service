@@ -4,7 +4,7 @@
     "ID": "CourtLocation",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "courtLocation",
-    "ListElementCode": "preferredCourt",
+    "ListElementCode": "applicantPreferredCourt",
     "FieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY"
   },
