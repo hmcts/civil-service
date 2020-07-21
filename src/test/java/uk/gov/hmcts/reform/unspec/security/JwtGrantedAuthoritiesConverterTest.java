@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.security;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,62 +34,70 @@ class JwtGrantedAuthoritiesConverterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
-    @Test
+    @Nested
     @DisplayName("Gets empty authorities")
-    void shouldReturnEmptyAuthorities() {
-        Jwt jwt = Mockito.mock(Jwt.class);
-        Collection<GrantedAuthority> authorities = converter.convert(jwt);
-        assertNotNull(authorities);
-        assertEquals(0, authorities.size());
+    class EmptyAuthorities {
+
+        @Test
+        void shouldReturnEmptyAuthorities_whenNoRolesOnJwt() {
+            Jwt jwt = Mockito.mock(Jwt.class);
+            Collection<GrantedAuthority> authorities = converter.convert(jwt);
+            assertNotNull(authorities);
+            assertEquals(0, authorities.size());
+        }
+
+        @Test
+        void shouldReturnEmptyAuthorities_whenClaimNotAvailable() {
+            Jwt jwt = Mockito.mock(Jwt.class);
+            when(jwt.containsClaim(anyString())).thenReturn(false);
+            Collection<GrantedAuthority> authorities = converter.convert(jwt);
+            assertNotNull(authorities);
+            assertEquals(0, authorities.size());
+        }
+
+        @Test
+        void shouldReturnEmptyAuthorities_whenClaimValueDoesNotMatch() {
+            Jwt jwt = Mockito.mock(Jwt.class);
+            when(jwt.containsClaim(anyString())).thenReturn(true);
+            when(jwt.getClaim(anyString())).thenReturn("Test");
+            Collection<GrantedAuthority> authorities = converter.convert(jwt);
+            assertNotNull(authorities);
+            assertEquals(0, authorities.size());
+        }
+
+        @Test
+        void shouldReturnEmptyAuthorities_whenIdamReturnsNoUsers() {
+            Jwt jwt = Mockito.mock(Jwt.class);
+            when(jwt.containsClaim(anyString())).thenReturn(true);
+            when(jwt.getClaim(anyString())).thenReturn("access_token");
+            when(jwt.getTokenValue()).thenReturn("access_token");
+            UserInfo userInfo = mock(UserInfo.class);
+            doReturn(Collections.emptyList()).when(userInfo).getRoles();
+            when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            Collection<GrantedAuthority> authorities = converter.convert(jwt);
+            assertNotNull(authorities);
+            assertEquals(0, authorities.size());
+        }
     }
 
-    @Test
-    void shouldReturnEmptyAuthoritiesWhenClaimNotAvailable() {
-        Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(false);
-        Collection<GrantedAuthority> authorities = converter.convert(jwt);
-        assertNotNull(authorities);
-        assertEquals(0, authorities.size());
-    }
+    @Nested
+    class ValidAuthorities {
 
-    @Test
-    void shouldReturnEmptyAuthoritiesWhenClaimValueNotEquals() {
-        Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
-        when(jwt.getClaim(anyString())).thenReturn("Test");
-        Collection<GrantedAuthority> authorities = converter.convert(jwt);
-        assertNotNull(authorities);
-        assertEquals(0, authorities.size());
-    }
-
-    @Test
-    void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
-        Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
-        when(jwt.getClaim(anyString())).thenReturn("access_token");
-        when(jwt.getTokenValue()).thenReturn("access_token");
-        UserInfo userInfo = mock(UserInfo.class);
-        doReturn(Collections.emptyList()).when(userInfo).getRoles();
-        when(userService.getUserInfo(anyString())).thenReturn(userInfo);
-        Collection<GrantedAuthority> authorities = converter.convert(jwt);
-        assertNotNull(authorities);
-        assertEquals(0, authorities.size());
-    }
-
-    @Test
-    void shouldReturnAuthoritiesWhenIdamReturnsUserRoles() {
-        Jwt jwt = Mockito.mock(Jwt.class);
-        when(jwt.containsClaim(anyString())).thenReturn(true);
-        when(jwt.getClaim(anyString())).thenReturn("access_token");
-        when(jwt.getTokenValue()).thenReturn("access_token");
-        UserInfo userInfo = mock(UserInfo.class);
-        doReturn(ImmutableList.of("caseworker-solicitor")).when(userInfo).getRoles();
-        when(userService.getUserInfo(anyString())).thenReturn(userInfo);
-        Collection<GrantedAuthority> authorities = converter.convert(jwt);
-        assertNotNull(authorities);
-        assertEquals(1, authorities.size());
+        @Test
+        void shouldReturnAuthorities_whenIdamReturnsUserRoles() {
+            Jwt jwt = Mockito.mock(Jwt.class);
+            when(jwt.containsClaim(anyString())).thenReturn(true);
+            when(jwt.getClaim(anyString())).thenReturn("access_token");
+            when(jwt.getTokenValue()).thenReturn("access_token");
+            UserInfo userInfo = mock(UserInfo.class);
+            doReturn(ImmutableList.of("caseworker-solicitor")).when(userInfo).getRoles();
+            when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            Collection<GrantedAuthority> authorities = converter.convert(jwt);
+            assertNotNull(authorities);
+            assertEquals(1, authorities.size());
+        }
     }
 }

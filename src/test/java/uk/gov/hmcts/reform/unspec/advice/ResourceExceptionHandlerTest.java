@@ -20,7 +20,7 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void shouldReturnNotFoundWhenCallbackException() {
+    public void shouldReturnNotFound_whenCallbackExceptionThrown() {
         testTemplate(
             "expected exception for missing callback handler",
             CallbackException::new,

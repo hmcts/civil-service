@@ -67,6 +67,7 @@ class AllocatedTrackTest {
 
     @Nested
     class OtherClaims {
+
         @ParameterizedTest(name = "{0} has small claim track when claim value is less than 10000")
         @EnumSource(
             value = ClaimType.class,

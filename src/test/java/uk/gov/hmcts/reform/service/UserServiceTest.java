@@ -49,8 +49,7 @@ class UserServiceTest {
     }
 
     @Test
-    void findsUserInfoForAuthToken() {
-
+    void shouldReturnUserInfo_whenValidAuthToken() {
         UserInfo found = userService.getUserInfo(AUTHORISATION);
 
         assertThat(found.getSub()).isEqualTo(SUB);

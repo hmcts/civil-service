@@ -53,7 +53,7 @@ public class CallbackHandlerFactoryTest {
     }
 
     @Test
-    public void shouldThrowCallbackExceptionWhenUnknownEvent() {
+    public void shouldThrowCallbackException_whenUnknownEvent() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId("nope")
@@ -70,8 +70,7 @@ public class CallbackHandlerFactoryTest {
     }
 
     @Test
-    public void shouldDispatchCallbackWhenCreateCaseEvent() {
-
+    public void shouldDispatchCallback_whenValidCaseEvent() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CASE.getValue())

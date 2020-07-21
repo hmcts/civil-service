@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -24,73 +25,95 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ConfirmServiceCallbackHandler handler;
 
-    @Test
-    void shouldPrepopulateServedDocumentsList() {
-        CallbackParams params = callbackParamsOf(new HashMap<>(), CallbackType.ABOUT_TO_START);
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+    @Nested
+    class AboutToStartCallback {
 
-        assertThat(response.getData()).isEqualTo(Map.of("servedDocuments", List.of(ServedDocuments.CLAIM_FORM)));
+        @Test
+        void shouldPrepopulateServedDocumentsList_whenInvoked() {
+            CallbackParams params = callbackParamsOf(new HashMap<>(), CallbackType.ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .isEqualTo(Map.of("servedDocuments", List.of(ServedDocuments.CLAIM_FORM)));
+        }
     }
 
-    @Test
-    void shouldReturnErrorWhenWhitespaceInServedDocumentsOther() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("servedDocumentsOther", " ");
+    @Nested
+    class MidEventCallback {
 
-        CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+        @Test
+        void shouldReturnError_whenWhitespaceInServedDocumentsOther() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("servedDocumentsOther", " ");
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
 
-        assertThat(response.getErrors()).containsExactly("CONTENT TBC: please enter a valid value for other documents");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "CONTENT TBC: please enter a valid value for other documents");
+        }
+
+        @Test
+        void shouldReturnNoError_whenValidServedDocumentsOther() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("servedDocumentsOther", "A valid document");
+
+            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData()).isEqualTo(data);
+            assertThat(response.getErrors()).isEmpty();
+        }
     }
 
-    @Test
-    void shouldReturnNoErrorWhenValidServedDocumentsOtherValue() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("servedDocumentsOther", "A valid document");
+    @Nested
+    class AboutToSubmitCallback {
 
-        CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+        @Test
+        void shouldReturnExpectedResponse_whenValidData() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("serviceMethod", "POST");
+            data.put("serviceDate", "2099-06-23");
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
 
-        assertThat(response.getData()).isEqualTo(data);
-        assertThat(response.getErrors()).isEmpty();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData()).isEqualTo(
+                Map.of(
+                    "deemedDateOfService", LocalDate.of(2099, 6, 25),
+                    "responseDeadline", LocalDateTime.of(2099, 7, 9, 16, 0),
+                    "serviceMethod", "POST",
+                    "serviceDate", "2099-06-23"
+                ));
+        }
     }
 
-    @Test
-    void shouldReturnExpectedAboutToSubmitCallbackResponseObject() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("serviceMethod", "POST");
-        data.put("serviceDate", "2099-06-23");
+    @Nested
+    class SubmittedCallback {
 
-        CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
+        @Test
+        void shouldReturnExpectedResponse_whenValidData() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("deemedDateOfService", "2099-06-25");
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
 
-        assertThat(response.getData()).isEqualTo(
-            Map.of(
-                "deemedDateOfService", LocalDate.of(2099, 6, 25),
-                "responseDeadline", LocalDateTime.of(2099, 7, 9, 16, 0),
-                "serviceMethod", "POST",
-                "serviceDate", "2099-06-23"
-            ));
-    }
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-    @Test
-    void shouldReturnExpectedSubmittedCallbackResponseObject() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("deemedDateOfService", "2099-06-25");
-
-        CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
-
-        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-        assertThat(response).isEqualToComparingFieldByField(
-            SubmittedCallbackResponse.builder()
-                .confirmationHeader("# You've confirmed service")
-                .confirmationBody("<br /> Deemed date of service: 25 June 2099."
-                                      + "<br />The defendant must respond before 4:00pm on 9 July 2099."
-                                      + "\n\n[Download certificate of service](http://www.google.com) (PDF, 266 KB)")
-                .build());
+            assertThat(response).isEqualToComparingFieldByField(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader("# You've confirmed service")
+                    .confirmationBody("<br /> Deemed date of service: 25 June 2099."
+                                          + "<br />The defendant must respond before 4:00pm on 9 July 2099."
+                                          + "\n\n[Download certificate of service](http://www.google.com) (PDF, 266 KB)")
+                    .build());
+        }
     }
 }

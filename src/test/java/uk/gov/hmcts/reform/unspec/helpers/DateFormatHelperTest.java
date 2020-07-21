@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.helpers;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,19 +14,27 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 
 class DateFormatHelperTest {
 
-    @Test
-    void shouldFormatDateTimeToExpectedFormat() {
-        LocalDateTime now = LocalDateTime.of(2999, 1, 1, 9, 0, 0);
+    @Nested
+    class LocalDateTimeFormat {
 
-        assertThat(formatLocalDateTime(now, DATE_TIME_AT))
-            .isEqualTo("9:00am on 1 January 2999");
+        @Test
+        void shouldReturnExpectedDateTimeFormat_whenValidFormatIsPassed() {
+            LocalDateTime now = LocalDateTime.of(2999, 1, 1, 9, 0, 0);
+
+            assertThat(formatLocalDateTime(now, DATE_TIME_AT))
+                .isEqualTo("9:00am on 1 January 2999");
+        }
     }
 
-    @Test
-    void shouldFormatDateToExpectedFormat() {
-        LocalDate now = LocalDate.of(2999, 1, 1);
+    @Nested
+    class LocalDateFormat {
 
-        assertThat(formatLocalDate(now, DATE))
-            .isEqualTo("1 January 2999");
+        @Test
+        void shouldReturnExpectedDateFormat_whenValidFormatIsPassed() {
+            LocalDate now = LocalDate.of(2999, 1, 1);
+
+            assertThat(formatLocalDate(now, DATE))
+                .isEqualTo("1 January 2999");
+        }
     }
 }
