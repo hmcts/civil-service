@@ -4,19 +4,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @RequiredArgsConstructor
 public class ClaimValue {
 
-    private final Integer lowerValue;
-    private final Integer higherValue;
+    private final BigDecimal lowerValue;
+    private final BigDecimal higherValue;
 
     public boolean hasLargerLowerValue() {
         if (lowerValue == null || higherValue == null) {
             return false;
         }
 
-        return lowerValue > higherValue;
+        return lowerValue.compareTo(higherValue) > 0;
     }
 }

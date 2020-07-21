@@ -36,13 +36,71 @@ spring:
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
-idam:
-  web:
-    url: "http://localhost:9002"
+fees:
   api:
-    url: "http://localhost:5000"
+    service: civil money claims
+    jurisdiction1: civil
+    jurisdiction2: county court
+    channel: default
+    event: issue
+
+payments:
+  api:
+    # TODO: update once f&p onboarding is completed
+    site_id:
+    service:
+
+idam:
   s2s-auth:
     microservice: unspec-service
 
 unspecified:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
+
+---
+
+spring:
+  profiles: local
+
+fees:
+  api:
+    url: http://localhost:8765
+
+payments:
+  api:
+    url: http://localhost:8765
+
+idam:
+  web:
+    url: http://localhost:9002
+  api:
+    url: http://localhost:5000
+  s2s-auth:
+    url: http://localhost:4502
+    totp_secret: AABBCCDDEEFFGGHH
+  client:
+    id: unspec
+    redirect_uri: https://localhost:9000/oauth2/callback
+    secret: OOOOOOOOOOOOOOOO
+
+---
+
+spring:
+  profiles: integration-test
+
+fees:
+  api:
+    url: http://fake-fees-register-api
+
+payments:
+  api:
+    url: http://fake-payment-register-api
+
+idam:
+  web:
+    url: http://fake-idam-web
+  api:
+    url: http://fake-idam-api
+  s2s-auth:
+    url: http://fake-service-auth-provider-api
+    totp_secret: AABBCCDDEEFFGGHH

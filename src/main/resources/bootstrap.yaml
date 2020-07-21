@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    propertiesvolume:
+      enabled: true
+      prefixed: false
+      paths: /mnt/secrets/unspec
+      aliases:
+        microservicekey-unspec-service: idam.s2s-auth.totp_secret

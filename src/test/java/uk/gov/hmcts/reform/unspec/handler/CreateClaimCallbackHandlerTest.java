@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -34,7 +35,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnExpectedErrorInMidEventWhenValuesAreInvalid() {
         Map<String, Object> data = new HashMap<>();
-        data.put("claimValue", ClaimValue.builder().higherValue(1).lowerValue(10).build());
+        data.put(
+            "claimValue",
+            ClaimValue.builder().higherValue(BigDecimal.valueOf(1)).lowerValue(BigDecimal.valueOf(10)).build()
+        );
 
         CallbackParams params = callbackParamsOf(data, CallbackType.MID);
 
@@ -47,7 +51,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnNoErrorInMidEventWhenValuesAreValid() {
         Map<String, Object> data = new HashMap<>();
-        data.put("claimValue", ClaimValue.builder().higherValue(10).lowerValue(1).build());
+        data.put(
+            "claimValue",
+            ClaimValue.builder().higherValue(BigDecimal.valueOf(10)).lowerValue(BigDecimal.valueOf(1)).build()
+        );
         data.put("claimType", PERSONAL_INJURY_WORK);
 
         CallbackParams params = callbackParamsOf(data, CallbackType.MID);
@@ -58,7 +65,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .isEqualTo(
                 Map.of(
-                "claimValue", ClaimValue.builder().higherValue(10).lowerValue(1).build(),
+                "claimValue", ClaimValue.builder()
+                        .higherValue(BigDecimal.valueOf(10))
+                        .lowerValue(BigDecimal.valueOf(1))
+                        .build(),
                 "claimType", PERSONAL_INJURY_WORK,
                 "allocatedTrack", SMALL_CLAIM
             ));

@@ -2,13 +2,15 @@ package uk.gov.hmcts.reform.unspec.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClaimValueTest {
 
-    public static final int HIGHER_VALUE = 1000;
-    public static final int LOWER_VALUE = 10;
+    public static final BigDecimal HIGHER_VALUE = BigDecimal.valueOf(1000);
+    public static final BigDecimal LOWER_VALUE = BigDecimal.valueOf(10);
 
     @Test
     void shouldReturnTrueWhenHigherValueIsSmallerThanLower() {

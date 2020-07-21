@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.unspec.enums;
 
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 
+import java.math.BigDecimal;
+
 public enum AllocatedTrack {
     SMALL_CLAIM,
     FAST_CLAIM,
@@ -9,19 +11,27 @@ public enum AllocatedTrack {
 
     public static AllocatedTrack getAllocatedTrack(ClaimValue claimValue, ClaimType claimType) {
         if (claimType.isPersonalInjury()) {
-            if (claimValue.getHigherValue() < 1000) {
+            if (isValueSmallerThan(claimValue.getHigherValue(), 1000)) {
                 return SMALL_CLAIM;
-            } else if (claimValue.getHigherValue() >= 1000 && claimValue.getHigherValue() <= 25000) {
+            } else if (isValueWithinRange(claimValue.getHigherValue(), 1000, 25000)) {
                 return FAST_CLAIM;
             }
         }
 
-        if (claimValue.getHigherValue() < 10000) {
+        if (isValueSmallerThan(claimValue.getHigherValue(), 10000)) {
             return SMALL_CLAIM;
-        } else if (claimValue.getHigherValue() >= 10000 && claimValue.getHigherValue() <= 25000) {
+        } else if (isValueWithinRange(claimValue.getHigherValue(), 10000, 25000)) {
             return FAST_CLAIM;
         } else {
             return MULTI_CLAIM;
         }
+    }
+
+    private static boolean isValueSmallerThan(BigDecimal value, int comparisionValue) {
+        return value.compareTo(BigDecimal.valueOf(comparisionValue)) < 0;
+    }
+
+    private static boolean isValueWithinRange(BigDecimal value, int lower, int higher) {
+        return value.compareTo(BigDecimal.valueOf(lower)) >= 0 &&  value.compareTo(BigDecimal.valueOf(higher)) <= 0;
     }
 }

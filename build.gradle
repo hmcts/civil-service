@@ -133,7 +133,7 @@ sonarqube {
     property "sonar.projectName", "UNSPEC :: service"
     property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java"
   }
 }
 
@@ -176,6 +176,12 @@ repositories {
   mavenLocal()
   jcenter()
   mavenCentral()
+  maven {
+    url "https://dl.bintray.com/hmcts/hmcts-maven"
+  }
+  maven {
+    url  "http://repo.spring.io/milestone"
+  }
 }
 
 def versions = [
@@ -230,13 +236,18 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.4'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.2'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.37'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.37'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.4'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.4'
+
+  compile group: 'uk.gov.hmcts.reform', name: 'fees-java-client', version: '0.0.6'
+  compile group: 'uk.gov.hmcts.reform', name: 'payments-client', version: '1.0.0'
+  compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
+  compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
