@@ -30,6 +30,26 @@ def otherSecrets = [
   ]
 ]
 
+def archiveCoreCaseDataDefinitions(env) {
+  dir("${WORKSPACE}/bin") {
+    sh "./build-release-ccd-definition.sh ${env}"
+  }
+
+  dir("${WORKSPACE}/build") {
+    steps.archiveArtifacts artifacts: "ccd-config/ccd-unspec-${env}.xlsx"
+  }
+}
+
+def uploadCoreCaseDataDefinitions(env) {
+  dir("${WORKSPACE}/bin"){
+    ccdDefinitionFilePath="${WORKSPACE}/build/ccd-release-config/ccd-unspec-${env}.xlsx"
+    sh """
+    eval \$(./variables/load-${env}-environment-variables.sh)
+    ${WORKSPACE}/civil-unspecified-docker/bin/utils/ccd-import-definition.sh ${ccdDefinitionFilePath}
+  """
+  }
+}
+
 withPipeline(type, product, component) {
   disableLegacyDeployment()
 
@@ -41,6 +61,22 @@ withPipeline(type, product, component) {
   }
 
   after('checkout') {
+    onMaster {
+      withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
+        try {
+          sh '''
+            set -e
+
+            git remote set-url origin $(git config remote.origin.url | sed "s/github.com/${BEARER_TOKEN}@github.com/g")
+
+            git fetch origin demo:demo
+            git push --force origin HEAD:demo
+          '''
+        } catch (err) {
+          notifyBuildEvent channel: '#unspec_notification', color: 'warning', message: 'Failed to update demo branch'
+        }
+      }
+    }
     sh """ git submodule update --init """
   }
 
@@ -58,6 +94,12 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 
+  before('smoketest:aat') {
+    env.URL = "https://manage-case.aat.platform.hmcts.net"
+    archiveCoreCaseDataDefinitions('aat')
+    uploadCoreCaseDataDefinitions('aat')
+  }
+
   after('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
@@ -68,6 +110,16 @@ withPipeline(type, product, component) {
 
   after('smoketest:demo') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
+  before('buildinfra:demo') {
+    def subscription = 'nonprod'
+    withSubscription(subscription) {
+      withTeamSecrets(pipelineConf, 'demo') {
+        archiveCoreCaseDataDefinitions('demo')
+        uploadCoreCaseDataDefinitions('demo')
+      }
+    }
   }
 
 }
