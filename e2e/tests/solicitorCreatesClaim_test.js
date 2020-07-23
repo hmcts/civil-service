@@ -14,3 +14,8 @@ Scenario('Solicitor confirms service', async (I) => {
   await I.confirmService();
   await I.see('updated with event: Confirm service');
 });
+
+Scenario('Solicitor requests extension', async (I) => {
+  await I.requestExtension();
+  await I.see('updated with event: Request extension');
+});

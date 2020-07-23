@@ -11,9 +11,10 @@ module.exports = {
   },
 
   async enterServiceDate() {
-    I.fillField(this.fields.serviceDate.day, '1');
-    I.fillField(this.fields.serviceDate.month, '1');
-    I.fillField(this.fields.serviceDate.year, '2099');
+    const serviceDate = new Date();
+    I.fillField(this.fields.serviceDate.day, serviceDate.getDate());
+    I.fillField(this.fields.serviceDate.month, serviceDate.getMonth() +1);
+    I.fillField(this.fields.serviceDate.year, serviceDate.getFullYear());
 
     await I.clickContinue();
   }

@@ -162,5 +162,32 @@
     "Label": "Response deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionProposedDeadline",
+    "Label": "Proposed new deadline",
+    "HintText": "This can't be later than 28 working days after the current deadline. All deadlines require a response before 4pm on the deadline day.",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionAlreadyAgreed",
+    "Label": "Have you already agreed the new deadline with the claimant's legal representative?",
+    "HintText": "If not, you can propose it using this service.",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionReason",
+    "Label": "Reason why more time is needed.",
+    "HintText": "This is mandatory - the claimant will see your answer.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
   }
 ]
