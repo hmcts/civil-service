@@ -56,6 +56,10 @@ withPipeline(type, product, component) {
   enableAksStagingDeployment()
   enableSlackNotifications('#unspec_notification')
 
+  onMaster {
+    loadVaultSecrets(otherSecrets)
+  }
+
   onPR {
     loadVaultSecrets(otherSecrets)
   }
