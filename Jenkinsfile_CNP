@@ -108,6 +108,10 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 
+  before('functionalTest:aat') {
+    env.SKIP_FUNCTIONAL_TESTS = 'true'
+  }
+
   after('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }

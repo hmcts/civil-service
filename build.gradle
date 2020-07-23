@@ -93,6 +93,12 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
+  onlyIf(new Spec<Task>() {
+    boolean isSatisfiedBy(Task task) {
+      String skipTestsEnvironmentVariable = System.env.SKIP_FUNCTIONAL_TESTS
+      return skipTestsEnvironmentVariable == null || skipTestsEnvironmentVariable == 'false'
+    }
+  })
   commandLine '/usr/bin/yarn', '--silent', 'test:functional'
 }
 
