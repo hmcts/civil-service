@@ -2,6 +2,24 @@ apiVersion: v2
 description: A Helm chart for unspec-service App
 name: unspec-service
 home: https://github.com/hmcts/unspec-service
-version: 1.2.0
+version: 1.2.1
 maintainers:
   - name: HMCTS Unspecified team
+
+dependencies:
+  - name: java
+    version: 3.0.0
+    repository: '@hmctspublic'
+  - name: ccd
+    version: 4.3.3
+    repository: '@hmctspublic'
+    tags:
+      - unspec-ccd-stack
+  - name: xui-webapp
+    version: ~0.2.1
+    repository: '@hmctspublic'
+    condition: xui-webapp.enabled
+  - name: idam-pr
+    version: ~2.2.3
+    repository: '@hmctspublic'
+    condition: idam-pr.enabled
