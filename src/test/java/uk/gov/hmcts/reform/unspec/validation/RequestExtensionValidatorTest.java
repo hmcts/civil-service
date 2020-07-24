@@ -12,8 +12,8 @@ import java.util.List;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 
 @SpringBootTest(classes = {RequestExtensionValidator.class, JacksonAutoConfiguration.class})
 class RequestExtensionValidatorTest {

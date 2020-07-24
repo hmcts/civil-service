@@ -34,3 +34,5 @@ java:
       secrets:
         - unspec-idam-client-secret
         - microservicekey-unspec-service
+        - system-update-user-username
+        - system-update-user-password

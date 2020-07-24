@@ -46,5 +46,18 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "N",
     "EndButtonLabel": "Ask for extension"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "MOVE_TO_STAYED",
+    "Name": "Move case to stayed",
+    "Description": "Moves a case to stayed state",
+    "DisplayOrder": 4,
+    "PreConditionState(s)": "CREATED",
+    "PostConditionState": "STAYED",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
   }
 ]

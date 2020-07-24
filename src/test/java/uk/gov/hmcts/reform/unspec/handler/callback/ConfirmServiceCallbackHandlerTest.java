@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.handler;
+package uk.gov.hmcts.reform.unspec.handler.callback;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

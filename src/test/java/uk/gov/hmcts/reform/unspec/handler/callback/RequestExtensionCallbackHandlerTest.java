@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.handler;
+package uk.gov.hmcts.reform.unspec.handler.callback;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,11 +21,11 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.ALREADY_AGREED;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.EXTENSION_ALREADY_AGREED;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.NOT_AGREED;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
-import static uk.gov.hmcts.reform.unspec.handler.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.ALREADY_AGREED;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.EXTENSION_ALREADY_AGREED;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.NOT_AGREED;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
