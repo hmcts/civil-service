@@ -1,10 +1,12 @@
 #!groovy
 
 @Library("Infrastructure")
+import uk.gov.hmcts.contino.AppPipelineConfig
 
 def type = "java"
 def product = "unspec"
 def component = "service"
+AppPipelineConfig pipelineConf;
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -51,6 +53,7 @@ def uploadCoreCaseDataDefinitions(env) {
 }
 
 withPipeline(type, product, component) {
+  pipelineConf = config;
   disableLegacyDeployment()
 
   enableAksStagingDeployment()
@@ -129,5 +132,4 @@ withPipeline(type, product, component) {
       }
     }
   }
-
 }
