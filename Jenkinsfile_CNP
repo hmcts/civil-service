@@ -16,7 +16,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
-def otherSecrets = [
+def secrets = [
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
     secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
@@ -59,13 +59,13 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#unspec_notification')
 
   onPR {
-    loadVaultSecrets(otherSecrets)
+    loadVaultSecrets(secrets)
   }
   onMaster {
-    loadVaultSecrets(otherSecrets)
+    loadVaultSecrets(secrets)
   }
   onDemo {
-    loadVaultSecrets(serviceSecrets + otherSecrets)
+    loadVaultSecrets(secrets)
   }
 
   after('checkout') {
@@ -114,10 +114,6 @@ withPipeline(type, product, component) {
 
   after('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  before('functionalTest:aat') {
-    env.SKIP_FUNCTIONAL_TESTS = 'true'
   }
 
   before('buildinfra:demo') {
