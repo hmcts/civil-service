@@ -1,6 +1,12 @@
 server:
   port: 4000
 
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
 management:
   health:
     probes:

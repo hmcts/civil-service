@@ -55,16 +55,17 @@ def uploadCoreCaseDataDefinitions(env) {
 withPipeline(type, product, component) {
   pipelineConf = config;
   disableLegacyDeployment()
-
   enableAksStagingDeployment()
   enableSlackNotifications('#unspec_notification')
 
+  onPR {
+    loadVaultSecrets(otherSecrets)
+  }
   onMaster {
     loadVaultSecrets(otherSecrets)
   }
-
-  onPR {
-    loadVaultSecrets(otherSecrets)
+  onDemo {
+    loadVaultSecrets(serviceSecrets + otherSecrets)
   }
 
   after('checkout') {
@@ -97,6 +98,10 @@ withPipeline(type, product, component) {
     env.URL="https://xui-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
+  after('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
@@ -115,14 +120,6 @@ withPipeline(type, product, component) {
     env.SKIP_FUNCTIONAL_TESTS = 'true'
   }
 
-  after('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  after('smoketest:demo') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
   before('buildinfra:demo') {
     def subscription = 'nonprod'
     withSubscription(subscription) {
@@ -131,5 +128,9 @@ withPipeline(type, product, component) {
         uploadCoreCaseDataDefinitions('demo')
       }
     }
+  }
+
+  after('smoketest:demo') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 }
