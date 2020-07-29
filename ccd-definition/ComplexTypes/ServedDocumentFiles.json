@@ -1,0 +1,54 @@
+[
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "## Content TBC",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "particularsOfClaim",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Particulars of claim",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "medicalReports",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Medical reports",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "scheduleOfLoss",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Schedule of loss",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Certificate of suitability",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "other",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Other documents",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  }
+]

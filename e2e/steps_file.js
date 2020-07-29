@@ -22,6 +22,10 @@ const serviceDatePage = require('./pages/confirmService/serviceDate.page');
 const proposeDeadline = require('./pages/requestExtension/proposeDeadline.page');
 const extensionAlreadyAgreed = require('./pages/requestExtension/extensionAlreadyAgreed.page');
 
+const respondToExtensionPage = require('./pages/respondExtension/respond.page');
+const counterExtensionPage = require('./pages/respondExtension/counter.page');
+const rejectionReasonPage = require('./pages/respondExtension/reason.page');
+
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
 
@@ -93,6 +97,18 @@ module.exports = function() {
       this.see('You asked for extra time to respond');
       this.click('Close and Return to case details');
       this.waitForElement('exui-alert');
+    },
+
+    async respondToExtension() {
+      await caseViewPage.startEvent('Respond to extension request');
+      await respondToExtensionPage.selectDoNotAccept();
+      await counterExtensionPage.enterCounterDate();
+      await rejectionReasonPage.enterResponse();
+
+      await this.retryUntilExists(() => this.click('Respond to request'), 'ccd-markdown');
+      this.see('You\'ve responded to the request for more time');
+      await this.retryUntilExists(() => this.click('Close and Return to case details'),
+        locate('exui-alert').withText('updated with event: Respond to extension request'));
     },
 
     async clickContinue() {

@@ -189,5 +189,46 @@
     "HintText": "This is mandatory - the claimant will see your answer.",
     "FieldType": "TextArea",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionLabel4pm",
+    "Label": "All deadlines require a response before 4pm on the deadline day",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionAccepted",
+    "Label": "Do you agree to extend the deadline to this date?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionCounter",
+    "Label": "Would you like to set a different extended deadline?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionCounterDate",
+    "Label": "New deadline",
+    "HintText": "This can't be later than 28 working days after the current deadline. All deadlines require a response before 4pm on the deadline day.",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1claimResponseExtensionRejectionReason",
+    "Label": "Add a response",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
   }
 ]

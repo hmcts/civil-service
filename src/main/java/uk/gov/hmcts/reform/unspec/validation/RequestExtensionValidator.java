@@ -23,31 +23,38 @@ public class RequestExtensionValidator {
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0);
     private final ObjectMapper mapper;
 
+    public List<String> validateProposedDeadline(LocalDate dateToValidate,  LocalDateTime responseDeadline) {
+        if (dateToValidate == null) {
+            return ImmutableList.of("The proposed deadline must be provided");
+        }
+
+        if (!dateToValidate.isAfter(now())) {
+            return ImmutableList.of("The proposed deadline must be a date in the future");
+        }
+
+        if (!dateToValidate.isAfter(responseDeadline.toLocalDate())) {
+            return ImmutableList.of("The proposed deadline must be after the current deadline");
+        }
+
+        if (LocalDateTime.of(dateToValidate, END_OF_BUSINESS_DAY).isAfter(responseDeadline.plusDays(28))) {
+            return ImmutableList.of("The proposed deadline cannot be more than 28 days after the current deadline");
+        }
+
+        return emptyList();
+    }
+
     public List<String> validateProposedDeadline(CaseDetails caseDetails) {
         LocalDate proposedDeadline = mapper.convertValue(
             caseDetails.getData().get(PROPOSED_DEADLINE),
             LocalDate.class
         );
 
-        if (proposedDeadline == null) {
-            return ImmutableList.of("The proposed deadline must be provided");
-        }
-
-        if (!proposedDeadline.isAfter(now())) {
-            return ImmutableList.of("The proposed deadline must be a date in the future");
-        }
-
         LocalDateTime responseDeadline = mapper.convertValue(
             caseDetails.getData().get(RESPONSE_DEADLINE),
             LocalDateTime.class
         );
-        if (!proposedDeadline.isAfter(responseDeadline.toLocalDate())) {
-            return ImmutableList.of("The proposed deadline must be after the current deadline");
-        }
-        if (LocalDateTime.of(proposedDeadline, END_OF_BUSINESS_DAY).isAfter(responseDeadline.plusDays(28))) {
-            return ImmutableList.of("The proposed deadline cannot be more than 28 days after the current deadline");
-        }
-        return emptyList();
+
+        return validateProposedDeadline(proposedDeadline, responseDeadline);
     }
 
     public List<String> validateAlreadyRequested(CaseDetails caseDetails) {

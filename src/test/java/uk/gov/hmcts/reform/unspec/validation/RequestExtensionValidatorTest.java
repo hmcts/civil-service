@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -63,7 +65,7 @@ class RequestExtensionValidatorTest {
         }
 
         @Test
-        void shouldReturnError_whenProposedDeadlineInIsNotInFuture() {
+        void shouldReturnError_whenProposedDeadlineIsNotInFuture() {
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(of(PROPOSED_DEADLINE, now(),
                          RESPONSE_DEADLINE, now().atTime(16, 0)
@@ -72,12 +74,11 @@ class RequestExtensionValidatorTest {
 
             List<String> errors = validator.validateProposedDeadline(caseDetails);
 
-            assertThat(errors)
-                .containsOnly("The proposed deadline must be a date in the future");
+            assertThat(errors).containsOnly("The proposed deadline must be a date in the future");
         }
 
         @Test
-        void shouldReturnError_whenProposedDeadlineInIsSameAsResponseDeadline() {
+        void shouldReturnError_whenProposedDeadlineIsSameAsResponseDeadline() {
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(of(PROPOSED_DEADLINE, now().plusDays(5),
                          RESPONSE_DEADLINE, now().plusDays(5).atTime(16, 0)
@@ -86,12 +87,11 @@ class RequestExtensionValidatorTest {
 
             List<String> errors = validator.validateProposedDeadline(caseDetails);
 
-            assertThat(errors)
-                .containsOnly("The proposed deadline must be after the current deadline");
+            assertThat(errors).containsOnly("The proposed deadline must be after the current deadline");
         }
 
         @Test
-        void shouldReturnError_whenProposedDeadlineInIsBeforeResponseDeadline() {
+        void shouldReturnError_whenProposedDeadlineIsBeforeResponseDeadline() {
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(of(PROPOSED_DEADLINE, now().plusDays(4),
                          RESPONSE_DEADLINE, now().plusDays(5).atTime(16, 0)
@@ -100,8 +100,17 @@ class RequestExtensionValidatorTest {
 
             List<String> errors = validator.validateProposedDeadline(caseDetails);
 
-            assertThat(errors)
-                .containsOnly("The proposed deadline must be after the current deadline");
+            assertThat(errors).containsOnly("The proposed deadline must be after the current deadline");
+        }
+
+        @Test
+        void shouldReturnNoErrors_whenIndividualDates() {
+            LocalDate proposedDeadline = now().plusDays(14);
+            LocalDateTime responseDeadline = now().plusDays(7).atTime(16, 0);
+
+            List<String> errors = validator.validateProposedDeadline(proposedDeadline, responseDeadline);
+
+            assertThat(errors).isEmpty();
         }
     }
 

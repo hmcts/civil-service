@@ -19,3 +19,8 @@ Scenario('Solicitor requests extension', async (I) => {
   await I.requestExtension();
   await I.see('updated with event: Request extension');
 });
+
+Scenario('Solicitor reponds to extension request', async (I) => {
+  await I.respondToExtension();
+  await I.see('updated with event: Respond to extension request');
+});

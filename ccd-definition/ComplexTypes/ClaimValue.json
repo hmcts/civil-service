@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "Your fee will be calculated based on the higher value.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "lowerValue",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Lower value",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "higherValue",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Higher value",
+    "SecurityClassification": "Public"
+  }
+]
