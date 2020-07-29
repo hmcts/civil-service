@@ -17,7 +17,6 @@ module.exports = {
 
   async uploadServedDocuments(file) {
     I.waitForElement(this.fields.servedDocumentFiles.id);
-
     for (const fileType of this.fields.servedDocumentFiles.options) {
       await within(fileType, async () => {
         I.click('Add new');

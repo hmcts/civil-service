@@ -19,6 +19,7 @@ module.exports = {
   },
 
   async enterServedDocuments() {
+    I.waitForElement(this.fields.servedDocuments.id);
     await within(this.fields.servedDocuments.id, () => {
       I.click(this.fields.servedDocuments.options.responsePack);
       I.click(this.fields.servedDocuments.options.medicalReports);

@@ -7,6 +7,7 @@ module.exports = {
   },
 
   async enterCourt() {
+      I.waitForElement(this.fields.courtLocation);
       I.fillField(this.fields.courtLocation, 'London High Court');
       await I.clickContinue();
   }

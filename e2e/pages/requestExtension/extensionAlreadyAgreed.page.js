@@ -14,6 +14,7 @@ module.exports = {
   },
 
   async selectAlreadyAgreed () {
+    I.waitForElement(this.fields.extensionAlreadyAgreed.id);
     await within(this.fields.extensionAlreadyAgreed.id, () => {
       I.click(this.fields.extensionAlreadyAgreed.options.no);
     });

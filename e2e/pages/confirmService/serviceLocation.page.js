@@ -14,6 +14,7 @@ module.exports = {
   },
 
   async selectUsualResidence() {
+    I.waitForElement(this.fields.serviceLocation.id);
     await within(this.fields.serviceLocation.id, () => {
       I.click(this.fields.serviceLocation.options.usualResidence);
     });

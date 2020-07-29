@@ -10,6 +10,7 @@ module.exports = {
   },
 
   async enterNameAndRole(fieldID = '', name = 'John Smith', role = 'Solicitor') {
+    I.waitForElement(this.fields(fieldID).name);
     I.fillField(this.fields(fieldID).name, name);
     I.fillField(this.fields(fieldID).role, role);
     await I.clickContinue();

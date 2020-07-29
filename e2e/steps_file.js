@@ -45,6 +45,7 @@ module.exports = function() {
     },
 
     grabCaseNumber: async function () {
+      this.waitForElement('ccd-case-header > h1');
       let caseNumber = await this.grabTextFrom('ccd-case-header > h1');
 
       caseNumber = caseNumber.split('-').join('');
@@ -63,10 +64,10 @@ module.exports = function() {
       await claimTypePage.selectClaimType();
       await claimValuePage.enterClaimValue();
       await statementOfTruth.enterNameAndRole('claim');
+      this.waitForText('Issue claim');
       await this.retryUntilExists(() => this.click('Issue claim'), 'ccd-markdown');
       this.see('Your claim has been issued');
-      await this.retryUntilExists(() =>
-        this.click('Close and Return to case details'), locate('ccd-case-header > h1'));
+      this.click('Close and Return to case details');
     },
 
     async confirmService() {
@@ -79,8 +80,8 @@ module.exports = function() {
       await statementOfTruth.enterNameAndRole('service');
       await this.retryUntilExists(() => this.click('Confirm service'), 'ccd-markdown');
       this.see('You\'ve confirmed service');
-      await this.retryUntilExists(() => this.click('Close and Return to case details'),
-        locate('exui-alert').withText('updated with event: Confirm service'));
+      this.click('Close and Return to case details');
+      this.waitForElement('exui-alert');
     },
 
     async requestExtension() {
@@ -91,6 +92,7 @@ module.exports = function() {
       await this.retryUntilExists(() => this.click('Ask for extension'), 'ccd-markdown');
       this.see('You asked for extra time to respond');
       this.click('Close and Return to case details');
+      this.waitForElement('exui-alert');
     },
 
     async clickContinue() {

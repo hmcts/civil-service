@@ -11,6 +11,7 @@ module.exports = {
   },
 
   async enterServiceDate() {
+    I.waitForElement(this.fields.serviceDate.day);
     const serviceDate = new Date();
     I.fillField(this.fields.serviceDate.day, serviceDate.getDate());
     I.fillField(this.fields.serviceDate.month, serviceDate.getMonth() +1);

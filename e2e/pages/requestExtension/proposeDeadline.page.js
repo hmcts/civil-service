@@ -11,6 +11,7 @@ module.exports = {
   },
 
   async enterExtensionProposedDeadline () {
+    I.waitForElement(this.fields.extensionProposedDeadline.day);
     const proposedDeadline = new Date();
     proposedDeadline.setDate(proposedDeadline.getDate() + 28);
     I.fillField(this.fields.extensionProposedDeadline.day, proposedDeadline.getDate());

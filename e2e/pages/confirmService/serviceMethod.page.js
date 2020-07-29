@@ -16,6 +16,7 @@ module.exports = {
   },
 
   async selectPostMethod() {
+    I.waitForElement(this.fields.serviceMethod.id);
     await within(this.fields.serviceMethod.id, () => {
       I.click(this.fields.serviceMethod.options.post);
     });
