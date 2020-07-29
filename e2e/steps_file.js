@@ -32,7 +32,7 @@ const party = require('./fragments/party');
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
 
-module.exports = function() {
+module.exports = function () {
   return actor({
     // Define custom steps here, use 'this' to access default methods of I.
     // It is recommended to place a general 'login' function here.
@@ -82,6 +82,8 @@ module.exports = function() {
       await serviceLocationPage.selectUsualResidence();
       await serviceDatePage.enterServiceDate();
       await statementOfTruth.enterNameAndRole('service');
+
+      this.waitForText('Confirm service');
       await this.retryUntilExists(() => this.click('Confirm service'), 'ccd-markdown');
       this.see('You\'ve confirmed service');
       this.click('Close and Return to case details');
@@ -93,6 +95,7 @@ module.exports = function() {
       await proposeDeadline.enterExtensionProposedDeadline();
       await extensionAlreadyAgreed.selectAlreadyAgreed();
 
+      this.waitForText('Ask for extension');
       await this.retryUntilExists(() => this.click('Ask for extension'), 'ccd-markdown');
       this.see('You asked for extra time to respond');
       this.click('Close and Return to case details');
@@ -105,6 +108,7 @@ module.exports = function() {
       await counterExtensionPage.enterCounterDate();
       await rejectionReasonPage.enterResponse();
 
+      this.waitForText('Respond to request');
       await this.retryUntilExists(() => this.click('Respond to request'), 'ccd-markdown');
       this.see('You\'ve responded to the request for more time');
       await this.retryUntilExists(() => this.click('Close and Return to case details'),

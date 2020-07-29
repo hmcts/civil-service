@@ -1,4 +1,4 @@
-const { I } = inject();
+const {I} = inject();
 
 module.exports = {
 
@@ -7,9 +7,9 @@ module.exports = {
   },
 
   async enterCourt() {
-      I.waitForElement(this.fields.courtLocation);
-      I.fillField(this.fields.courtLocation, 'London High Court');
-      await I.clickContinue();
+    I.waitForElement(this.fields.courtLocation);
+    I.fillField(this.fields.courtLocation, 'London High Court');
+    await I.clickContinue();
   }
 };
 

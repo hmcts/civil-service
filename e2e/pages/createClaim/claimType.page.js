@@ -1,4 +1,4 @@
-const { I } = inject();
+const {I} = inject();
 
 module.exports = {
 
@@ -7,9 +7,9 @@ module.exports = {
   },
 
   async selectClaimType() {
-      I.waitForElement(this.fields.claimType);
-      I.selectOption(this.fields.claimType, 'Personal injury - road accident');
-      await I.clickContinue();
+    I.waitForElement(this.fields.claimType);
+    I.selectOption(this.fields.claimType, 'Personal injury - road accident');
+    await I.clickContinue();
   }
 };
 

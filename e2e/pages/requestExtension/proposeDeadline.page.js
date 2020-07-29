@@ -1,23 +1,17 @@
-const { I } = inject();
+const {I} = inject();
+
+const date = require('../../fragments/date');
 
 module.exports = {
 
   fields: {
     extensionProposedDeadline: {
-      day: '#respondentSolicitor1claimResponseExtensionProposedDeadline-day',
-      month: '#respondentSolicitor1claimResponseExtensionProposedDeadline-month',
-      year: '#respondentSolicitor1claimResponseExtensionProposedDeadline-year'
+      id: 'respondentSolicitor1claimResponseExtensionProposedDeadline',
     }
   },
 
-  async enterExtensionProposedDeadline () {
-    I.waitForElement(this.fields.extensionProposedDeadline.day);
-    const proposedDeadline = new Date();
-    proposedDeadline.setDate(proposedDeadline.getDate() + 28);
-    I.fillField(this.fields.extensionProposedDeadline.day, proposedDeadline.getDate());
-    I.fillField(this.fields.extensionProposedDeadline.month, proposedDeadline.getMonth() + 1);
-    I.fillField(this.fields.extensionProposedDeadline.year, proposedDeadline.getFullYear());
-
+  async enterExtensionProposedDeadline() {
+    await date.enterDate(this.fields.extensionProposedDeadline.id);
     await I.clickContinue();
   }
 };

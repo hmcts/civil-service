@@ -18,6 +18,7 @@ module.exports = {
   },
 
   async enterCounterDate() {
+    I.waitForElement(this.fields.extensionCounter.id);
     await within(this.fields.extensionCounter.id, () => {
       I.click(this.fields.extensionCounter.options.yes);
     });

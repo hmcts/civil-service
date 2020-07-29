@@ -1,4 +1,4 @@
-const { I } = inject();
+const {I} = inject();
 
 module.exports = {
 
@@ -13,7 +13,7 @@ module.exports = {
     extensionReason: '#respondentSolicitor1claimResponseExtensionReason'
   },
 
-  async selectAlreadyAgreed () {
+  async selectAlreadyAgreed() {
     I.waitForElement(this.fields.extensionAlreadyAgreed.id);
     await within(this.fields.extensionAlreadyAgreed.id, () => {
       I.click(this.fields.extensionAlreadyAgreed.options.no);

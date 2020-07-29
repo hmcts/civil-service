@@ -7,6 +7,7 @@ module.exports = {
   },
 
   async enterResponse() {
+    I.waitForElement(this.fields.extensionResponse);
     I.fillField(this.fields.extensionResponse, 'Response to extension');
     await I.clickContinue();
   }
