@@ -50,10 +50,8 @@ module.exports = function () {
 
     grabCaseNumber: async function () {
       this.waitForElement('ccd-case-header > h1');
-      let caseNumber = await this.grabTextFrom('ccd-case-header > h1');
 
-      caseNumber = caseNumber.split('-').join('');
-      return caseNumber;
+      return await this.grabTextFrom('ccd-case-header > h1');
     },
 
     async createCase() {
@@ -87,7 +85,7 @@ module.exports = function () {
       await this.retryUntilExists(() => this.click('Confirm service'), 'ccd-markdown');
       this.see('You\'ve confirmed service');
       this.click('Close and Return to case details');
-      this.waitForElement('exui-alert');
+      this.waitForElement('ccd-case-header > h1');
     },
 
     async requestExtension() {
@@ -99,7 +97,7 @@ module.exports = function () {
       await this.retryUntilExists(() => this.click('Ask for extension'), 'ccd-markdown');
       this.see('You asked for extra time to respond');
       this.click('Close and Return to case details');
-      this.waitForElement('exui-alert');
+      this.waitForElement('ccd-case-header > h1');
     },
 
     async respondToExtension() {
@@ -111,8 +109,8 @@ module.exports = function () {
       this.waitForText('Respond to request');
       await this.retryUntilExists(() => this.click('Respond to request'), 'ccd-markdown');
       this.see('You\'ve responded to the request for more time');
-      await this.retryUntilExists(() => this.click('Close and Return to case details'),
-        locate('exui-alert').withText('updated with event: Respond to extension request'));
+      this.click('Close and Return to case details');
+      this.waitForElement('ccd-case-header > h1');
     },
 
     async clickContinue() {

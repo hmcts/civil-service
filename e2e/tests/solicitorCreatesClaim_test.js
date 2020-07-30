@@ -1,27 +1,29 @@
 const config = require('../config.js');
 
+let caseNumber;
+const caseEventMessage = eventName => `Case ${caseNumber} has been updated with event: ${eventName}`;
+
 Feature('Claim creation');
 
 Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.login(config.solicitorUser);
   await I.createCase();
 
-  let caseNumber = await I.grabCaseNumber();
-  await I.see('Case ' + caseNumber + ' has been created.');
+  caseNumber = await I.grabCaseNumber();
+  await I.see(`Case ${caseNumber.split('-').join('')} has been created.`);
 });
 
 Scenario('Solicitor confirms service', async (I) => {
   await I.confirmService();
-  await I.waitForElement(locate('exui-alert').withText('updated with event: Confirm service'));
+  await I.see(caseEventMessage('Confirm service'));
 });
 
 Scenario('Solicitor requests extension', async (I) => {
   await I.requestExtension();
-  await I.waitForElement(locate('exui-alert').withText('updated with event: Request extension'));
+  await I.see(caseEventMessage('Request extension'));
 });
 
-//TODO: enable after fixing master build
-xScenario('Solicitor reponds to extension request', async (I) => {
+Scenario('Solicitor reponds to extension request', async (I) => {
   await I.respondToExtension();
-  await I.waitForElement(locate('exui-alert').withText('updated with event: Respond to extension request'));
+  await I.see(caseEventMessage('Respond to extension request'));
 });
