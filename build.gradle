@@ -250,7 +250,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.37'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.4'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.4'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.6'
 
   compile group: 'uk.gov.hmcts.reform', name: 'fees-java-client', version: '0.0.6'
   compile group: 'uk.gov.hmcts.reform', name: 'payments-client', version: '1.0.0'
