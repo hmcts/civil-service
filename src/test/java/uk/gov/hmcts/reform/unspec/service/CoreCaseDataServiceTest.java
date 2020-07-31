@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service;
 
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.unspec.model.search.Query;
 
 import java.util.List;
 import java.util.Map;
@@ -108,18 +110,18 @@ class CoreCaseDataServiceTest {
 
         @Test
         void shouldReturnCases_WhenSearchingCasesAsSystemUpdateUser() {
-            String query = "query";
+            Query query = new Query(QueryBuilders.matchQuery("field", "value"), List.of(), 0);
 
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
 
-            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query))
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString()))
                 .thenReturn(searchResult);
 
             List<CaseDetails> casesFound = service.searchCases(query).getCases();
 
             assertThat(casesFound).isEqualTo(cases);
-            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
+            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString());
             verify(idamClient).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         }
     }

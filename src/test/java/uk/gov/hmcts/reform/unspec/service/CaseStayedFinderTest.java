@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.event.MoveCaseToStayedEvent;
+import uk.gov.hmcts.reform.unspec.service.search.CaseStayedSearchService;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ class CaseStayedFinderTest {
     private JobExecutionContext jobExecutionContext;
 
     @Mock
-    private CaseSearchService caseSearchService;
+    private CaseStayedSearchService searchService;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -57,7 +58,7 @@ class CaseStayedFinderTest {
                                                     .data(data)
                                                     .build());
 
-        when(caseSearchService.getCasesToBeStayed()).thenReturn(caseDetails);
+        when(searchService.getCases()).thenReturn(caseDetails);
 
         caseStayedFinder.execute(jobExecutionContext);
 
@@ -66,7 +67,7 @@ class CaseStayedFinderTest {
 
     @Test
     void shouldNotEmitMoveCaseToStayedEvent_WhenNoCasesFound() {
-        when(caseSearchService.getCasesToBeStayed()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(List.of());
 
         caseStayedFinder.execute(jobExecutionContext);
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.event.MoveCaseToStayedEvent;
+import uk.gov.hmcts.reform.unspec.service.search.CaseStayedSearchService;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CaseStayedFinder implements Job {
 
-    private final CaseSearchService caseSearchService;
+    private final CaseStayedSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -23,7 +24,7 @@ public class CaseStayedFinder implements Job {
         final String jobName = context.getJobDetail().getKey().getName();
         log.info("Job {} started", jobName);
 
-        List<CaseDetails> cases = caseSearchService.getCasesToBeStayed();
+        List<CaseDetails> cases = caseSearchService.getCases();
 
         log.info("Job '{}' found {} case(s)", jobName, cases.size());
 
