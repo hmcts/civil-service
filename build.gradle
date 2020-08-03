@@ -268,7 +268,7 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation 'org.mockito:mockito-inline:3.4.4'
+  testImplementation 'org.mockito:mockito-inline:3.4.6'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
