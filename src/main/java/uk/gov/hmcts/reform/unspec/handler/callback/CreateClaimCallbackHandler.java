@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
+import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,13 +36,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final String responsePackLink;
+    private final ReferenceNumberRepository referenceNumberRepository;
 
+    @Autowired
     public CreateClaimCallbackHandler(
         ObjectMapper mapper,
-        @Value("${unspecified.response-pack-url}") String responsePackLink
+        @Value("${unspecified.response-pack-url}") String responsePackLink,
+        ReferenceNumberRepository referenceNumberRepository
     ) {
         this.mapper = mapper;
         this.responsePackLink = responsePackLink;
+        this.referenceNumberRepository = referenceNumberRepository;
     }
 
     @Override
@@ -81,6 +87,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private AboutToStartOrSubmitCallbackResponse addIssuedDate(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         data.put("claimIssuedDate", LocalDate.now());
+        data.put("legacyReferenceNumber", referenceNumberRepository.getReferenceNumber());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                    .data(data)
