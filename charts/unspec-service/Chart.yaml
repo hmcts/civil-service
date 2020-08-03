@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for unspec-service App
 name: unspec-service
 home: https://github.com/hmcts/unspec-service
-version: 1.2.6
+version: 1.2.7
 maintainers:
   - name: HMCTS Unspecified team
 
