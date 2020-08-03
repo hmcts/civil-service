@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.config;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,9 @@ import javax.sql.DataSource;
 @ConditionalOnProperty("reference.database.enabled")
 public class DatabaseConfiguration {
 
+    @Value("${reference.database.migration}")
+    public String performDbMigration;
+
     @Bean
     @Primary
     @ConfigurationProperties("spring.datasource")
@@ -36,7 +40,9 @@ public class DatabaseConfiguration {
     @Bean
     public TransactionAwareDataSourceProxy dataSourceProxy(DataSource dataSource) {
         TransactionAwareDataSourceProxy dataSourceProxy = new TransactionAwareDataSourceProxy(dataSource);
-        migrateFlyway(dataSourceProxy);
+        if (Boolean.parseBoolean(performDbMigration)) {
+            migrateFlyway(dataSourceProxy);
+        }
         return dataSourceProxy;
     }
 

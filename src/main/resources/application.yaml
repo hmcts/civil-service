@@ -71,6 +71,7 @@ core_case_data:
 reference:
   database:
     enabled: true
+    migration: false
 
 ---
 
@@ -97,7 +98,9 @@ idam:
     id: unspec
     redirect_uri: https://localhost:9000/oauth2/callback
     secret: OOOOOOOOOOOOOOOO
-
+reference:
+  database:
+    migration: true
 ---
 
 spring:
