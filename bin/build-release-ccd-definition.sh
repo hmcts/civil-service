@@ -22,6 +22,7 @@ release_definition_output_file=${build_dir}/ccd-unspec-${environment}.xlsx
 
 mkdir -p ${build_dir}
 
+$(${root_dir}/bin/variables/load-${environment}-environment-variables.sh)
+
 # build the ccd definition file
-export CCD_DEF_CASE_SERVICE_BASE_URL=http://unspec-service-${environment}.service.core-compute-${environment}.internal
 ${root_dir}/civil-unspecified-docker/bin/utils/process-definition.sh ${config_dir} ${release_definition_output_file} "${excludedFilenamePatterns}"
