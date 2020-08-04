@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for unspec-service App
 name: unspec-service
 home: https://github.com/hmcts/unspec-service
-version: 1.2.7
+version: 1.2.8
 maintainers:
   - name: HMCTS Unspecified team
 
@@ -23,7 +23,3 @@ dependencies:
     version: ~2.2.3
     repository: '@hmctspublic'
     condition: idam-pr.enabled
-  - name: postgresql
-    version: 8.9.8
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled

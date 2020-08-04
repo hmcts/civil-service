@@ -21,11 +21,6 @@ spring:
     cache-names: userInfoCache
     caffeine:
       spec: expireAfterAccess=3600s
-  datasource:
-    driverClassName: org.postgresql.Driver
-    username: ${CMC_DB_USERNAME:-}
-    password: ${CMC_DB_PASSWORD:-}
-    url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
 
   security:
     oauth2:
@@ -37,8 +32,7 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
-  flyway:
-    enabled: ${REFERENCE_DATABASE_MIGRATION:true}
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -69,10 +63,6 @@ unspecified:
 core_case_data:
   api:
     url: http://localhost:4452
-reference:
-  database:
-    enabled: true
-    migration: false
 
 ---
 
@@ -131,7 +121,3 @@ idam:
 core_case_data:
   api:
     url: http://fake-ccd-data-store-api
-
-reference:
-  database:
-    enabled: false

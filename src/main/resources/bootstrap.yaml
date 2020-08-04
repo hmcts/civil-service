@@ -9,4 +9,3 @@ spring:
         system-update-user-password: unspecified.system-update.password
         system-update-user-username: unspecified.system-update.username
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
-        cmc-db-password: CMC_DB_PASSWORD

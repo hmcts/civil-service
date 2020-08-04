@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
-import uk.gov.hmcts.reform.unspec.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 
 import java.math.BigDecimal;
@@ -26,11 +25,7 @@ import static uk.gov.hmcts.reform.unspec.enums.ClaimType.PERSONAL_INJURY_WORK;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
-@SpringBootTest(classes = {
-    CreateClaimCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    MockDatabaseConfiguration.class},
-    properties = {"reference.database.enabled=false"})
+@SpringBootTest(classes = {CreateClaimCallbackHandler.class, JacksonAutoConfiguration.class})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired

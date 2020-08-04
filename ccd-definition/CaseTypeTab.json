@@ -8,15 +8,5 @@
     "TabDisplayOrder": 1,
     "CaseFieldID": "caseHistory",
     "TabFieldDisplayOrder": 1
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "Channel": "CaseWorker",
-    "TabID": "ClaimDetails",
-    "TabLabel": "Claim Details",
-    "TabDisplayOrder": 2,
-    "CaseFieldID": "legacyReferenceNumber",
-    "TabFieldDisplayOrder": 1
   }
 ]
