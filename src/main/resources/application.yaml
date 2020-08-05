@@ -54,6 +54,13 @@ idam:
   s2s-auth:
     microservice: unspec-service
 
+bankHolidays:
+  api:
+    url: https://www.gov.uk
+
+nonworking-days:
+  datafile: /data/non-working_days.dat
+
 unspecified:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
   system-update:
