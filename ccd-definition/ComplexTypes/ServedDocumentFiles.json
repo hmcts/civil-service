@@ -3,7 +3,7 @@
     "ID": "ServedDocumentFiles",
     "ListElementCode": "label",
     "FieldType": "Label",
-    "ElementLabel": "## Content TBC",
+    "ElementLabel": "Upload any documents that you have sent to the defendant.\n\nFiles must be a maximum size of 10MB and in the following format: pdf, doc,docx,jpg,jpeg, png, xls or xlsx.",
     "SecurityClassification": "Public"
   },
   {
