@@ -16,6 +16,8 @@ public class CallbackTypeTest {
             .isEqualTo(CallbackType.ABOUT_TO_SUBMIT);
         assertThat(CallbackType.fromValue("submitted"))
             .isEqualTo(CallbackType.SUBMITTED);
+        assertThat(CallbackType.fromValue("mid-secondary"))
+            .isEqualTo(CallbackType.MID_SECONDARY);
     }
 
     @Test
