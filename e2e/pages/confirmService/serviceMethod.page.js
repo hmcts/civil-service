@@ -4,7 +4,7 @@ module.exports = {
 
   fields: {
     serviceMethod: {
-      id: '#serviceMethod',
+      id: '#serviceMethod_serviceMethod',
       options: {
         post: 'First class post',
         dx: 'Document exchange',

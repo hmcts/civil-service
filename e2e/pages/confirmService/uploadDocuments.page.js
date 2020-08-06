@@ -25,7 +25,7 @@ module.exports = {
       });
     }
 
-    await I.retryUntilExists(() => I.clickContinue(), '#serviceMethod');
+    await I.clickContinue();
   },
 };
 

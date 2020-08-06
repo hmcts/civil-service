@@ -1,0 +1,43 @@
+[
+  {
+    "ID": "ServiceMethod",
+    "ListElementCode": "type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ServiceMethod",
+    "ElementLabel": "I served by:",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServiceMethod",
+    "ListElementCode": "dxNumber",
+    "FieldType": "Number",
+    "ElementLabel": "DX number",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "type = \"DOCUMENT_EXCHANGE\""
+  },
+  {
+    "ID": "ServiceMethod",
+    "ListElementCode": "faxNumber",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Fax number",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "type = \"FAX\""
+  },
+  {
+    "ID": "ServiceMethod",
+    "ListElementCode": "email",
+    "FieldType": "Email",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "type = \"EMAIL\""
+  },
+  {
+    "ID": "ServiceMethod",
+    "ListElementCode": "other",
+    "FieldType": "TextArea",
+    "ElementLabel": "Enter the type",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "type = \"OTHER\"",
+    "Max": "100"
+  }
+]

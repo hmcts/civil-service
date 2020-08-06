@@ -119,8 +119,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "serviceMethod",
     "Label": "How did you serve the documents?",
-    "FieldType": "FixedRadioList",
-    "FieldTypeParameter": "ServiceMethod",
+    "FieldType": "ServiceMethod",
     "SecurityClassification": "Public"
   },
   {
@@ -137,6 +136,14 @@
     "ID": "serviceDate",
     "Label": "When did you serve the documents?",
     "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "serviceDateAndTime",
+    "Label": "When did you serve the documents?",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
   {

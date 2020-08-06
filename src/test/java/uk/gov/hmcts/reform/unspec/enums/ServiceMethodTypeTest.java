@@ -11,14 +11,14 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-class ServiceMethodTest {
+class ServiceMethodTypeTest {
 
     @Nested
     class ExpectedDays {
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"POST", "DOCUMENT_EXCHANGE", "FAX", "EMAIL", "OTHER"})
-        void shouldReturnExpectedDays_whenTimeIsBefore4pm(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"POST", "DOCUMENT_EXCHANGE", "FAX", "EMAIL", "OTHER"})
+        void shouldReturnExpectedDays_whenTimeIsBefore4pm(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atStartOfDay()))
@@ -26,8 +26,8 @@ class ServiceMethodTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"POST", "DOCUMENT_EXCHANGE", "FAX", "EMAIL", "OTHER"})
-        void shouldReturnExpectedDays_whenTimeIs4am(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"POST", "DOCUMENT_EXCHANGE", "FAX", "EMAIL", "OTHER"})
+        void shouldReturnExpectedDays_whenTimeIs4am(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atTime(4, 0)))
@@ -39,8 +39,8 @@ class ServiceMethodTest {
     class PlusOneDay {
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"EMAIL", "FAX"})
-        void shouldReturnPlusOneDays_whenTimeIsAfter4pm(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"EMAIL", "FAX"})
+        void shouldReturnPlusOneDays_whenTimeIsAfter4pm(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atTime(16, 1)))
@@ -48,8 +48,8 @@ class ServiceMethodTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"EMAIL", "FAX"})
-        void shouldReturnPlusOneDays_whenTimeIs4pm(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"EMAIL", "FAX"})
+        void shouldReturnPlusOneDays_whenTimeIs4pm(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atTime(16, 0)))
@@ -61,8 +61,8 @@ class ServiceMethodTest {
     class PlusTwoDays {
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"POST", "DOCUMENT_EXCHANGE", "OTHER"})
-        void shouldReturnPlusTwoDays_whenTimeIsAfter4pm(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"POST", "DOCUMENT_EXCHANGE", "OTHER"})
+        void shouldReturnPlusTwoDays_whenTimeIsAfter4pm(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atTime(16, 1)))
@@ -70,8 +70,8 @@ class ServiceMethodTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = ServiceMethod.class, names = {"POST", "DOCUMENT_EXCHANGE", "OTHER"})
-        void shouldReturnPlusTwoDays_whenTimeIs4pm(ServiceMethod serviceMethod) {
+        @EnumSource(value = ServiceMethodType.class, names = {"POST", "DOCUMENT_EXCHANGE", "OTHER"})
+        void shouldReturnPlusTwoDays_whenTimeIs4pm(ServiceMethodType serviceMethod) {
             LocalDate dateTime = LocalDate.of(2000, 1, 1);
 
             assertThat(serviceMethod.getDeemedDateOfService(dateTime.atTime(16, 1)))

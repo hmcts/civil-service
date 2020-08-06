@@ -60,7 +60,7 @@
     "PageDisplayOrder": 4,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
-    "FieldShowCondition": "serviceMethod = \"POST\""
+    "PageShowCondition": "serviceMethod.type = \"POST\" OR serviceMethod.type = \"DOCUMENT_EXCHANGE\""
   },
   {
     "LiveFrom": "01/01/2017",
@@ -72,7 +72,21 @@
     "PageID": "Date",
     "PageDisplayOrder": 5,
     "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "serviceMethod.type = \"POST\" OR serviceMethod.type = \"DOCUMENT_EXCHANGE\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CONFIRM_SERVICE",
+    "CaseFieldID": "serviceDateAndTime",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "Date",
+    "PageDisplayOrder": 5,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "serviceMethod.type = \"FAX\" OR serviceMethod.type = \"EMAIL\" OR serviceMethod.type = \"OTHER\""
   },
   {
     "LiveFrom": "01/01/2017",
