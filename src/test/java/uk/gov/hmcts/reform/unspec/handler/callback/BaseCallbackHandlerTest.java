@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackVersion;
 
 import java.util.Map;
 
-public class BaseCallbackHandlerTest {
+public abstract class BaseCallbackHandlerTest {
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type) {
         return callbackParamsOf(data, type, null, null);

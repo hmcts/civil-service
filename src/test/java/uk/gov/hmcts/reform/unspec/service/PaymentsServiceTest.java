@@ -77,16 +77,17 @@ class PaymentsServiceTest {
     }
 
     @Test
-    public void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+    void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         CaseDetails caseDetails = CaseDetails.builder()
             .id(1L)
             .data(Map.of(
                 "claimValue", Map.of("lowerValue", "50", "higherValue", "500"),
-            "pbaNumber", "PBA1234567",
-            "caseReference", "case reference",
-            "customerReference", "customer reference",
-            "description", "description",
-            "organisationName", "organisation name"))
+                "pbaNumber", "PBA1234567",
+                "caseReference", "case reference",
+                "customerReference", "customer reference",
+                "description", "description",
+                "organisationName", "organisation name"
+            ))
             .build();
         var expectedCreditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
             .accountNumber("PBA1234567")

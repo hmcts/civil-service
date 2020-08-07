@@ -24,13 +24,13 @@ class RequestDataTest {
     private RequestData requestData;
 
     @Test
-    public void shouldReturnAuthorisationHeaderFromRequest() {
+    void shouldReturnAuthorisationHeaderFromRequest() {
         when(httpServletRequest.getHeader("authorization")).thenReturn(AUTH_TOKEN);
         assertThat(requestData.authorisation()).isEqualTo(AUTH_TOKEN);
     }
 
     @Test
-    public void shouldReturnUserIdFromRequest() {
+    void shouldReturnUserIdFromRequest() {
         when(httpServletRequest.getHeader("user-id")).thenReturn(USER_ID);
         assertThat(requestData.userId()).isEqualTo(USER_ID);
     }

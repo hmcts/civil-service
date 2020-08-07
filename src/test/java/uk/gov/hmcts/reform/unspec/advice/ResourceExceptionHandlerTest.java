@@ -10,17 +10,17 @@ import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ResourceExceptionHandlerTest {
+class ResourceExceptionHandlerTest {
 
     private ResourceExceptionHandler handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         handler = new ResourceExceptionHandler();
     }
 
     @Test
-    public void shouldReturnNotFound_whenCallbackExceptionThrown() {
+    void shouldReturnNotFound_whenCallbackExceptionThrown() {
         testTemplate(
             "expected exception for missing callback handler",
             CallbackException::new,

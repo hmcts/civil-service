@@ -18,16 +18,16 @@ public abstract class ElasticSearchService {
 
     private final CoreCaseDataService coreCaseDataService;
 
-    private static final int startIndex = 0;
-    private static final int esDefaultSearchLimit = 10;
+    private static final int START_INDEX = 0;
+    private static final int ES_DEFAULT_SEARCH_LIMIT = 10;
 
     public List<CaseDetails> getCases() {
-        SearchResult searchResult = coreCaseDataService.searchCases(query(startIndex));
+        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX));
         int pages = calculatePages(searchResult);
         List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
 
         for (int i = 1; i < pages; i++) {
-            SearchResult result = coreCaseDataService.searchCases(query(i * esDefaultSearchLimit));
+            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT));
             caseDetails.addAll(result.getCases());
         }
 
@@ -37,6 +37,6 @@ public abstract class ElasticSearchService {
     abstract Query query(int startIndex);
 
     private int calculatePages(SearchResult searchResult) {
-        return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(esDefaultSearchLimit), UP).intValue();
+        return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
     }
 }

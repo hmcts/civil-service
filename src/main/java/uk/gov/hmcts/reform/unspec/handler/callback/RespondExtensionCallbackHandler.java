@@ -117,7 +117,7 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format(
-                "# You've responded to the request for more time\n## Claim number: %s",
+                "# You've responded to the request for more time%n## Claim number: %s",
                 claimNumber
             ))
             .confirmationBody(body)

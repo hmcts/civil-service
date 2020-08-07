@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
 
 @ExtendWith(MockitoExtension.class)
-public class CallbackHandlerFactoryTest {
+class CallbackHandlerFactoryTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
     public static final CallbackResponse RESPONSE = AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -48,12 +48,12 @@ public class CallbackHandlerFactoryTest {
     private CallbackHandlerFactory callbackHandlerFactory;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         callbackHandlerFactory = new CallbackHandlerFactory(ImmutableList.of(sampleCallbackHandler));
     }
 
     @Test
-    public void shouldThrowCallbackException_whenUnknownEvent() {
+    void shouldThrowCallbackException_whenUnknownEvent() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId("nope")
@@ -70,7 +70,7 @@ public class CallbackHandlerFactoryTest {
     }
 
     @Test
-    public void shouldDispatchCallback_whenValidCaseEvent() {
+    void shouldDispatchCallback_whenValidCaseEvent() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CASE.getValue())

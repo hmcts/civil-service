@@ -51,7 +51,7 @@ class FeesServiceTest {
     }
 
     @Test
-    public void shouldReturnFeeAmount_whenValidClaimValue() {
+    void shouldReturnFeeAmount_whenValidClaimValue() {
         var claimValue = ClaimValue.builder()
             .lowerValue(BigDecimal.valueOf(100))
             .higherValue(BigDecimal.valueOf(5000))
@@ -64,7 +64,7 @@ class FeesServiceTest {
     }
 
     @Test
-    public void shouldReturnFeeData_whenValidClaimValue() {
+    void shouldReturnFeeData_whenValidClaimValue() {
         var claimValue = ClaimValue.builder()
             .lowerValue(BigDecimal.valueOf(100))
             .higherValue(BigDecimal.valueOf(5000))

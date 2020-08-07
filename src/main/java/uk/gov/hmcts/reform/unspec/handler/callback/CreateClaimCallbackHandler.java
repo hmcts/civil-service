@@ -102,7 +102,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
                 + " 4pm if you're doing this on the due day", documentLink, responsePackLink, formattedServiceDeadline);
 
         return SubmittedCallbackResponse.builder()
-                   .confirmationHeader(format("# Your claim has been issued\n## Claim number: %s", claimNumber))
+                   .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", claimNumber))
                    .confirmationBody(body)
                    .build();
     }

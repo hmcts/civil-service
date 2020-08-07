@@ -21,6 +21,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -50,7 +51,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData().get(EXTENSION_REASON)).isEqualTo("No reason given");
+            assertThat(response.getData()).containsOnly(entry(EXTENSION_REASON, "No reason given"));
         }
 
         @Test
@@ -62,7 +63,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData().get(EXTENSION_REASON)).isEqualTo("Reason given");
+            assertThat(response.getData()).containsOnly(entry(EXTENSION_REASON, "Reason given"));
         }
     }
 
@@ -132,7 +133,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData().get(RESPONSE_DEADLINE)).isEqualTo(proposedDeadline.atTime(16, 0));
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
         }
 
         @Test
@@ -151,7 +152,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData().get(RESPONSE_DEADLINE)).isEqualTo(responseDeadline.plusDays(7));
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, responseDeadline.plusDays(7));
         }
 
         @Test
@@ -168,7 +169,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData().get(RESPONSE_DEADLINE)).isEqualTo(responseDeadline);
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, responseDeadline);
         }
     }
 
@@ -189,7 +190,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You've responded to the request for more time\n## Claim number: TBC")
+                    .confirmationHeader(format("# You've responded to the request for more time%n## Claim number: TBC"))
                     .confirmationBody(expectedBody)
                     .build());
         }

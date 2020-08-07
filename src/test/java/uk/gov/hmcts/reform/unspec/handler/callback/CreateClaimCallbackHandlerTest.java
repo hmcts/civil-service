@@ -122,7 +122,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Your claim has been issued\n## Claim number: TBC")
+                    .confirmationHeader(format("# Your claim has been issued%n## Claim number: TBC"))
                     .confirmationBody(body)
                     .build());
         }
