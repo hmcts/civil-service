@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
 
 @ExtendWith(MockitoExtension.class)
-class CallbackHandlerFactoryTest {
+public class CallbackHandlerFactoryTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
     public static final CallbackResponse RESPONSE = AboutToStartOrSubmitCallbackResponse.builder().build();

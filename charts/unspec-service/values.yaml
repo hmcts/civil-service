@@ -28,6 +28,9 @@ java:
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/realms/root/realms/hmcts
     FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCMOSIS_TORNADO_URL: https://docmosis-development.platform.hmcts.net
+    DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+
   keyVaults:
     unspec:
       resourceGroup: unspec
@@ -37,3 +40,4 @@ java:
         - system-update-user-username
         - system-update-user-password
         - AppInsightsInstrumentationKey
+        - docmosis-api-key

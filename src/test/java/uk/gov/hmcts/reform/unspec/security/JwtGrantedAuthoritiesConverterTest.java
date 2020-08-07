@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.unspec.security;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -24,18 +23,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(classes = {JwtGrantedAuthoritiesConverter.class})
 class JwtGrantedAuthoritiesConverterTest {
 
-    @Mock
+    @MockBean
     private UserService userService;
 
-    @InjectMocks
+    @Autowired
     private JwtGrantedAuthoritiesConverter converter;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Nested
     @DisplayName("Gets empty authorities")

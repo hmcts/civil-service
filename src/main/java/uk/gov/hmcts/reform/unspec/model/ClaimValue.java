@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import uk.gov.hmcts.reform.unspec.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
@@ -20,5 +21,13 @@ public class ClaimValue {
         }
 
         return lowerValue.compareTo(higherValue) > 0;
+    }
+
+    public String formData() {
+        BigDecimal higherAmount = MonetaryConversions.penniesToPounds(higherValue);
+        if (lowerValue == null) {
+            return "up to £" + higherAmount;
+        }
+        return "£" + MonetaryConversions.penniesToPounds(lowerValue) + " - £" + higherAmount;
     }
 }

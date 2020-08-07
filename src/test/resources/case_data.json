@@ -1,0 +1,142 @@
+{
+  "claimant": {
+    "type": "INDIVIDUAL",
+    "individualTitle": "Mr",
+    "primaryAddress": {
+      "County": "County",
+      "Country": "Country",
+      "PostCode": "POSTCODE",
+      "PostTown": "City",
+      "AddressLine1": "99 The Road",
+      "AddressLine2": "The Street",
+      "AddressLine3": ""
+    },
+    "individualLastName": "Smith",
+    "individualFirstName": "John",
+    "individualDateOfBirth": "1980-06-23"
+  },
+  "respondent": {
+    "type": "INDIVIDUAL",
+    "individualTitle": "Mr",
+    "primaryAddress": {
+      "County": "County",
+      "Country": "Country",
+      "PostCode": "POSTCODE",
+      "PostTown": "City",
+      "AddressLine1": "99 The Road",
+      "AddressLine2": "The Street",
+      "AddressLine3": ""
+    },
+    "individualLastName": "Smith",
+    "individualFirstName": "John",
+    "individualDateOfBirth": "1980-06-23"
+  },
+  "claimValue": {
+    "lowerValue": "10000",
+    "higherValue": "100000"
+  },
+  "serviceDate": "2020-06-23",
+  "courtLocation": {
+    "preferredCourt": "The court location"
+  },
+  "serviceMethod": {
+    "type": "POST"
+  },
+  "servedDocuments": [
+    "PARTICULARS_OF_CLAIM",
+    "CLAIM_FORM",
+    "RESPONSE_PACK",
+    "MEDICAL_REPORTS",
+    "SCHEDULE_LOSS",
+    "CERTIFICATE_SUITABILITY",
+    "OTHER"
+  ],
+  "serviceLocation": {
+    "location": "RESIDENCE"
+  },
+  "responseDeadline": "2020-07-09T16:00:00",
+  "deemedDateOfService": "2020-06-25",
+  "servedDocumentFiles": {
+    "other": [
+      {
+        "id": "ab0c264f-bf69-45e9-9f41-98eb5e1ac2eb",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/844cdafe-cebb-488b-9216-bb0eb56b54d0",
+          "document_filename": "examplePDF.pdf",
+          "document_binary_url": "http://dm-store:8080/documents/844cdafe-cebb-488b-9216-bb0eb56b54d0/binary"
+        }
+      }
+    ],
+    "medicalReports": [
+      {
+        "id": "34365922-2a33-44e2-a84b-4dc7a705ee6c",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/7caa65f2-8f9a-4c5a-9ac9-a258e734e680",
+          "document_filename": "examplePDF.pdf",
+          "document_binary_url": "http://dm-store:8080/documents/7caa65f2-8f9a-4c5a-9ac9-a258e734e680/binary"
+        }
+      }
+    ],
+    "scheduleOfLoss": [
+      {
+        "id": "527937fb-7dec-4978-9c90-17d11784cf25",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/a53713c5-e7a4-488c-b2ae-7d9e0a8baec1",
+          "document_filename": "examplePDF.pdf",
+          "document_binary_url": "http://dm-store:8080/documents/a53713c5-e7a4-488c-b2ae-7d9e0a8baec1/binary"
+        }
+      }
+    ],
+    "particularsOfClaim": [
+      {
+        "id": "36af7e13-4dd0-4b73-89c6-183f8c800f8d",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/b776f5d2-fc2f-4873-afcc-db69ad06851c",
+          "document_filename": "examplePDF.pdf",
+          "document_binary_url": "http://dm-store:8080/documents/b776f5d2-fc2f-4873-afcc-db69ad06851c/binary"
+        }
+      }
+    ],
+    "certificateOfSuitability": [
+      {
+        "id": "59609f65-1ed1-4790-973f-572ddce601a7",
+        "value": {
+          "document_url": "http://dm-store:8080/documents/cb423d57-21bc-4156-ab0c-970a0483e616",
+          "document_filename": "examplePDF.pdf",
+          "document_binary_url": "http://dm-store:8080/documents/cb423d57-21bc-4156-ab0c-970a0483e616/binary"
+        }
+      }
+    ]
+  },
+  "solicitorReferences": {
+    "defendantReference": "6789",
+    "claimantReference": "12345"
+  },
+  "servedDocumentsOther": "Other documents",
+  "claimStatementOfTruth": {
+    "name": "John",
+    "role": "Smith"
+  },
+  "serviceStatementOfTruth": {
+    "name": "John",
+    "role": "Smith"
+  },
+  "systemGeneratedCaseDocuments": [
+    {
+      "id": "93de0b53-fade-49af-8c96-412dcdbb2449",
+      "value": {
+        "documentSize": 56975,
+        "documentLink": {
+          "document_binary_url": "http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f\/binary",
+          "document_url": "http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f",
+          "document_filename": "sealed_claim_form_000LR095.pdf"
+        },
+        "documentName": "sealed_claim_form_000LR095.pdf.pdf",
+        "documentType": "SEALED_CLAIM",
+        "createdDatetime": "2020-07-16T14:05:15.550439",
+        "createdBy": "Unspec"
+      }
+    }
+  ],
+  "ccdCaseReference": 1594908311412773
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "DocumentType",
+    "ListElementCode": "SEALED_CLAIM",
+    "ListElement": "Sealed Claim form",
+    "DisplayOrder": 1
+  }
+]

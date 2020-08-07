@@ -237,5 +237,14 @@
     "Label": "Add a response",
     "FieldType": "TextArea",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "systemGeneratedCaseDocuments",
+    "Label": "System generated Case Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
   }
 ]

@@ -1,18 +1,26 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
+import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
+import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import uk.gov.hmcts.reform.unspec.utils.ElementUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,32 +30,33 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CASE);
+    public static final String CONFIRMATION_SUMMARY = "<br />Follow these steps to serve a claim:"
+        + "\n* <a href=\"%s\" target=\"_blank\">[Download the sealed claim form]</a> (PDF, %sKB)"
+        + "\n* Send the form, particulars of claim and "
+        + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
+        + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
+        + " 4pm if you're doing this on the due day";
 
-    private final ObjectMapper mapper;
-    private final String responsePackLink;
-
-    public CreateClaimCallbackHandler(
-        ObjectMapper mapper,
-        @Value("${unspecified.response-pack-url}") String responsePackLink
-    ) {
-        this.mapper = mapper;
-        this.responsePackLink = responsePackLink;
-    }
+    private final SealedClaimFormGenerator sealedClaimFormGenerator;
+    private final ClaimIssueConfiguration claimIssueConfiguration;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
             CallbackType.MID, this::validateClaimValues,
-            CallbackType.ABOUT_TO_SUBMIT, this::addIssuedDate,
+            CallbackType.ABOUT_TO_SUBMIT, this::issueClaim,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
     }
@@ -58,52 +67,68 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateClaimValues(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        ClaimValue claimValue = mapper.convertValue(data.get("claimValue"), ClaimValue.class);
+        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         List<String> errors = new ArrayList<>();
 
+        ClaimValue claimValue = caseData.getClaimValue();
         if (claimValue.hasLargerLowerValue()) {
             errors.add("CONTENT TBC: Higher value must not be lower than the lower value.");
         }
 
+        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         if (errors.isEmpty()) {
-            ClaimType claimType = mapper.convertValue(data.get("claimType"), ClaimType.class);
-
+            ClaimType claimType = caseData.getClaimType();
             data.put("allocatedTrack", getAllocatedTrack(claimValue, claimType));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                   .data(data)
-                   .errors(errors)
-                   .build();
+            .data(data)
+            .errors(errors)
+            .build();
     }
 
-    private AboutToStartOrSubmitCallbackResponse addIssuedDate(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        data.put("claimIssuedDate", LocalDate.now());
+    private CallbackResponse issueClaim(CallbackParams callbackParams) {
+        CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        LocalDate issueDate = LocalDate.now();
+        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+
+        CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
+            caseData.toBuilder().claimIssuedDate(issueDate).build(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
+        Map<String, Object> data = caseDetails.getData();
+        data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
+        data.put("claimIssuedDate", issueDate);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                   .data(data)
-                   .build();
+            .data(data)
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        String documentLink = "https://www.google.com";
+        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        Long documentSize = ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+            .filter(c -> c.getDocumentType() == DocumentType.SEALED_CLAIM)
+            .findFirst()
+            .map(CaseDocument::getDocumentSize)
+            .orElse(0L);
+
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
         String claimNumber = "TBC";
 
         String body = format(
-            "<br />Follow these steps to serve a claim:"
-                + "\n* [Download the sealed claim form](%s) (PDF, 123KB)"
-                + "\n* Send the form, particulars of claim and "
-                + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
-                + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
-                + " 4pm if you're doing this on the due day", documentLink, responsePackLink, formattedServiceDeadline);
+            CONFIRMATION_SUMMARY,
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+            documentSize / 1024,
+            claimIssueConfiguration.getResponsePackLink(),
+            formattedServiceDeadline
+        );
 
         return SubmittedCallbackResponse.builder()
-                   .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", claimNumber))
-                   .confirmationBody(body)
-                   .build();
+            .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", claimNumber))
+            .confirmationBody(body)
+            .build();
     }
 }

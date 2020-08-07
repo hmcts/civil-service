@@ -8,5 +8,14 @@
     "TabDisplayOrder": 1,
     "CaseFieldID": "caseHistory",
     "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "CaseDocuments",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "systemGeneratedCaseDocuments",
+    "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(documentType, documentLink)"
   }
 ]
