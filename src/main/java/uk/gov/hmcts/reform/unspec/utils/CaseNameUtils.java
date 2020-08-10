@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public class CaseNameUtils {
 
-    //TODO Need to confirm the cas  e name logic
+    //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData ->
         fetchClaimantName(caseData) + " v " + fetchDefendantName(caseData);
 
@@ -16,7 +16,7 @@ public class CaseNameUtils {
         //NO-OP
     }
 
-    private static String fetchDefendantName(CaseData caseData) {
+    public static String fetchDefendantName(CaseData caseData) {
         StringBuilder defendantNameBuilder = new StringBuilder();
         if (caseData.getRespondent2() != null) {
             defendantNameBuilder.append("1 ");
@@ -33,7 +33,7 @@ public class CaseNameUtils {
         return defendantNameBuilder.toString();
     }
 
-    private static String fetchClaimantName(CaseData caseData) {
+    public static String fetchClaimantName(CaseData caseData) {
         StringBuilder claimantNameBuilder = new StringBuilder();
 
         if (caseData.getClaimant2() != null) {

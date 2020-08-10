@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.utils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 
 import java.util.List;
 
@@ -59,6 +60,20 @@ class ElementUtilsTest {
         @Test
         void shouldReturnEmptyListIfListOfElementIsNull() {
             assertThat(unwrapElements(null)).isEmpty();
+        }
+    }
+
+    @Nested
+    class BuildElement {
+
+        @Test
+        void shouldBuildElement_whenObjectIsProvided() {
+            CaseDocument document = CaseDocument.builder().build();
+
+            Element<CaseDocument> element = ElementUtils.element(document);
+
+            assertThat(element.getId()).isNotNull();
+            assertThat(element.getValue()).isEqualTo(document);
         }
     }
 }

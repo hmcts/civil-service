@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -31,6 +32,13 @@ public class ElementUtils {
             .map(Element::getValue)
             .filter(Objects::nonNull)
             .collect(toUnmodifiableList());
+    }
+
+    public static <T> Element<T> element(T element) {
+        return Element.<T>builder()
+            .id(UUID.randomUUID())
+            .value(element)
+            .build();
     }
 
     private static <T> Collection<T> nullSafeCollection(Collection<T> collection) {
