@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.unspec.service.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DocumentManagementService {
 
     public static final String UNSPEC = "Unspec";

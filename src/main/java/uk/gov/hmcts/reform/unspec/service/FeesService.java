@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.fees.client.FeesClient;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
@@ -14,7 +13,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class FeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);

@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.unspec.utils.CaseNameUtils.toCaseName;
 class CaseNameUtilsTest {
 
     @Test
-    public void caseNameNotNull() {
+    void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.INDIVIDUAL)
@@ -30,7 +30,7 @@ class CaseNameUtilsTest {
     }
 
     @Test
-    public void caseName_whenMultiClaimant() {
+    void shouldReturnCaseName_whenMultiClaimant() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.INDIVIDUAL)
@@ -57,7 +57,7 @@ class CaseNameUtilsTest {
     }
 
     @Test
-    public void caseName_whenMultiDefendant() {
+    void shouldReturnCaseName_whenMultiDefendant() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.INDIVIDUAL)
@@ -84,7 +84,7 @@ class CaseNameUtilsTest {
     }
 
     @Test
-    public void caseNameWhenClaimantIsSoleTrader() {
+    void shouldReturnCaseName_whenClaimantIsSoleTrader() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.SOLE_TRADER)
@@ -106,7 +106,7 @@ class CaseNameUtilsTest {
     }
 
     @Test
-    public void caseNameWhenDefendantIsSoleTrader() {
+    void shouldReturnCaseName_whenDefendantIsSoleTrader() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.INDIVIDUAL)
@@ -128,7 +128,7 @@ class CaseNameUtilsTest {
     }
 
     @Test
-    public void caseNameWhenBothAreSoleTrader() {
+    void shouldReturnCaseName_whenBothAreSoleTrader() {
         CaseData caseData = CaseData.builder()
             .claimant(Party.builder()
                           .type(Party.Type.SOLE_TRADER)
@@ -149,5 +149,4 @@ class CaseNameUtilsTest {
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName).isEqualTo("Mrs. Georgina Hammersmith T/A EuroStar v Mr. Boris Johnson T/A UberFlip");
     }
-
 }

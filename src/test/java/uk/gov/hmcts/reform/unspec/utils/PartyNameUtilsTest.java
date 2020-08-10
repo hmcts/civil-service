@@ -9,13 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PartyNameUtilsTest {
 
     @Test
-    public void shouldThrowNullPointer_whenPartyTypeIsNull() {
+    void shouldThrowNullPointer_whenPartyTypeIsNull() {
         Party party = Party.builder().type(null).build();
         assertThrows(NullPointerException.class, () -> PartyNameUtils.getPartyNameBasedOnType(party));
     }
 
     @Test
-    public void shouldProvideName_whenPartyTypeIsIndividual() {
+    void shouldProvideName_whenPartyTypeIsIndividual() {
         Party individual = Party.builder()
             .individualTitle("Mr")
             .individualFirstName("Jacob")
@@ -26,7 +26,7 @@ class PartyNameUtilsTest {
     }
 
     @Test
-    public void shouldProvideName_whenPartyTypeIsIndividualWithoutTitle() {
+    void shouldProvideName_whenPartyTypeIsIndividualWithoutTitle() {
         Party individual = Party.builder()
             .individualFirstName("Jacob")
             .individualLastName("Martin")
@@ -36,7 +36,7 @@ class PartyNameUtilsTest {
     }
 
     @Test
-    public void shouldProvideName_whenPartyTypeIsCompany() {
+    void shouldProvideName_whenPartyTypeIsCompany() {
         Party individual = Party.builder()
             .companyName("XYZ Company House")
             .type(Party.Type.COMPANY).build();
@@ -45,7 +45,7 @@ class PartyNameUtilsTest {
     }
 
     @Test
-    public void shouldProvideName_whenPartyTypeIsOrganisation() {
+    void shouldProvideName_whenPartyTypeIsOrganisation() {
         Party organisation = Party.builder()
             .organisationName("ABC Solutions")
             .type(Party.Type.ORGANISATION).build();
@@ -54,7 +54,7 @@ class PartyNameUtilsTest {
     }
 
     @Test
-    public void shouldProvideName_whenPartyTypeIsSoleTrader() {
+    void shouldProvideName_whenPartyTypeIsSoleTrader() {
         Party soleTrader = Party.builder()
             .soleTraderTitle("Mr")
             .soleTraderFirstName("Jacob")

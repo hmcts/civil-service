@@ -87,7 +87,7 @@ public abstract class BaseIntegrationTest {
         when(authenticationMock.getPrincipal()).thenReturn(getJwt());
 
         Collection<? extends GrantedAuthority> authorityCollection = Stream.of(authorities)
-            .map(a -> new SimpleGrantedAuthority(a))
+            .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toCollection(ArrayList::new));
 
         when(authenticationMock.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);

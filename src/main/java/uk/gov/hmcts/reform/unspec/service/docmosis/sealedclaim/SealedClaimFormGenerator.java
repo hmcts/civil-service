@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -26,8 +25,8 @@ import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedOnType;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class SealedClaimFormGenerator extends TemplateDataGenerator<SealedClaimForm> {
+@RequiredArgsConstructor
+public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedClaimForm> {
 
     public static final String TEMP_CLAIM_DETAILS = "The claimant seeks compensation from injuries and losses arising"
         + " from a road traffic accident which occurred on 1st July 2017 as a result of the negligence of the first "

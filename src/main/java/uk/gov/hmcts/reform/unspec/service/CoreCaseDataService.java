@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -18,7 +17,7 @@ import static uk.gov.hmcts.reform.unspec.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.unspec.CaseDefinitionConstants.JURISDICTION;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class CoreCaseDataService {
 
     private final IdamClient idamClient;
@@ -37,7 +36,8 @@ public class CoreCaseDataService {
             JURISDICTION,
             CASE_TYPE,
             caseId.toString(),
-            eventName.getValue());
+            eventName.getValue()
+        );
 
         coreCaseDataApi.submitEventForCaseWorker(
             userToken,
@@ -47,7 +47,8 @@ public class CoreCaseDataService {
             CASE_TYPE,
             caseId.toString(),
             true,
-            caseDataContentFromStartEventResponse(startEventResponse));
+            caseDataContentFromStartEventResponse(startEventResponse)
+        );
     }
 
     public SearchResult searchCases(Query query) {
@@ -60,8 +61,8 @@ public class CoreCaseDataService {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
-                .id(startEventResponse.getEventId())
-                .build())
+                       .id(startEventResponse.getEventId())
+                       .build())
             .data(startEventResponse.getCaseDetails().getData())
             .build();
     }

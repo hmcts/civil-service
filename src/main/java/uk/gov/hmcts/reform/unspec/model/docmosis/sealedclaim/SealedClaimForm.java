@@ -21,7 +21,7 @@ import java.util.List;
 public class SealedClaimForm implements DocmosisData {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]";
+    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private final List<Claimant> claimants;
     private final Representative claimantRepresentative;
     private final List<Defendant> defendants;

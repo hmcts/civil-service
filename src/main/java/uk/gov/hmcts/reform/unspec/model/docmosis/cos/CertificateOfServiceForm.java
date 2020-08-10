@@ -22,7 +22,7 @@ import java.time.LocalDate;
 public class CertificateOfServiceForm implements DocmosisData {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]";
+    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private final String caseName;
     private final String referenceNumber;
     private final SolicitorReferences solicitorReferences;

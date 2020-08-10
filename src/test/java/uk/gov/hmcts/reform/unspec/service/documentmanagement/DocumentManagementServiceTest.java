@@ -42,7 +42,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackHandlerFactoryTest.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
 import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService.FILES_NAME;
@@ -57,6 +56,7 @@ class DocumentManagementServiceTest {
 
     private static final List<String> USER_ROLES = List.of("caseworker-civil", "caseworker-civil-solicitor");
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
+    public static final String BEARER_TOKEN = "Bearer Token";
 
     @MockBean
     private DocumentMetadataDownloadClientApi documentMetadataDownloadClient;

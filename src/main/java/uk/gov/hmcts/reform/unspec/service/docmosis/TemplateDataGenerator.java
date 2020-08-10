@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.io.IOException;
 
-public abstract class TemplateDataGenerator<T> {
+public interface TemplateDataGenerator<T> {
 
-    public abstract T getTemplateData(CaseData caseData) throws IOException;
+    T getTemplateData(CaseData caseData) throws IOException;
 }

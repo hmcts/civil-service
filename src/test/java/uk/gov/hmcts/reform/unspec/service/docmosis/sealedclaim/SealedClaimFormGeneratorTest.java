@@ -28,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackHandlerFactoryTest.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService.UNSPEC;
@@ -41,6 +40,7 @@ import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentMana
 })
 class SealedClaimFormGeneratorTest {
 
+    public static final String BEARER_TOKEN = "Bearer Token";
     public static final String REFERENCE_NUMBER = "000LR095";
     private final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private final String fileName = format(N1.getDocumentTitle(), REFERENCE_NUMBER);

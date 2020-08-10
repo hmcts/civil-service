@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.search;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.unspec.model.search.Query;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import static java.math.RoundingMode.UP;
 
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public abstract class ElasticSearchService {
 
     private final CoreCaseDataService coreCaseDataService;
