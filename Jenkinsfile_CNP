@@ -108,12 +108,18 @@ withPipeline(type, product, component) {
 
   before('smoketest:aat') {
     env.URL = "https://manage-case.aat.platform.hmcts.net"
-    archiveCoreCaseDataDefinitions('aat')
-    uploadCoreCaseDataDefinitions('aat')
+    archiveCoreCaseDataDefinitions('staging')
+    uploadCoreCaseDataDefinitions('staging')
   }
 
   after('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
+  after('functionalTest:aat') {
+    env.URL = "https://manage-case.aat.platform.hmcts.net"
+    archiveCoreCaseDataDefinitions('aat')
+    uploadCoreCaseDataDefinitions('aat')
   }
 
   before('buildinfra:demo') {
