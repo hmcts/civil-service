@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.unspec.utils.CaseNameUtils;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
@@ -77,7 +76,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .claimantRepresentative(TEMP_REPRESENTATIVE)
             .referenceNumber(REFERENCE_NUMBER)
             .issueDate(caseData.getClaimIssuedDate())
-            .submittedOn(LocalDate.of(2020, 9, 29))
+            .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
             .claimantExternalReference(caseData.getSolicitorReferences().getClaimantReference())
             .defendantExternalReference(caseData.getSolicitorReferences().getDefendantReference())
             .caseName(CaseNameUtils.toCaseName.apply(caseData))

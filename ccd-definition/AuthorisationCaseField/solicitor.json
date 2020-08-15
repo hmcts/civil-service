@@ -142,6 +142,20 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "claimSubmittedDateTime",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "confirmationOfServiceDeadline",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "claimIssuedDate",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"

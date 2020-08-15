@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.unspec.service.bankholidays;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +31,7 @@ public class BankHolidays {
         @JsonIgnoreProperties(ignoreUnknown = true)
         static class EventDate {
             @JsonProperty("date")
-            @JsonFormat(pattern = "yyyy-MM-dd")
+            @JsonDeserialize(using = LocalDateDeserializer.class)
             LocalDate date;
         }
     }

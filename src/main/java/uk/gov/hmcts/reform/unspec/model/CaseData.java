@@ -32,6 +32,7 @@ public class CaseData {
     private final ServiceMethod serviceMethod;
     private final LocalDate serviceDate;
     private final LocalDateTime serviceDateAndTime;
+    private final LocalDateTime claimSubmittedDateTime;
     private final LocalDate claimIssuedDate;
     private final LocalDate deemedDateOfService;
     private final LocalDateTime responseDeadline;

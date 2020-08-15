@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
+@RequiredArgsConstructor
 public class RequestExtensionCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_EXTENSION);
@@ -41,18 +43,26 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
 
-    public RequestExtensionCallbackHandler(ObjectMapper mapper, RequestExtensionValidator validator) {
-        this.mapper = mapper;
-        this.validator = validator;
-    }
-
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
             CallbackType.ABOUT_TO_START, this::aboutToStart,
             CallbackType.MID, this::validateRequestedDeadline,
+            CallbackType.ABOUT_TO_SUBMIT, this::updateResponseDeadline,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
+    }
+
+    private CallbackResponse updateResponseDeadline(CallbackParams callbackParams) {
+        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
+        LocalDate proposedDeadline = mapper.convertValue(data.get(PROPOSED_DEADLINE), LocalDate.class);
+        YesOrNo extensionAlreadyAgreed = mapper.convertValue(data.get(EXTENSION_ALREADY_AGREED), YesOrNo.class);
+        if (extensionAlreadyAgreed == YES) {
+            data.put(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(data)
+            .build();
     }
 
     @Override

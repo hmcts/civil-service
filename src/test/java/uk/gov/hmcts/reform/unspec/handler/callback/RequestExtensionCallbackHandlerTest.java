@@ -41,7 +41,7 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RequestExtensionCallbackHandler handler;
 
     @Nested
-    class AboutToSubmitCallback {
+    class AboutToStartCallback {
 
         @Test
         void shouldReturnError_whenExtensionIsAlreadyRequested() {
@@ -100,6 +100,54 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        @Test
+        void shouldUpdateResponseDeadlineToProposedDeadline_whenExtensionAlreadyAgreed() {
+            LocalDate proposedDeadline = now().plusDays(14);
+            LocalDateTime responseDeadline = now().atTime(16, 0);
+
+            CallbackParams params = callbackParamsOf(
+                new HashMap<>() {
+                    {
+                        put(PROPOSED_DEADLINE, proposedDeadline);
+                        put(EXTENSION_ALREADY_AGREED, "Yes");
+                        put(RESPONSE_DEADLINE, responseDeadline);
+                    }
+                },
+                CallbackType.ABOUT_TO_SUBMIT
+            );
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
+        }
+
+        @Test
+        void shouldNotUpdateResponseDeadline_whenExtensionIsNotAlreadyAgreed() {
+            LocalDate proposedDeadline = now().plusDays(14);
+            LocalDateTime responseDeadline = now().atTime(16, 0);
+
+            CallbackParams params = callbackParamsOf(
+                new HashMap<>() {
+                    {
+                        put(PROPOSED_DEADLINE, proposedDeadline);
+                        put(EXTENSION_ALREADY_AGREED, "No");
+                        put(RESPONSE_DEADLINE, responseDeadline);
+                    }
+                },
+                CallbackType.ABOUT_TO_SUBMIT
+            );
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, responseDeadline);
         }
     }
 

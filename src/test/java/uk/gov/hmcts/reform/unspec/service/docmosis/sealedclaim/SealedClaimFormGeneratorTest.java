@@ -54,8 +54,8 @@ class SealedClaimFormGeneratorTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldGenerateSealedClaimForm() throws JsonProcessingException {
-        CaseData caseData = getCaseData();
+    void shouldGenerateSealedClaimForm_whenValidDataIsProvided() throws JsonProcessingException {
+        CaseData caseData = getCaseData().toBuilder().claimSubmittedDateTime(LocalDateTime.now()).build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));

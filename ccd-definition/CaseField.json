@@ -92,6 +92,22 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimSubmittedDateTime",
+    "Label": "Claim Submitted at",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "confirmationOfServiceDeadline",
+    "Label": "Confirmation of service deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "servedDocuments",
     "Label": "Which documents did you serve?",
     "FieldType": "MultiSelectList",

@@ -95,7 +95,7 @@ class CaseStayedSearchServiceTest {
     private Query buildQuery(int fromValue) {
         return new Query(
             QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("data.claimIssuedDate").lt("now-112d"))
+                .must(QueryBuilders.rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
                 .must(QueryBuilders.matchQuery("state", "CREATED")),
             List.of("reference"),
             fromValue

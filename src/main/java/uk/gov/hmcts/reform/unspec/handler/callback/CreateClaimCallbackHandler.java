@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.utils.ElementUtils;
 
@@ -50,6 +52,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final IssueDateCalculator issueDateCalculator;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<CallbackType, Callback> callbacks() {
@@ -88,17 +92,23 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse issueClaim(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
-        LocalDate issueDate = LocalDate.now();
+        LocalDateTime submittedAt = LocalDateTime.now();
+        LocalDate issueDate = issueDateCalculator.calculateIssueDay(submittedAt);
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
-            caseData.toBuilder().claimIssuedDate(issueDate).build(),
+            caseData.toBuilder().claimIssuedDate(issueDate).claimSubmittedDateTime(submittedAt).build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
         Map<String, Object> data = caseDetails.getData();
-        data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
+        data.put("claimSubmittedDateTime", submittedAt);
         data.put("claimIssuedDate", issueDate);
+        data.put(
+            "confirmationOfServiceDeadline",
+            deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate)
+        );
+        data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)

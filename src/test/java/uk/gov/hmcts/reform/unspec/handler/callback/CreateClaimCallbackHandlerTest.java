@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.Document;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.utils.ResourceReader;
 
@@ -60,6 +62,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     public static final String REFERENCE_NUMBER = "000LR095";
     @MockBean
     private SealedClaimFormGenerator sealedClaimFormGenerator;
+    @MockBean
+    IssueDateCalculator issueDateCalculator;
+    @MockBean
+    DeadlinesCalculator deadlinesCalculator;
+
     @Autowired
     private CreateClaimCallbackHandler handler;
     @Autowired
@@ -115,7 +122,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void shouldIssueClaimWithSystemGeneratedDocumentsAndDate() throws JsonProcessingException {
+        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
+            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(LocalDate.now());
+            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
+                .thenReturn(LocalDate.now().atTime(23, 59, 59));
+            CallbackParams params = callbackParamsOf(new HashMap<>(), CallbackType.ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData()).containsEntry("claimIssuedDate", LocalDate.now());
+            assertThat(response.getData()).containsEntry(
+                "confirmationOfServiceDeadline",
+                LocalDate.now().atTime(23, 59, 59)
+            );
+            assertThat(response.getData()).containsKey("claimSubmittedDateTime");
+        }
+
+        @Test
+        void shouldIssueClaimWithSystemGeneratedDocumentsAndDate_whenInvoked() throws JsonProcessingException {
+            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(LocalDate.now());
+            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
+                .thenReturn(LocalDate.now().atTime(23, 59, 59));
+
             CallbackParams params = callbackParamsOf(getCaseData(), CallbackType.ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

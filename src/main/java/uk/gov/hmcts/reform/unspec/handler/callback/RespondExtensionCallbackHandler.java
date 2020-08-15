@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class RespondExtensionCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESPOND_EXTENSION);
@@ -38,11 +40,6 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
-
-    public RespondExtensionCallbackHandler(ObjectMapper mapper, RequestExtensionValidator validator) {
-        this.mapper = mapper;
-        this.validator = validator;
-    }
 
     @Override
     protected Map<CallbackType, Callback> callbacks() {

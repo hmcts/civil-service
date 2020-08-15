@@ -17,11 +17,10 @@ public class CaseStayedSearchService extends ElasticSearchService {
         super(coreCaseDataService);
     }
 
-    //TODO: update case data to store claimIssuedDate + 4 months. ES query can then be done on this value using now
     public Query query(int startIndex) {
         return new Query(
             boolQuery()
-                .must(rangeQuery("data.claimIssuedDate").lt("now-112d"))
+                .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
                 .must(matchQuery("state", "CREATED")),
             List.of("reference"),
             startIndex

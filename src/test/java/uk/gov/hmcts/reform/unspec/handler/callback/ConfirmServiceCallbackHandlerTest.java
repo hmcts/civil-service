@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.cos.CertificateOfServiceGenerator;
 
 import java.time.LocalDate;
@@ -25,6 +27,8 @@ import java.util.Map;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.handler.callback.ConfirmServiceCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -35,12 +39,15 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 @ContextConfiguration(classes = {
     ConfirmServiceCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    DeadlinesCalculator.class
 })
 class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CertificateOfServiceGenerator certificateOfServiceGenerator;
+    @MockBean
+    WorkingDayIndicator workingDayIndicator;
 
     @Autowired
     private ConfirmServiceCallbackHandler handler;
@@ -96,6 +103,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenDateEntry() {
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
             Map<String, Object> data = new HashMap<>();
             data.put("serviceMethod", Map.of("type", "POST"));
             data.put("serviceDate", "2099-06-23");
@@ -117,6 +126,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenDateAndTimeEntry() {
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
             Map<String, Object> data = new HashMap<>();
             data.put("serviceMethod", Map.of("type", "FAX"));
             data.put("serviceDateAndTime", "2099-06-23T15:00:00");
@@ -145,16 +156,15 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> data = new HashMap<>();
             int documentSize = 0;
             LocalDate deemedDateOfService = LocalDate.now();
+            LocalDateTime responseDeadline = deemedDateOfService.plusDays(14).atTime(16, 0);
             data.put("deemedDateOfService", deemedDateOfService);
+            data.put("responseDeadline", responseDeadline);
 
             CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             String formattedDeemedDateOfService = formatLocalDate(deemedDateOfService, DATE);
-            String responseDeadlineDate = formatLocalDateTime(
-                deemedDateOfService.plusDays(14).atTime(16, 0),
-                DATE_TIME_AT
-            );
+            String responseDeadlineDate = formatLocalDateTime(responseDeadline, DATE_TIME_AT);
 
             String body = format(
                 CONFIRMATION_SUMMARY,
