@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -36,9 +37,10 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
+@SpringBootTest(classes = {
     ConfirmServiceCallbackHandler.class,
     JacksonAutoConfiguration.class,
+    ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
     DeadlinesCalculator.class
 })
@@ -95,6 +97,146 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).isEqualTo(data);
             assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class SecondMidEventCallback {
+
+        private final LocalDate claimIssueDate = LocalDate.of(2000, 6, 22);
+
+        @Nested
+        class ServiceDate {
+
+            private final LocalDate today = LocalDate.now();
+            private final LocalDate futureDate = today.plusYears(1);
+
+            @Test
+            void shouldReturnNoErrors_whenServiceDateInPastAndAfterIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "POST"));
+                data.put("serviceDate", claimIssueDate.plusDays(1));
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnNoErrors_whenServiceDateIsTodayAndAfterIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "POST"));
+                data.put("serviceDate", today);
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnError_whenServiceDateInFuture() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "POST"));
+                data.put("serviceDate", futureDate);
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).containsOnly("The date must not be in the future");
+            }
+
+            @Test
+            void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "POST"));
+                data.put("serviceDate", claimIssueDate.minusDays(1));
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).containsOnly("The date must not be before issue date of claim");
+            }
+        }
+
+        @Nested
+        class ServiceDateAndTime {
+
+            private final LocalDateTime today = LocalDateTime.now();
+            private final LocalDateTime futureDate = today.plusYears(1);
+
+            @Test
+            void shouldReturnNoErrors_whenServiceDateInPastAndAfterIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "FAX"));
+                data.put("serviceDateAndTime", claimIssueDate.plusDays(1).atTime(12, 0));
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnNoErrors_whenServiceDateIsTodayAndAfterIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "FAX"));
+                data.put("serviceDateAndTime", today);
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnError_whenServiceDateInFuture() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "FAX"));
+                data.put("serviceDateAndTime", futureDate);
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).containsOnly("The date must not be in the future");
+            }
+
+            @Test
+            void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
+                Map<String, Object> data = new HashMap<>();
+                data.put("serviceMethod", Map.of("type", "FAX"));
+                data.put("serviceDateAndTime", claimIssueDate.atTime(12, 0).minusDays(1));
+                data.put("claimIssuedDate", claimIssueDate);
+
+                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).containsOnly("The date must not be before issue date of claim");
+            }
         }
     }
 

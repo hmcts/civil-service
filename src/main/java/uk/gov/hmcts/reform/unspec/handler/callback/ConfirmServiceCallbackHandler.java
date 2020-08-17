@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.cos.CertificateOfServiceGenerator;
+import uk.gov.hmcts.reform.unspec.validation.groups.ConfirmServiceDateGroup;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -44,10 +48,12 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 public class ConfirmServiceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CONFIRM_SERVICE);
+
     public static final String CONFIRMATION_SUMMARY = "<br /> Deemed date of service: %s."
         + "<br />The defendant must respond before %s."
         + "\n\n[Download certificate of service](%s) (PDF, %s KB)";
 
+    private final Validator validator;
     private final CertificateOfServiceGenerator certificateOfServiceGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -57,6 +63,7 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
         return Map.of(
             CallbackType.ABOUT_TO_START, this::prepopulateServedDocuments,
             CallbackType.MID, this::checkServedDocumentsOtherHasWhiteSpace,
+            CallbackType.MID_SECONDARY, this::validateServiceDate,
             CallbackType.ABOUT_TO_SUBMIT, this::prepareCertificateOfService,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
@@ -86,6 +93,19 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
         if (servedDocumentsOther != null && servedDocumentsOther.toString().isBlank()) {
             errors.add("CONTENT TBC: please enter a valid value for other documents");
         }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(data)
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateServiceDate(CallbackParams callbackParams) {
+        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
+        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        List<String> errors = validator.validate(caseData, ConfirmServiceDateGroup.class).stream()
+            .map(ConstraintViolation::getMessage)
+            .collect(Collectors.toList());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
