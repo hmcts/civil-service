@@ -11,7 +11,7 @@ module.exports = {
   },
 
   async enterExtensionProposedDeadline() {
-    await date.enterDate(this.fields.extensionProposedDeadline.id);
+    await date.enterDate(this.fields.extensionProposedDeadline.id, 50);
     await I.clickContinue();
   }
 };

@@ -18,6 +18,11 @@ Scenario('Solicitor confirms service', async (I) => {
   await I.see(caseEventMessage('Confirm service'));
 });
 
+Scenario('Solicitor acknowledges service', async (I) => {
+  await I.acknowledgeService();
+  await I.see(caseEventMessage('Acknowledge service'));
+});
+
 Scenario('Solicitor requests extension', async (I) => {
   await I.requestExtension();
   await I.see(caseEventMessage('Request extension'));

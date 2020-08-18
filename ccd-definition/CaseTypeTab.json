@@ -17,5 +17,16 @@
     "CaseFieldID": "systemGeneratedCaseDocuments",
     "TabFieldDisplayOrder": 1,
     "DisplayContextParameter": "#TABLE(documentType, documentLink)"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "Channel": "CaseWorker",
+    "TabID": "Test",
+    "TabLabel": "Test",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "respondent",
+    "TabFieldDisplayOrder": 1,
+    "Comment": "Place holder tab so that we can use label to inject respondent fields in to acknowledge service event"
   }
 ]

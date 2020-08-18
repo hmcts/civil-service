@@ -1,0 +1,54 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "defendantDetails",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "ConfirmNameAddress",
+    "PageLabel": "Confirm name and address",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "solicitorReferences",
+    "CaseEventFieldLabel": "Confirm your details",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "ConfirmDetails",
+    "PageLabel": "Confirm your details",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "respondent",
+    "CaseEventFieldLabel": " ",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX",
+    "PageID": "ConfirmDetails",
+    "PageLabel": "Confirm your details",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "responseIntention",
+    "CaseEventFieldLabel": "The defendant intends to:",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ResponseIntention",
+    "PageLabel": "Response intention",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y"
+  }
+]

@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.unspec.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.unspec.validation.groups.DateOfBirthGroup;
 
 import java.time.LocalDate;
+import javax.validation.constraints.PastOrPresent;
 
 @Data
 @Builder(toBuilder = true)
@@ -15,6 +17,8 @@ public class Party {
     private final String individualTitle;
     private final String individualFirstName;
     private final String individualLastName;
+
+    @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate individualDateOfBirth;
     private final String companyName;
     private final String organisationName;
@@ -22,6 +26,8 @@ public class Party {
     private final String soleTraderFirstName;
     private final String soleTraderLastName;
     private final String soleTraderTradingAs;
+
+    @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate soleTraderDateOfBirth;
     private final Address primaryAddress;
 

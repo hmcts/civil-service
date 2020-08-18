@@ -23,7 +23,7 @@ module.exports = {
       I.click(this.fields.extensionCounter.options.yes);
     });
 
-    await date.enterDate(this.fields.extensionCounterDate.id);
+    await date.enterDate(this.fields.extensionCounterDate.id, 50);
     await I.clickContinue();
   }
 };

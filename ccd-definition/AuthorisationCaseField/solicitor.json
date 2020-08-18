@@ -222,5 +222,19 @@
     "CaseFieldID": "systemGeneratedCaseDocuments",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "defendantDetails",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "responseIntention",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
   }
 ]
