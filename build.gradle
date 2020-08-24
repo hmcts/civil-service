@@ -278,7 +278,7 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.9.0'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.5.2'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.5.5'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.2'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
