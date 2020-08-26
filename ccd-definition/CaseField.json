@@ -279,5 +279,46 @@
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "ResponseIntention",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1ClaimResponseType",
+    "Label": "The defendant:",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ResponseType",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "responseHandOffLabel",
+    "Label": "This online service only currently supports full defences. Post your response to:\n\nCounty Court Money Claims Centre\n\nPO Box 527\n\nSalford\n\nM5 0BY\n\nDX:702634 Salford 5",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1ClaimResponseDocument",
+    "Label": "Upload your response",
+    "FieldType": "ResponseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentDetails",
+    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:**\n${respondent.companyName}${respondent.organisationName}${respondent.soleTraderTitle}${respondent.individualTitle} ${respondent.individualFirstName}${respondent.soleTraderFirstName} ${respondent.individualLastName}${respondent.soleTraderLastName} ${respondent.soleTraderTradingAs}\n\n**Address:**<br />\n${respondent.primaryAddress.AddressLine1}<br />${respondent.primaryAddress.AddressLine2}<br />${respondent.primaryAddress.AddressLine3}<br />${respondent.primaryAddress.PostTown}<br />${respondent.primaryAddress.County}<br />${respondent.primaryAddress.PostCode}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicantSolicitorResponseDeadlineToRespondentSolicitor1",
+    "Label": "Claimant response deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
   }
 ]

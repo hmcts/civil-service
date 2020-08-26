@@ -14,5 +14,13 @@
     "Name": "Stayed",
     "Description": "Case is in stayed state",
     "DisplayOrder": 2
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "AWAITING_CLAIMANT_INTENTION",
+    "Name": "Awaiting claimant intention",
+    "Description": "Awaiting claimant intention",
+    "DisplayOrder": 3
   }
 ]

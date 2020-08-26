@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "ResponseDocument",
+    "ListElementCode": "file",
+    "FieldType": "Document",
+    "ElementLabel": "Response Document",
+    "HintText": "You must include a statement of truth in your response document. We accept documents sized 10MB or smaller, in these formats: pdf, doc, docx, jpg, jpeg, xls, xlsx, png.",
+    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "SecurityClassification": "Public"
+  }
+]

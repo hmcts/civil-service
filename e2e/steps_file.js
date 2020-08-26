@@ -20,7 +20,7 @@ const serviceLocationPage = require('./pages/confirmService/serviceLocation.page
 const serviceDatePage = require('./pages/confirmService/serviceDate.page');
 
 const confirmNameAndAddressPage = require('./pages/acknowledgeSerivce/confirmNameAndAddress.page');
-const confirmDetailsPage = require('./pages/acknowledgeSerivce/confirmDetails.page');
+const confirmDetailsPage = require('./fragments/confirmDetails.page');
 const responseIntentionPage = require('./pages/acknowledgeSerivce/responseIntention.page');
 
 const proposeDeadline = require('./pages/requestExtension/proposeDeadline.page');
@@ -29,6 +29,11 @@ const extensionAlreadyAgreed = require('./pages/requestExtension/extensionAlread
 const respondToExtensionPage = require('./pages/respondExtension/respond.page');
 const counterExtensionPage = require('./pages/respondExtension/counter.page');
 const rejectionReasonPage = require('./pages/respondExtension/reason.page');
+
+const responseConfirmNameAndAddressPage = require('./pages/respondToClaim/confirmNameAndAddress.page');
+const responseTypePage = require('./pages/respondToClaim/responseType.page');
+const uploadResponsePage = require('./pages/respondToClaim/uploadResponseDocument.page');
+
 
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
@@ -129,6 +134,20 @@ module.exports = function () {
       this.see('You\'ve responded to the request for more time');
       this.click('Close and Return to case details');
       this.waitForElement(CASE_HEADER);
+    },
+
+    async respondToClaim() {
+      await caseViewPage.startEvent('Respond to claim');
+
+      await responseTypePage.selectFullDefence();
+      await uploadResponsePage.uploadResponseDocuments(config.testFile);
+      await responseConfirmNameAndAddressPage.verifyDetails();
+      await confirmDetailsPage.confirmReference();
+
+      this.waitForText('Submit response');
+      await this.retryUntilExists(() => this.click('Submit response'), 'ccd-markdown');
+      this.see('You\'ve submitted your response');
+      this.click('Close and Return to case details');
     },
 
     async clickContinue() {

@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.Party;
-import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
@@ -22,34 +21,33 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
+public class RespondToClaimCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_SERVICE);
-    private static final String RESPONDENT = "respondent";
-    private static final String RESPONSE_DEADLINE = "responseDeadline";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
+    public static final String RESPONDENT = "respondent";
+    public static final String CLAIMANT_RESPONSE_DEADLINE = "applicantSolicitorResponseDeadlineToRespondentSolicitor1";
 
     private final ObjectMapper mapper;
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final WorkingDayIndicator workingDayIndicator;
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
 
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
             CallbackType.MID, this::validateDateOfBirth,
-            CallbackType.ABOUT_TO_SUBMIT, this::setNewResponseDeadline,
+            CallbackType.ABOUT_TO_SUBMIT, this::setClaimantResponseDeadline,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
-    }
-
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
@@ -58,38 +56,37 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                   .data(data)
-                   .errors(errors)
-                   .build();
+            .errors(errors)
+            .build();
     }
 
-    private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
+    private CallbackResponse setClaimantResponseDeadline(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = mapper.convertValue(data.get(RESPONSE_DEADLINE), LocalDateTime.class);
-
-        LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
-
-        data.put(RESPONSE_DEADLINE, newResponseDate.atTime(16, 0));
+        //TODO: There will be in separate ticket for response deadline when requirement is confirmed
+        LocalDate claimantResponseDeadLine = LocalDate.now();
+        data.put(CLAIMANT_RESPONSE_DEADLINE, claimantResponseDeadLine.atTime(16, 0));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                   .data(data)
-                   .build();
+            .data(data)
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = mapper.convertValue(data.get(RESPONSE_DEADLINE), LocalDateTime.class);
+        LocalDateTime responseDeadline = mapper.convertValue(data.get(CLAIMANT_RESPONSE_DEADLINE), LocalDateTime.class);
 
-        String formattedDeemedDateOfService = formatLocalDateTime(responseDeadline, DATE);
-        String acknowledgmentOfServiceForm = "http://www.google.com";
+        String claimNumber = "TBC";
 
-        String body = format("<br />You need to respond before 4pm on %s."
-                                 + "\n\n[Download the Acknowledgement of Service form](%s)",
-                             formattedDeemedDateOfService, acknowledgmentOfServiceForm
+        String body = format(
+            "<br />The claimant has until %s to proceed. We will let you know when they respond.",
+            formatLocalDateTime(responseDeadline, DATE)
         );
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# You've acknowledged service")
+            .confirmationHeader(format(
+                "# You've submitted your response%n## Claim number: %s",
+                claimNumber
+            ))
             .confirmationBody(body)
             .build();
     }
