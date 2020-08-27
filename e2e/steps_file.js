@@ -148,6 +148,7 @@ module.exports = function () {
       await this.retryUntilExists(() => this.click('Submit response'), 'ccd-markdown');
       this.see('You\'ve submitted your response');
       this.click('Close and Return to case details');
+      this.waitForElement(CASE_HEADER);
     },
 
     async clickContinue() {
