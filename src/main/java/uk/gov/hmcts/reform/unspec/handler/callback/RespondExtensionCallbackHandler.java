@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @Service
 @RequiredArgsConstructor
@@ -90,12 +91,12 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
 
         if (proposedDeadlineAccepted == YesOrNo.YES) {
             newDeadline = mapToDate(data, PROPOSED_DEADLINE);
-            data.put(RESPONSE_DEADLINE, newDeadline.atTime(16, 0));
+            data.put(RESPONSE_DEADLINE, newDeadline.atTime(MID_NIGHT));
         }
 
         if (providedCounterDate == YesOrNo.YES) {
             newDeadline = mapToDate(data, COUNTER_DEADLINE);
-            data.put(RESPONSE_DEADLINE, newDeadline.atTime(16, 0));
+            data.put(RESPONSE_DEADLINE, newDeadline.atTime(MID_NIGHT));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -242,7 +242,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondentSolicitor1claimResponseExtensionCounterDate",
     "Label": "New deadline",
-    "HintText": "This can't be later than 28 working days after the current deadline. All deadlines require a response before 4pm on the deadline day.",
+    "HintText": "This can't be later than 28 working days after the current deadline. All deadlines require a response before 23:59 on the deadline day.",
     "FieldType": "Date",
     "SecurityClassification": "Public"
   },

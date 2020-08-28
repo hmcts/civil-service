@@ -259,7 +259,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsExactlyInAnyOrderEntriesOf(
                 Map.of(
                     "deemedDateOfService", LocalDate.of(2099, 6, 25),
-                    "responseDeadline", LocalDateTime.of(2099, 7, 9, 16, 0),
+                    "responseDeadline", LocalDateTime.of(2099, 7, 9, 23, 59, 59),
                     "serviceMethod", Map.of("type", "POST"),
                     "serviceDate", "2099-06-23",
                     "systemGeneratedCaseDocuments", emptyList()
@@ -282,7 +282,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsExactlyInAnyOrderEntriesOf(
                 Map.of(
                     "deemedDateOfService", LocalDate.of(2099, 6, 23),
-                    "responseDeadline", LocalDateTime.of(2099, 7, 7, 16, 0),
+                    "responseDeadline", LocalDateTime.of(2099, 7, 7, 23, 59, 59),
                     "serviceMethod", Map.of("type", "FAX"),
                     "serviceDateAndTime", "2099-06-23T15:00:00",
                     "systemGeneratedCaseDocuments", emptyList()

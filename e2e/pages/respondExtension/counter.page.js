@@ -19,6 +19,7 @@ module.exports = {
 
   async enterCounterDate() {
     I.waitForElement(this.fields.extensionCounter.id);
+    await I.see('Your current deadline is');
     await within(this.fields.extensionCounter.id, () => {
       I.click(this.fields.extensionCounter.options.yes);
     });

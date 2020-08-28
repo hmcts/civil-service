@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +59,7 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
         LocalDate proposedDeadline = mapper.convertValue(data.get(PROPOSED_DEADLINE), LocalDate.class);
         YesOrNo extensionAlreadyAgreed = mapper.convertValue(data.get(EXTENSION_ALREADY_AGREED), YesOrNo.class);
         if (extensionAlreadyAgreed == YES) {
-            data.put(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
+            data.put(RESPONSE_DEADLINE, proposedDeadline.atTime(MID_NIGHT));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)

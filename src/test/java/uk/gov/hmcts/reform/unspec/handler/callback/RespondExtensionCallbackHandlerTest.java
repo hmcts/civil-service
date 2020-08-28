@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @SpringBootTest(classes = {
     RespondExtensionCallbackHandler.class,
@@ -75,7 +76,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(
                 of(COUNTER_DATE, now().minusDays(1),
                    COUNTER, YesOrNo.YES,
-                   RESPONSE_DEADLINE, now().atTime(16, 0)
+                   RESPONSE_DEADLINE, now().atTime(MID_NIGHT)
                 ),
                 CallbackType.MID
             );
@@ -92,7 +93,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(
                 of(COUNTER_DATE, now().plusDays(14),
                    COUNTER, YesOrNo.YES,
-                   RESPONSE_DEADLINE, now().atTime(16, 0)
+                   RESPONSE_DEADLINE, now().atTime(MID_NIGHT)
                 ),
                 CallbackType.MID
             );
@@ -125,7 +126,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate proposedDeadline = now().plusDays(14);
             Map<String, Object> map = new HashMap<>();
             map.put(PROPOSED_DEADLINE, proposedDeadline);
-            map.put(RESPONSE_DEADLINE, now().atTime(16, 0));
+            map.put(RESPONSE_DEADLINE, now().atTime(MID_NIGHT));
             map.put(ACCEPT, YesOrNo.YES);
 
             CallbackParams params = callbackParamsOf(map, CallbackType.ABOUT_TO_SUBMIT);
@@ -133,12 +134,12 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(MID_NIGHT));
         }
 
         @Test
         void shouldUpdateResponseDeadlineToCounterDate_whenAcceptIsNoAndCounterIsYes() {
-            LocalDateTime responseDeadline = now().atTime(16, 0);
+            LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
 
             Map<String, Object> map = new HashMap<>();
             map.put(RESPONSE_DEADLINE, responseDeadline);
@@ -157,7 +158,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldKeepExistingResponseDeadline_whenAcceptIsNoAndCounterIsNo() {
-            LocalDateTime responseDeadline = now().atTime(16, 0);
+            LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
 
             Map<String, Object> map = new HashMap<>();
             map.put(RESPONSE_DEADLINE, responseDeadline);
@@ -178,7 +179,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_withNewResponseDeadline() {
-            LocalDateTime responseDeadline = now().atTime(16, 0);
+            LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
             CallbackParams params = callbackParamsOf(
                 of(RESPONSE_DEADLINE, responseDeadline), CallbackType.SUBMITTED
             );

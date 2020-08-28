@@ -27,6 +27,7 @@ import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -87,7 +88,7 @@ class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetNewResponseDeadline_whenInvoked() {
             Map<String, Object> data = new HashMap<>();
-            LocalDateTime responseDeadline = now().atTime(16, 0);
+            LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
             data.put("responseDeadline", responseDeadline);
 
             CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);

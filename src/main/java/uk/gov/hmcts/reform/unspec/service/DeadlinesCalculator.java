@@ -16,8 +16,7 @@ import static uk.gov.hmcts.reform.unspec.enums.ServiceMethodType.FAX;
 @RequiredArgsConstructor
 public class DeadlinesCalculator {
 
-    private static final LocalTime MID_NIGHT = LocalTime.of(23, 59, 59);
-    private static final LocalTime CLOSE_OFFICE = LocalTime.of(16, 00, 00);
+    public static final LocalTime MID_NIGHT = LocalTime.of(23, 59, 59);
 
     private final WorkingDayIndicator workingDayIndicator;
 
@@ -48,7 +47,7 @@ public class DeadlinesCalculator {
 
     public LocalDateTime calculateDefendantResponseDeadline(@NonNull LocalDate deemedDateOfService) {
         LocalDate responseDeadline = deemedDateOfService.plusDays(14);
-        return calculateFirstWorkingDay(responseDeadline).atTime(CLOSE_OFFICE);
+        return calculateFirstWorkingDay(responseDeadline).atTime(MID_NIGHT);
     }
 
     public LocalDateTime calculateConfirmationOfServiceDeadline(@NonNull LocalDate issueDate) {

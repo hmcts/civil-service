@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallba
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @SpringBootTest(classes = {
     RequestExtensionCallbackHandler.class,
@@ -109,7 +110,7 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateResponseDeadlineToProposedDeadline_whenExtensionAlreadyAgreed() {
             LocalDate proposedDeadline = now().plusDays(14);
-            LocalDateTime responseDeadline = now().atTime(16, 0);
+            LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
 
             CallbackParams params = callbackParamsOf(
                 new HashMap<>() {
@@ -125,7 +126,7 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(16, 0));
+            assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, proposedDeadline.atTime(MID_NIGHT));
         }
 
         @Test

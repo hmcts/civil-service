@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +70,7 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
         LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
 
-        data.put(RESPONSE_DEADLINE, newResponseDate.atTime(16, 0));
+        data.put(RESPONSE_DEADLINE, newResponseDate.atTime(MID_NIGHT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                    .data(data)
