@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "NotProceedingWithClaim",
+    "ListElementCode": "reason",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "NotProceedingWithClaimReason",
+    "ElementLabel": "Why not?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "NotProceedingWithClaim",
+    "ListElementCode": "other",
+    "FieldType": "Text",
+    "ElementLabel": "Give details",
+    "FieldShowCondition": "reason = \"OTHER\"",
+    "SecurityClassification": "Public"
+  }
+]

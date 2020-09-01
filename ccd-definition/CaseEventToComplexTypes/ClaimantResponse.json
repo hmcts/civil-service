@@ -1,0 +1,23 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ResponseDocument",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "respondent1ClaimResponseDocument",
+    "ListElementCode": "file",
+    "EventElementLabel": "Document url",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "DefenceDocument",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant1DefenceResponseDocument",
+    "ListElementCode": "file",
+    "EventElementLabel": "Upload file",
+    "EventHintText": "We accept documents sized 10MB or smaller, in these formats: pdf, doc, docx, jpg, jpeg, xls, xlsx, png.",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  }
+]

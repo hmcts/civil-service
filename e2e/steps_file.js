@@ -34,6 +34,8 @@ const responseConfirmNameAndAddressPage = require('./pages/respondToClaim/confir
 const responseTypePage = require('./pages/respondToClaim/responseType.page');
 const uploadResponsePage = require('./pages/respondToClaim/uploadResponseDocument.page');
 
+const proceedPage = require('./pages/respondToDefence/proceed.page');
+const uploadResponseDocumentPage = require('./pages/respondToDefence/uploadResponseDocument.page');
 
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
@@ -126,6 +128,14 @@ module.exports = function () {
       await responseConfirmNameAndAddressPage.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await event.submit('Submit response', 'You\'ve submitted your response');
+      await event.returnToCaseDetails();
+    },
+
+    async respondToDefence() {
+      await caseViewPage.startEvent('View and respond to defence');
+      await proceedPage.proceedWithClaim();
+      await uploadResponseDocumentPage.uploadResponseDocuments(config.testFile);
+      await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await event.returnToCaseDetails();
     },
 

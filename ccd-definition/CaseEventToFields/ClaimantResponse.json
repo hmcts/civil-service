@@ -1,0 +1,60 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "respondent1ClaimResponseType",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "RespondentResponse",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "respondent1ClaimResponseDocument",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX",
+    "PageID": "RespondentResponse",
+    "ShowSummaryChangeOption": "N",
+    "CaseEventFieldLabel": "Response document"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant1ProceedWithClaim",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": "RespondentResponse",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant1DefenceResponseDocument",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "applicant1ProceedWithClaim = \"Yes\"",
+    "DisplayContext": "COMPLEX",
+    "PageID": "DefenceResponseDocument",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant1NotProceedingReason",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "applicant1ProceedWithClaim = \"No\"",
+    "DisplayContext": "OPTIONAL",
+    "PageID": "NotProceedingWithClaimReason",
+    "ShowSummaryChangeOption": "Y"
+  }
+]
