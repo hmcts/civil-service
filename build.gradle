@@ -290,7 +290,7 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation 'org.mockito:mockito-inline:3.5.7'
+  testImplementation 'org.mockito:mockito-inline:3.5.9'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
