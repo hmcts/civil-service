@@ -38,7 +38,7 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
         + "accepts or rejects your request.</p>";
 
     public static final String PROPOSED_DEADLINE = "respondentSolicitor1claimResponseExtensionProposedDeadline";
-    public static final String RESPONSE_DEADLINE = "responseDeadline";
+    public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
     public static final String EXTENSION_ALREADY_AGREED = "respondentSolicitor1claimResponseExtensionAlreadyAgreed";
 
     private final ObjectMapper mapper;

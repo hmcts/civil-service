@@ -30,6 +30,7 @@ public class Party {
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate soleTraderDateOfBirth;
     private final Address primaryAddress;
+    private final String partyName;
 
     public enum Type {
         INDIVIDUAL,

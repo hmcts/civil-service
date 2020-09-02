@@ -3,8 +3,8 @@ const {I} = inject();
 module.exports = {
 
   fields: {
-    claimantReference: '#solicitorReferences_claimantReference',
-    defendantReference: '#solicitorReferences_defendantReference',
+    claimantReference: '#solicitorReferences_applicantSolicitor1Reference',
+    defendantReference: '#solicitorReferences_respondentSolicitor1Reference',
   },
 
   async enterReferences() {

@@ -64,7 +64,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "DEFENDANT_RESPONSE",
-    "CaseFieldID": "respondent",
+    "CaseFieldID": "respondent1",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "COMPLEX",

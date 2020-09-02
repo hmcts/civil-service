@@ -34,18 +34,22 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "claimant",
+    "ID": "applicant1",
     "Label": "Claimant details",
     "FieldType": "Party",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the first applicant on the case",
+    "_Category":  "COMMON"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "respondent",
+    "ID": "respondent1",
     "Label": "Defendant details",
     "FieldType": "Party",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the first respondent on the case",
+    "_Category":  "COMMON"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -76,10 +80,12 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "claimStatementOfTruth",
+    "ID": "applicantSolicitor1ClaimStatementOfTruth",
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The statement of truth acknowledged by the first applicant solictor of the issue of the claim.",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -87,7 +93,9 @@
     "ID": "claimIssuedDate",
     "Label": "Claim issued date",
     "FieldType": "Date",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The derived legal date the claim is deemed issued. It is based on the date time when the claim was submitted digitally",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -133,58 +141,72 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceMethod",
+    "ID": "serviceMethodToRespondentSolicitor1",
     "Label": "How did you serve the documents?",
     "FieldType": "ServiceMethod",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The delivery method type of service from the applicant solicitor to the first respondent solicitor",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceLocation",
+    "ID": "serviceLocationToRespondentSolicitor1",
     "Label": "Where did you serve the documents?",
     "FieldType": "ServiceLocation",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The delivery location of service from the applicant solicitor to the first respondent solicitor",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceDate",
+    "ID": "serviceDateToRespondentSolicitor1",
     "Label": "When did you serve the documents?",
     "FieldType": "Date",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The actual date the claim was served by the applicant solicitor to the first respondent solicitor",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceDateAndTime",
+    "ID": "serviceDateTimeToRespondentSolicitor1",
     "Label": "When did you serve the documents?",
     "FieldType": "DateTime",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The actual date time the claim was served by the applicant solicitor to the first respondent solicitor",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceStatementOfTruth",
+    "ID": "applicant1ServiceStatementOfTruthToRespondentSolicitor1",
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The statement of truth acknowledged by the applicant solictor of the service of the claim to the first respondent solicitor",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "deemedDateOfService",
+    "ID": "deemedServiceDateToRespondentSolicitor1",
     "Label": "Deemed date of service",
     "FieldType": "Date",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The derived legal date the claim is deemed served to the first respondent solicitor. It is based on the date time when the claim was actually served",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "responseDeadline",
+    "ID": "respondentSolicitor1ResponseDeadline",
     "Label": "Response deadline",
     "FieldType": "DateTime",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The date time by which the first respondent solicitor has to submit the response to the claim.",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -267,18 +289,20 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "defendantDetails",
-    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:** ${respondent.individualTitle}${respondent.soleTraderTitle}${respondent.companyName}${respondent.organisationName} ${respondent.individualFirstName}${respondent.soleTraderFirstName} ${respondent.individualLastName}${respondent.soleTraderLastName} ${respondent.soleTraderTradingAs}\n\n\n\n**Address:**<br />\r\n${respondent.primaryAddress.AddressLine1}<br />${respondent.primaryAddress.AddressLine2}<br />${respondent.primaryAddress.AddressLine3}<br />${respondent.primaryAddress.PostTown}<br />${respondent.primaryAddress.County}<br />${respondent.primaryAddress.PostCode}",
+    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:** ${respondent1.partyName} ${respondent1.soleTraderTradingAs}\n\n\n\n**Address:**<br />\r\n${respondent1.primaryAddress.AddressLine1}<br />${respondent1.primaryAddress.AddressLine2}<br />${respondent1.primaryAddress.AddressLine3}<br />${respondent1.primaryAddress.PostTown}<br />${respondent1.primaryAddress.County}<br />${respondent1.primaryAddress.PostCode}",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "responseIntention",
+    "ID": "respondent1ClaimResponseIntentionType",
     "Label": "Response intention",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "ResponseIntention",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The intended response of the first respondent to the claim",
+    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -309,7 +333,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondentDetails",
-    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:**\n${respondent.companyName}${respondent.organisationName}${respondent.soleTraderTitle}${respondent.individualTitle} ${respondent.individualFirstName}${respondent.soleTraderFirstName} ${respondent.individualLastName}${respondent.soleTraderLastName} ${respondent.soleTraderTradingAs}\n\n**Address:**<br />\n${respondent.primaryAddress.AddressLine1}<br />${respondent.primaryAddress.AddressLine2}<br />${respondent.primaryAddress.AddressLine3}<br />${respondent.primaryAddress.PostTown}<br />${respondent.primaryAddress.County}<br />${respondent.primaryAddress.PostCode}",
+    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:**\n${respondent1.partyName} ${respondent1.soleTraderTradingAs}\n\n**Address:**<br />\n${respondent1.primaryAddress.AddressLine1}<br />${respondent1.primaryAddress.AddressLine2}<br />${respondent1.primaryAddress.AddressLine3}<br />${respondent1.primaryAddress.PostTown}<br />${respondent1.primaryAddress.County}<br />${respondent1.primaryAddress.PostCode}",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },

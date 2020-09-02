@@ -44,8 +44,8 @@ class HasServiceDateTheSameAsOrAfterIssueDateValidatorTest {
     private CaseData buildCaseDataWithServiceDateOf(LocalDate serviceDate) {
         return CaseData.builder()
             .claimIssuedDate(NOW)
-            .serviceMethod(ServiceMethod.builder().type(ServiceMethodType.POST).build())
-            .serviceDate(serviceDate)
+            .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(ServiceMethodType.POST).build())
+            .serviceDateToRespondentSolicitor1(serviceDate)
             .build();
     }
 }

@@ -6,7 +6,7 @@ module.exports = {
 
   fields: {
     serviceDate: {
-      id: 'serviceDate',
+      id: 'serviceDateToRespondentSolicitor1',
     }
   },
 

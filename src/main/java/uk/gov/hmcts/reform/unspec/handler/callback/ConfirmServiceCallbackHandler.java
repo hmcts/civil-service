@@ -115,12 +115,12 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse prepareCertificateOfService(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        ServiceMethod serviceMethod = caseData.getServiceMethod();
+        ServiceMethod serviceMethod = caseData.getServiceMethodToRespondentSolicitor1();
         LocalDateTime serviceDate;
         if (serviceMethod.requiresDateEntry()) {
-            serviceDate = caseData.getServiceDate().atStartOfDay();
+            serviceDate = caseData.getServiceDateToRespondentSolicitor1().atStartOfDay();
         } else {
-            serviceDate = caseData.getServiceDateAndTime();
+            serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();
         }
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
 
@@ -128,12 +128,12 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
             serviceDate, serviceMethod.getType());
         LocalDateTime responseDeadline = deadlinesCalculator.calculateDefendantResponseDeadline(deemedDateOfService);
 
-        data.put("deemedDateOfService", deemedDateOfService);
-        data.put("responseDeadline", responseDeadline);
+        data.put("deemedServiceDateToRespondentSolicitor1", deemedDateOfService);
+        data.put("respondentSolicitor1ResponseDeadline", responseDeadline);
 
         CaseData caseDateUpdated = caseData.toBuilder()
-            .deemedDateOfService(deemedDateOfService)
-            .responseDeadline(responseDeadline)
+            .deemedServiceDateToRespondentSolicitor1(deemedDateOfService)
+            .respondentSolicitor1ResponseDeadline(responseDeadline)
             .build();
 
         CaseDocument certificateOfService = certificateOfServiceGenerator.generate(
@@ -156,9 +156,12 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
 
-        LocalDate deemedDateOfService = caseData.getDeemedDateOfService();
+        LocalDate deemedDateOfService = caseData.getDeemedServiceDateToRespondentSolicitor1();
         String formattedDeemedDateOfService = formatLocalDate(deemedDateOfService, DATE);
-        String responseDeadlineDate = formatLocalDateTime(caseData.getResponseDeadline(), DATE_TIME_AT);
+        String responseDeadlineDate = formatLocalDateTime(
+            caseData.getRespondentSolicitor1ResponseDeadline(),
+            DATE_TIME_AT
+        );
         Long documentSize = unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
             .filter(c -> c.getDocumentType() == DocumentType.CERTIFICATE_OF_SERVICE)
             .findFirst()

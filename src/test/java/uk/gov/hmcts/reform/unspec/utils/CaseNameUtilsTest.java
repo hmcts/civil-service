@@ -12,18 +12,14 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.INDIVIDUAL)
-                          .individualTitle("Mr.")
-                          .individualLastName("Clark")
-                          .individualFirstName("Sam")
-                          .build())
-            .respondent(Party.builder()
+            .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr.")
-                            .individualLastName("Richards")
-                            .individualFirstName("Alex")
+                            .partyName("Mr. Sam Clark")
                             .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .partyName("Mr. Alex Richards")
+                             .build())
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName).isNotNull().isEqualTo("Mr. Sam Clark v Mr. Alex Richards");
@@ -32,24 +28,18 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenMultiClaimant() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.INDIVIDUAL)
-                          .individualTitle("Mr.")
-                          .individualLastName("Clark")
-                          .individualFirstName("Sam")
-                          .build())
-            .claimant2(Party.builder()
-                           .type(Party.Type.INDIVIDUAL)
-                           .individualTitle("Mr.")
-                           .individualLastName("Clark")
-                           .individualFirstName("White")
-                           .build())
-            .respondent(Party.builder()
+            .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr.")
-                            .individualLastName("Richards")
-                            .individualFirstName("Alex")
+                            .partyName("Mr. Sam Clark")
                             .build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Mr. White Clark")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .partyName("Mr. Alex Richards")
+                             .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -59,24 +49,18 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenMultiDefendant() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.INDIVIDUAL)
-                          .individualTitle("Mr.")
-                          .individualLastName("Clark")
-                          .individualFirstName("Sam")
-                          .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Mr. Sam Clark")
+                            .build())
             .respondent2(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .individualTitle("Mr.")
-                             .individualLastName("Richards")
-                             .individualFirstName("White")
+                             .partyName("Mr. White Richards")
                              .build())
-            .respondent(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr.")
-                            .individualLastName("Richards")
-                            .individualFirstName("Alex")
-                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .partyName("Mr. Alex Richards")
+                             .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -86,19 +70,15 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenClaimantIsSoleTrader() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.SOLE_TRADER)
-                          .soleTraderTitle("Mrs.")
-                          .soleTraderLastName("Hammersmith")
-                          .soleTraderFirstName("Georgina")
-                          .soleTraderTradingAs("EuroStar")
-                          .build())
-            .respondent(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr.")
-                            .individualLastName("Richards")
-                            .individualFirstName("Alex")
+            .applicant1(Party.builder()
+                            .type(Party.Type.SOLE_TRADER)
+                            .partyName("Mrs. Georgina Hammersmith")
+                            .soleTraderTradingAs("EuroStar")
                             .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .partyName("Mr. Alex Richards")
+                             .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -108,19 +88,15 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenDefendantIsSoleTrader() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.INDIVIDUAL)
-                          .individualTitle("Mr.")
-                          .individualLastName("Richards")
-                          .individualFirstName("White")
-                          .build())
-            .respondent(Party.builder()
-                            .type(Party.Type.SOLE_TRADER)
-                            .soleTraderTitle("Mr.")
-                            .soleTraderLastName("Johnson")
-                            .soleTraderFirstName("Boris")
-                            .soleTraderTradingAs("UberFlip")
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Mr. White Richards")
                             .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.SOLE_TRADER)
+                             .partyName("Mr. Boris Johnson")
+                             .soleTraderTradingAs("UberFlip")
+                             .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -130,20 +106,16 @@ class CaseNameUtilsTest {
     @Test
     void shouldReturnCaseName_whenBothAreSoleTrader() {
         CaseData caseData = CaseData.builder()
-            .claimant(Party.builder()
-                          .type(Party.Type.SOLE_TRADER)
-                          .soleTraderTitle("Mrs.")
-                          .soleTraderLastName("Hammersmith")
-                          .soleTraderFirstName("Georgina")
-                          .soleTraderTradingAs("EuroStar")
-                          .build())
-            .respondent(Party.builder()
+            .applicant1(Party.builder()
                             .type(Party.Type.SOLE_TRADER)
-                            .soleTraderTitle("Mr.")
-                            .soleTraderLastName("Johnson")
-                            .soleTraderFirstName("Boris")
-                            .soleTraderTradingAs("UberFlip")
+                            .partyName("Mrs. Georgina Hammersmith")
+                            .soleTraderTradingAs("EuroStar")
                             .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.SOLE_TRADER)
+                             .partyName("Mr. Boris Johnson")
+                             .soleTraderTradingAs("UberFlip")
+                             .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);

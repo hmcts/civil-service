@@ -122,11 +122,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
+        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() throws JsonProcessingException {
             when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(LocalDate.now());
             when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
                 .thenReturn(LocalDate.now().atTime(23, 59, 59));
-            CallbackParams params = callbackParamsOf(new HashMap<>(), CallbackType.ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(getCaseData(), CallbackType.ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

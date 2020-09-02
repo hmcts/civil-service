@@ -13,10 +13,10 @@ public class HasServiceDateTheSameAsOrAfterIssueDateValidator implements
     @Override
     public boolean isValid(CaseData value, ConstraintValidatorContext context) {
         LocalDate serviceDate;
-        if (value.getServiceMethod().requiresDateEntry()) {
-            serviceDate = value.getServiceDate();
+        if (value.getServiceMethodToRespondentSolicitor1().requiresDateEntry()) {
+            serviceDate = value.getServiceDateToRespondentSolicitor1();
         } else {
-            serviceDate = value.getServiceDateAndTime().toLocalDate();
+            serviceDate = value.getServiceDateTimeToRespondentSolicitor1().toLocalDate();
         }
 
         return serviceDate.equals(value.getClaimIssuedDate()) || serviceDate.isAfter(value.getClaimIssuedDate());

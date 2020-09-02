@@ -4,7 +4,7 @@ module.exports = {
 
   fields: {
     serviceLocation: {
-      id: '#serviceLocation_serviceLocation',
+      id: '#serviceLocationToRespondentSolicitor1_serviceLocationToRespondentSolicitor1',
       options: {
         usualResidence: 'Usual residence',
         placeOfBusiness: 'Place of business',

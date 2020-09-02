@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -16,12 +17,14 @@ import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
+import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.utils.ElementUtils;
+import uk.gov.hmcts.reform.unspec.utils.PartyNameUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,7 +51,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
         + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
         + " 4pm if you're doing this on the due day";
+    public static final String RESPONDENT = "respondent1";
+    public static final String CLAIMANT = "applicant1";
 
+    private final ObjectMapper mapper;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -109,10 +115,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate)
         );
         data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
+        data.put(RESPONDENT, updatePartyWithPartyName(data.get(RESPONDENT)));
+        data.put(CLAIMANT, updatePartyWithPartyName(data.get(CLAIMANT)));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
             .build();
+    }
+
+    private Party updatePartyWithPartyName(Object partyObject) {
+        Party party = mapper.convertValue(partyObject, Party.class);
+
+        return party.toBuilder().partyName(PartyNameUtils.getPartyNameBasedOnType(party)).build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

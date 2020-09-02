@@ -25,7 +25,7 @@
     "TabID": "Test",
     "TabLabel": "Test",
     "TabDisplayOrder": 3,
-    "CaseFieldID": "respondent",
+    "CaseFieldID": "respondent1",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder tab so that we can use label to inject respondent fields in to acknowledge service event"
   },
@@ -36,7 +36,7 @@
     "TabID": "Test",
     "TabLabel": "Test",
     "TabDisplayOrder": 3,
-    "CaseFieldID": "responseDeadline",
+    "CaseFieldID": "respondentSolicitor1ResponseDeadline",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder so that we can use label to inject responseDeadline field in to confirm service event"
   }

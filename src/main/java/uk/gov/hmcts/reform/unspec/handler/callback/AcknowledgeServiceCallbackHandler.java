@@ -32,8 +32,8 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_SERVICE);
-    private static final String RESPONDENT = "respondent";
-    private static final String RESPONSE_DEADLINE = "responseDeadline";
+    private static final String RESPONDENT = "respondent1";
+    private static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
 
     private final ObjectMapper mapper;
     private final DateOfBirthValidator dateOfBirthValidator;

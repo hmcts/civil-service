@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.unspec.utils.CaseNameUtils;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
-import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -70,32 +69,32 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .claimants(getClaimants(caseData))
             .defendants(geDefendants(caseData))
             .claimValue(caseData.getClaimValue().formData())
-            .statementOfTruth(caseData.getClaimStatementOfTruth())
+            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(TEMP_CLAIM_DETAILS)
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
             .claimantRepresentative(TEMP_REPRESENTATIVE)
             .referenceNumber(REFERENCE_NUMBER)
             .issueDate(caseData.getClaimIssuedDate())
             .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
-            .claimantExternalReference(caseData.getSolicitorReferences().getClaimantReference())
-            .defendantExternalReference(caseData.getSolicitorReferences().getDefendantReference())
+            .claimantExternalReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .defendantExternalReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .caseName(CaseNameUtils.toCaseName.apply(caseData))
             .build();
     }
 
     private List<Defendant> geDefendants(CaseData caseData) {
-        Party respondent = caseData.getRespondent();
+        Party respondent = caseData.getRespondent1();
         return List.of(Defendant.builder()
-                           .name(getPartyNameBasedOnType(respondent))
+                           .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(TEMP_REPRESENTATIVE)
                            .build());
     }
 
     private List<Claimant> getClaimants(CaseData caseData) {
-        Party applicant = caseData.getClaimant();
+        Party applicant = caseData.getApplicant1();
         return List.of(Claimant.builder()
-                           .name(getPartyNameBasedOnType(applicant))
+                           .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .build());
     }

@@ -50,7 +50,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "RESPOND_EXTENSION",
-    "CaseFieldID": "responseDeadline",
+    "CaseFieldID": "respondentSolicitor1ResponseDeadline",
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "READONLY",
     "PageID": "Counter",

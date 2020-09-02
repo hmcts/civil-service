@@ -114,8 +114,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenServiceDateInPastAndAfterIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "POST"));
-                data.put("serviceDate", claimIssueDate.plusDays(1));
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "POST"));
+                data.put("serviceDateToRespondentSolicitor1", claimIssueDate.plusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -129,8 +129,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenServiceDateIsTodayAndAfterIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "POST"));
-                data.put("serviceDate", today);
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "POST"));
+                data.put("serviceDateToRespondentSolicitor1", today);
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -144,8 +144,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnError_whenServiceDateInFuture() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "POST"));
-                data.put("serviceDate", futureDate);
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "POST"));
+                data.put("serviceDateToRespondentSolicitor1", futureDate);
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -159,8 +159,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "POST"));
-                data.put("serviceDate", claimIssueDate.minusDays(1));
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "POST"));
+                data.put("serviceDateToRespondentSolicitor1", claimIssueDate.minusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -181,8 +181,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenServiceDateInPastAndAfterIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "FAX"));
-                data.put("serviceDateAndTime", claimIssueDate.plusDays(1).atTime(12, 0));
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"));
+                data.put("serviceDateTimeToRespondentSolicitor1", claimIssueDate.plusDays(1).atTime(12, 0));
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -196,8 +196,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenServiceDateIsTodayAndAfterIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "FAX"));
-                data.put("serviceDateAndTime", today);
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"));
+                data.put("serviceDateTimeToRespondentSolicitor1", today);
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -211,8 +211,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnError_whenServiceDateInFuture() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "FAX"));
-                data.put("serviceDateAndTime", futureDate);
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"));
+                data.put("serviceDateTimeToRespondentSolicitor1", futureDate);
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -226,8 +226,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
                 Map<String, Object> data = new HashMap<>();
-                data.put("serviceMethod", Map.of("type", "FAX"));
-                data.put("serviceDateAndTime", claimIssueDate.atTime(12, 0).minusDays(1));
+                data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"));
+                data.put("serviceDateTimeToRespondentSolicitor1", claimIssueDate.atTime(12, 0).minusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
                 CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
@@ -248,8 +248,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             Map<String, Object> data = new HashMap<>();
-            data.put("serviceMethod", Map.of("type", "POST"));
-            data.put("serviceDate", "2099-06-23");
+            data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "POST"));
+            data.put("serviceDateToRespondentSolicitor1", "2099-06-23");
 
             CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -258,10 +258,10 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsExactlyInAnyOrderEntriesOf(
                 Map.of(
-                    "deemedDateOfService", LocalDate.of(2099, 6, 25),
-                    "responseDeadline", LocalDateTime.of(2099, 7, 9, 23, 59, 59),
-                    "serviceMethod", Map.of("type", "POST"),
-                    "serviceDate", "2099-06-23",
+                    "deemedServiceDateToRespondentSolicitor1", LocalDate.of(2099, 6, 25),
+                    "respondentSolicitor1ResponseDeadline", LocalDateTime.of(2099, 7, 9, 23, 59, 59),
+                    "serviceMethodToRespondentSolicitor1", Map.of("type", "POST"),
+                    "serviceDateToRespondentSolicitor1", "2099-06-23",
                     "systemGeneratedCaseDocuments", emptyList()
                 ));
         }
@@ -271,8 +271,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             Map<String, Object> data = new HashMap<>();
-            data.put("serviceMethod", Map.of("type", "FAX"));
-            data.put("serviceDateAndTime", "2099-06-23T15:00:00");
+            data.put("serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"));
+            data.put("serviceDateTimeToRespondentSolicitor1", "2099-06-23T15:00:00");
 
             CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -281,10 +281,10 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsExactlyInAnyOrderEntriesOf(
                 Map.of(
-                    "deemedDateOfService", LocalDate.of(2099, 6, 23),
-                    "responseDeadline", LocalDateTime.of(2099, 7, 7, 23, 59, 59),
-                    "serviceMethod", Map.of("type", "FAX"),
-                    "serviceDateAndTime", "2099-06-23T15:00:00",
+                    "deemedServiceDateToRespondentSolicitor1", LocalDate.of(2099, 6, 23),
+                    "respondentSolicitor1ResponseDeadline", LocalDateTime.of(2099, 7, 7, 23, 59, 59),
+                    "serviceMethodToRespondentSolicitor1", Map.of("type", "FAX"),
+                    "serviceDateTimeToRespondentSolicitor1", "2099-06-23T15:00:00",
                     "systemGeneratedCaseDocuments", emptyList()
                 ));
         }
@@ -299,8 +299,8 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             int documentSize = 0;
             LocalDate deemedDateOfService = LocalDate.now();
             LocalDateTime responseDeadline = deemedDateOfService.plusDays(14).atTime(16, 0);
-            data.put("deemedDateOfService", deemedDateOfService);
-            data.put("responseDeadline", responseDeadline);
+            data.put("deemedServiceDateToRespondentSolicitor1", deemedDateOfService);
+            data.put("respondentSolicitor1ResponseDeadline", responseDeadline);
 
             CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
 

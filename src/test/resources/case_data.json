@@ -1,5 +1,5 @@
 {
-  "claimant": {
+  "applicant1": {
     "type": "INDIVIDUAL",
     "individualTitle": "Mr",
     "primaryAddress": {
@@ -15,7 +15,7 @@
     "individualFirstName": "John",
     "individualDateOfBirth": "1980-06-23"
   },
-  "respondent": {
+  "respondent1": {
     "type": "INDIVIDUAL",
     "individualTitle": "Mr",
     "primaryAddress": {
@@ -35,11 +35,11 @@
     "lowerValue": "10000",
     "higherValue": "100000"
   },
-  "serviceDate": "2020-06-23",
+  "serviceDateToRespondentSolicitor1": "2020-06-23",
   "courtLocation": {
     "preferredCourt": "The court location"
   },
-  "serviceMethod": {
+  "serviceMethodToRespondentSolicitor1": {
     "type": "POST"
   },
   "servedDocuments": [
@@ -51,11 +51,11 @@
     "CERTIFICATE_SUITABILITY",
     "OTHER"
   ],
-  "serviceLocation": {
+  "serviceLocationToRespondentSolicitor1": {
     "location": "RESIDENCE"
   },
-  "responseDeadline": "2020-07-09T16:00:00",
-  "deemedDateOfService": "2020-06-25",
+  "respondentSolicitor1ResponseDeadline": "2020-07-09T16:00:00",
+  "deemedServiceDateToRespondentSolicitor1": "2020-06-25",
   "servedDocumentFiles": {
     "other": [
       {
@@ -109,15 +109,15 @@
     ]
   },
   "solicitorReferences": {
-    "defendantReference": "6789",
-    "claimantReference": "12345"
+    "respondentSolicitor1Reference": "6789",
+    "applicantSolicitor1Reference": "12345"
   },
   "servedDocumentsOther": "Other documents",
-  "claimStatementOfTruth": {
+  "applicantSolicitor1ClaimStatementOfTruth": {
     "name": "John",
     "role": "Smith"
   },
-  "serviceStatementOfTruth": {
+  "applicant1ServiceStatementOfTruthToRespondentSolicitor1": {
     "name": "John",
     "role": "Smith"
   },

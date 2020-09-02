@@ -4,7 +4,7 @@ module.exports = {
 
   fields: {
     serviceMethod: {
-      id: '#serviceMethod_serviceMethod',
+      id: '#serviceMethodToRespondentSolicitor1_serviceMethodToRespondentSolicitor1',
       options: {
         post: 'First class post',
         dx: 'Document exchange',

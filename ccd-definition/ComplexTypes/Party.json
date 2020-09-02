@@ -101,5 +101,13 @@
     "FieldType": "AddressUK",
     "ElementLabel": "Address",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyName",
+    "FieldType": "Text",
+    "ElementLabel": "Party name",
+    "FieldShowCondition": "type = \"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public"
   }
 ]

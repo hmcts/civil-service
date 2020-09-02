@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 public class RespondToClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
-    public static final String RESPONDENT = "respondent";
+    public static final String RESPONDENT = "respondent1";
     public static final String CLAIMANT_RESPONSE_DEADLINE = "applicantSolicitorResponseDeadlineToRespondentSolicitor1";
 
     private final ObjectMapper mapper;

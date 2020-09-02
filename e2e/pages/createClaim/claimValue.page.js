@@ -13,7 +13,7 @@ module.exports = {
     I.waitForElement(this.fields.lowerValue);
     I.fillField(this.fields.lowerValue, '1000');
     I.fillField(this.fields.higherValue, '10000');
-    await I.retryUntilExists(() => I.clickContinue(), statementOfTruth.fields('claim').name);
+    await I.retryUntilExists(() => I.clickContinue(), statementOfTruth.fields.claim.name);
   }
 };
 

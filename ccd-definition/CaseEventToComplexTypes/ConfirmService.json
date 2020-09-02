@@ -61,7 +61,7 @@
     "LiveFrom": "01/01/2017",
     "ID": "StatementOfTruth",
     "CaseEventID": "CONFIRM_SERVICE",
-    "CaseFieldID": "serviceStatementOfTruth",
+    "CaseFieldID": "applicant1ServiceStatementOfTruthToRespondentSolicitor1",
     "ListElementCode": "label",
     "EventElementLabel": "I believe that the facts stated in this certificate are true.",
     "FieldDisplayOrder": 1,
@@ -71,7 +71,7 @@
     "LiveFrom": "01/01/2017",
     "ID": "StatementOfTruth",
     "CaseEventID": "CONFIRM_SERVICE",
-    "CaseFieldID": "serviceStatementOfTruth",
+    "CaseFieldID": "applicant1ServiceStatementOfTruthToRespondentSolicitor1",
     "ListElementCode": "name",
     "FieldDisplayOrder": 2,
     "DisplayContext": "MANDATORY"
@@ -80,7 +80,7 @@
     "LiveFrom": "01/01/2017",
     "ID": "StatementOfTruth",
     "CaseEventID": "CONFIRM_SERVICE",
-    "CaseFieldID": "serviceStatementOfTruth",
+    "CaseFieldID": "applicant1ServiceStatementOfTruthToRespondentSolicitor1",
     "ListElementCode": "role",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY"

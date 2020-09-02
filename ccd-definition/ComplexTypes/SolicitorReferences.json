@@ -1,16 +1,20 @@
 [
   {
     "ID": "SolicitorReferences",
-    "ListElementCode": "claimantReference",
+    "ListElementCode": "applicantSolicitor1Reference",
     "FieldType": "Text",
     "ElementLabel": "Claimant's legal representative's reference",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The reference value understood by the first applicant solicitor firm for the [claim / applicant]",
+    "_Category":  "COMMON"
   },
   {
     "ID": "SolicitorReferences",
-    "ListElementCode": "defendantReference",
+    "ListElementCode": "respondentSolicitor1Reference",
     "FieldType": "Text",
     "ElementLabel": "Defendant's legal representative's reference",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "_Definition":  "The reference value understood by the first respondent solicitor firm for the [claim / respondent]",
+    "_Category":  "COMMON"
   }
 ]

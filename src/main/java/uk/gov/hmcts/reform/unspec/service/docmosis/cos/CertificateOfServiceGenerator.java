@@ -68,15 +68,15 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
             .caseName(CaseNameUtils.toCaseName.apply(caseData))
             .referenceNumber(TEMP_REFERENCE_NUMBER)
             .solicitorReferences(prepareSolicitorReferences(caseData.getSolicitorReferences()))
-            .dateServed(caseData.getServiceDate())
-            .deemedDateOfService(caseData.getDeemedDateOfService())
+            .dateServed(caseData.getServiceDateToRespondentSolicitor1())
+            .deemedDateOfService(caseData.getDeemedServiceDateToRespondentSolicitor1())
             .applicantName(CaseNameUtils.fetchClaimantName(caseData))
             .respondentName(CaseNameUtils.fetchDefendantName(caseData))
             .respondentRepresentative(TEMP_REPRESENTATIVE)
-            .serviceMethod(caseData.getServiceMethod().getType().getLabel())
-            .servedLocation(prepareServedLocation(caseData.getServiceLocation()))
+            .serviceMethod(caseData.getServiceMethodToRespondentSolicitor1().getType().getLabel())
+            .servedLocation(prepareServedLocation(caseData.getServiceLocationToRespondentSolicitor1()))
             .documentsServed(prepareDocumentList(caseData.getServedDocuments(), caseData.getServedDocumentsOther()))
-            .statementOfTruth(caseData.getClaimStatementOfTruth())
+            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .applicantRepresentative(TEMP_REPRESENTATIVE)
             .build();
     }
@@ -84,8 +84,10 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
     public SolicitorReferences prepareSolicitorReferences(SolicitorReferences solicitorReferences) {
         return SolicitorReferences
             .builder()
-            .claimantReference(ofNullable(solicitorReferences.getClaimantReference()).orElse("Not Provided"))
-            .defendantReference(ofNullable(solicitorReferences.getDefendantReference()).orElse("Not Provided"))
+            .applicantSolicitor1Reference(
+                ofNullable(solicitorReferences.getApplicantSolicitor1Reference()).orElse("Not Provided"))
+            .respondentSolicitor1Reference(
+                ofNullable(solicitorReferences.getRespondentSolicitor1Reference()).orElse("Not Provided"))
             .build();
     }
 

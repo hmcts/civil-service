@@ -9,6 +9,6 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolicitorReferences {
 
-    private final String claimantReference;
-    private final String defendantReference;
+    private final String applicantSolicitor1Reference;
+    private final String respondentSolicitor1Reference;
 }

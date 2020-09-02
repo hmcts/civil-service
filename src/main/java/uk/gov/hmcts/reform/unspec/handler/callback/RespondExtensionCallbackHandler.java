@@ -33,7 +33,7 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESPOND_EXTENSION);
     public static final String COUNTER_DEADLINE = "respondentSolicitor1claimResponseExtensionCounterDate";
-    public static final String RESPONSE_DEADLINE = "responseDeadline";
+    public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
     public static final String PROPOSED_DEADLINE = "respondentSolicitor1claimResponseExtensionProposedDeadline";
     public static final String EXTENSION_REASON = "respondentSolicitor1claimResponseExtensionReason";
     public static final String PROVIDED_COUNTER_DATE = "respondentSolicitor1claimResponseExtensionCounter";

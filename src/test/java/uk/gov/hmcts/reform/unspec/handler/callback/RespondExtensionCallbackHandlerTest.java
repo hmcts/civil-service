@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 })
 class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    public static final String RESPONSE_DEADLINE = "responseDeadline";
+    public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
     public static final String COUNTER_DATE = "respondentSolicitor1claimResponseExtensionCounterDate";
     public static final String COUNTER = "respondentSolicitor1claimResponseExtensionCounter";
 

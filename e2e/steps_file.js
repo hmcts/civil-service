@@ -74,8 +74,8 @@ module.exports = function () {
       await this.clickContinue();
       await solicitorReferencesPage.enterReferences();
       await chooseCourtPage.enterCourt();
-      await party.enterParty('claimant', config.address);
-      await party.enterParty('respondent', config.address);
+      await party.enterParty('applicant1', config.address);
+      await party.enterParty('respondent1', config.address);
       await claimTypePage.selectClaimType();
       await claimValuePage.enterClaimValue();
       await statementOfTruth.enterNameAndRole('claim');

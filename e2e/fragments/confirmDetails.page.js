@@ -4,7 +4,7 @@ module.exports = {
 
   fields: {
     solicitorReferences: {
-      id: '#solicitorReferences_defendantReference'
+      id: '#solicitorReferences_respondentSolicitor1Reference'
     }
   },
 

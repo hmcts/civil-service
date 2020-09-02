@@ -44,7 +44,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(strings = {"individualDateOfBirth", "soleTraderDateOfBirth"})
         void shouldReturnError_whenDateOfBirthIsInTheFuture(String dateOfBirthField) {
             Map<String, Object> data = new HashMap<>();
-            data.put("respondent", Map.of(dateOfBirthField, "2030-01-01"));
+            data.put("respondent1", Map.of(dateOfBirthField, "2030-01-01"));
 
             CallbackParams params = callbackParamsOf(data, CallbackType.MID);
 
@@ -58,7 +58,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(strings = {"individualDateOfBirth", "soleTraderDateOfBirth"})
         void shouldReturnNoError_whenDateOfBirthIsInThePast(String dateOfBirthField) {
             Map<String, Object> data = new HashMap<>();
-            data.put("respondent", Map.of(dateOfBirthField, "2000-01-01"));
+            data.put("respondent1", Map.of(dateOfBirthField, "2000-01-01"));
 
             CallbackParams params = callbackParamsOf(data, CallbackType.MID);
 
