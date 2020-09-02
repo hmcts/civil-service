@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.service.UserService;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
@@ -100,8 +101,10 @@ public class DocumentManagementService {
                 URI.create(documentMetadata.links.binary.href).getPath()
             );
 
-            ByteArrayResource resource = (ByteArrayResource) responseEntity.getBody();
-            return resource.getByteArray();
+            return Optional.ofNullable(responseEntity.getBody())
+                .map(ByteArrayResource.class::cast)
+                .map(ByteArrayResource::getByteArray)
+                .orElseThrow(RuntimeException::new);
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
