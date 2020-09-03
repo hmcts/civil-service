@@ -377,5 +377,13 @@
     "FieldType": "Text",
     "Label": "CaseMan Reference number",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "withdrawClaim",
+    "Label": "Withdraw claim",
+    "FieldType": "CloseClaim",
+    "SecurityClassification": "Public"
   }
 ]

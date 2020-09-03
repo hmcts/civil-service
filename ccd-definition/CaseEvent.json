@@ -123,5 +123,19 @@
     "ShowSummary": "Y",
     "ShowEventNotes": "N",
     "EndButtonLabel": "Submit your response"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "WITHDRAW_CLAIM",
+    "Name": "Withdraw claim",
+    "Description": "Withdraw a claim",
+    "DisplayOrder": 9,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "CLOSED",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "EndButtonLabel": "Withdraw claim"
   }
 ]

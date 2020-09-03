@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.unspec.validation.interfaces.HasServiceDateTheSameAsO
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.PastOrPresent;
 
 @Data
@@ -48,4 +49,7 @@ public class CaseData {
     private final ServiceLocation serviceLocationToRespondentSolicitor1;
     private final ServedDocumentFiles servedDocumentFiles;
     private final String servedDocumentsOther;
+
+    @Valid
+    private final CloseClaim withdrawClaim;
 }
