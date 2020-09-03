@@ -38,6 +38,7 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
     public static final String EXTENSION_REASON = "respondentSolicitor1claimResponseExtensionReason";
     public static final String PROVIDED_COUNTER_DATE = "respondentSolicitor1claimResponseExtensionCounter";
     public static final String PROPOSED_DEADLINE_ACCEPTED = "respondentSolicitor1claimResponseExtensionAccepted";
+    public static final String LEGACY_CASE_REFERENCE = "legacyCaseReference";
 
     private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
@@ -108,7 +109,7 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         LocalDateTime responseDeadline = mapToDateTime(data, RESPONSE_DEADLINE);
 
-        String claimNumber = "TBC";
+        String claimNumber = data.get(LEGACY_CASE_REFERENCE).toString();
 
         String body = format(
             "<br />The defendant must respond before 4pm on %s", formatLocalDateTime(responseDeadline, DATE));

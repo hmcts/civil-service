@@ -50,7 +50,7 @@ import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentMana
 class CertificateOfServiceGeneratorTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
-    public static final String REFERENCE_NUMBER = "000LR095";
+    public static final String REFERENCE_NUMBER = "000LR001";
     private final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private final String fileName = format(N215.getDocumentTitle(), REFERENCE_NUMBER);
 

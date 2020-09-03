@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
+import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
@@ -60,6 +61,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final IssueDateCalculator issueDateCalculator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ReferenceNumberRepository referenceNumberRepository;
 
     @Override
     protected Map<CallbackType, Callback> callbacks() {
@@ -101,9 +103,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         LocalDateTime submittedAt = LocalDateTime.now();
         LocalDate issueDate = issueDateCalculator.calculateIssueDay(submittedAt);
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        String referenceNumber = referenceNumberRepository.getReferenceNumber();
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
-            caseData.toBuilder().claimIssuedDate(issueDate).claimSubmittedDateTime(submittedAt).build(),
+            caseData.toBuilder()
+                .claimIssuedDate(issueDate)
+                .legacyCaseReference(referenceNumber)
+                .claimSubmittedDateTime(submittedAt)
+                .build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
@@ -117,6 +124,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
         data.put(RESPONDENT, updatePartyWithPartyName(data.get(RESPONDENT)));
         data.put(CLAIMANT, updatePartyWithPartyName(data.get(CLAIMANT)));
+        data.put("legacyCaseReference", referenceNumber);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
@@ -139,7 +147,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-        String claimNumber = "TBC";
+        String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
             CONFIRMATION_SUMMARY,

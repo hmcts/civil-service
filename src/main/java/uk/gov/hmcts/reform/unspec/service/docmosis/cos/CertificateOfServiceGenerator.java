@@ -43,7 +43,6 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
                             .postCode("NP204AG")
                             .build())
         .build(); //TODO Rep details need to be picked from reference data
-    public static final String TEMP_REFERENCE_NUMBER = "000LR095"; //TODO Need to agree a way to get
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
@@ -66,7 +65,7 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
     public CertificateOfServiceForm getTemplateData(CaseData caseData) {
         return CertificateOfServiceForm.builder()
             .caseName(CaseNameUtils.toCaseName.apply(caseData))
-            .referenceNumber(TEMP_REFERENCE_NUMBER)
+            .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(prepareSolicitorReferences(caseData.getSolicitorReferences()))
             .dateServed(caseData.getServiceDateToRespondentSolicitor1())
             .deemedDateOfService(caseData.getDeemedServiceDateToRespondentSolicitor1())

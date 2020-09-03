@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallba
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.NOT_AGREED;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RespondExtensionCallbackHandler.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
@@ -37,6 +38,8 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     JacksonAutoConfiguration.class
 })
 class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    public static final String REFERENCE_NUMBER = "000LR001";
 
     @Autowired
     private RequestExtensionCallbackHandler handler;
@@ -162,7 +165,8 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(
                 of(PROPOSED_DEADLINE, proposedDeadline,
                    EXTENSION_ALREADY_AGREED, "Yes",
-                   RESPONSE_DEADLINE, responseDeadline
+                   RESPONSE_DEADLINE, responseDeadline,
+                   LEGACY_CASE_REFERENCE, REFERENCE_NUMBER
                 ),
                 CallbackType.SUBMITTED
             );
@@ -171,7 +175,10 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You asked for extra time to respond\n## Claim number: TBC")
+                    .confirmationHeader(format(
+                        "# You asked for extra time to respond%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
                     .confirmationBody(prepareBody(proposedDeadline, responseDeadline, ALREADY_AGREED))
                     .build());
         }
@@ -183,7 +190,8 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(
                 of(PROPOSED_DEADLINE, proposedDeadline,
                    EXTENSION_ALREADY_AGREED, "No",
-                   RESPONSE_DEADLINE, responseDeadline
+                   RESPONSE_DEADLINE, responseDeadline,
+                   LEGACY_CASE_REFERENCE, REFERENCE_NUMBER
                 ),
                 CallbackType.SUBMITTED
             );
@@ -192,7 +200,10 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You asked for extra time to respond\n## Claim number: TBC")
+                    .confirmationHeader(format(
+                        "# You asked for extra time to respond%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
                     .confirmationBody(prepareBody(proposedDeadline, responseDeadline, NOT_AGREED))
                     .build());
         }

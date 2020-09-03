@@ -26,11 +26,11 @@ import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 @RequiredArgsConstructor
 public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedClaimForm> {
 
+    //TODO this need ui implementation to capture claim details
     public static final String TEMP_CLAIM_DETAILS = "The claimant seeks compensation from injuries and losses arising"
         + " from a road traffic accident which occurred on 1st July 2017 as a result of the negligence of the first "
         + "defendant.The claimant seeks compensation from injuries and losses arising from a road traffic accident "
         + "which occurred on 1st July 2017 as a result of the negligence of the first defendant.";
-    //TODO this need ui implementation to capture claim details
 
     private static final Representative TEMP_REPRESENTATIVE = Representative.builder()
         .contactName("MiguelSpooner")
@@ -45,7 +45,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
                             .postCode("NP204AG")
                             .build())
         .build(); //TODO Rep details need to be picked from reference data
-    public static final String REFERENCE_NUMBER = "000LR095"; //TODO Need to agree a way to get
+
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
@@ -73,7 +73,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .claimDetails(TEMP_CLAIM_DETAILS)
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
             .claimantRepresentative(TEMP_REPRESENTATIVE)
-            .referenceNumber(REFERENCE_NUMBER)
+            .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getClaimIssuedDate())
             .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
             .claimantExternalReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())

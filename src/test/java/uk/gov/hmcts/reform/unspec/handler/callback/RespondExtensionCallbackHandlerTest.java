@@ -22,6 +22,7 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static uk.gov.hmcts.reform.unspec.handler.callback.RespondExtensionCallbackHandler.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
@@ -36,6 +37,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
     public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
     public static final String COUNTER_DATE = "respondentSolicitor1claimResponseExtensionCounterDate";
     public static final String COUNTER = "respondentSolicitor1claimResponseExtensionCounter";
+    public static final String REFERENCE_NUMBER = "000LR001";
 
     @Autowired
     private RespondExtensionCallbackHandler handler;
@@ -181,7 +183,8 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedResponse_withNewResponseDeadline() {
             LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
             CallbackParams params = callbackParamsOf(
-                of(RESPONSE_DEADLINE, responseDeadline), CallbackType.SUBMITTED
+                of(RESPONSE_DEADLINE, responseDeadline,
+                   LEGACY_CASE_REFERENCE, REFERENCE_NUMBER), CallbackType.SUBMITTED
             );
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -191,7 +194,10 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've responded to the request for more time%n## Claim number: TBC"))
+                    .confirmationHeader(format(
+                        "# You've responded to the request for more time%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
                     .confirmationBody(expectedBody)
                     .build());
         }

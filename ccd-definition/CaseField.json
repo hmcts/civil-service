@@ -369,5 +369,13 @@
     "FieldType": "NotProceedingWithClaim",
     "SecurityClassification": "Public",
     "Comment": "Label purposefully left blank so not to appear in the UI"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "legacyCaseReference",
+    "FieldType": "Text",
+    "Label": "CaseMan Reference number",
+    "SecurityClassification": "Public"
   }
 ]

@@ -6,18 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.unspec.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
@@ -50,16 +49,16 @@ import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLA
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService.UNSPEC;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
+@SpringBootTest(classes = {
     CreateClaimCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class
-})
+    ClaimIssueConfiguration.class,
+    MockDatabaseConfiguration.class},
+    properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    public static final String REFERENCE_NUMBER = "000LR095";
+    public static final String REFERENCE_NUMBER = "000LR001";
     @MockBean
     private SealedClaimFormGenerator sealedClaimFormGenerator;
     @MockBean
@@ -132,6 +131,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getData()).containsEntry("claimIssuedDate", LocalDate.now());
+            assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
             assertThat(response.getData()).containsEntry(
                 "confirmationOfServiceDeadline",
                 LocalDate.now().atTime(23, 59, 59)
@@ -179,6 +179,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .value(CaseDocument.builder().documentSize(documentSize).documentType(SEALED_CLAIM).build())
                 .build();
             data.put("systemGeneratedCaseDocuments", List.of(documents));
+            data.put("legacyCaseReference", REFERENCE_NUMBER);
             CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -195,7 +196,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Your claim has been issued\n## Claim number: TBC")
+                    .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", REFERENCE_NUMBER))
                     .confirmationBody(body)
                     .build());
         }
@@ -203,6 +204,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedSubmittedCallbackResponseObject_whenDocumentIsNotGenerated() {
             Map<String, Object> data = new HashMap<>();
+            data.put("legacyCaseReference", REFERENCE_NUMBER);
             int documentSize = 0;
             CallbackParams params = callbackParamsOf(data, CallbackType.SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -220,7 +222,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# Your claim has been issued%n## Claim number: TBC"))
+                    .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", REFERENCE_NUMBER))
                     .confirmationBody(body)
                     .build());
         }

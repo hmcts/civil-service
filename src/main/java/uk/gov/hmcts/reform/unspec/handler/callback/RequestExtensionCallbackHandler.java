@@ -40,6 +40,7 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     public static final String PROPOSED_DEADLINE = "respondentSolicitor1claimResponseExtensionProposedDeadline";
     public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
     public static final String EXTENSION_ALREADY_AGREED = "respondentSolicitor1claimResponseExtensionAlreadyAgreed";
+    public static final String LEGACY_CASE_REFERENCE = "legacyCaseReference";
 
     private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
@@ -93,7 +94,7 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
             LocalDate.class
         );
         YesOrNo extensionAlreadyAgreed = mapper.convertValue(data.get(EXTENSION_ALREADY_AGREED), YesOrNo.class);
-        String claimNumber = "TBC";
+        String claimNumber = data.get(LEGACY_CASE_REFERENCE).toString();
 
         LocalDate responseDeadline = mapper.convertValue(
             data.get(RESPONSE_DEADLINE),
