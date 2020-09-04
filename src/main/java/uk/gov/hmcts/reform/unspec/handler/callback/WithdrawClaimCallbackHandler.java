@@ -13,20 +13,20 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.validation.groups.ClaimWithdrawalDateGroup;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 
 @Service
 @RequiredArgsConstructor
 public class WithdrawClaimCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(WITHDRAW_CLAIM);
+    private static final List<CaseEvent> EVENTS = List.of(WITHDRAW_CLAIM, DISCONTINUE_CLAIM);
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final Validator validator;

@@ -137,5 +137,19 @@
     "ShowSummary": "N",
     "ShowEventNotes": "N",
     "EndButtonLabel": "Withdraw claim"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "DISCONTINUE_CLAIM",
+    "Name": "Discontinue claim",
+    "Description": "Discontinue a claim",
+    "DisplayOrder": 10,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "CLOSED",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "EndButtonLabel": "Discontinue claim"
   }
 ]
