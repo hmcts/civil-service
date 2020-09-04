@@ -40,6 +40,7 @@ exports.config = {
     },
   },
   mocha: {
+    bail: true,
     reporterOptions: {
       'codeceptjs-cli-reporter': {
         stdout: '-',
