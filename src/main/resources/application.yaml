@@ -95,6 +95,16 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
+feign:
+  client:
+    config:
+      remoteRuntimeService:
+        url: http://localhost:9404/engine-rest/
+      remoteRepositoryService:
+        url: http://localhost:9404/engine-rest/
+      remoteExternalTaskService:
+        url: http://localhost:9404/engine-rest/
+
 fees:
   api:
     url: http://localhost:8765
@@ -166,3 +176,13 @@ docmosis:
   tornado:
     url: http://fake-docmosis-api
     key: fake-key
+
+feign:
+  client:
+    config:
+      remoteRuntimeService:
+        url: http://fake/engine-rest/
+      remoteRepositoryService:
+        url: http://fake/engine-rest/
+      remoteExternalTaskService:
+        url: http://fake/engine-rest/

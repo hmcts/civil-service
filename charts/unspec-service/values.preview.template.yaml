@@ -14,6 +14,8 @@ postgresql:
       CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
   postgresqlUsername: hmcts
   postgresqlPassword: hmcts
   persistence:
@@ -40,6 +42,9 @@ java:
     CMC_DB_PASSWORD: hmcts
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
+    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: camunda-${SERVICE_FQDN}/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: camunda-${SERVICE_FQDN}/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: camunda-${SERVICE_FQDN}/engine-rest/
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
@@ -132,3 +137,16 @@ ccd:
   postgresql:
     persistence:
       enabled: false
+
+camunda-bpm:
+  enabled: true
+  java:
+    disableKeyVaults: true
+    releaseNameOverride: ${SERVICE_NAME}-camunda
+    ingressHost: camunda-${SERVICE_FQDN}
+    environment:
+      CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
+      CAMUNDA_DB_NAME: camunda
+      CAMUNDA_DB_USER_NAME: hmcts
+      CAMUNDA_DB_PASSWORD: hmcts
+      CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true

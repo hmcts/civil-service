@@ -8,5 +8,9 @@
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
+  <suppress until="2030-01-01">
+    <notes><![CDATA[Awaiting version bump from jackson-module-kotlin to take 1.3.7 -> 1.4]]></notes>
+    <cve>CVE-2020-15824</cve>
+  </suppress>
 
 </suppressions>

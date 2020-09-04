@@ -93,6 +93,7 @@ withPipeline(type, product, component) {
       eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/add-roles-preview.sh
       ./bin/import-ccd-definition.sh
+      ./bin/import-bpmn-diagram.sh "payment.bpmn"
     """
 
     env.URL="https://xui-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"

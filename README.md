@@ -8,6 +8,7 @@ Civil Unspecified's CCD Callback Service.
 - [Prerequisites](#prerequisites)
 - [Testing](#testing)
 - [Building and deploying application](#building-and-deploying-the-application)
+- [Camunda](#camunda)
 
 ## Prerequisites:
 - [Docker](https://www.docker.com)
@@ -155,6 +156,21 @@ docker image rm <image-id>
 ```
 
 There is no need to remove postgres and java or similar core images.
+
+## Camunda
+
+Camunda UI runs on `http:localhost:9404`. You can login with:
+```$xslt
+username: demo
+password: demo
+```
+
+The REST API is available at `http:localhost:9404/engine-rest/`. The REST API documentation is available [here](https://docs.camunda.org/manual/latest/reference/rest/).
+
+To upload a bpmn diagram via the REST API there is a script located in `./bin directory`.
+Run `./bin/import-bpmn-diagram.sh "the name of the diagram"` to upload it to Camunda. The diagram must exist within
+`src/main/resources`. By setting `CAMUNDA_BASE_URL` env variable you can also use this script to upload diagrams to
+Camunda in other environments.
 
 ## License
 

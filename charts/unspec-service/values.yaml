@@ -8,6 +8,9 @@ idam-pr:
 xui-webapp:
   enabled: false
 
+camunda-bpm:
+  enabled: false
+
 java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/unspec/service:latest'
@@ -37,6 +40,9 @@ java:
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCMOSIS_TORNADO_URL: https://docmosis-development.platform.hmcts.net
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: https://camunda-bpm.{{ .Values.global.environment }}.platform.hmcts.net/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: https://camunda-bpm.{{ .Values.global.environment }}.platform.hmcts.net/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: https://camunda-bpm.{{ .Values.global.environment }}.platform.hmcts.net/engine-rest/
 
   keyVaults:
     unspec:

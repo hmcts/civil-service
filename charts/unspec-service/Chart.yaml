@@ -2,13 +2,13 @@ apiVersion: v2
 description: A Helm chart for unspec-service App
 name: unspec-service
 home: https://github.com/hmcts/unspec-service
-version: 1.3.0
+version: 1.3.1
 maintainers:
   - name: HMCTS Unspecified team
 
 dependencies:
   - name: java
-    version: 3.0.0
+    version: 3.2.1
     repository: '@hmctspublic'
   - name: ccd
     version: 4.3.3
@@ -27,3 +27,7 @@ dependencies:
     version: 8.9.8
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
+  - name: camunda-bpm
+    version: 0.0.9
+    repository: '@hmctspublic'
+    condition: camunda-bpm.enabled
