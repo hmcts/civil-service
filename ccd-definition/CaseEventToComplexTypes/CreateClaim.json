@@ -345,6 +345,15 @@
   },
   {
     "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "particularsOfClaim",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
     "ID": "ClaimValue",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimValue",
