@@ -19,8 +19,6 @@ const serviceMethodPage = require('./pages/confirmService/serviceMethod.page');
 const serviceLocationPage = require('./pages/confirmService/serviceLocation.page');
 const serviceDatePage = require('./pages/confirmService/serviceDate.page');
 
-const confirmNameAndAddressPage = require('./pages/acknowledgeSerivce/confirmNameAndAddress.page');
-const confirmDetailsPage = require('./fragments/confirmDetails.page');
 const responseIntentionPage = require('./pages/acknowledgeSerivce/responseIntention.page');
 
 const proposeDeadline = require('./pages/requestExtension/proposeDeadline.page');
@@ -30,7 +28,6 @@ const respondToExtensionPage = require('./pages/respondExtension/respond.page');
 const counterExtensionPage = require('./pages/respondExtension/counter.page');
 const rejectionReasonPage = require('./pages/respondExtension/reason.page');
 
-const responseConfirmNameAndAddressPage = require('./pages/respondToClaim/confirmNameAndAddress.page');
 const responseTypePage = require('./pages/respondToClaim/responseType.page');
 const uploadResponsePage = require('./pages/respondToClaim/uploadResponseDocument.page');
 
@@ -40,6 +37,8 @@ const uploadResponseDocumentPage = require('./pages/respondToDefence/uploadRespo
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
 const event = require('./fragments/event');
+const defendantDetails = require('./fragments/defendantDetails.page');
+const confirmDetailsPage = require('./fragments/confirmDetails.page');
 
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
@@ -97,7 +96,7 @@ module.exports = function () {
 
     async acknowledgeService() {
       await caseViewPage.startEvent('Acknowledge service');
-      await confirmNameAndAddressPage.verifyDetails();
+      await defendantDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await responseIntentionPage.selectResponseIntention();
       await event.submit('Acknowledge service', 'You\'ve acknowledged service');
@@ -125,7 +124,7 @@ module.exports = function () {
       await caseViewPage.startEvent('Respond to claim');
       await responseTypePage.selectFullDefence();
       await uploadResponsePage.uploadResponseDocuments(config.testFile);
-      await responseConfirmNameAndAddressPage.verifyDetails();
+      await defendantDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await event.submit('Submit response', 'You\'ve submitted your response');
       await event.returnToCaseDetails();

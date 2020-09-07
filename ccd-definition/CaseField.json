@@ -332,14 +332,6 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "respondentDetails",
-    "Label": "The claimant has provided the following name and address for the defendant.\n\nIf this is not correct, you should contact the claimant's legal representative.\n\n**Name:**\n${respondent1.partyName} ${respondent1.soleTraderTradingAs}\n\n**Address:**<br />\n${respondent1.primaryAddress.AddressLine1}<br />${respondent1.primaryAddress.AddressLine2}<br />${respondent1.primaryAddress.AddressLine3}<br />${respondent1.primaryAddress.PostTown}<br />${respondent1.primaryAddress.County}<br />${respondent1.primaryAddress.PostCode}",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicantSolicitorResponseDeadlineToRespondentSolicitor1",
     "Label": "Claimant response deadline",
     "FieldType": "DateTime",
