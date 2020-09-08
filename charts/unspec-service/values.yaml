@@ -27,7 +27,7 @@ java:
     SPRING_SECURITY_ENABLED: true
     CMC_DB_USERNAME: 'cmc@cmc-{{ .Values.global.environment }}'
     CMC_DB_HOST: cmc-{{ .Values.global.environment }}.postgres.database.azure.com
-    CMC_DB_CONNECTION_OPTIONS: '?sslmode=require'
+    CMC_DB_CONNECTION_OPTIONS: '?sslmode=require&gssEncMode=disable'
     CMC_DB_NAME: cmc
     CMC_DB_PORT: 5432
     REFERENCE_DATABASE_MIGRATION: false
