@@ -21,8 +21,7 @@ class AllocatedTrackTest {
         @ParameterizedTest(name = "{0} has small claim track when claim value is less than 1000")
         @EnumSource(
             value = ClaimType.class,
-            names = {"PERSONAL_INJURY_ROAD", "PERSONAL_INJURY_WORK", "PERSONAL_INJURY_PUBLIC",
-                "PERSONAL_INJURY_HOLIDAY", "PERSONAL_INJURY_DISEASE", "PERSONAL_INJURY_OTHER", "CLINICAL_NEGLIGENCE"})
+            names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesBelow1000ToSmallClaim(ClaimType claimType) {
             ClaimValue claimValue = claimValueWithHigherValueOf(BigDecimal.valueOf(999));
 
@@ -34,8 +33,7 @@ class AllocatedTrackTest {
         @ParameterizedTest(name = "{0} has fast claim track when claim value is 1000")
         @EnumSource(
             value = ClaimType.class,
-            names = {"PERSONAL_INJURY_ROAD", "PERSONAL_INJURY_WORK", "PERSONAL_INJURY_PUBLIC",
-                "PERSONAL_INJURY_HOLIDAY", "PERSONAL_INJURY_DISEASE", "PERSONAL_INJURY_OTHER", "CLINICAL_NEGLIGENCE"})
+            names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesOf1000ToFastClaim(ClaimType claimType) {
             ClaimValue claimValue = claimValueWithHigherValueOf(BigDecimal.valueOf(1000));
 
@@ -45,8 +43,7 @@ class AllocatedTrackTest {
         @ParameterizedTest(name = "{0} has fast claim track when claim value is more than 1000 but less than 25001")
         @EnumSource(
             value = ClaimType.class,
-            names = {"PERSONAL_INJURY_ROAD", "PERSONAL_INJURY_WORK", "PERSONAL_INJURY_PUBLIC",
-                "PERSONAL_INJURY_HOLIDAY", "PERSONAL_INJURY_DISEASE", "PERSONAL_INJURY_OTHER", "CLINICAL_NEGLIGENCE"})
+            names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesAbove1000AndBelow25000ToFastClaim(ClaimType claimType) {
             ClaimValue claimValue = claimValueWithHigherValueOf(BigDecimal.valueOf(25000));
 
@@ -56,8 +53,7 @@ class AllocatedTrackTest {
         @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
         @EnumSource(
             value = ClaimType.class,
-            names = {"PERSONAL_INJURY_ROAD", "PERSONAL_INJURY_WORK", "PERSONAL_INJURY_PUBLIC",
-                "PERSONAL_INJURY_HOLIDAY", "PERSONAL_INJURY_DISEASE", "PERSONAL_INJURY_OTHER", "CLINICAL_NEGLIGENCE"})
+            names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesAbove25000ToMultiClaim(ClaimType claimType) {
             ClaimValue claimValue = claimValueWithHigherValueOf(BigDecimal.valueOf(25001));
 

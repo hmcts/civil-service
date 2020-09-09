@@ -10,7 +10,7 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(ClaimValue claimValue, ClaimType claimType) {
-        if (claimType.isPersonalInjury()) {
+        if (claimType.isLowerFeeType()) {
             if (isValueSmallerThan(claimValue.getHigherValue(), 1000)) {
                 return SMALL_CLAIM;
             } else if (isValueWithinRange(claimValue.getHigherValue(), 1000, 25000)) {
