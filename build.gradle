@@ -206,16 +206,20 @@ repositories {
   maven {
     url  "http://repo.spring.io/milestone"
   }
+  maven {
+    url  "https://repo.spring.io/libs-milestone"
+  }
 }
 
 def versions = [
-  junit           : '5.6.2',
-  junitPlatform   : '1.6.2',
-  reformLogging   : '5.1.5',
-  springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '2.9.2',
-  lombok          : '1.18.12',
-  pact            : '3.5.24',
+  junit              : '5.6.2',
+  junitPlatform      : '1.6.2',
+  reformLogging      : '5.1.5',
+  springBoot         : springBoot.class.package.implementationVersion,
+  springStatemachine : '3.0.0.M2',
+  springfoxSwagger   : '2.9.2',
+  lombok             : '1.18.12',
+  pact               : '3.5.24',
 ]
 
 ext.libraries = [
@@ -236,6 +240,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+
+  implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
@@ -303,6 +309,8 @@ dependencies {
   testImplementation 'org.mockito:mockito-inline:3.5.10'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
+
+  testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
