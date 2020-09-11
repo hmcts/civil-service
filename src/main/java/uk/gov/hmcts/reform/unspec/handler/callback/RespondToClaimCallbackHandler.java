@@ -45,9 +45,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
             CallbackType.MID, this::validateDateOfBirth,
+            CallbackType.MID_SECONDARY, this::emptyCallbackWorkaround,
             CallbackType.ABOUT_TO_SUBMIT, this::setClaimantResponseDeadline,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
+    }
+
+    private CallbackResponse emptyCallbackWorkaround(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {

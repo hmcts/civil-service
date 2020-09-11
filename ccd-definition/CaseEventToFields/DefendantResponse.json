@@ -32,7 +32,8 @@
     "DisplayContext": "COMPLEX",
     "PageID": "Upload",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid-secondary"
   },
   {
     "LiveFrom": "01/01/2017",
