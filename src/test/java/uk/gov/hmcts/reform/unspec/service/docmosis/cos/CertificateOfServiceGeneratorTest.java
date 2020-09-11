@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.cos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +19,12 @@ import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.unspec.model.documents.Document;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.unspec.utils.ResourceReader;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -40,7 +37,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.CERTIFICATE_OF_SERVICE;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N215;
-import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService.UNSPEC;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -49,10 +45,14 @@ import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentMana
 })
 class CertificateOfServiceGeneratorTest {
 
-    public static final String BEARER_TOKEN = "Bearer Token";
-    public static final String REFERENCE_NUMBER = "000LR001";
-    private final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private final String fileName = format(N215.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String BEARER_TOKEN = "Bearer Token";
+    private static final String REFERENCE_NUMBER = "000LR001";
+    private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
+    private static final String fileName = format(N215.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
+        .documentName(fileName)
+        .documentType(CERTIFICATE_OF_SERVICE)
+        .build();
 
     @MockBean
     private DocumentManagementService documentManagementService;
@@ -65,7 +65,6 @@ class CertificateOfServiceGeneratorTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @SneakyThrows
     void shouldGenerateCertificateOfService_whenValidDataIsProvided() {
 
         when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N215)))
@@ -73,10 +72,11 @@ class CertificateOfServiceGeneratorTest {
 
         when(documentManagementService
                  .uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE))))
-            .thenReturn(getCaseDocument());
+            .thenReturn(CASE_DOCUMENT);
 
-        CaseDocument caseDocument = generator.generate(getCaseData(), BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(getCaseDocument());
+        CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(documentManagementService)
             .uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE)));
@@ -186,26 +186,5 @@ class CertificateOfServiceGeneratorTest {
 
             assertEquals(ServedDocuments.CLAIM_FORM.getLabel() + "\n" + "Other - Some other", documentList);
         }
-    }
-
-    private CaseData getCaseData() throws JsonProcessingException {
-        return objectMapper.readValue(ResourceReader.readString("case_data.json"), CaseData.class);
-    }
-
-    private CaseDocument getCaseDocument() {
-
-        return CaseDocument.builder()
-            .documentLink(Document.builder()
-                              .documentFileName(fileName)
-                              .documentBinaryUrl(
-                                  "http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f/binary")
-                              .documentUrl("http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
-                              .build())
-            .documentSize(56975)
-            .createdDatetime(LocalDateTime.of(2020, 07, 16, 14, 05, 15, 550439))
-            .documentType(CERTIFICATE_OF_SERVICE)
-            .createdBy(UNSPEC)
-            .documentName(fileName)
-            .build();
     }
 }

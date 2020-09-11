@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,11 +23,11 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.unspec.model.documents.Document;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
-import uk.gov.hmcts.reform.unspec.utils.ResourceReader;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.math.BigDecimal;
@@ -53,7 +51,6 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
-import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService.UNSPEC;
 
 @SpringBootTest(classes = {
     CreateClaimCallbackHandler.class,
@@ -67,6 +64,11 @@ import static uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentMana
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000LR001";
+    private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
+        .documentName(format(N1.getDocumentTitle(), REFERENCE_NUMBER))
+        .documentType(SEALED_CLAIM)
+        .build();
+
     @MockBean
     private SealedClaimFormGenerator sealedClaimFormGenerator;
     @MockBean
@@ -83,7 +85,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(getCaseDocument());
+        when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CASE_DOCUMENT);
     }
 
     @Nested
@@ -161,17 +163,17 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() throws JsonProcessingException {
+        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
             when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
             when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
                 .thenReturn(now().atTime(23, 59, 59));
-            CallbackParams params = callbackParamsOf(getCaseData(), CallbackType.ABOUT_TO_SUBMIT);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getData()).containsEntry("claimIssuedDate", now());
-            assertThat(response.getData()).containsEntry("claimIssuedDate", LocalDate.now());
             assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
             assertThat(response.getData()).containsEntry(
                 "confirmationOfServiceDeadline",
@@ -181,31 +183,25 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldIssueClaimWithSystemGeneratedDocumentsAndDate_whenInvoked() throws JsonProcessingException {
+        void shouldIssueClaimWithSystemGeneratedDocumentsAndDate_whenInvoked() {
             when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
             when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
                 .thenReturn(now().atTime(23, 59, 59));
-
-            CallbackParams params = callbackParamsOf(getCaseData(), CallbackType.ABOUT_TO_SUBMIT);
+            CaseData caseDataDraft = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(convertToMap(caseDataDraft), CallbackType.ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData caseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(caseData.getSystemGeneratedCaseDocuments()).isNotEmpty()
-                .contains(Element.<CaseDocument>builder().value(getCaseDocument()).build());
+                .contains(Element.<CaseDocument>builder().value(CASE_DOCUMENT).build());
 
             assertThat(caseData.getClaimIssuedDate()).isEqualTo(now());
         }
 
-        Map<String, Object> getCaseData() throws JsonProcessingException {
-            Map<String, Object> caseData = objectMapper.readValue(
-                ResourceReader.readString("case_data.json"),
-                new TypeReference<>() {
-                }
-            );
-            caseData.remove("systemGeneratedCaseDocuments");
-
-            return caseData;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> convertToMap(CaseData caseData) {
+            return (Map<String, Object>) objectMapper.convertValue(caseData, Map.class);
         }
     }
 
@@ -267,23 +263,5 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationBody(body)
                     .build());
         }
-    }
-
-    private CaseDocument getCaseDocument() {
-        String fileName = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
-
-        return CaseDocument.builder()
-            .documentLink(Document.builder()
-                              .documentFileName(fileName)
-                              .documentBinaryUrl(
-                                  "http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f/binary")
-                              .documentUrl("http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
-                              .build())
-            .documentSize(56975)
-            .createdDatetime(LocalDateTime.of(2020, 7, 16, 14, 5, 15, 550439))
-            .documentType(SEALED_CLAIM)
-            .createdBy(UNSPEC)
-            .documentName(fileName)
-            .build();
     }
 }
