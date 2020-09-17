@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.search;
 
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,13 +10,15 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.unspec.model.search.Query;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.when;
 class CaseStayedSearchServiceTest {
 
     @Captor
-    private ArgumentCaptor<Query> queryCaptor;
+    private ArgumentCaptor<SearchSourceBuilder> queryCaptor;
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
@@ -76,7 +78,7 @@ class CaseStayedSearchServiceTest {
         assertThat(searchService.getCases()).hasSize(2);
         verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
 
-        List<Query> capturedQueries = queryCaptor.getAllValues();
+        List<SearchSourceBuilder> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).isEqualToComparingFieldByField(buildQuery(0));
         assertThat(capturedQueries.get(1)).isEqualToComparingFieldByField(buildQuery(10));
     }
@@ -92,13 +94,12 @@ class CaseStayedSearchServiceTest {
             .build();
     }
 
-    private Query buildQuery(int fromValue) {
-        return new Query(
-            QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
-                .must(QueryBuilders.matchQuery("state", "CREATED")),
-            List.of("reference"),
-            fromValue
-        );
+    private SearchSourceBuilder buildQuery(int fromValue) {
+        return new SearchSourceBuilder()
+            .query(boolQuery()
+                       .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
+                       .must(matchQuery("state", "CREATED")))
+            .fetchSource("reference", null)
+            .from(fromValue);
     }
 }

@@ -11,3 +11,4 @@ spring:
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         cmc-db-password: CMC_DB_PASSWORD
         docmosis-api-key: docmosis.tornado.key
+        unspec-idam-client-secret: idam.client.secret

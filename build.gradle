@@ -157,7 +157,7 @@ sonarqube {
     property "sonar.projectName", "UNSPEC :: service"
     property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/*ExternalTaskListener.java"
   }
 }
 
@@ -237,7 +237,6 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
@@ -294,8 +293,13 @@ dependencies {
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.13.0'
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.11.2'
 
+  // JAX-B dependencies for JDK 9+
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
+
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.5.10'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.10'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.5.10'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -306,9 +310,13 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation 'org.mockito:mockito-inline:3.5.10'
+  testImplementation group: 'org.camunda.bpm.extension.springboot', name: 'camunda-bpm-spring-boot-starter-test', version: '2.2.0'
 
-  testImplementation group: 'io.rest-assured', name: 'rest-assured'
+  testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+  testImplementation group: 'io.rest-assured', name: 'rest-assured', {
+    exclude group: 'io.rest-assured', module: 'xml-path'
+  }
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
