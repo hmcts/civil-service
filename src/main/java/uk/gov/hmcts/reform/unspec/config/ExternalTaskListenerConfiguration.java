@@ -17,7 +17,6 @@ public class ExternalTaskListenerConfiguration {
     @Bean
     public ExternalTaskClient client() {
         return ExternalTaskClient.create()
-            .disableBackoffStrategy()
             .baseUrl(baseUrl)
             .build();
     }
