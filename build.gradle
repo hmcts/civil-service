@@ -299,7 +299,7 @@ dependencies {
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.5.11'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.10'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.5.10'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.5.11'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
