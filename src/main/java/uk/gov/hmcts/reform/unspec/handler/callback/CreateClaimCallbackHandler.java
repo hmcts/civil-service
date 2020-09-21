@@ -118,11 +118,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String referenceNumber = referenceNumberRepository.getReferenceNumber();
 
+        Party respondent = updatePartyWithPartyName(caseDetails.getData().get(RESPONDENT));
+        Party applicant = updatePartyWithPartyName(caseDetails.getData().get(CLAIMANT));
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseData.toBuilder()
                 .claimIssuedDate(issueDate)
                 .legacyCaseReference(referenceNumber)
                 .claimSubmittedDateTime(submittedAt)
+                .applicant1(applicant)
+                .respondent1(respondent)
                 .build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
@@ -135,8 +139,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate)
         );
         data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
-        data.put(RESPONDENT, updatePartyWithPartyName(data.get(RESPONDENT)));
-        data.put(CLAIMANT, updatePartyWithPartyName(data.get(CLAIMANT)));
+
+        data.put(RESPONDENT, respondent);
+        data.put(CLAIMANT, applicant);
         data.put("legacyCaseReference", referenceNumber);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
