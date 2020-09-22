@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.unspec.stateflow.grammar;
 
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.function.Predicate;
 
@@ -9,5 +9,5 @@ import java.util.function.Predicate;
  */
 public interface OnlyIf<S> {
 
-    OnlyIfNext<S> onlyIf(Predicate<CaseDetails> condition);
+    OnlyIfNext<S> onlyIf(Predicate<CaseData> condition);
 }

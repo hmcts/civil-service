@@ -8,7 +8,7 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import java.util.ArrayList;
@@ -81,12 +81,12 @@ class StateFlowTest {
             when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
             when(mockedStateMachine.startReactively()).thenReturn(mockedMono);
 
-            CaseDetails caseDetails = CaseDetails.builder().build();
+            CaseData caseData = CaseData.builder().build();
 
             StateFlow stateFlow = new StateFlow(mockedStateMachine);
 
-            assertThat(stateFlow.evaluate(caseDetails)).isSameAs(stateFlow);
-            verify(mockedVariables).put(eq(EXTENDED_STATE_CASE_KEY), eq(caseDetails));
+            assertThat(stateFlow.evaluate(caseData)).isSameAs(stateFlow);
+            verify(mockedVariables).put(eq(EXTENDED_STATE_CASE_KEY), eq(caseData));
             verify(mockedMono).block();
         }
     }

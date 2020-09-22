@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,8 +23,9 @@ public class RequestExtensionValidator {
 
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0);
     private final ObjectMapper mapper;
+    private final StateFlowEngine stateFlowEngine;
 
-    public List<String> validateProposedDeadline(LocalDate dateToValidate,  LocalDateTime responseDeadline) {
+    public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
         if (dateToValidate == null) {
             return ImmutableList.of("The proposed deadline must be provided");
         }
@@ -65,6 +67,6 @@ public class RequestExtensionValidator {
     }
 
     private boolean isExtensionAlreadyRequested(CaseDetails caseDetailsBefore) {
-        return caseDetailsBefore.getData().get(PROPOSED_DEADLINE) != null;
+        return stateFlowEngine.hasTransitionedTo(caseDetailsBefore, StateFlowEngine.FlowState.EXTENSION_REQUESTED);
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.HashMap;
@@ -20,6 +21,9 @@ public class CaseDetailsConverter {
     public CaseData toCaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
         data.put("ccdCaseReference", caseDetails.getId());
+        if (caseDetails.getState() != null) {
+            data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
+        }
         return objectMapper.convertValue(data, CaseData.class);
     }
 }

@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -30,7 +32,9 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 @SpringBootTest(classes = {
     RespondExtensionCallbackHandler.class,
     RequestExtensionValidator.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    StateFlowEngine.class,
+    CaseDetailsConverter.class
 })
 class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 

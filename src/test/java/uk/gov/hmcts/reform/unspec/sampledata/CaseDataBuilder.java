@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.sampledata;
 
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
@@ -24,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.CLAIM_FORM;
@@ -51,6 +55,7 @@ public class CaseDataBuilder {
     private String legacyCaseReference;
     private LocalDateTime confirmationOfServiceDeadline;
     private AllocatedTrack allocatedTrack;
+    private CaseState ccdState;
     // Confirm Service
     private LocalDate deemedServiceDateToRespondentSolicitor1;
     private LocalDateTime respondentSolicitor1ResponseDeadline;
@@ -110,6 +115,13 @@ public class CaseDataBuilder {
         confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         legacyCaseReference = "000LR001";
         allocatedTrack = FAST_CLAIM;
+        ccdState = CREATED;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimStayed() {
+        atStateClaimCreated();
+        ccdState = STAYED;
         return this;
     }
 
@@ -133,6 +145,7 @@ public class CaseDataBuilder {
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        ccdState = AWAITING_CLAIMANT_INTENTION;
         return this;
     }
 
@@ -229,6 +242,8 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .applicant1NotProceedingReason(applicant1NotProceedingReason)
+
+            .ccdState(ccdState)
             .build();
     }
 }

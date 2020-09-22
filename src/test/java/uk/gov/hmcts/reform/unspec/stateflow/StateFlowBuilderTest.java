@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.unspec.stateflow;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import java.util.function.Consumer;
@@ -314,15 +314,15 @@ class StateFlowBuilderTest {
 
         @Test
         void shouldEvaluateStateAndGetStateHistory() {
-            CaseDetails caseDetails = CaseDetails.builder().build();
+            CaseData caseData = CaseData.builder().build();
 
-            Predicate<CaseDetails> firstPredicate = c -> {
-                assertThat(c).isSameAs(caseDetails);
+            Predicate<CaseData> firstPredicate = c -> {
+                assertThat(c).isSameAs(caseData);
                 return true;
             };
 
-            Predicate<CaseDetails> secondPredicate = c -> {
-                assertThat(c).isSameAs(caseDetails);
+            Predicate<CaseData> secondPredicate = c -> {
+                assertThat(c).isSameAs(caseData);
                 return false;
             };
 
@@ -334,7 +334,7 @@ class StateFlowBuilderTest {
                 .state(FlowState.STATE_3)
                 .build();
 
-            stateFlow.evaluate(caseDetails);
+            stateFlow.evaluate(caseData);
 
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
@@ -348,7 +348,7 @@ class StateFlowBuilderTest {
 
         @Test
         void shouldEvaluateStateAndGetStateHistory_whenAmbiguousTransitions() {
-            CaseDetails caseDetails = CaseDetails.builder().build();
+            CaseData caseData = CaseData.builder().build();
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
@@ -358,7 +358,7 @@ class StateFlowBuilderTest {
                 .state(FlowState.STATE_3)
                 .build();
 
-            stateFlow.evaluate(caseDetails);
+            stateFlow.evaluate(caseData);
 
             assertThat(stateFlow.getState())
                 .extracting(State::getName)

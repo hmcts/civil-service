@@ -6,21 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.ALREADY_AGREED;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.EXTENSION_ALREADY_AGREED;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.NOT_AGREED;
@@ -35,7 +40,9 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 @SpringBootTest(classes = {
     RequestExtensionCallbackHandler.class,
     RequestExtensionValidator.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    StateFlowEngine.class,
+    CaseDetailsConverter.class
 })
 class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -49,10 +56,8 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenExtensionIsAlreadyRequested() {
-            Map<String, Object> data = new HashMap<>();
-            data.put(PROPOSED_DEADLINE, now());
-
-            CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_START);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateExtensionRequested().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -63,7 +68,7 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenExtensionIsRequestedFirstTime() {
-            CallbackParams params = callbackParamsOf(emptyMap(), CallbackType.ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(emptyMap(), ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

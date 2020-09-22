@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,10 +18,16 @@ import java.util.List;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 
-@SpringBootTest(classes = {RequestExtensionValidator.class, JacksonAutoConfiguration.class})
+@SpringBootTest(classes = {
+    RequestExtensionValidator.class,
+    JacksonAutoConfiguration.class,
+    StateFlowEngine.class,
+    CaseDetailsConverter.class
+})
 class RequestExtensionValidatorTest {
 
     @Autowired
@@ -119,10 +129,9 @@ class RequestExtensionValidatorTest {
 
         @Test
         void shouldReturnErrors_whenExtensionAlreadyRequested() {
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(of(PROPOSED_DEADLINE, now().plusDays(14),
-                         RESPONSE_DEADLINE, now().plusDays(7).atTime(16, 0)
-                ))
+            CaseDetails caseDetails = CaseDetailsBuilder.builder()
+                .state(CREATED)
+                .data(CaseDataBuilder.builder().atStateExtensionRequested().build())
                 .build();
 
             List<String> errors = validator.validateAlreadyRequested(caseDetails);
@@ -136,6 +145,7 @@ class RequestExtensionValidatorTest {
             List<String> errors = validator.validateAlreadyRequested(
                 CaseDetails.builder()
                     .data(of(RESPONSE_DEADLINE, now().atTime(16, 0)))
+                    .state(CREATED.name())
                     .build()
             );
 

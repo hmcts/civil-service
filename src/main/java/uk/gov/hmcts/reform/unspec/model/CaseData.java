@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.model;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
@@ -26,6 +27,7 @@ import javax.validation.constraints.PastOrPresent;
 public class CaseData {
 
     private final Long ccdCaseReference;
+    private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
     private final CourtLocation courtLocation;
     private final Party applicant1;

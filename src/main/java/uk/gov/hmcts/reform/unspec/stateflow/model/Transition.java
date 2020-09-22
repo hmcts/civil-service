@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.unspec.stateflow.model;
 
 import lombok.Data;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.function.Predicate;
 
@@ -12,14 +12,14 @@ public class Transition {
 
     private String targetState;
 
-    private Predicate<CaseDetails> condition;
+    private Predicate<CaseData> condition;
 
     public Transition(String sourceState, String targetState) {
         this.sourceState = sourceState;
         this.targetState = targetState;
     }
 
-    public Transition(String sourceState, String targetState, Predicate<CaseDetails> condition) {
+    public Transition(String sourceState, String targetState, Predicate<CaseData> condition) {
         this.sourceState = sourceState;
         this.targetState = targetState;
         this.condition = condition;

@@ -4,7 +4,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
 import org.springframework.statemachine.config.configurers.StateConfigurer;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.unspec.stateflow.grammar.Build;
 import uk.gov.hmcts.reform.unspec.stateflow.grammar.BuildNext;
@@ -152,7 +152,7 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
-        public OnlyIfNext<S> onlyIf(Predicate<CaseDetails> condition) {
+        public OnlyIfNext<S> onlyIf(Predicate<CaseData> condition) {
             checkNull(condition, STATE);
             stateFlowContext.getCurrentTransition()
                 .ifPresent(currentTransition -> currentTransition.setCondition(condition));
@@ -199,7 +199,7 @@ public class StateFlowBuilder<S> {
                     if (transition.getCondition() != null) {
                         transitionConfigurer.guard(
                             context -> transition.getCondition().test(
-                                context.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseDetails.class)
+                                context.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseData.class)
                             )
                         );
                     }

@@ -8,9 +8,12 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CallbackVersion;
+import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.service.UserService;
 
 import java.util.Map;
+
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 
 public abstract class BaseCallbackHandlerTest {
 
@@ -20,27 +23,31 @@ public abstract class BaseCallbackHandlerTest {
     @MockBean
     protected UserService userService;
 
+    public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
+        return callbackParamsOf(data, state, type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type) {
-        return callbackParamsOf(data, type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(data, CREATED, type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
+                                           CaseState state,
                                            CallbackType type,
                                            CallbackVersion version,
                                            Map<Params, Object> params
-
     ) {
         return CallbackParams.builder()
             .type(type)
-            .request(toCallbackRequest(data))
+            .request(toCallbackRequest(data, state.name()))
             .version(version)
             .params(params)
             .build();
     }
 
-    private CallbackRequest toCallbackRequest(Map<String, Object> data) {
+    private CallbackRequest toCallbackRequest(Map<String, Object> data, String state) {
         return CallbackRequest.builder()
-            .caseDetails(CaseDetails.builder().data(data).id(CASE_ID).build())
+            .caseDetails(CaseDetails.builder().data(data).id(CASE_ID).state(state).build())
             .build();
     }
 }
