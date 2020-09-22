@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service;
 
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,10 +19,12 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.unspec.model.search.Query;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -110,9 +111,7 @@ class CoreCaseDataServiceTest {
 
         @Test
         void shouldReturnCases_WhenSearchingCasesAsSystemUpdateUser() {
-            SearchSourceBuilder query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchQuery("field", "value"))
-                .from(0);
+            Query query = new Query(QueryBuilders.matchQuery("field", "value"), emptyList(), 0);
 
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();

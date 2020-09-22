@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.unspec.service.search;
 
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.unspec.model.search.Query;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 
 import java.math.BigDecimal;
@@ -33,7 +33,7 @@ public abstract class ElasticSearchService {
         return caseDetails;
     }
 
-    abstract SearchSourceBuilder query(int startIndex);
+    abstract Query query(int startIndex);
 
     private int calculatePages(SearchResult searchResult) {
         return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();

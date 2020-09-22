@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.search;
 
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.unspec.model.search.Query;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 class CaseStayedSearchServiceTest {
 
     @Captor
-    private ArgumentCaptor<SearchSourceBuilder> queryCaptor;
+    private ArgumentCaptor<Query> queryCaptor;
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
@@ -78,7 +79,7 @@ class CaseStayedSearchServiceTest {
         assertThat(searchService.getCases()).hasSize(2);
         verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
 
-        List<SearchSourceBuilder> capturedQueries = queryCaptor.getAllValues();
+        List<Query> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).isEqualToComparingFieldByField(buildQuery(0));
         assertThat(capturedQueries.get(1)).isEqualToComparingFieldByField(buildQuery(10));
     }
@@ -94,12 +95,11 @@ class CaseStayedSearchServiceTest {
             .build();
     }
 
-    private SearchSourceBuilder buildQuery(int fromValue) {
-        return new SearchSourceBuilder()
-            .query(boolQuery()
-                       .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
-                       .must(matchQuery("state", "CREATED")))
-            .fetchSource("reference", null)
-            .from(fromValue);
+    private Query buildQuery(int fromValue) {
+        BoolQueryBuilder query = boolQuery()
+            .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
+            .must(matchQuery("state", "CREATED"));
+
+        return new Query(query, List.of("reference"), fromValue);
     }
 }
