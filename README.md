@@ -58,6 +58,10 @@ To run tests with browser window open set `SHOW_BROWSER_WINDOW=true`. By default
 
 To run smoke tests enter `yarn test:smoke`.
 
+### API test
+
+To run API tests enter `yarn test:api`.
+
 ### Pact or contract testing
 
 You can run contract or pact tests as follows:

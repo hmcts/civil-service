@@ -5,8 +5,9 @@
   "scripts": {
     "lint": "eslint e2e",
     "test": "npx codeceptjs run --steps",
-    "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi",
-    "test:functional": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --invert --grep @smoke-tests --reporter mocha-multi"
+    "test:api": "MOCHAWESOME_REPORTFILENAME=api npx codeceptjs run --grep @api-tests --reporter mocha-multi --verbose",
+    "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi --verbose",
+    "test:functional": "MOCHAWESOME_REPORTFILENAME=functional npx codeceptjs run --invert --grep \"\\@smoke-tests|\\@api-tests\" --reporter mocha-multi"
   },
   "husky": {
     "hooks": {
@@ -21,6 +22,11 @@
     "husky": "^4.2.5",
     "mocha-multi": "^1.1.3",
     "mochawesome": "^6.1.1",
-    "puppeteer": "^4.0.1"
+    "puppeteer": "^4.0.1",
+    "node-fetch": "^2.6.1",
+    "totp-generator": "^0.0.7",
+    "http-proxy-agent": "^4.0.1",
+    "https-proxy-agent": "^5.0.0",
+    "uuid": "^3.4.0"
   }
 }
