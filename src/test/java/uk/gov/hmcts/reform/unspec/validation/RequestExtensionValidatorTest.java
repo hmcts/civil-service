@@ -9,7 +9,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallba
 @SpringBootTest(classes = {
     RequestExtensionValidator.class,
     JacksonAutoConfiguration.class,
+    FlowStateAllowedEventService.class,
     StateFlowEngine.class,
     CaseDetailsConverter.class
 })
@@ -142,12 +144,9 @@ class RequestExtensionValidatorTest {
 
         @Test
         void shouldReturnNoError_whenExtensionRequestedFirstTime() {
-            List<String> errors = validator.validateAlreadyRequested(
-                CaseDetails.builder()
-                    .data(of(RESPONSE_DEADLINE, now().atTime(16, 0)))
-                    .state(CREATED.name())
-                    .build()
-            );
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateServiceAcknowledge().build();
+
+            List<String> errors = validator.validateAlreadyRequested(caseDetails);
 
             assertThat(errors).isEmpty();
         }

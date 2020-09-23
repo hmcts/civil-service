@@ -13,7 +13,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -23,7 +24,6 @@ import java.util.HashMap;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.ALREADY_AGREED;
@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     RequestExtensionCallbackHandler.class,
     RequestExtensionValidator.class,
     JacksonAutoConfiguration.class,
+    FlowStateAllowedEventService.class,
     StateFlowEngine.class,
     CaseDetailsConverter.class
 })
@@ -68,7 +69,8 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenExtensionIsRequestedFirstTime() {
-            CallbackParams params = callbackParamsOf(emptyMap(), ABOUT_TO_START);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateServiceAcknowledge().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

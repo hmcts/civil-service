@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.stateflow.utils;
+package uk.gov.hmcts.reform.unspec.service.flowstate;
 
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 
-public class PredicateUtils {
+public class FlowPredicate {
 
     public static final Predicate<CaseData> claimantIssueClaim = caseData ->
         caseData.getClaimIssuedDate() != null
@@ -35,7 +35,7 @@ public class PredicateUtils {
     public static final Predicate<CaseData> schedulerStayClaim = caseData ->
         caseData.getCcdState() == STAYED;
 
-    private PredicateUtils() {
+    private FlowPredicate() {
         //Utility class
     }
 

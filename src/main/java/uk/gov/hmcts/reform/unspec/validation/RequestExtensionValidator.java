@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +14,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 
@@ -23,7 +24,7 @@ public class RequestExtensionValidator {
 
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0);
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
+    private final FlowStateAllowedEventService flowStateAllowedEventService;
 
     public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
         if (dateToValidate == null) {
@@ -60,13 +61,9 @@ public class RequestExtensionValidator {
     }
 
     public List<String> validateAlreadyRequested(CaseDetails caseDetails) {
-        if (isExtensionAlreadyRequested(caseDetails)) {
-            return ImmutableList.of("You can only request an extension once");
+        if (flowStateAllowedEventService.isAllowed(caseDetails, REQUEST_EXTENSION)) {
+            return emptyList();
         }
-        return emptyList();
-    }
-
-    private boolean isExtensionAlreadyRequested(CaseDetails caseDetailsBefore) {
-        return stateFlowEngine.hasTransitionedTo(caseDetailsBefore, StateFlowEngine.FlowState.EXTENSION_REQUESTED);
+        return ImmutableList.of("You can only request an extension once");
     }
 }

@@ -11,7 +11,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.unspec.stateflow.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     RespondExtensionCallbackHandler.class,
     RequestExtensionValidator.class,
     JacksonAutoConfiguration.class,
+    FlowStateAllowedEventService.class,
     StateFlowEngine.class,
     CaseDetailsConverter.class
 })
@@ -188,7 +190,8 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDateTime responseDeadline = now().atTime(MID_NIGHT);
             CallbackParams params = callbackParamsOf(
                 of(RESPONSE_DEADLINE, responseDeadline,
-                   LEGACY_CASE_REFERENCE, REFERENCE_NUMBER), CallbackType.SUBMITTED
+                   LEGACY_CASE_REFERENCE, REFERENCE_NUMBER
+                ), CallbackType.SUBMITTED
             );
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

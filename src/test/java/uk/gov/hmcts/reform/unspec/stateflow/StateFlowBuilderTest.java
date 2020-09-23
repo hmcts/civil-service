@@ -360,10 +360,6 @@ class StateFlowBuilderTest {
 
             stateFlow.evaluate(caseData);
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isEqualTo("ERROR");
-
             assertThat(stateFlow.getStateHistory())
                 .hasSize(2)
                 .extracting(State::getName)

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.stateflow.utils;
+package uk.gov.hmcts.reform.unspec.service.flowstate;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,16 +7,16 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.claimantConfirmService;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.claimantIssueClaim;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.claimantRespondToDefence;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.claimantRespondToRequestForExtension;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.defendantAcknowledgeService;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.defendantAskForAnExtension;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.defendantRespondToClaim;
-import static uk.gov.hmcts.reform.unspec.stateflow.utils.PredicateUtils.schedulerStayClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimantConfirmService;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimantIssueClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimantRespondToDefence;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimantRespondToRequestForExtension;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.defendantAcknowledgeService;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.defendantAskForAnExtension;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.defendantRespondToClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.schedulerStayClaim;
 
-class PredicateUtilsTest {
+class FlowPredicateTest {
 
     @Nested
     class ClaimIssuedPredicate {
