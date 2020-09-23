@@ -110,10 +110,6 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
-task runApiTests(type: Exec, description: 'Runs API tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api'
-}
-
 task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
   onlyIf(new Spec<Task>() {
     boolean isSatisfiedBy(Task task) {

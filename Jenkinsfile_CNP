@@ -113,7 +113,6 @@ withPipeline(type, product, component) {
 
   after('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-    sh "./gradlew runApiTests"
   }
 
   after('functionalTest:preview') {
@@ -132,7 +131,6 @@ withPipeline(type, product, component) {
 
   after('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-    sh "./gradlew runApiTests"
   }
 
   after('functionalTest:aat') {
