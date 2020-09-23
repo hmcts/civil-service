@@ -5,6 +5,8 @@ import org.elasticsearch.index.query.QueryBuilder;
 import java.util.List;
 import java.util.Objects;
 
+import static net.minidev.json.JSONValue.toJSONString;
+
 public class Query {
 
     private final QueryBuilder queryBuilder;
@@ -25,7 +27,7 @@ public class Query {
     public String toString() {
         return "{"
             + "\"query\": " + queryBuilder.toString() + ", "
-            + "\"_source\": " + dataToReturn + ", "
+            + "\"_source\": " + toJSONString(dataToReturn) + ", "
             + "\"from\": " + startIndex
             + "}";
     }

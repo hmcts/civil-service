@@ -20,7 +20,7 @@ public class CaseStayedSearchService extends ElasticSearchService {
     public Query query(int startIndex) {
         return new Query(
             boolQuery()
-                .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now"))
+                .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now-112d"))
                 .must(matchQuery("state", "CREATED")),
             List.of("reference"),
             startIndex
