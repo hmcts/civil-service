@@ -152,7 +152,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private Party updatePartyWithPartyName(Object partyObject) {
         Party party = mapper.convertValue(partyObject, Party.class);
 
-        return party.toBuilder().partyName(PartyNameUtils.getPartyNameBasedOnType(party)).build();
+        return party.toBuilder()
+            .partyName(PartyNameUtils.getPartyNameBasedOnType(party))
+            .partyTypeDisplayValue(party.getType().getDisplayValue())
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

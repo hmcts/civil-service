@@ -109,5 +109,15 @@
     "ElementLabel": "Party name",
     "FieldShowCondition": "type = \"DO_NOT_SHOW\"",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyTypeDisplayValue",
+    "FieldType": "Text",
+    "ElementLabel": "Party type displayed value",
+    "FieldShowCondition": "type = \"DO_NOT_SHOW\"",
+    "SecurityClassification": "Public",
+    "_Comments": "Field interpolation used on fixed list field will display its code instead of text, hence the workaround field populated on claim creation.",
+    "_Category": "WORKAROUND"
   }
 ]

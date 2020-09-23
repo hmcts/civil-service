@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
+import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
     CreateClaimCallbackHandler.class,
@@ -170,8 +171,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).containsEntry("claimIssuedDate", now());
             assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
@@ -197,6 +197,26 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(Element.<CaseDocument>builder().value(CASE_DOCUMENT).build());
 
             assertThat(caseData.getClaimIssuedDate()).isEqualTo(now());
+        }
+
+        @Test
+        void shouldUpdateRespondentAndApplicantWithPartyNameAndPartyTypeDisplayValue_whenInvoked() {
+            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
+            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
+                .thenReturn(now().atTime(23, 59, 59));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1").extracting("partyName").isEqualTo(
+                getPartyNameBasedOnType(caseData.getRespondent1()));
+            assertThat(response.getData()).extracting("respondent1").extracting("partyTypeDisplayValue").isEqualTo(
+                caseData.getRespondent1().getType().getDisplayValue());
+            assertThat(response.getData()).extracting("applicant1").extracting("partyName").isEqualTo(
+                getPartyNameBasedOnType(caseData.getApplicant1()));
+            assertThat(response.getData()).extracting("applicant1").extracting("partyTypeDisplayValue").isEqualTo(
+                caseData.getApplicant1().getType().getDisplayValue());
         }
 
         @SuppressWarnings("unchecked")
