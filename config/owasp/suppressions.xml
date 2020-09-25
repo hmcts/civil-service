@@ -12,5 +12,16 @@
     <notes><![CDATA[Awaiting version bump from jackson-module-kotlin to take 1.3.7 -> 1.4]]></notes>
     <cve>CVE-2020-15824</cve>
   </suppress>
-
+  <suppress>
+    <notes><![CDATA[
+      CVE is a json vulnerability for Node projects. False positive reported at https://github.com/jeremylong/DependencyCheck/issues/2794
+  ]]></notes>
+    <cve>CVE-2020-10663</cve>
+    <cve>CVE-2020-7712</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Awaiting openid dependencies version bump in nimbus-jose-jwt]]></notes>
+    <cve>CVE-2007-1651</cve>
+    <cve>CVE-2007-1652</cve>
+  </suppress>
 </suppressions>
