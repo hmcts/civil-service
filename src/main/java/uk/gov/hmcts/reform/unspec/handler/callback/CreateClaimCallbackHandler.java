@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.utils.ElementUtils;
-import uk.gov.hmcts.reform.unspec.utils.PartyNameUtils;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
@@ -118,15 +117,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String referenceNumber = referenceNumberRepository.getReferenceNumber();
 
-        Party respondent = updatePartyWithPartyName(caseDetails.getData().get(RESPONDENT));
-        Party applicant = updatePartyWithPartyName(caseDetails.getData().get(CLAIMANT));
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseData.toBuilder()
                 .claimIssuedDate(issueDate)
                 .legacyCaseReference(referenceNumber)
                 .claimSubmittedDateTime(submittedAt)
-                .applicant1(applicant)
-                .respondent1(respondent)
                 .build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
@@ -140,21 +135,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         );
         data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
 
-        data.put(RESPONDENT, respondent);
-        data.put(CLAIMANT, applicant);
+        data.put(RESPONDENT, caseData.getRespondent1());
+        data.put(CLAIMANT, caseData.getApplicant1());
         data.put("legacyCaseReference", referenceNumber);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
-            .build();
-    }
-
-    private Party updatePartyWithPartyName(Object partyObject) {
-        Party party = mapper.convertValue(partyObject, Party.class);
-
-        return party.toBuilder()
-            .partyName(PartyNameUtils.getPartyNameBasedOnType(party))
-            .partyTypeDisplayValue(party.getType().getDisplayValue())
             .build();
     }
 

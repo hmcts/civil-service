@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.unspec.validation.groups.DateOfBirthGroup;
 import java.time.LocalDate;
 import javax.validation.constraints.PastOrPresent;
 
+import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedOnType;
+
 @Data
 @Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -31,6 +33,7 @@ public class Party {
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate soleTraderDateOfBirth;
     private final Address primaryAddress;
+
     private final String partyName;
     private final String partyTypeDisplayValue;
 
@@ -43,5 +46,16 @@ public class Party {
         public String getDisplayValue() {
             return StringUtils.capitalize(this.name().toLowerCase().replace('_', ' '));
         }
+    }
+
+    public String getPartyName() {
+        if (partyName == null) {
+            return getPartyNameBasedOnType(this);
+        }
+        return partyName;
+    }
+
+    public String getPartyTypeDisplayValue() {
+        return this.getType().getDisplayValue();
     }
 }
