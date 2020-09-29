@@ -34,6 +34,7 @@ module.exports = {
   confirmService: async () => {
     await request.startEvent('CONFIRM_SERVICE', caseId);
 
+    delete caseData.servedDocumentFiles;
     await assertValidData('CONFIRM_SERVICE', 'ServedDocuments', confirmServiceData.valid.servedDocuments);
     await assertValidData('CONFIRM_SERVICE', 'Upload', confirmServiceData.valid.upload);
     await assertValidData('CONFIRM_SERVICE', 'Method', confirmServiceData.valid.method);
