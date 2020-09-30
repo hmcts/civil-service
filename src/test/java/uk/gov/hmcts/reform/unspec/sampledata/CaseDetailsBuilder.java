@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 
 @SuppressWarnings("unchecked")
@@ -19,6 +20,7 @@ public class CaseDetailsBuilder {
 
     private String state;
     private Map<String, Object> data;
+    private Long id;
 
     public static CaseDetailsBuilder builder() {
         return new CaseDetailsBuilder();
@@ -34,10 +36,43 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder id(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateClaimDraft() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = CREATED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateClaimCreated() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = CREATED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateServiceConfirmed() {
+        CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = CREATED.name();
+        return this;
+    }
+
     public CaseDetailsBuilder atStateServiceAcknowledge() {
         CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = CREATED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateRespondedToClaim() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CLAIMANT_INTENTION.name();
         return this;
     }
 
@@ -52,6 +87,7 @@ public class CaseDetailsBuilder {
         return CaseDetails.builder()
             .data(data)
             .state(state)
+            .id(id)
             .build();
     }
 }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +24,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.unspec.Application;
 import uk.gov.hmcts.reform.unspec.TestIdamConfiguration;
-import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.UserService;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -126,11 +123,5 @@ public abstract class BaseIntegrationTest {
                 String.format("Failed to serialize '%s' to JSON", input.getClass().getSimpleName()), e
             );
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> convertToMap(CaseData caseData) {
-        return objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
     }
 }

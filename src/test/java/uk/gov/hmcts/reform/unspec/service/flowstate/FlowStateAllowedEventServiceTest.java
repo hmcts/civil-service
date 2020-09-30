@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CONFIRM_SERVICE;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
@@ -92,7 +92,7 @@ class FlowStateAllowedEventServiceTest {
         @Test
         void shouldReturnValidEvents_whenFlowStateIsDraft() {
             assertThat(flowStateAllowedEventService.getAllowedEvents(DRAFT.fullName()))
-                .containsExactlyInAnyOrder(CREATE_CASE, WITHDRAW_CLAIM, DISCONTINUE_CLAIM);
+                .containsExactlyInAnyOrder(CREATE_CLAIM, WITHDRAW_CLAIM, DISCONTINUE_CLAIM);
         }
 
         @Test
@@ -144,7 +144,7 @@ class FlowStateAllowedEventServiceTest {
 
         @ParameterizedTest
         @CsvSource({
-            "DRAFT,CREATE_CASE",
+            "DRAFT,CREATE_CLAIM",
             "CLAIM_ISSUED,MOVE_TO_STAYED",
             "CLAIM_ISSUED,CONFIRM_SERVICE",
             "SERVICE_CONFIRMED,ACKNOWLEDGE_SERVICE",
@@ -184,7 +184,7 @@ class FlowStateAllowedEventServiceTest {
         @SneakyThrows
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
-                Arguments.of(CREATE_CASE, new String[]{DRAFT.fullName()}),
+                Arguments.of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 Arguments.of(CONFIRM_SERVICE, new String[]{CLAIM_ISSUED.fullName()}),
                 Arguments.of(REQUEST_EXTENSION, new String[]{SERVICE_ACKNOWLEDGED.fullName()}),
                 Arguments.of(RESPOND_EXTENSION, new String[]{EXTENSION_REQUESTED.fullName()}),
@@ -241,7 +241,7 @@ class FlowStateAllowedEventServiceTest {
                 Arguments.of(true, CaseDetailsBuilder.builder().atStateExtensionRequested().build(), RESPOND_EXTENSION),
                 Arguments.of(true, CaseDetailsBuilder.builder().atStateExtensionRequested().build(), WITHDRAW_CLAIM),
                 Arguments.of(true, CaseDetailsBuilder.builder().atStateExtensionRequested().build(), DISCONTINUE_CLAIM),
-                Arguments.of(false, CaseDetailsBuilder.builder().atStateExtensionRequested().build(), CREATE_CASE),
+                Arguments.of(false, CaseDetailsBuilder.builder().atStateExtensionRequested().build(), CREATE_CLAIM),
                 Arguments.of(
                     false,
                     CaseDetailsBuilder.builder().atStateExtensionRequested().build(),
@@ -256,7 +256,7 @@ class FlowStateAllowedEventServiceTest {
                     DEFENDANT_RESPONSE
                 ),
                 Arguments.of(true, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), DISCONTINUE_CLAIM),
-                Arguments.of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CREATE_CASE),
+                Arguments.of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CREATE_CLAIM),
                 Arguments.of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CONFIRM_SERVICE),
                 Arguments.of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CLAIMANT_RESPONSE)
             );

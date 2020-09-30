@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.callback;
 
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 
@@ -43,5 +44,14 @@ public abstract class CallbackHandler {
                     callbackParams.getRequest().getEventId(),
                     callbackParams.getType()
                 )));
+    }
+
+    /**
+     * To be used to return empty callback response, will be used in overriding classes.
+     * @param callbackParams This parameter is required as this is passed as reference for execute method in CallBack
+     * @return empty callback response
+     */
+    protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

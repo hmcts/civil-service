@@ -42,6 +42,7 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
+            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
             CallbackType.MID, this::validateDateOfBirth,
             CallbackType.ABOUT_TO_SUBMIT, this::setNewResponseDeadline,
             CallbackType.SUBMITTED, this::buildConfirmation

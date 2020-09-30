@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.unspec.advice.EventAllowed;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 
 import java.util.Arrays;
@@ -26,6 +27,7 @@ public class CallbackHandlerFactory {
         Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers));
     }
 
+    @EventAllowed
     public CallbackResponse dispatch(CallbackParams callbackParams) {
         String eventId = callbackParams.getRequest().getEventId();
         return ofNullable(eventHandlers.get(eventId))

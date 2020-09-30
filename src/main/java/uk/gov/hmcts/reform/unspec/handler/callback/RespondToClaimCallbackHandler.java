@@ -44,6 +44,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
+            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
             CallbackType.MID, this::validateDateOfBirth,
             CallbackType.MID_SECONDARY, this::emptyCallbackWorkaround,
             CallbackType.ABOUT_TO_SUBMIT, this::setClaimantResponseDeadline,

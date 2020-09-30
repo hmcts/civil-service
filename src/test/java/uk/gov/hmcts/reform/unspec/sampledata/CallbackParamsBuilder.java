@@ -25,6 +25,16 @@ public class CallbackParamsBuilder {
         return this;
     }
 
+    public CallbackParamsBuilder type(CallbackType type) {
+        this.type = type;
+        return this;
+    }
+
+    public CallbackParamsBuilder request(CallbackRequest request) {
+        this.request = request;
+        return this;
+    }
+
     public CallbackParamsBuilder version(CallbackVersion version) {
         this.version = version;
         return this;

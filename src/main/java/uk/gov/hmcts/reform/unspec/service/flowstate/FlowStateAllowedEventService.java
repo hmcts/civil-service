@@ -15,7 +15,7 @@ import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CONFIRM_SERVICE;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CASE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
@@ -40,7 +40,7 @@ public class FlowStateAllowedEventService {
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.of(
         DRAFT.fullName(),
-        List.of(CREATE_CASE, WITHDRAW_CLAIM, DISCONTINUE_CLAIM),
+        List.of(CREATE_CLAIM, WITHDRAW_CLAIM, DISCONTINUE_CLAIM),
 
         CLAIM_ISSUED.fullName(),
         List.of(MOVE_TO_STAYED, CONFIRM_SERVICE, WITHDRAW_CLAIM, DISCONTINUE_CLAIM),

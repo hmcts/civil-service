@@ -17,10 +17,11 @@ public class FlowPredicate {
             && caseData.getRespondentSolicitor1ResponseDeadline() != null;
 
     public static final Predicate<CaseData> defendantAcknowledgeService = caseData ->
-        caseData.getRespondent1ClaimResponseIntentionType() != null;
+        caseData.getRespondent1ClaimResponseIntentionType() != null
+            && caseData.getRespondent1ClaimResponseDocument() == null;
 
     public static final Predicate<CaseData> defendantRespondToClaim = caseData ->
-        caseData.getApplicantSolicitorResponseDeadlineToRespondentSolicitor1() != null;
+        caseData.getRespondent1ClaimResponseDocument() != null;
 
     public static final Predicate<CaseData> defendantAskForAnExtension = caseData ->
         caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline() != null;

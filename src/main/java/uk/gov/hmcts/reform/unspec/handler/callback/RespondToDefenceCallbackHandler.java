@@ -35,6 +35,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
+            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
             CallbackType.SUBMITTED, this::buildConfirmation
         );
     }
