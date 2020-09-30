@@ -1,0 +1,24 @@
+[
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "processInstanceId",
+    "FieldType": "Text",
+    "ElementLabel": "Camunda process instance Id",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "status",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "BusinessProcessStatus",
+    "ElementLabel": "Camunda business process status",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "activityId",
+    "FieldType": "Text",
+    "ElementLabel": "Last successfully processed task activity id",
+    "SecurityClassification": "Public"
+  }
+]

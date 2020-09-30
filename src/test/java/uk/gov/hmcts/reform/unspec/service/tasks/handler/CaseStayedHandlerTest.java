@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.service.tasks;
+package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -12,7 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.event.MoveCaseToStayedEvent;
 import uk.gov.hmcts.reform.unspec.service.search.CaseStayedSearchService;
-import uk.gov.hmcts.reform.unspec.service.tasks.handler.CaseStayedHandler;
 
 import java.util.List;
 import java.util.Map;

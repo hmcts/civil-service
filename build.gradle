@@ -157,7 +157,7 @@ sonarqube {
     property "sonar.projectName", "UNSPEC :: service"
     property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/*ExternalTaskListener.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/*ExternalTaskListener.java, **/stereotypes/**"
   }
 }
 
@@ -264,6 +264,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'payments-client', version: '1.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.17.0-RELEASE'
 
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok

@@ -151,5 +151,19 @@
     "ShowSummary": "N",
     "ShowEventNotes": "N",
     "EndButtonLabel": "Discontinue claim"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE",
+    "Name": "Notify defendant solicitor",
+    "Description": "Notify defendant solicitor for claim service",
+    "DisplayOrder": 11,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
   }
 ]

@@ -55,3 +55,4 @@ java:
         - AppInsightsInstrumentationKey
         - docmosis-api-key
         - cmc-db-password
+        - gov-notify-api-key

@@ -86,4 +86,6 @@ public class CaseData {
 
     @Valid
     private final CloseClaim discontinueClaim;
+
+    private final BusinessProcess businessProcess;
 }

@@ -5,7 +5,10 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -18,7 +21,7 @@ public abstract class BpmnBaseTest {
     public static final String WORKER_ID = "test-worker";
     public final String bpmnFileName;
     public final String processId;
-
+    public Deployment deployment;
     public static ProcessEngine engine;
 
     public ProcessInstance processInstance;
@@ -38,8 +41,18 @@ public abstract class BpmnBaseTest {
     @BeforeEach
     void setup() {
         //deploy process
-        engine.getRepositoryService().createDeployment().addClasspathResource(bpmnFileName).deploy();
+        deployment = engine.getRepositoryService().createDeployment().addClasspathResource(bpmnFileName).deploy();
         processInstance = engine.getRuntimeService().startProcessInstanceByKey(processId);
+    }
+
+    @AfterEach
+    void tearDown() {
+        engine.getRepositoryService().deleteDeployment(deployment.getId());
+    }
+
+    @AfterAll
+    static void shutDown() {
+        engine.close();
     }
 
     /**

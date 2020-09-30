@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.unspec.model.search.Query;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static uk.gov.hmcts.reform.unspec.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.unspec.CaseDefinitionConstants.JURISDICTION;
 
@@ -26,6 +29,10 @@ public class CoreCaseDataService {
     private final AuthTokenGenerator authTokenGenerator;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
+        triggerEvent(caseId, eventName, Map.of());
+    }
+
+    public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified) {
         String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String systemUpdateUserId = idamClient.getUserInfo(userToken).getUid();
 
@@ -47,7 +54,7 @@ public class CoreCaseDataService {
             CASE_TYPE,
             caseId.toString(),
             true,
-            caseDataContentFromStartEventResponse(startEventResponse)
+            caseDataContentFromStartEventResponse(startEventResponse, contentModified)
         );
     }
 
@@ -57,13 +64,17 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
-    private CaseDataContent caseDataContentFromStartEventResponse(StartEventResponse startEventResponse) {
+    private CaseDataContent caseDataContentFromStartEventResponse(
+        StartEventResponse startEventResponse, Map<String, Object> contentModified) {
+        var payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
+        payload.putAll(contentModified);
+
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
                        .id(startEventResponse.getEventId())
                        .build())
-            .data(startEventResponse.getCaseDetails().getData())
+            .data(payload)
             .build();
     }
 }
