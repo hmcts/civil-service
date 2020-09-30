@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.unspec.stereotypes.LogExternalTask;
 
 import java.util.Map;
 
@@ -19,7 +18,6 @@ public class CaseEventTaskHandler implements ExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
 
     @Override
-    @LogExternalTask
     public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         Map<String, Object> allVariables = externalTask.getAllVariables();
         String ccdId = (String) allVariables.get("CCD_ID");
