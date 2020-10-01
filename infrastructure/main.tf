@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "key-vault" {
-  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=azurermv2"
+  source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=master"
   name                    = "unspec-${var.env}"
   product                 = var.product
   env                     = var.env
