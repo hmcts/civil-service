@@ -44,6 +44,14 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1LitigationFriend",
+    "Label": "Claimant litigation details",
+    "FieldType": "LitigationFriend",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1",
     "Label": "Defendant details",
     "FieldType": "Party",

@@ -52,11 +52,23 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "applicant1LitigationFriend",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ClaimantLitigationFriend",
+    "PageDisplayOrder": 5,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "respondent1",
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "Defendant",
-    "PageDisplayOrder": 5,
+    "PageDisplayOrder": 6,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -68,7 +80,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimType",
-    "PageDisplayOrder": 6,
+    "PageDisplayOrder": 7,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -80,7 +92,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimType",
-    "PageDisplayOrder": 6,
+    "PageDisplayOrder": 7,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "claimType = \"OTHER\""
@@ -93,7 +105,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "PersonalInjuryType",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "PageShowCondition": "claimType = \"PERSONAL_INJURY\""
@@ -106,7 +118,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "MANDATORY",
     "PageID": "PersonalInjuryType",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "personalInjuryType = \"PERSONAL_INJURY_OTHER\""
@@ -119,7 +131,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "Upload",
-    "PageDisplayOrder": 8,
+    "PageDisplayOrder": 9,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -131,7 +143,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "ClaimValue",
-    "PageDisplayOrder": 9,
+    "PageDisplayOrder": 10,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid"
@@ -144,7 +156,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "StatementOfTruth",
-    "PageDisplayOrder": 10,
+    "PageDisplayOrder": 11,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   }
