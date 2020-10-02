@@ -1,4 +1,5 @@
-const dataHelper = require('../api/dataHelper.js');
+const dataHelper = require('../api/dataHelper');
+const config = require('../config');
 
 module.exports = {
   valid: {
@@ -16,18 +17,47 @@ module.exports = {
     claimant: {
       applicant1: {
         type: 'COMPANY',
-        companyName: 'Test Inc'
+        companyName: 'Test Inc',
+        primaryAddress: {
+          AddressLine1: `${config.address.buildingAndStreet.lineOne + ' - claimant'}`,
+          AddressLine2: config.address.buildingAndStreet.lineTwo,
+          AddressLine3: config.address.buildingAndStreet.lineThree,
+          PostTown: config.address.town,
+          County: config.address.county,
+          Country: config.address.country,
+          PostCode: config.address.postcode
+        }
       }
     },
     applicant1LitigationFriend: {
       applicant1LitigationFriend: {
-        required: 'No'
+        required: 'Yes',
+        fullName: 'Bob the litigant friend',
+        hasSameAddressAsLitigant: 'No',
+        primaryAddress: {
+          AddressLine1: `${config.address.buildingAndStreet.lineOne + ' - litigant friend'}`,
+          AddressLine2: config.address.buildingAndStreet.lineTwo,
+          AddressLine3: config.address.buildingAndStreet.lineThree,
+          PostTown: config.address.town,
+          County: config.address.county,
+          Country: config.address.country,
+          PostCode: config.address.postcode
+        }
       }
     },
     defendant: {
       respondent1: {
         type: 'ORGANISATION',
-        organisationName: 'Test Defendant Org'
+        organisationName: 'Test Defendant Org',
+        primaryAddress: {
+          AddressLine1: `${config.address.buildingAndStreet.lineOne + ' - defendant'}`,
+          AddressLine2: config.address.buildingAndStreet.lineTwo,
+          AddressLine3: config.address.buildingAndStreet.lineThree,
+          PostTown: config.address.town,
+          County: config.address.county,
+          Country: config.address.country,
+          PostCode: config.address.postcode
+        }
       }
     },
     claimType: {

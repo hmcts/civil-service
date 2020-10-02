@@ -3,7 +3,7 @@ const config = require('../config.js');
 let caseNumber;
 const caseEventMessage = eventName => `Case ${caseNumber} has been updated with event: ${eventName}`;
 
-Feature('Claim creation');
+Feature('Claim creation @claim-tests');
 
 Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.login(config.solicitorUser);

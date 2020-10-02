@@ -16,6 +16,7 @@ module.exports = {
     await assertValidData('CREATE_CLAIM', 'References', createClaimData.valid.references);
     await assertValidData('CREATE_CLAIM', 'Court', createClaimData.valid.court);
     await assertValidData('CREATE_CLAIM', 'Claimant', createClaimData.valid.claimant);
+    await assertValidData('CREATE_CLAIM', 'ClaimantLitigationFriend', createClaimData.valid.applicant1LitigationFriend);
     await assertValidData('CREATE_CLAIM', 'Defendant', createClaimData.valid.defendant);
     await assertValidData('CREATE_CLAIM', 'ClaimType', createClaimData.valid.claimType);
     await assertValidData('CREATE_CLAIM', 'PersonalInjuryType', createClaimData.valid.personalInjuryType);
