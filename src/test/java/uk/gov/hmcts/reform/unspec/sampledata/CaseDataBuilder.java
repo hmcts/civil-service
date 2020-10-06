@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.CourtLocation;
@@ -86,6 +87,7 @@ public class CaseDataBuilder {
     private YesOrNo applicant1ProceedWithClaim;
     private ResponseDocument applicant1DefenceResponseDocument;
     private String applicant1NotProceedingReason;
+    private BusinessProcess businessProcess;
 
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
@@ -181,6 +183,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
+        this.businessProcess = businessProcess;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -244,6 +251,7 @@ public class CaseDataBuilder {
             .applicant1NotProceedingReason(applicant1NotProceedingReason)
 
             .ccdState(ccdState)
+            .businessProcess(businessProcess)
             .build();
     }
 }

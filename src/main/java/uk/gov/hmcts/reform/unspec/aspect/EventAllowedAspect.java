@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.advice;
+package uk.gov.hmcts.reform.unspec.aspect;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

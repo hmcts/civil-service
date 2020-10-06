@@ -34,6 +34,7 @@ public class WithdrawClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<CallbackType, Callback> callbacks() {
         return Map.of(
+            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
             CallbackType.MID, this::validateWithdrawalDate
         );
     }

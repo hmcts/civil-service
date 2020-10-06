@@ -7,11 +7,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.springframework.stereotype.Component;
 
 import static uk.gov.hmcts.reform.unspec.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
-@Aspect
 @Slf4j
+@Aspect
+@Component
 public class ExternalTaskLogger {
 
     @Before(value = "execution(* org.camunda.bpm.client.task.ExternalTaskHandler.execute(..)) && args(externalTask,..)",
