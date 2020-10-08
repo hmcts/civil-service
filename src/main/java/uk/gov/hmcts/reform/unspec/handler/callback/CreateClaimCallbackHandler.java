@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
@@ -37,6 +36,10 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -66,13 +69,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final DateOfBirthValidator dateOfBirthValidator;
 
     @Override
-    protected Map<CallbackType, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() {
         return Map.of(
-            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
-            CallbackType.MID, this::validateClaimValues,
-            CallbackType.MID_SECONDARY, this::validateDateOfBirth,
-            CallbackType.ABOUT_TO_SUBMIT, this::issueClaim,
-            CallbackType.SUBMITTED, this::buildConfirmation
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "claim-value"), this::validateClaimValues,
+            callbackKey(MID, "claimant"), this::validateDateOfBirth,
+            callbackKey(ABOUT_TO_SUBMIT), this::issueClaim,
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 

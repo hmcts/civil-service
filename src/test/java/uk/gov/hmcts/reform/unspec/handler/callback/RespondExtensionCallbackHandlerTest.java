@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RespondExtensionCallbackHandler.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
@@ -77,7 +78,9 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventCallback {
+    class MidEventCounterCallback {
+
+        private static final String PAGE_ID = "counter";
 
         @Test
         void shouldReturnExpectedError_whenValuesAreInvalid() {
@@ -86,7 +89,8 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
                    COUNTER, YesOrNo.YES,
                    RESPONSE_DEADLINE, now().atTime(MID_NIGHT)
                 ),
-                CallbackType.MID
+                MID,
+                PAGE_ID
             );
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -103,7 +107,8 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
                    COUNTER, YesOrNo.YES,
                    RESPONSE_DEADLINE, now().atTime(MID_NIGHT)
                 ),
-                CallbackType.MID
+                MID,
+                PAGE_ID
             );
 
             AboutToStartOrSubmitCallbackResponse response =
@@ -114,7 +119,7 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenCounterDateIsNo() {
-            CallbackParams params = callbackParamsOf(of(COUNTER, YesOrNo.NO), CallbackType.MID);
+            CallbackParams params = callbackParamsOf(of(COUNTER, YesOrNo.NO), MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

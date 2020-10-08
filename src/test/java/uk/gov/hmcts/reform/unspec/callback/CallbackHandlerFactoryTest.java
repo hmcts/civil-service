@@ -51,9 +51,9 @@ class CallbackHandlerFactoryTest {
 
             return new CallbackHandler() {
                 @Override
-                protected Map<CallbackType, Callback> callbacks() {
+                protected Map<String, Callback> callbacks() {
                     return ImmutableMap.of(
-                        ABOUT_TO_SUBMIT, this::createCitizenClaim
+                        ABOUT_TO_SUBMIT.getValue(), this::createCitizenClaim
                     );
                 }
 
@@ -73,9 +73,9 @@ class CallbackHandlerFactoryTest {
 
             return new CallbackHandler() {
                 @Override
-                protected Map<CallbackType, Callback> callbacks() {
+                protected Map<String, Callback> callbacks() {
                     return ImmutableMap.of(
-                        ABOUT_TO_SUBMIT, this::sendSealedClaim
+                        ABOUT_TO_SUBMIT.getValue(), this::sendSealedClaim
                     );
                 }
 

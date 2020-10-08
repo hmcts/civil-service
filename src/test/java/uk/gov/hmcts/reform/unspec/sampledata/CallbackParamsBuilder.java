@@ -14,6 +14,7 @@ public class CallbackParamsBuilder {
     private CallbackRequest request;
     private Map<CallbackParams.Params, Object> params;
     private CallbackVersion version;
+    private String pageId;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
@@ -40,12 +41,18 @@ public class CallbackParamsBuilder {
         return this;
     }
 
+    public CallbackParamsBuilder pageId(String pageId) {
+        this.pageId = pageId;
+        return this;
+    }
+
     public CallbackParams build() {
         return CallbackParams.builder()
             .type(type)
             .request(request)
             .params(params)
             .version(version)
+            .pageId(pageId)
             .build();
     }
 }

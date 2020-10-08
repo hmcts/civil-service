@@ -40,20 +40,29 @@ public class CallbackController {
         this.callbackHandlerFactory = callbackHandlerFactory;
     }
 
-    @PostMapping(path = {"/{callback-type}", "{version}/{callback-type}"})
+    @PostMapping(path = {
+        "/{callback-type}",
+        "/{callback-type}/{page-id}",
+        "/version/{version}/{callback-type}",
+        "/version/{version}/{callback-type}/{page-id}"
+    })
     @ApiOperation("Handles all callbacks from CCD")
     public CallbackResponse callback(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
-        @PathVariable("version") Optional<CallbackVersion> version
+        @PathVariable("version") Optional<CallbackVersion> version,
+        @PathVariable("page-id") Optional<String> pageId
     ) {
-        log.info("Received callback from CCD, eventId: {} and callback type: {}", callback.getEventId(), callbackType);
+        log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
+                 callback.getEventId(), callbackType, pageId, version
+        );
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
             .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
+            .pageId(pageId.orElse(null))
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);

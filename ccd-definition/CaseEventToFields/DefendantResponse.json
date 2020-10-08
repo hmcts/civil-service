@@ -33,7 +33,7 @@
     "PageID": "Upload",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
     "ShowSummaryChangeOption": "Y",
-    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid-secondary"
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/upload"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -59,7 +59,7 @@
     "DisplayContext": "COMPLEX",
     "PageID": "ConfirmDetails",
     "ShowSummaryChangeOption": "Y",
-    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid"
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details"
   },
   {
     "LiveFrom": "01/01/2017",

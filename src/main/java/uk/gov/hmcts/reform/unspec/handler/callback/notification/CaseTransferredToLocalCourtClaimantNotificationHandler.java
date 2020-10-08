@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.unspec.service.NotificationService;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT;
 
 @Service
@@ -35,9 +35,9 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
-    protected Map<CallbackType, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() {
         return Map.of(
-            CallbackType.ABOUT_TO_SUBMIT, this::notifyClaimantForCaseTransferredToLocalCourt
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantForCaseTransferredToLocalCourt
         );
     }
 

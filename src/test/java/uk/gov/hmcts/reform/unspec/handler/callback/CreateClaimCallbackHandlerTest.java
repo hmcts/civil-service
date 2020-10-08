@@ -47,7 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID_SECONDARY;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.ClaimType.PERSONAL_INJURY;
 import static uk.gov.hmcts.reform.unspec.handler.callback.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
@@ -109,7 +109,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventCallback {
+    class MidEventClaimValueCallback {
+
+        private static final String PAGE_ID = "claim-value";
 
         @Test
         void shouldReturnExpectedErrorInMidEvent_whenValuesAreInvalid() {
@@ -117,7 +119,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             data.put("claimValue", ClaimValue.builder()
                 .higherValue(BigDecimal.valueOf(1)).lowerValue(BigDecimal.valueOf(10)).build());
 
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+            CallbackParams params = callbackParamsOf(data, MID, "claim-value");
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -131,7 +133,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             data.put("claimValue", ClaimValue.builder()
                 .higherValue(BigDecimal.valueOf(10)).lowerValue(BigDecimal.valueOf(1)).build());
             data.put("claimType", PERSONAL_INJURY);
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -148,7 +150,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidSecondaryEventCallback {
+    class MidEventClaimantCallback {
+
+        private static final String PAGE_ID = "claimant";
 
         @ParameterizedTest
         @ValueSource(strings = {"individualDateOfBirth", "soleTraderDateOfBirth"})
@@ -156,7 +160,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> data = new HashMap<>();
             data.put("applicant1", Map.of(dateOfBirthField, now().plusDays(1)));
 
-            CallbackParams params = callbackParamsOf(data, MID_SECONDARY);
+            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -170,7 +174,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> data = new HashMap<>();
             data.put("applicant1", Map.of(dateOfBirthField, now().minusDays(1)));
 
-            CallbackParams params = callbackParamsOf(data, MID_SECONDARY);
+            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

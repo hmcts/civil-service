@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
@@ -23,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.DefendantResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
@@ -45,13 +48,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     }
 
     @Override
-    protected Map<CallbackType, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() {
         return Map.of(
-            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
-            CallbackType.MID, this::validateDateOfBirth,
-            CallbackType.MID_SECONDARY, this::emptyCallbackWorkaround,
-            CallbackType.ABOUT_TO_SUBMIT, this::setClaimantResponseDeadline,
-            CallbackType.SUBMITTED, this::buildConfirmation
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
+            callbackKey(MID, "upload"), this::emptyCallbackWorkaround,
+            callbackKey(ABOUT_TO_SUBMIT), this::setClaimantResponseDeadline,
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 

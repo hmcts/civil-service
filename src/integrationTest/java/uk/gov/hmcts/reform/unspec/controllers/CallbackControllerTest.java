@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID_SECONDARY;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
 
 public class CallbackControllerTest extends BaseIntegrationTest {
@@ -21,7 +20,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
             .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
             .build();
 
-        doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, MID_SECONDARY.getValue())
+        doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, "invalid-callback-type")
             .andExpect(status().isNotFound());
     }
 }

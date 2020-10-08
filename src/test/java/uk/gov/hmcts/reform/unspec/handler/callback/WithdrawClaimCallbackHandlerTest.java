@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CloseClaim;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
@@ -20,6 +19,7 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 
 @SpringBootTest(classes = {
     WithdrawClaimCallbackHandler.class,
@@ -48,13 +48,15 @@ class WithdrawClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEvent {
+    class MidEventWithdrawalReasonCallback {
+
+        private static final String PAGE_ID = "withdrawal-reason";
 
         @Test
         void shouldReturnErrors_whenDateInFuture() {
             HashMap<String, Object> data = new HashMap<>();
             data.put("withdrawClaim", CloseClaim.builder().date(LocalDate.now().plusDays(1)).build());
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -66,7 +68,7 @@ class WithdrawClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoErrors_whenDateInPast() {
             HashMap<String, Object> data = new HashMap<>();
             data.put("withdrawClaim", CloseClaim.builder().date(LocalDate.now().minusDays(1)).build());
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

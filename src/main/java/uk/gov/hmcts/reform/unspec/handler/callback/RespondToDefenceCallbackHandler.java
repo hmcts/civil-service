@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
@@ -20,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.DefendantResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
@@ -39,11 +41,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     }
 
     @Override
-    protected Map<CallbackType, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() {
         return Map.of(
-            CallbackType.ABOUT_TO_START, this::emptyCallbackResponse,
-            CallbackType.ABOUT_TO_SUBMIT, this::handleNotifications,
-            CallbackType.SUBMITTED, this::buildConfirmation
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::handleNotifications,
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -52,8 +54,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
         YesOrNo proceeding = mapper.convertValue(data.get(APPLICANT_1_PROCEEDING), YesOrNo.class);
         var response = mapper.convertValue(data.get("respondent1ClaimResponseType"), DefendantResponseType.class);
         if (response == FULL_DEFENCE && proceeding == YES) {
-            data.put("businessProcess",
-                     BusinessProcess.builder().activityId("CaseTransferredToLocalCourtHandling").build());
+            data.put(
+                "businessProcess",
+                BusinessProcess.builder().activityId("CaseTransferredToLocalCourtHandling").build()
+            );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -87,7 +91,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     private String getBody(YesOrNo proceeding) {
         if (proceeding == YES) {
             return "<br />We'll review the case. We'll contact you to tell you what to do next.%n%n"
-                    + "[Download directions questionnaire](%s)";
+                + "[Download directions questionnaire](%s)";
         }
         return "CONTENT TBC";
     }

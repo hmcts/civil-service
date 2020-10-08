@@ -24,21 +24,27 @@ public abstract class BaseCallbackHandlerTest {
     protected UserService userService;
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
-        return callbackParamsOf(data, state, type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type) {
-        return callbackParamsOf(data, CREATED, type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(data, CREATED, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, String pageId) {
+        return callbackParamsOf(data, CREATED, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
                                            CaseState state,
                                            CallbackType type,
                                            CallbackVersion version,
+                                           String pageId,
                                            Map<Params, Object> params
     ) {
         return CallbackParams.builder()
             .type(type)
+            .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
             .version(version)
             .params(params)

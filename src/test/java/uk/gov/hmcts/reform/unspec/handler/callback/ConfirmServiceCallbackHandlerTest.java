@@ -30,6 +30,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.handler.callback.ConfirmServiceCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -69,15 +70,14 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventCallback {
+    class MidEventServedDocumentCallback {
 
         @Test
         void shouldReturnError_whenWhitespaceInServedDocumentsOther() {
             Map<String, Object> data = new HashMap<>();
             data.put("servedDocumentsOther", " ");
 
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
-
+            CallbackParams params = callbackParamsOf(data, MID, "served-documents");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
@@ -90,7 +90,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> data = new HashMap<>();
             data.put("servedDocumentsOther", "A valid document");
 
-            CallbackParams params = callbackParamsOf(data, CallbackType.MID);
+            CallbackParams params = callbackParamsOf(data, MID, "served-documents");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -101,7 +101,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class SecondMidEventCallback {
+    class MidEventServiceDateCallback {
 
         private final LocalDate claimIssueDate = LocalDate.of(2000, 6, 22);
 
@@ -118,7 +118,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateToRespondentSolicitor1", claimIssueDate.plusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -133,7 +133,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateToRespondentSolicitor1", today);
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -148,7 +148,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateToRespondentSolicitor1", futureDate);
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -163,7 +163,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateToRespondentSolicitor1", claimIssueDate.minusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -185,7 +185,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateTimeToRespondentSolicitor1", claimIssueDate.plusDays(1).atTime(12, 0));
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -200,7 +200,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateTimeToRespondentSolicitor1", today);
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -215,7 +215,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateTimeToRespondentSolicitor1", futureDate);
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -230,7 +230,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 data.put("serviceDateTimeToRespondentSolicitor1", claimIssueDate.atTime(12, 0).minusDays(1));
                 data.put("claimIssuedDate", claimIssueDate);
 
-                CallbackParams params = callbackParamsOf(data, CallbackType.MID_SECONDARY);
+                CallbackParams params = callbackParamsOf(data, MID, "service-date");
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
