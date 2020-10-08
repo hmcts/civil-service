@@ -180,6 +180,24 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsEntry(RESPONSE_DEADLINE, responseDeadline);
         }
+
+        @Test
+        void shouldSetExtensionResponseBusinessProcessToReady_whenInvoked() {
+            Map<String, Object> data = new HashMap<>(Map.of(
+                RESPONSE_DEADLINE, now().atTime(MID_NIGHT),
+                COUNTER, YesOrNo.NO,
+                ACCEPT, YesOrNo.NO
+            ));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
+
+            //TODO: uncomment when CMC-794 is played
+            //assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY);
+            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isEqualTo(
+                "ExtensionResponseHandling");
+            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
+        }
     }
 
     @Nested

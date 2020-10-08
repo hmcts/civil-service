@@ -43,7 +43,7 @@ public class CoreCaseDataService {
             JURISDICTION,
             CASE_TYPE,
             caseId.toString(),
-            eventName.getValue()
+            eventName.name()
         );
 
         coreCaseDataApi.submitEventForCaseWorker(

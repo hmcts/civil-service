@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
@@ -29,8 +29,8 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedO
 @RequiredArgsConstructor
 public class ClaimIssueNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE);
-    public static final String NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE_TASK_ID
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+    public static final String NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID
         = "NotifyDefendantSolicitorForClaimIssue";
 
     private final NotificationService notificationService;
@@ -46,7 +46,7 @@ public class ClaimIssueNotificationHandler extends CallbackHandler implements No
 
     @Override
     public String camundaActivityId() {
-        return NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE_TASK_ID;
+        return NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID;
     }
 
     @Override

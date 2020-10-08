@@ -14,7 +14,7 @@ class CaseEventTaskTest extends BpmnBaseTest {
     public static final String TOPIC_NAME = "processCaseEvent";
 
     public CaseEventTaskTest() {
-        super("claim_issue.bpmn", "Claim_issue_event_handling");
+        super("claim_issue.bpmn", "ClaimIssueHandling");
     }
 
     @Test
@@ -38,7 +38,7 @@ class CaseEventTaskTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks).hasSize(1);
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CCD_ID", "1600774271669709")
-            .containsEntry("CASE_EVENT", "NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE")
+            .containsEntry("CASE_EVENT", "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE")
         ;
 
         completeTask(lockedExternalTasks.get(0).getId());

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
-  <bpmn:process id="Claim_issue_event_handling" isExecutable="true">
-    <bpmn:serviceTask id="SealedClaimEmailTaskId" name="SendEmail" camunda:type="external" camunda:topic="processCaseEvent">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
+  <bpmn:process id="ClaimIssueHandling" isExecutable="true">
+    <bpmn:serviceTask id="SealedClaimEmailTaskId" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CCD_ID">1600774271669709</camunda:inputParameter>
-          <camunda:inputParameter name="CASE_EVENT">NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE</camunda:inputParameter>
+          <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_04568qf</bpmn:incoming>
@@ -21,7 +21,7 @@
     </bpmn:startEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Claim_issue_event_handling">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ClaimIssueHandling">
       <bpmndi:BPMNEdge id="Flow_08ehj83_di" bpmnElement="Flow_08ehj83">
         <di:waypoint x="540" y="120" />
         <di:waypoint x="732" y="120" />

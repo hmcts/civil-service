@@ -87,6 +87,9 @@ reference:
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   defendantSolicitorClaimIssueEmailTemplate: "1e55aae6-879e-4e63-93ce-cf4cf93636f2"
+  solicitorResponseToCase: "094e4e93-5782-4afe-a1c0-ce797a4c8d2c"
+  claimantSolicitorEmail: claimantsolicitor@gmail.com
+  defendantSolicitorEmail: defendantsolicitor@gmail.com
 ---
 
 spring:
@@ -135,6 +138,11 @@ document_management:
 docmosis:
   tornado:
     url: http://localhost:5433
+
+notifications:
+  govNotifyApiKey: some-gov-uk-notify-api-key
+  claimantSolicitorEmail: claimantsolicitor@example.com
+  defendantSolicitorEmail: defendantsolicitor@example.com
 ---
 
 spring:
@@ -190,3 +198,5 @@ feign:
         url: http://fake/engine-rest/
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
+  claimantSolicitorEmail: claimantsolicitor@example.com
+  defendantSolicitorEmail: defendantsolicitor@example.com

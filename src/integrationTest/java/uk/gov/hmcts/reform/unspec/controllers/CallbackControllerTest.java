@@ -17,7 +17,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnNotFoundWhenCallbackHandlerIsNotImplemented() {
         CallbackRequest callbackRequest = CallbackRequest.builder()
-            .eventId(REQUEST_EXTENSION.getValue())
+            .eventId(REQUEST_EXTENSION.name())
             .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
             .build();
 

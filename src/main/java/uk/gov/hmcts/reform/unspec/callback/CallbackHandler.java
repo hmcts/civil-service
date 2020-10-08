@@ -32,7 +32,7 @@ public abstract class CallbackHandler {
 
     public void register(Map<String, CallbackHandler> handlers) {
         handledEvents().forEach(
-            handledEvent -> handlers.put(handledEvent.getValue(), this));
+            handledEvent -> handlers.put(handledEvent.name(), this));
     }
 
     public CallbackResponse handle(CallbackParams callbackParams) {

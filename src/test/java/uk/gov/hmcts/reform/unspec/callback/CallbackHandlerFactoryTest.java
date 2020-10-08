@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 
 @SpringBootTest(classes = {
     CallbackHandlerFactory.class,
@@ -41,7 +41,7 @@ class CallbackHandlerFactoryTest {
         .build();
 
     public static final CallbackResponse ALREADY_HANDLED_EVENT_RESPONSE = AboutToStartOrSubmitCallbackResponse.builder()
-        .errors(List.of(format("Event %s is already processed", NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE.getValue())))
+        .errors(List.of(format("Event %s is already processed", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())))
         .build();
 
     @TestConfiguration
@@ -90,7 +90,7 @@ class CallbackHandlerFactoryTest {
 
                 @Override
                 public List<CaseEvent> handledEvents() {
-                    return Collections.singletonList(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE);
+                    return Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
                 }
             };
         }
@@ -120,7 +120,7 @@ class CallbackHandlerFactoryTest {
     void shouldProcessEvent_whenValidCaseEvent() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(CREATE_CLAIM.getValue())
+            .eventId(CREATE_CLAIM.name())
             .caseDetails(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
@@ -140,7 +140,7 @@ class CallbackHandlerFactoryTest {
     void shouldNotProcessEventAgain_whenEventIsAlreadyProcessed() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE.getValue())
+            .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("SealedClaimEmailTaskId").build()
@@ -163,7 +163,7 @@ class CallbackHandlerFactoryTest {
     void shouldProcessEvent_whenEventIsNotAlreadyProcessed() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE.getValue())
+            .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("unProcessedTask").build()
@@ -186,7 +186,7 @@ class CallbackHandlerFactoryTest {
     void shouldProcessEvent_whenEventHasNoCamundaTask() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(CREATE_CLAIM.getValue())
+            .eventId(CREATE_CLAIM.name())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("unProcessedTask").build()

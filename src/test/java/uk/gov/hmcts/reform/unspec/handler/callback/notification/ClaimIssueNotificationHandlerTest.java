@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.unspec.handler.callback.notification.ClaimIssueNotificationHandler.NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE_TASK_ID;
+import static uk.gov.hmcts.reform.unspec.handler.callback.notification.ClaimIssueNotificationHandler.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID;
 
 @SpringBootTest(classes = {
     ClaimIssueNotificationHandler.class,
@@ -49,7 +49,7 @@ class ClaimIssueNotificationHandlerTest extends BaseCallbackHandlerTest {
             String solicitorEmail = "solicitor@example.com";
             Map<String, Object> data = Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE_TASK_ID).build(),
+                BusinessProcess.builder().activityId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID).build(),
                 "serviceMethodToRespondentSolicitor1",
                 Map.of("email", solicitorEmail),
                 "legacyCaseReference", "000LR001",

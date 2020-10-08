@@ -12,6 +12,7 @@ public interface NotificationData {
     String DEFENDANT_SOLICITOR_NAME = "defendantSolicitorName";
     String ISSUED_ON = "issuedOn";
     String RESPONSE_DEADLINE = "responseDeadline";
+    String SOLICITOR_REFERENCE = "solicitorReference";
 
     Map<String, String> addProperties(CaseData caseData);
 

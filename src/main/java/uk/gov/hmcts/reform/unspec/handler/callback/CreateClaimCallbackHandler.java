@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.Party;
@@ -139,6 +140,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         data.put(RESPONDENT, caseData.getRespondent1());
         data.put(CLAIMANT, caseData.getApplicant1());
         data.put("legacyCaseReference", referenceNumber);
+        data.put("businessProcess", BusinessProcess.builder().activityId("ClaimIssueHandling").build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)

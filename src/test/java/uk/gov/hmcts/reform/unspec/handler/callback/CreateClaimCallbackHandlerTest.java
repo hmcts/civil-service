@@ -182,14 +182,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @Test
-        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
+        private CallbackParams params;
+        private CaseData caseData;
+
+        @BeforeEach
+        void setup() {
             when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
             when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
                 .thenReturn(now().atTime(23, 59, 59));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
+        }
 
+        @Test
+        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).containsEntry("claimIssuedDate", now());
@@ -203,29 +209,17 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldIssueClaimWithSystemGeneratedDocumentsAndDate_whenInvoked() {
-            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
-            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
-                .thenReturn(now().atTime(23, 59, 59));
-            CaseData caseDataDraft = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(convertToMap(caseDataDraft), CallbackType.ABOUT_TO_SUBMIT);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData caseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(caseData.getSystemGeneratedCaseDocuments()).isNotEmpty()
+            CaseData responseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseData.getSystemGeneratedCaseDocuments()).isNotEmpty()
                 .contains(Element.<CaseDocument>builder().value(CASE_DOCUMENT).build());
 
-            assertThat(caseData.getClaimIssuedDate()).isEqualTo(now());
+            assertThat(responseData.getClaimIssuedDate()).isEqualTo(now());
         }
 
         @Test
         void shouldUpdateRespondentAndApplicantWithPartyNameAndPartyTypeDisplayValue_whenInvoked() {
-            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
-            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
-                .thenReturn(now().atTime(23, 59, 59));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(convertToMap(caseData), CallbackType.ABOUT_TO_SUBMIT);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("respondent1").extracting("partyName").isEqualTo(
@@ -236,6 +230,17 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 getPartyNameBasedOnType(caseData.getApplicant1()));
             assertThat(response.getData()).extracting("applicant1").extracting("partyTypeDisplayValue").isEqualTo(
                 caseData.getApplicant1().getType().getDisplayValue());
+        }
+
+        @Test
+        void shouldSetClaimIssueBusinessProcessToReady_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //TODO: uncomment when CMC-794 is played
+            //assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY);
+            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isEqualTo(
+                "ClaimIssueHandling");
+            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
         }
 
         @SuppressWarnings("unchecked")

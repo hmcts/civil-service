@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
@@ -44,7 +44,7 @@ class CaseEventTaskHandlerTest {
                 "CCD_ID",
                 CASE_ID.toString(),
                 "CASE_EVENT",
-                NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE.getValue()
+                NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
             ));
     }
 
@@ -57,7 +57,7 @@ class CaseEventTaskHandlerTest {
 
             verify(coreCaseDataService).triggerEvent(
                 eq(CASE_ID),
-                eq(NOTIFY_DEFENDANT_SOLICITOR_FOR_CLAIM_ISSUE),
+                eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE),
                 anyMap()
             );
             verify(externalTaskService).complete(mockExternalTask);
