@@ -41,6 +41,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
     StateFlowEngine.class})
 class EventAllowedAspectTest {
 
+    private static final String ERROR_MESSAGE = "This action cannot currently be performed because it has either "
+        + "already been completed or another action must be completed first.";
+
     @Autowired
     EventAllowedAspect eventAllowedAspect;
     @MockBean
@@ -66,7 +69,7 @@ class EventAllowedAspectTest {
     @SneakyThrows
     void shouldNotProceedToMethodInvocation_whenEventIsNotAllowed() {
         AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(List.of("Invalid action performed"))
+            .errors(List.of(ERROR_MESSAGE))
             .build();
         when(proceedingJoinPoint.proceed()).thenReturn(response);
 

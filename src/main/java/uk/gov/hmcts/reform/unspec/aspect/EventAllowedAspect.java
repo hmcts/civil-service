@@ -24,6 +24,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 @RequiredArgsConstructor
 public class EventAllowedAspect {
 
+    private static final String ERROR_MESSAGE = "This action cannot currently be performed because it has either "
+        + "already been completed or another action must be completed first.";
+
     private final FlowStateAllowedEventService flowStateAllowedEventService;
 
     @Pointcut("execution(* *(*)) && @annotation(EventAllowed)")
@@ -49,7 +52,7 @@ public class EventAllowedAspect {
                 caseEvent.getDisplayName(), caseDetails.getId()
             ));
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of("Invalid action performed"))
+                .errors(List.of(ERROR_MESSAGE))
                 .build();
         }
     }
