@@ -11,6 +11,6 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "businessProcess",
     "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU"
+    "CRUD": "CRUD"
   }
 ]

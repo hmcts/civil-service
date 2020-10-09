@@ -90,6 +90,10 @@ notifications:
   solicitorResponseToCase: "a2b3d626-bf20-406e-ac8c-8d8a5ea43c66"
   claimantSolicitorEmail: claimantsolicitor@gmail.com
   defendantSolicitorEmail: defendantsolicitor@gmail.com
+
+testing:
+  support:
+    enabled: ${TESTING_SUPPORT_ENABLED:false}
 ---
 
 spring:
@@ -142,6 +146,10 @@ docmosis:
 notifications:
   claimantSolicitorEmail: claimantsolicitor@example.com
   defendantSolicitorEmail: defendantsolicitor@example.com
+
+testing:
+  support:
+    enabled: true
 ---
 
 spring:
@@ -199,3 +207,7 @@ notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
   claimantSolicitorEmail: claimantsolicitor@example.com
   defendantSolicitorEmail: defendantsolicitor@example.com
+
+testing:
+  support:
+    enabled: true

@@ -1,6 +1,7 @@
 const assert = require('assert').strict;
 
-const request = require('../api/request.js');
+const request = require('./request.js');
+const testingSupport = require('./testingSupport.js');
 
 const createClaimData = require('../fixtures/createClaim.js');
 const confirmServiceData = require('../fixtures/confirmService.js');
@@ -33,6 +34,7 @@ module.exports = {
   },
 
   confirmService: async () => {
+    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent('CONFIRM_SERVICE', caseId);
 
     delete caseData.servedDocumentFiles;

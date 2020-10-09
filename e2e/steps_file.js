@@ -4,6 +4,8 @@
 
 const output = require('codeceptjs').output;
 
+const testingSupport = require('./api/testingSupport.js');
+
 const config = require('./config.js');
 const loginPage = require('./pages/login.page');
 const caseViewPage = require('./pages/caseView.page');
@@ -47,6 +49,8 @@ const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
 const CASE_HEADER = 'ccd-case-header > h1';
 
+let caseId;
+
 module.exports = function () {
   return actor({
     // Define custom steps here, use 'this' to access default methods of I.
@@ -86,9 +90,12 @@ module.exports = function () {
       await statementOfTruth.enterNameAndRole('claim');
       await event.submit('Issue claim', 'Your claim has been issued');
       await event.returnToCaseDetails();
+
+      caseId = (await this.grabCaseNumber()).split('-').join('').substring(1);
     },
 
     async confirmService() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('Confirm service');
       await servedDocumentsPage.enterServedDocuments();
       await uploadDocumentsPage.uploadServedDocuments(config.testFile);
@@ -101,6 +108,7 @@ module.exports = function () {
     },
 
     async acknowledgeService() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('Acknowledge service');
       await defendantDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
@@ -110,6 +118,7 @@ module.exports = function () {
     },
 
     async requestExtension() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('Request extension');
       await proposeDeadline.enterExtensionProposedDeadline();
       await extensionAlreadyAgreed.selectAlreadyAgreed();
@@ -118,6 +127,7 @@ module.exports = function () {
     },
 
     async respondToExtension() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('Respond to extension request');
       await respondToExtensionPage.selectDoNotAccept();
       await counterExtensionPage.enterCounterDate();
@@ -127,6 +137,7 @@ module.exports = function () {
     },
 
     async respondToClaim() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('Respond to claim');
       await responseTypePage.selectFullDefence();
       await uploadResponsePage.uploadResponseDocuments(config.testFile);
@@ -137,6 +148,7 @@ module.exports = function () {
     },
 
     async respondToDefence() {
+      await testingSupport.resetBusinessProcess(caseId);
       await caseViewPage.startEvent('View and respond to defence');
       await proceedPage.proceedWithClaim();
       await uploadResponseDocumentPage.uploadResponseDocuments(config.testFile);

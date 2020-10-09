@@ -1,6 +1,6 @@
 const config = require('../config.js');
 
-const restHelper = require('../api/restHelper.js');
+const restHelper = require('./restHelper.js');
 const totp = require('totp-generator');
 
 const tokens = {};

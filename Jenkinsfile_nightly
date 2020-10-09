@@ -17,6 +17,8 @@ properties([
       description: 'The URL of service auth provider'),
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
+    string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-preview.internal',
+      description: 'The URL of unspec service'),
     string(name: 'FUNCTIONAL_TESTS_WORKERS',
       defaultValue: '5',
       description: 'Number of workers running functional tests'),
@@ -51,6 +53,7 @@ withNightlyPipeline(type, product, component) {
   env.PROXY_SERVER = params.PROXY_SERVER
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
   env.CCD_DATA_STORE_URL = params.CCD_DATA_STORE_URL
+  env.UNSPEC_SERVICE_URL = params.UNSPEC_SERVICE_URL
   loadVaultSecrets(secrets)
 
   enableFullFunctionalTest()

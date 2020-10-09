@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.aspect.NoOngoingBusinessProcessAspect.ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CONFIRM_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 
@@ -97,7 +98,6 @@ class NoOngoingBusinessProcessAspectTest {
         AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
             .build();
-        when(proceedingJoinPoint.proceed()).thenReturn(response);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .type(ABOUT_TO_START)
@@ -114,5 +114,29 @@ class NoOngoingBusinessProcessAspectTest {
 
         assertThat(result).isEqualTo(response);
         verify(proceedingJoinPoint, never()).proceed();
+    }
+
+    @SneakyThrows
+    @ParameterizedTest
+    @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldProceedToMethodInvocation_whenOngoingBusinessProcessOnSubmittedCallback(BusinessProcessStatus status) {
+        AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+        when(proceedingJoinPoint.proceed()).thenReturn(response);
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .type(SUBMITTED)
+            .request(CallbackRequest.builder()
+                         .eventId(CONFIRM_SERVICE.name())
+                         .caseDetails(CaseDetailsBuilder.builder().data(
+                             CaseDataBuilder.builder()
+                                 .atStateClaimCreated()
+                                 .businessProcess(BusinessProcess.builder().status(status).build())
+                                 .build()).build())
+                         .build())
+            .build();
+        Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+        assertThat(result).isEqualTo(response);
+        verify(proceedingJoinPoint).proceed();
     }
 }
