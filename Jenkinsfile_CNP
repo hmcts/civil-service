@@ -138,7 +138,7 @@ withPipeline(type, product, component) {
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.UNSPEC_SERVICE_URL="http://unspec-service-aat.service.core-compute-preview.internal"
+    env.UNSPEC_SERVICE_URL="http://unspec-service-aat.service.core-compute-aat.internal"
   }
 
   after('functionalTest:aat') {

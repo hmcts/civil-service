@@ -17,7 +17,7 @@ properties([
       description: 'The URL of service auth provider'),
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
-    string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-preview.internal',
+    string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-aat.internal',
       description: 'The URL of unspec service'),
     string(name: 'FUNCTIONAL_TESTS_WORKERS',
       defaultValue: '5',
