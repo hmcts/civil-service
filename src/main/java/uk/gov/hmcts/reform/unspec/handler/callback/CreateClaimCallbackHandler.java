@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
-import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -103,14 +102,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             errors.add("CONTENT TBC: Higher value must not be lower than the lower value.");
         }
 
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        if (errors.isEmpty()) {
-            ClaimType claimType = caseData.getClaimType();
-            data.put("allocatedTrack", getAllocatedTrack(claimValue, claimType));
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
             .errors(errors)
             .build();
     }
@@ -144,6 +136,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         data.put(CLAIMANT, caseData.getApplicant1());
         data.put("legacyCaseReference", referenceNumber);
         data.put("businessProcess", BusinessProcess.builder().activityId("ClaimIssueHandling").build());
+        data.put("allocatedTrack", getAllocatedTrack(caseData.getClaimValue(), caseData.getClaimType()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
