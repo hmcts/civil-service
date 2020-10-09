@@ -40,7 +40,7 @@ public class NoOngoingBusinessProcessAspect {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        if (caseData.hasNoOngoingBusinessProcess()) {
+        if (caseData.hasNoOngoingBusinessProcess() || caseEvent.isCamundaEvent()) {
             return joinPoint.proceed();
         } else {
             log.info(format(
