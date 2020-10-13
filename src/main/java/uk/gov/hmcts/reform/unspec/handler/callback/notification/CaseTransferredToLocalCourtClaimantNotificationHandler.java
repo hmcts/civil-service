@@ -68,7 +68,7 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
+            SOLICITOR_REFERENCE, "claimant solicitor"
         );
     }
 }

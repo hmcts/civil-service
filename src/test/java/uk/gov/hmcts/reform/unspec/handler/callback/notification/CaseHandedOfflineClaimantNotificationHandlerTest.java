@@ -46,14 +46,8 @@ class CaseHandedOfflineClaimantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyParties_whenInvoked() {
-            String claimantReference = "Claimant ref";
-            String defendantReference = "Claimant ref";
             String legacyCaseReference = "000LR001";
-            Map<String, Object> data = Map.of(
-                "solicitorReferences", Map.of(
-                    "applicantSolicitor1Reference", claimantReference,
-                    "respondentSolicitor1Reference", defendantReference),
-                "legacyCaseReference", legacyCaseReference);
+            Map<String, Object> data = Map.of("legacyCaseReference", legacyCaseReference);
 
             CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -62,7 +56,7 @@ class CaseHandedOfflineClaimantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "claimantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseReference, SOLICITOR_REFERENCE, claimantReference),
+                Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseReference, SOLICITOR_REFERENCE, "claimant solicitor"),
                 "case-handed-offline-claimant-notification-000LR001"
             );
         }

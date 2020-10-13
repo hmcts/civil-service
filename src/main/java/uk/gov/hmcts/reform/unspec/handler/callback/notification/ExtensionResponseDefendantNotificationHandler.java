@@ -65,7 +65,7 @@ public class ExtensionResponseDefendantNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor1Reference()
+            SOLICITOR_REFERENCE, "defendant solicitor"
         );
     }
 }

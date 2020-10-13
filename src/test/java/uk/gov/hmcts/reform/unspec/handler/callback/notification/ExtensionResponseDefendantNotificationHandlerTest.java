@@ -46,14 +46,8 @@ class ExtensionResponseDefendantNotificationHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            String claimantReference = "Claimant ref";
-            String defendantReference = "Claimant ref";
             String legacyCaseReference = "000LR001";
-            Map<String, Object> data = Map.of(
-                "solicitorReferences", Map.of(
-                    "applicantSolicitor1Reference", claimantReference,
-                    "respondentSolicitor1Reference", defendantReference),
-                "legacyCaseReference", legacyCaseReference);
+            Map<String, Object> data = Map.of("legacyCaseReference", legacyCaseReference);
 
             CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -62,7 +56,7 @@ class ExtensionResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             verify(notificationService).sendMail(
                 "defendantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseReference, SOLICITOR_REFERENCE, defendantReference),
+                Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseReference, SOLICITOR_REFERENCE, "defendant solicitor"),
                 "extension-response-defendant-notification-000LR001"
             );
         }
