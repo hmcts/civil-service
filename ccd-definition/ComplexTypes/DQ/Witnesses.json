@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "Witnesses",
+    "ListElementCode": "witnessesToAppear",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you have witnesses you want to appear at the hearing?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Witnesses",
+    "ListElementCode": "details",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Witness",
+    "ElementLabel": "Witness details",
+    "FieldShowCondition": "witnessesToAppear = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Min": 1
+  }
+]

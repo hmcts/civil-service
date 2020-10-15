@@ -184,5 +184,95 @@
     "FieldShowCondition": "respondentSolicitor1Reference=\"DO_NOT_SHOW\"",
     "Comment": "Required for hiding field on CYA page",
     "ShowSummary": "N"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "expertRequired",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "exportReportsSent",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "jointExpertSuitable",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "details.name",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "details.fieldOfExpertise",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "details.whyRequired",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Experts",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQExperts",
+    "ListElementCode": "details.estimatedCost",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "DisclosureReport",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQDisclosureReport",
+    "ListElementCode": "disclosureFormFiledAndServed",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "DisclosureReport",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQDisclosureReport",
+    "ListElementCode": "disclosureProposalAgreed",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "DisclosureReport",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQDisclosureReport",
+    "ListElementCode": "draftOrderNumber",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
   }
 ]

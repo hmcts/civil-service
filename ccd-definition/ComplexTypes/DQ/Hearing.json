@@ -1,0 +1,45 @@
+[
+  {
+    "ID": "Hearing",
+    "ListElementCode": "hearingLength",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "HearingLength",
+    "ElementLabel": "How long do you estimate the hearing will take?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
+    "ListElementCode": "hearingLengthHours",
+    "FieldType": "Number",
+    "ElementLabel": "How many hours?",
+    "HintText": "Enter a numeric value, for example 3",
+    "FieldShowCondition": "hearingLength = \"LESS_THAN_DAY\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
+    "ListElementCode": "hearingLengthDays",
+    "FieldType": "Number",
+    "ElementLabel": "How many days?",
+    "HintText": "Enter a numeric value, for example 3",
+    "FieldShowCondition": "hearingLength = \"MORE_THAN_DAY\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
+    "ListElementCode": "unavailableDatesRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Are there any days within the next 12 months when you, your client, or an expert or a witness couldn't attend a hearing?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
+    "ListElementCode": "unavailableDates",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "UnavailableDate",
+    "ElementLabel": "Unavailable date",
+    "FieldShowCondition": "unavailableDatesRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Min": 1
+  }
+]
