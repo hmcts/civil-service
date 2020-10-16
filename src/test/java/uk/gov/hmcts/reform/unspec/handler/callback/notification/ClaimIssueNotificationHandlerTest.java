@@ -7,27 +7,22 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
-import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.service.NotificationService;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.unspec.handler.callback.notification.ClaimIssueNotificationHandler.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.sampledata.ServiceMethodBuilder.SERVICE_EMAIL;
 
 @SpringBootTest(classes = {
     ClaimIssueNotificationHandler.class,
-    CaseDetailsConverter.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
@@ -46,24 +41,13 @@ class ClaimIssueNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            String solicitorEmail = "solicitor@example.com";
-            Map<String, Object> data = Map.of(
-                "businessProcess",
-                BusinessProcess.builder().activityId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_TASK_ID).build(),
-                "serviceMethodToRespondentSolicitor1",
-                Map.of("email", solicitorEmail),
-                "legacyCaseReference", "000LR001",
-                "applicant1", PartyBuilder.builder().individual().build(),
-                "claimIssuedDate", LocalDate.now(),
-                "respondentSolicitor1ResponseDeadline", LocalDateTime.now()
-            );
-
-            CallbackParams params = callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT);
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                eq(solicitorEmail),
+                eq(SERVICE_EMAIL),
                 eq(notificationsProperties.getDefendantSolicitorClaimIssueEmailTemplate()),
                 anyMap(),
                 anyString()

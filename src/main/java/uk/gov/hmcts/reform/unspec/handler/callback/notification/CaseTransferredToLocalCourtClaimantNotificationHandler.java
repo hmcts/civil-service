@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.NotificationService;
 
@@ -32,7 +31,6 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -52,7 +50,7 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
     }
 
     private CallbackResponse notifyClaimantForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             notificationsProperties.getClaimantSolicitorEmail(),

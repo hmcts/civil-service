@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CallbackVersion;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Map;
 
@@ -15,9 +16,16 @@ public class CallbackParamsBuilder {
     private Map<CallbackParams.Params, Object> params;
     private CallbackVersion version;
     private String pageId;
+    private CaseData caseData;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
+    }
+
+    public CallbackParamsBuilder of(CallbackType type, CaseData caseData) {
+        this.type = type;
+        this.caseData = caseData;
+        return this;
     }
 
     public CallbackParamsBuilder of(CallbackType type, CaseDetails caseDetails) {
@@ -53,6 +61,7 @@ public class CallbackParamsBuilder {
             .params(params)
             .version(version)
             .pageId(pageId)
+            .caseData(caseData)
             .build();
     }
 }

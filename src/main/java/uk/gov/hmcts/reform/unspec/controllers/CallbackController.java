@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.unspec.controllers;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CallbackVersion;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ import javax.validation.constraints.NotNull;
 @Api
 @Slf4j
 @RestController
+@AllArgsConstructor
 @RequestMapping(
     path = "/cases/callbacks",
     produces = MediaType.APPLICATION_JSON_VALUE,
@@ -34,11 +36,7 @@ import javax.validation.constraints.NotNull;
 public class CallbackController {
 
     private final CallbackHandlerFactory callbackHandlerFactory;
-
-    @Autowired
-    public CallbackController(CallbackHandlerFactory callbackHandlerFactory) {
-        this.callbackHandlerFactory = callbackHandlerFactory;
-    }
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @PostMapping(path = {
         "/{callback-type}",
@@ -63,6 +61,7 @@ public class CallbackController {
             .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
+            .caseData(caseDetailsConverter.toCaseData(callback.getCaseDetails()))
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);

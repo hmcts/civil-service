@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.unspec.enums.ServiceMethodType.POST;
 
 public class ServiceMethodBuilder {
 
+    public static final String SERVICE_EMAIL = "service@email.com";
+
     private ServiceMethodType type;
     private String dxNumber;
     private String faxNumber;
@@ -28,7 +30,7 @@ public class ServiceMethodBuilder {
 
     public ServiceMethodBuilder email() {
         type = EMAIL;
-        email = "service@email.com";
+        email = SERVICE_EMAIL;
         return this;
     }
 
