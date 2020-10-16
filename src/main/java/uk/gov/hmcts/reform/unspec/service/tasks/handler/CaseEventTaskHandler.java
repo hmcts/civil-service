@@ -20,11 +20,11 @@ public class CaseEventTaskHandler implements ExternalTaskHandler {
     @Override
     public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         Map<String, Object> allVariables = externalTask.getAllVariables();
-        String ccdId = (String) allVariables.get("CCD_ID");
+        Long ccdId = (Long) allVariables.get("CCD_ID");
         String eventId = (String) allVariables.get("CASE_EVENT");
 
         coreCaseDataService.triggerEvent(
-            Long.valueOf(ccdId),
+            ccdId,
             CaseEvent.valueOf(eventId),
             Map.of(
                 "businessProcess",

@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
 import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
@@ -66,6 +66,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
+    private final BusinessProcessService businessProcessService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -135,11 +136,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         data.put(RESPONDENT, caseData.getRespondent1());
         data.put(CLAIMANT, caseData.getApplicant1());
         data.put("legacyCaseReference", referenceNumber);
-        data.put("businessProcess", BusinessProcess.builder().activityId("ClaimIssueHandling").build());
+        List<String> errors = businessProcessService.updateBusinessProcess(data, CREATE_CLAIM);
         data.put("allocatedTrack", getAllocatedTrack(caseData.getClaimValue(), caseData.getClaimType()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
+            .errors(errors)
             .build();
     }
 

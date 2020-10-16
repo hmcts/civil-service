@@ -143,10 +143,6 @@ docmosis:
   tornado:
     url: http://localhost:5433
 
-notifications:
-  claimantSolicitorEmail: claimantsolicitor@example.com
-  defendantSolicitorEmail: defendantsolicitor@example.com
-
 testing:
   support:
     enabled: true
@@ -203,6 +199,7 @@ feign:
         url: http://fake/engine-rest/
       remoteExternalTaskService:
         url: http://fake/engine-rest/
+
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
   claimantSolicitorEmail: claimantsolicitor@example.com

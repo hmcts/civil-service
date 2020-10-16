@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
-import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -46,6 +46,7 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
+    private final BusinessProcessService businessProcessService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -104,10 +105,11 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
             data.put(RESPONSE_DEADLINE, newDeadline.atTime(MID_NIGHT));
         }
 
-        data.put("businessProcess", BusinessProcess.builder().activityId("ExtensionResponseHandling").build());
+        List<String> errors = businessProcessService.updateBusinessProcess(data, RESPOND_EXTENSION);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)
+            .errors(errors)
             .build();
     }
 

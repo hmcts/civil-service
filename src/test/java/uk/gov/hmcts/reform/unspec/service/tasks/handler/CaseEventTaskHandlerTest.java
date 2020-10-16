@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SO
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
 
-    private static final String errorMessage = "Event failed processing";
     private static final Long CASE_ID = 1L;
 
     @Mock
@@ -41,10 +40,8 @@ class CaseEventTaskHandlerTest {
         when(mockExternalTask.getActivityId()).thenReturn("activityId");
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
-                "CCD_ID",
-                CASE_ID.toString(),
-                "CASE_EVENT",
-                NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+                "CCD_ID", CASE_ID,
+                "CASE_EVENT", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
             ));
     }
 

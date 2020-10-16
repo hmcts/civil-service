@@ -20,5 +20,12 @@
     "FieldType": "Text",
     "ElementLabel": "Last successfully processed task activity id",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "camundaEvent",
+    "FieldType": "Text",
+    "ElementLabel": "Camunda event name used to trigger business process by sending message",
+    "SecurityClassification": "Public"
   }
 ]

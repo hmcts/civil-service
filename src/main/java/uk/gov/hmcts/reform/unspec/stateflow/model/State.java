@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.unspec.stateflow.model;
 
+import lombok.EqualsAndHashCode;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
+
+@EqualsAndHashCode
 public class State {
 
     public static final String ERROR_STATE = "ERROR";
@@ -20,6 +24,10 @@ public class State {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isFlowState(FlowState flowState) {
+        return FlowState.fromFullName(name) == flowState;
     }
 
     @Override

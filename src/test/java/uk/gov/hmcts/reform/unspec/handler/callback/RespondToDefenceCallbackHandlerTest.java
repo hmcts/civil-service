@@ -1,37 +1,51 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
-import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToDefenceCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    StateFlowEngine.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private BusinessProcessService businessProcessService;
 
     @Autowired
     private RespondToDefenceCallbackHandler handler;
@@ -54,53 +68,28 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        @BeforeEach
+        void setup() {
+            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(List.of());
+            clearInvocations(businessProcessService);
+        }
+
         @Test
-        void shouldSetCaseTransferredToLocalCourtBusinessProcessToReady_whenFullDefenceAndProceedingWithClaim() {
-            Map<String, Object> data = new HashMap<>(Map.of(
-                "respondent1ClaimResponseType", "FULL_DEFENCE",
-                "applicant1ProceedWithClaim", "Yes"
-            ));
+        void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateFullDefence().build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
+            handler.handle(callbackParamsOf(caseDetails.getData(), CallbackType.ABOUT_TO_SUBMIT));
 
-            //TODO: uncomment when CMC-794 is played
-            //assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY);
-            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isEqualTo(
-                "CaseTransferredToLocalCourtHandling");
-            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
+            verify(businessProcessService).updateBusinessProcess(caseDetails.getData(), CLAIMANT_RESPONSE);
         }
 
-        @ParameterizedTest
-        @EnumSource(
-            value = DefendantResponseType.class,
-            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM"})
-        void shouldNotSetBusinessProcess_whenNotFullDefence(DefendantResponseType responseType) {
-            Map<String, Object> data = new HashMap<>(Map.of(
-                "respondent1ClaimResponseType", responseType,
-                "applicant1ProceedWithClaim", "Yes"
-            ));
+        @Test
+        void shouldNotUpdateBusinessProcess_whenNotAtFullDefenceState() {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateRespondedToClaim().build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
+            handler.handle(callbackParamsOf(caseDetails.getData(), CallbackType.ABOUT_TO_SUBMIT));
 
-            assertThat(response.getData()).doesNotContainKey("businessProcess");
-        }
-
-        @ParameterizedTest
-        @EnumSource(
-            value = DefendantResponseType.class,
-            names = {"FULL_DEFENCE", "FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM"})
-        void shouldNotSetBusinessProcess_whenNotProceedingWithClaim(DefendantResponseType responseType) {
-            Map<String, Object> data = new HashMap<>(Map.of(
-                "respondent1ClaimResponseType", responseType,
-                "applicant1ProceedWithClaim", "No"
-            ));
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
-
-            assertThat(response.getData()).doesNotContainKey("businessProcess");
+            verifyNoInteractions(businessProcessService);
         }
     }
 

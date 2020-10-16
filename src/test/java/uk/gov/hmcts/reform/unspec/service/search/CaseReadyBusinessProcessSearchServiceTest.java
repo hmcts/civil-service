@@ -8,21 +8,19 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class CaseStayedSearchServiceTest extends ElasticSearchServiceTest {
+class CaseReadyBusinessProcessSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new CaseStayedSearchService(coreCaseDataService);
+        searchService = new CaseReadyBusinessProcessSearchService(coreCaseDataService);
     }
 
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now-112d"))
-            .must(matchQuery("state", "CREATED"));
+            .must(matchQuery("data.businessProcess.status", "READY"));
 
-        return new Query(query, List.of("reference"), fromValue);
+        return new Query(query, List.of(), fromValue);
     }
 }

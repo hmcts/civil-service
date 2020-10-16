@@ -3,7 +3,7 @@
 set -eu
 
 dir=$(dirname ${0})
-filepath="$(realpath ".")/src/main/resources"
+filepath="$(realpath ".")/src/main/resources/camunda"
 
 for file in $(find ${filepath} -name '*.bpmn')
 do

@@ -1,16 +1,19 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -25,7 +29,11 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RespondExtensionCallbackHandler.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
@@ -45,6 +53,9 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
     public static final String COUNTER_DATE = "respondentSolicitor1claimResponseExtensionCounterDate";
     public static final String COUNTER = "respondentSolicitor1claimResponseExtensionCounter";
     public static final String REFERENCE_NUMBER = "000LR001";
+
+    @MockBean
+    private BusinessProcessService businessProcessService;
 
     @Autowired
     private RespondExtensionCallbackHandler handler;
@@ -134,6 +145,11 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
         public static final String PROPOSED_DEADLINE = "respondentSolicitor1claimResponseExtensionProposedDeadline";
         public static final String ACCEPT = "respondentSolicitor1claimResponseExtensionAccepted";
 
+        @BeforeEach
+        void setup() {
+            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(List.of());
+        }
+
         @Test
         void shouldUpdateResponseDeadlineToProposedDeadline_whenAcceptIsYes() {
             LocalDate proposedDeadline = now().plusDays(14);
@@ -187,21 +203,16 @@ class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetExtensionResponseBusinessProcessToReady_whenInvoked() {
+        void shouldUpdateBusinessProcess_whenInvoked() {
             Map<String, Object> data = new HashMap<>(Map.of(
                 RESPONSE_DEADLINE, now().atTime(MID_NIGHT),
                 COUNTER, YesOrNo.NO,
                 ACCEPT, YesOrNo.NO
             ));
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
+            handler.handle(callbackParamsOf(data, CallbackType.ABOUT_TO_SUBMIT));
 
-            //TODO: uncomment when CMC-794 is played
-            //assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY);
-            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isEqualTo(
-                "ExtensionResponseHandling");
-            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
+            verify(businessProcessService).updateBusinessProcess(data, RESPOND_EXTENSION);
         }
     }
 

@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
@@ -45,9 +46,11 @@ import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.ClaimType.PERSONAL_INJURY;
 import static uk.gov.hmcts.reform.unspec.handler.callback.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
@@ -74,6 +77,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         .documentType(SEALED_CLAIM)
         .build();
 
+    @MockBean
+    private BusinessProcessService businessProcessService;
     @MockBean
     private SealedClaimFormGenerator sealedClaimFormGenerator;
     @MockBean
@@ -183,6 +188,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(List.of());
             when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(now());
             when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
                 .thenReturn(now().atTime(23, 59, 59));
@@ -236,14 +242,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetClaimIssueBusinessProcessToReady_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        void shouldUpdateBusinessProcess_whenInvoked() {
+            handler.handle(params);
 
-            //TODO: uncomment when CMC-794 is played
-            //assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY);
-            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isEqualTo(
-                "ClaimIssueHandling");
-            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
+            verify(businessProcessService).updateBusinessProcess(
+                params.getRequest().getCaseDetails().getData(),
+                CREATE_CLAIM
+            );
         }
 
         @SuppressWarnings("unchecked")

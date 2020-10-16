@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
+  <bpmn:process id="DEFENDANT_RESPONSE_PROCESS_ID" isExecutable="true">
+    <bpmn:endEvent id="Event_13n9twk">
+      <bpmn:incoming>Flow_1xdr8bm</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="DefendantResponseFullDefenceEmailApplicantSolicitor1" targetRef="Event_13n9twk" />
+    <bpmn:serviceTask id="DefendantResponseFullDefenceEmailApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="CASE_EVENT">NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17u38kw</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xdr8bm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_16ow5zb</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1q049d8" messageRef="Message_1xf7rku" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="CASE_EVENT">NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1shs5t2</bpmn:incoming>
+      <bpmn:outgoing>Flow_0oh6jwt</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01e5t4p</bpmn:incoming>
+      <bpmn:outgoing>Flow_1shs5t2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1shs5t2" sourceRef="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1" targetRef="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" />
+    <bpmn:exclusiveGateway id="Gateway_1q9qem9">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16ow5zb</bpmn:incoming>
+      <bpmn:outgoing>Flow_17u38kw</bpmn:outgoing>
+      <bpmn:outgoing>Flow_01e5t4p</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_16ow5zb" sourceRef="StartEvent_1" targetRef="Gateway_1q9qem9" />
+    <bpmn:sequenceFlow id="Flow_17u38kw" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseFullDefenceEmailApplicantSolicitor1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${false == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_01e5t4p" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${true == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_0yvsxsk">
+      <bpmn:incoming>Flow_0oh6jwt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0oh6jwt" sourceRef="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" targetRef="Event_0yvsxsk" />
+    <bpmn:textAnnotation id="TextAnnotation_18hpho5">
+      <bpmn:text>Case Handed Offline</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0uge6um" sourceRef="Gateway_1q9qem9" targetRef="TextAnnotation_18hpho5" />
+    <bpmn:textAnnotation id="TextAnnotation_0yaoqdd">
+      <bpmn:text>Full Defence Response</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0xe3lfi" sourceRef="Gateway_1q9qem9" targetRef="TextAnnotation_0yaoqdd" />
+  </bpmn:process>
+  <bpmn:message id="Message_1xf7rku" name="DEFENDANT_RESPONSE" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="DEFENDANT_RESPONSE_PROCESS_ID">
+      <bpmndi:BPMNEdge id="Flow_0oh6jwt_di" bpmnElement="Flow_0oh6jwt">
+        <di:waypoint x="560" y="180" />
+        <di:waypoint x="602" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01e5t4p_di" bpmnElement="Flow_01e5t4p">
+        <di:waypoint x="260" y="272" />
+        <di:waypoint x="260" y="180" />
+        <di:waypoint x="320" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17u38kw_di" bpmnElement="Flow_17u38kw">
+        <di:waypoint x="285" y="297" />
+        <di:waypoint x="460" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16ow5zb_di" bpmnElement="Flow_16ow5zb">
+        <di:waypoint x="188" y="297" />
+        <di:waypoint x="235" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1shs5t2_di" bpmnElement="Flow_1shs5t2">
+        <di:waypoint x="420" y="180" />
+        <di:waypoint x="460" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xdr8bm_di" bpmnElement="Flow_1xdr8bm">
+        <di:waypoint x="560" y="297" />
+        <di:waypoint x="602" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
+        <dc:Bounds x="602" y="279" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="DefendantResponseFullDefenceEmailApplicantSolicitor1">
+        <dc:Bounds x="460" y="257" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1pp6fod_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="279" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u1unx7_di" bpmnElement="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1">
+        <dc:Bounds x="460" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_080rc91_di" bpmnElement="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1">
+        <dc:Bounds x="320" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1q9qem9_di" bpmnElement="Gateway_1q9qem9" isMarkerVisible="true">
+        <dc:Bounds x="235" y="272" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0yvsxsk_di" bpmnElement="Event_0yvsxsk">
+        <dc:Bounds x="602" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_18hpho5_di" bpmnElement="TextAnnotation_18hpho5">
+        <dc:Bounds x="210" y="110" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0yaoqdd_di" bpmnElement="TextAnnotation_0yaoqdd">
+        <dc:Bounds x="320" y="310" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0uge6um_di" bpmnElement="Association_0uge6um">
+        <di:waypoint x="260" y="272" />
+        <di:waypoint x="260" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0xe3lfi_di" bpmnElement="Association_0xe3lfi">
+        <di:waypoint x="279" y="303" />
+        <di:waypoint x="320" y="315" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -85,7 +85,7 @@ class CallbackHandlerFactoryTest {
 
                 @Override
                 public String camundaActivityId() {
-                    return "SealedClaimEmailTaskId";
+                    return "ClaimIssueEmailRespondentSolicitor1";
                 }
 
                 @Override
@@ -143,7 +143,7 @@ class CallbackHandlerFactoryTest {
             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("SealedClaimEmailTaskId").build()
+                BusinessProcess.builder().activityId("ClaimIssueEmailRespondentSolicitor1").build()
             )).build())
             .build();
 

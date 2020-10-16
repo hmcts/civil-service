@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
-  <bpmn:process id="ClaimIssueHandling" isExecutable="true">
-    <bpmn:serviceTask id="SealedClaimEmailTaskId" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+  <bpmn:process id="CREATE_CLAIM_PROCESS_ID" isExecutable="true">
+    <bpmn:serviceTask id="ClaimIssueEmailRespondentSolicitor1" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="CCD_ID">1600774271669709</camunda:inputParameter>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_04568qf</bpmn:incoming>
       <bpmn:outgoing>Flow_08ehj83</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_04568qf" sourceRef="Event_0t2zome" targetRef="SealedClaimEmailTaskId" />
-    <bpmn:sequenceFlow id="Flow_08ehj83" sourceRef="SealedClaimEmailTaskId" targetRef="Event_1148m43" />
+    <bpmn:sequenceFlow id="Flow_04568qf" sourceRef="Event_0t2zome" targetRef="ClaimIssueEmailRespondentSolicitor1" />
+    <bpmn:sequenceFlow id="Flow_08ehj83" sourceRef="ClaimIssueEmailRespondentSolicitor1" targetRef="Event_1148m43" />
     <bpmn:endEvent id="Event_1148m43">
       <bpmn:incoming>Flow_08ehj83</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:startEvent id="Event_0t2zome" name="Start" camunda:initiator="IssueClaim">
+    <bpmn:startEvent id="Event_0t2zome" name="Start">
       <bpmn:outgoing>Flow_04568qf</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1cb4oje" messageRef="Message_0slk3de" />
     </bpmn:startEvent>
   </bpmn:process>
+  <bpmn:message id="Message_0slk3de" name="CREATE_CLAIM" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ClaimIssueHandling">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CREATE_CLAIM_PROCESS_ID">
       <bpmndi:BPMNEdge id="Flow_08ehj83_di" bpmnElement="Flow_08ehj83">
-        <di:waypoint x="540" y="120" />
-        <di:waypoint x="732" y="120" />
+        <di:waypoint x="340" y="120" />
+        <di:waypoint x="392" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_04568qf_di" bpmnElement="Flow_04568qf">
         <di:waypoint x="188" y="120" />
-        <di:waypoint x="440" y="120" />
+        <di:waypoint x="240" y="120" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0bn79uc_di" bpmnElement="SealedClaimEmailTaskId">
-        <dc:Bounds x="440" y="80" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0bn79uc_di" bpmnElement="ClaimIssueEmailRespondentSolicitor1">
+        <dc:Bounds x="240" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1148m43_di" bpmnElement="Event_1148m43">
-        <dc:Bounds x="732" y="102" width="36" height="36" />
+        <dc:Bounds x="392" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0xl2o8r_di" bpmnElement="Event_0t2zome">
+      <bpmndi:BPMNShape id="Event_1m02c2o_di" bpmnElement="Event_0t2zome">
         <dc:Bounds x="152" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="158" y="145" width="24" height="14" />

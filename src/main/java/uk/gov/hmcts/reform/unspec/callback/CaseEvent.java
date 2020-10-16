@@ -34,6 +34,7 @@ public enum CaseEvent {
         "Notify transferred local court",
         CAMUNDA
     ),
+    DISPATCH_BUSINESS_PROCESS("Dispatch business process", CAMUNDA),
     START_BUSINESS_PROCESS("Start business process", CAMUNDA),
     TESTING_SUPPORT_RESET_BUSINESS_PROCESS("Reset business process", USER);
 
