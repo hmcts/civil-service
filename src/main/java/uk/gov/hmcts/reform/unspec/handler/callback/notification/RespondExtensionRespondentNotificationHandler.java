@@ -16,18 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE;
 
 @Service
 @RequiredArgsConstructor
-public class CaseTransferredToLocalCourtClaimantNotificationHandler extends CallbackHandler
-    implements NotificationData {
+public class RespondExtensionRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT);
-    public static final String NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT_TASK_ID =
-        "NotifyClaimantSolicitorForCaseTransferredToLocalCourt";
-    private static final String REFERENCE_TEMPLATE = "case-transferred-to-local-court-claimant-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE);
+    public static final String TASK_ID = "RespondExtensionNotifyRespondentSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "respond-extension-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -35,13 +32,13 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantForCaseTransferredToLocalCourt
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantSolicitorForExtensionResponse
         );
     }
 
     @Override
     public String camundaActivityId() {
-        return NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT_TASK_ID;
+        return TASK_ID;
     }
 
     @Override
@@ -49,16 +46,15 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendantSolicitorForExtensionResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getClaimantSolicitorEmail(),
+            notificationsProperties.getDefendantSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -66,7 +62,7 @@ public class CaseTransferredToLocalCourtClaimantNotificationHandler extends Call
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, "claimant solicitor"
+            SOLICITOR_REFERENCE, "defendant solicitor"
         );
     }
 }

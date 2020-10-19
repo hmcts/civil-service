@@ -25,17 +25,17 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.notification.Notificat
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    DefendantResponseClaimantNotificationHandler.class,
+    DefendantResponseCaseHandedOfflineApplicantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private DefendantResponseClaimantNotificationHandler handler;
+    private DefendantResponseCaseHandedOfflineApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -47,17 +47,17 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotifyClaimantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
+        void shouldNotifyParties_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "claimantsolicitor@example.com",
+                "defendantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
-                "defendant-response-claimant-notification-000LR001"
+                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "defendant solicitor"),
+                "defendant-response-case-handed-offline-respondent-notification-000LR001"
             );
         }
     }

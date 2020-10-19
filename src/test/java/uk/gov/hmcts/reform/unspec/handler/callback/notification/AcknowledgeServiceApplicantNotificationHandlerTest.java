@@ -25,17 +25,17 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.notification.Notificat
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CaseTransferredToLocalCourtDefendantNotificationHandler.class,
+    AcknowledgeServiceApplicantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class CaseTransferredToLocalCourtDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class AcknowledgeServiceApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private CaseTransferredToLocalCourtDefendantNotificationHandler handler;
+    private AcknowledgeServiceApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -47,17 +47,17 @@ class CaseTransferredToLocalCourtDefendantNotificationHandlerTest extends BaseCa
         }
 
         @Test
-        void shouldNotifyParties_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        void shouldNotifyClaimantSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                notificationsProperties.getDefendantSolicitorEmail(),
+                "claimantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "defendant solicitor"),
-                "case-transferred-to-local-court-defendant-notification-000LR001"
+                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
+                "acknowledge-service-applicant-notification-000LR001"
             );
         }
     }

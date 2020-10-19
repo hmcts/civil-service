@@ -42,7 +42,7 @@ class RespondExtensionTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks).hasSize(1);
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CASE_EVENT", "NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE");
-        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("RespondExtensionEmailRespondentSolicitor1");
+        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("RespondExtensionNotifyRespondentSolicitor1");
 
         completeTask(lockedExternalTasks.get(0).getId());
 

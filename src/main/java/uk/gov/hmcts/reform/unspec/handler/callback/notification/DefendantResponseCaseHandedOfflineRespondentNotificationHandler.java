@@ -20,12 +20,12 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOL
 
 @Service
 @RequiredArgsConstructor
-public class CaseHandedOfflineClaimantNotificationHandler extends CallbackHandler implements NotificationData {
+public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler extends CallbackHandler
+    implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
-    public static final String NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE_TASK_ID =
-        "NotifyClaimantSolicitorForCaseHandedOffline";
-    private static final String REFERENCE_TEMPLATE = "case-handed-offline-claimant-notification-%s";
+    public static final String TASK_ID = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -39,7 +39,7 @@ public class CaseHandedOfflineClaimantNotificationHandler extends CallbackHandle
 
     @Override
     public String camundaActivityId() {
-        return NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE_TASK_ID;
+        return TASK_ID;
     }
 
     @Override

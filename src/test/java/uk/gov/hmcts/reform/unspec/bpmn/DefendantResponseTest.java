@@ -41,7 +41,7 @@ class DefendantResponseTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CASE_EVENT", "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE");
         assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo(
-            "DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1");
+            "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1");
 
         completeTask(lockedExternalTasks.get(0).getId());
 
@@ -52,7 +52,7 @@ class DefendantResponseTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CASE_EVENT", "NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE");
         assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo(
-            "DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1");
+            "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1");
         completeTask(lockedExternalTasks.get(0).getId());
 
         //assert no external tasks left

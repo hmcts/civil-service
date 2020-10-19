@@ -6,6 +6,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -18,6 +19,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
+@ConditionalOnExpression("${polling.event.emitter.enabled:true}")
 public class PollingEventEmitterHandler implements ExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;
@@ -28,7 +30,6 @@ public class PollingEventEmitterHandler implements ExternalTaskHandler {
     @Override
     public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         final String taskName = externalTask.getTopicName();
-        log.info("Job {} started", taskName);
 
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", taskName, cases.size());
@@ -49,6 +50,5 @@ public class PollingEventEmitterHandler implements ExternalTaskHandler {
         });
 
         externalTaskService.complete(externalTask);
-        log.info("Job '{}' finished", taskName);
     }
 }

@@ -25,17 +25,17 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.notification.Notificat
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CaseTransferredToLocalCourtClaimantNotificationHandler.class,
+    RespondExtensionRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class CaseTransferredToLocalCourtClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class RespondExtensionRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private CaseTransferredToLocalCourtClaimantNotificationHandler handler;
+    private RespondExtensionRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -47,17 +47,17 @@ class CaseTransferredToLocalCourtClaimantNotificationHandlerTest extends BaseCal
         }
 
         @Test
-        void shouldNotifyParties_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        void shouldNotifyDefendantSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateExtensionResponded().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "claimantsolicitor@example.com",
+                "defendantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
-                "case-transferred-to-local-court-claimant-notification-000LR001"
+                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "defendant solicitor"),
+                "respond-extension-respondent-notification-000LR001"
             );
         }
     }

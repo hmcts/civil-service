@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT;
 
 @Service
 @RequiredArgsConstructor
-public class RequestForExtensionClaimantNotificationHandler extends CallbackHandler implements NotificationData {
+public class ClaimantResponseApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION);
-    public static final String NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION_TASK_ID =
-        "NotifyClaimantSolicitorForRequestForExtension";
-    private static final String REFERENCE_TEMPLATE = "request-for-extension-claimant-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT);
+    public static final String TASK_ID = "ClaimantResponseNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "claimant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -33,13 +33,13 @@ public class RequestForExtensionClaimantNotificationHandler extends CallbackHand
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSolicitorForRequestForExtension
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantForCaseTransferredToLocalCourt
         );
     }
 
     @Override
     public String camundaActivityId() {
-        return NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION_TASK_ID;
+        return TASK_ID;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class RequestForExtensionClaimantNotificationHandler extends CallbackHand
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantSolicitorForRequestForExtension(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
@@ -56,6 +56,7 @@ public class RequestForExtensionClaimantNotificationHandler extends CallbackHand
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

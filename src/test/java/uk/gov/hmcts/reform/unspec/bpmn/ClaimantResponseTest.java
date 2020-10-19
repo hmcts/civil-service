@@ -39,7 +39,7 @@ class ClaimantResponseTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks).hasSize(1);
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CASE_EVENT", "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT");
-        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("ClaimantResponseEmailRespondentSolicitor1");
+        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("ClaimantResponseNotifyRespondentSolicitor1");
         completeTask(lockedExternalTasks.get(0).getId());
 
         //fetch and complete task
@@ -48,7 +48,7 @@ class ClaimantResponseTest extends BpmnBaseTest {
         assertThat(lockedExternalTasks).hasSize(1);
         assertThat(lockedExternalTasks.get(0).getVariables())
             .containsEntry("CASE_EVENT", "NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT");
-        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("ClaimantResponseEmailApplicantSolicitor1");
+        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo("ClaimantResponseNotifyApplicantSolicitor1");
         completeTask(lockedExternalTasks.get(0).getId());
 
         //assert no external tasks left

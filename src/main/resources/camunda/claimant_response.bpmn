@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="CLAIMANT_RESPONSE_PROCESS_ID" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartEvent_1" targetRef="ClaimantResponseEmailRespondentSolicitor1" />
+    <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartEvent_1" targetRef="ClaimantResponseNotifyRespondentSolicitor1" />
     <bpmn:endEvent id="Event_13n9twk">
       <bpmn:incoming>Flow_0etbo17</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="ClaimantResponseEmailRespondentSolicitor1" targetRef="ClaimantResponseEmailApplicantSolicitor1" />
-    <bpmn:serviceTask id="ClaimantResponseEmailRespondentSolicitor1" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="ClaimantResponseNotifyRespondentSolicitor1" targetRef="ClaimantResponseNotifyApplicantSolicitor1" />
+    <bpmn:serviceTask id="ClaimantResponseNotifyRespondentSolicitor1" name="Notify respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT</camunda:inputParameter>
@@ -15,7 +15,7 @@
       <bpmn:incoming>Flow_0kvxp0b</bpmn:incoming>
       <bpmn:outgoing>Flow_1xdr8bm</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ClaimantResponseEmailApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="ClaimantResponseNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT</camunda:inputParameter>
@@ -28,7 +28,7 @@
       <bpmn:outgoing>Flow_0kvxp0b</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1oxj7lg" messageRef="Message_0ttrrz3" />
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0etbo17" sourceRef="ClaimantResponseEmailApplicantSolicitor1" targetRef="Event_13n9twk" />
+    <bpmn:sequenceFlow id="Flow_0etbo17" sourceRef="ClaimantResponseNotifyApplicantSolicitor1" targetRef="Event_13n9twk" />
   </bpmn:process>
   <bpmn:message id="Message_0ttrrz3" name="CLAIMANT_RESPONSE" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -48,10 +48,10 @@
       <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
         <dc:Bounds x="542" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="ClaimantResponseEmailRespondentSolicitor1">
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="ClaimantResponseNotifyRespondentSolicitor1">
         <dc:Bounds x="270" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_13h7jgg_di" bpmnElement="ClaimantResponseEmailApplicantSolicitor1">
+      <bpmndi:BPMNShape id="Activity_13h7jgg_di" bpmnElement="ClaimantResponseNotifyApplicantSolicitor1">
         <dc:Bounds x="410" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1diii28_di" bpmnElement="StartEvent_1">

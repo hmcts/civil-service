@@ -4,8 +4,8 @@
     <bpmn:endEvent id="Event_13n9twk">
       <bpmn:incoming>Flow_1xdr8bm</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="DefendantResponseFullDefenceEmailApplicantSolicitor1" targetRef="Event_13n9twk" />
-    <bpmn:serviceTask id="DefendantResponseFullDefenceEmailApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="DefendantResponseFullDefenceNotifyApplicantSolicitor1" targetRef="Event_13n9twk" />
+    <bpmn:serviceTask id="DefendantResponseFullDefenceNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE</camunda:inputParameter>
@@ -18,7 +18,7 @@
       <bpmn:outgoing>Flow_16ow5zb</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1q049d8" messageRef="Message_1xf7rku" />
     </bpmn:startEvent>
-    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE</camunda:inputParameter>
@@ -27,7 +27,7 @@
       <bpmn:incoming>Flow_1shs5t2</bpmn:incoming>
       <bpmn:outgoing>Flow_0oh6jwt</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1" name="Notify respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE</camunda:inputParameter>
@@ -36,7 +36,7 @@
       <bpmn:incoming>Flow_01e5t4p</bpmn:incoming>
       <bpmn:outgoing>Flow_1shs5t2</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1shs5t2" sourceRef="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1" targetRef="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" />
+    <bpmn:sequenceFlow id="Flow_1shs5t2" sourceRef="DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1" targetRef="DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1" />
     <bpmn:exclusiveGateway id="Gateway_1q9qem9">
       <bpmn:extensionElements>
         <camunda:properties>
@@ -48,16 +48,16 @@
       <bpmn:outgoing>Flow_01e5t4p</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_16ow5zb" sourceRef="StartEvent_1" targetRef="Gateway_1q9qem9" />
-    <bpmn:sequenceFlow id="Flow_17u38kw" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseFullDefenceEmailApplicantSolicitor1">
+    <bpmn:sequenceFlow id="Flow_17u38kw" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseFullDefenceNotifyApplicantSolicitor1">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${false == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_01e5t4p" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1">
+    <bpmn:sequenceFlow id="Flow_01e5t4p" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${true == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="Event_0yvsxsk">
       <bpmn:incoming>Flow_0oh6jwt</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0oh6jwt" sourceRef="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1" targetRef="Event_0yvsxsk" />
+    <bpmn:sequenceFlow id="Flow_0oh6jwt" sourceRef="DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1" targetRef="Event_0yvsxsk" />
     <bpmn:textAnnotation id="TextAnnotation_18hpho5">
       <bpmn:text>Case Handed Offline</bpmn:text>
     </bpmn:textAnnotation>
@@ -98,16 +98,16 @@
       <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
         <dc:Bounds x="602" y="279" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="DefendantResponseFullDefenceEmailApplicantSolicitor1">
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="DefendantResponseFullDefenceNotifyApplicantSolicitor1">
         <dc:Bounds x="460" y="257" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1pp6fod_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="152" y="279" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0u1unx7_di" bpmnElement="DefendantResponseCaseHandedOfflineEmailApplicantSolicitor1">
+      <bpmndi:BPMNShape id="Activity_0u1unx7_di" bpmnElement="DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1">
         <dc:Bounds x="460" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_080rc91_di" bpmnElement="DefendantResponseCaseHandedOfflineEmailRespondentSolicitor1">
+      <bpmndi:BPMNShape id="Activity_080rc91_di" bpmnElement="DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1">
         <dc:Bounds x="320" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1q9qem9_di" bpmnElement="Gateway_1q9qem9" isMarkerVisible="true">

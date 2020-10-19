@@ -26,7 +26,6 @@ public class CaseStayedHandler implements ExternalTaskHandler {
     @Override
     public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         final String taskName = externalTask.getTopicName();
-        log.info("Job {} started", taskName);
 
         try {
             List<CaseDetails> cases = caseSearchService.getCases();
@@ -36,8 +35,6 @@ public class CaseStayedHandler implements ExternalTaskHandler {
                 new MoveCaseToStayedEvent(caseDetails.getId())));
 
             externalTaskService.complete(externalTask);
-            log.info("Job '{}' finished", taskName);
-
         } catch (Exception e) {
             int maxRetries = 3;
             int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();

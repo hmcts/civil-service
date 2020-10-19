@@ -29,6 +29,11 @@ class PollingEventEmitterSchedulerTest extends BpmnBaseTest {
         //get jobs
         List<JobDefinition> jobDefinitions = getJobs();
 
+        //assert that job is as expected
+        assertThat(jobDefinitions).hasSize(1);
+        assertThat(jobDefinitions.get(0).getJobType()).isEqualTo("timer-start-event");
+        assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: 0 0/30 * * * ?");
+
         //get external tasks
         List<ExternalTask> externalTasks = getExternalTasks();
         assertThat(externalTasks).hasSize(1);

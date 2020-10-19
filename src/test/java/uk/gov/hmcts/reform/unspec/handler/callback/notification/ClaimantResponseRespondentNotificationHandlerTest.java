@@ -25,17 +25,17 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.notification.Notificat
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ExtensionResponseDefendantNotificationHandler.class,
+    ClaimantResponseRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ExtensionResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private ExtensionResponseDefendantNotificationHandler handler;
+    private ClaimantResponseRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -47,17 +47,17 @@ class ExtensionResponseDefendantNotificationHandlerTest extends BaseCallbackHand
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionResponded().build();
+        void shouldNotifyParties_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "defendantsolicitor@example.com",
+                notificationsProperties.getDefendantSolicitorEmail(),
                 "template-id",
                 Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "defendant solicitor"),
-                "extension-response-defendant-notification-000LR001"
+                "claimant-response-respondent-notification-000LR001"
             );
         }
     }

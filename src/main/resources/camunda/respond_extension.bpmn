@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="RESPOND_EXTENSION_PROCESS_ID" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartEvent_1" targetRef="RespondExtensionEmailRespondentSolicitor1" />
+    <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartEvent_1" targetRef="RespondExtensionNotifyRespondentSolicitor1" />
     <bpmn:endEvent id="Event_13n9twk">
       <bpmn:incoming>Flow_1xdr8bm</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="RespondExtensionEmailRespondentSolicitor1" targetRef="Event_13n9twk" />
-    <bpmn:serviceTask id="RespondExtensionEmailRespondentSolicitor1" name="Send email respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="RespondExtensionNotifyRespondentSolicitor1" targetRef="Event_13n9twk" />
+    <bpmn:serviceTask id="RespondExtensionNotifyRespondentSolicitor1" name="Notify respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE</camunda:inputParameter>
@@ -34,7 +34,7 @@
       <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
         <dc:Bounds x="432" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="RespondExtensionEmailRespondentSolicitor1">
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="RespondExtensionNotifyRespondentSolicitor1">
         <dc:Bounds x="270" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_03hme7p_di" bpmnElement="StartEvent_1">

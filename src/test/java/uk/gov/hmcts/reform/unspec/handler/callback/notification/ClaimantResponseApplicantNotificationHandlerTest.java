@@ -25,17 +25,17 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.notification.Notificat
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CaseHandedOfflineClaimantNotificationHandler.class,
+    ClaimantResponseApplicantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class CaseHandedOfflineClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private CaseHandedOfflineClaimantNotificationHandler handler;
+    private ClaimantResponseApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -57,7 +57,7 @@ class CaseHandedOfflineClaimantNotificationHandlerTest extends BaseCallbackHandl
                 "claimantsolicitor@example.com",
                 "template-id",
                 Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
-                "case-handed-offline-claimant-notification-000LR001"
+                "claimant-response-applicant-notification-000LR001"
             );
         }
     }
