@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -52,7 +50,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.MULTI_CLAIM;
-import static uk.gov.hmcts.reform.unspec.enums.ClaimType.PERSONAL_INJURY;
 import static uk.gov.hmcts.reform.unspec.handler.callback.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
@@ -110,39 +107,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-    }
-
-    @Nested
-    class MidEventClaimValueCallback {
-
-        private static final String PAGE_ID = "claim-value";
-
-        @Test
-        void shouldReturnExpectedErrorInMidEvent_whenValuesAreInvalid() {
-            Map<String, Object> data = new HashMap<>();
-            data.put("claimValue", ClaimValue.builder()
-                .higherValue(BigDecimal.valueOf(1)).lowerValue(BigDecimal.valueOf(10)).build());
-
-            CallbackParams params = callbackParamsOf(data, MID, "claim-value");
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors())
-                .containsOnly("CONTENT TBC: Higher value must not be lower than the lower value.");
-        }
-
-        @Test
-        void shouldReturnNoErrorInMidEvent_whenValuesAreValid() {
-            Map<String, Object> data = new HashMap<>();
-            data.put("claimValue", ClaimValue.builder()
-                .higherValue(BigDecimal.valueOf(10)).lowerValue(BigDecimal.valueOf(1)).build());
-            data.put("claimType", PERSONAL_INJURY);
-            CallbackParams params = callbackParamsOf(data, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
         }
     }
 

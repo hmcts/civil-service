@@ -5,14 +5,12 @@ const statementOfTruth = require('../../fragments/statementOfTruth');
 module.exports = {
 
   fields: {
-    lowerValue: '#claimValue_lowerValue',
-    higherValue: '#claimValue_higherValue',
+    statementOfValue: '#claimValue_statementOfValueInPennies',
   },
 
   async enterClaimValue() {
-    I.waitForElement(this.fields.lowerValue);
-    I.fillField(this.fields.lowerValue, '1000');
-    I.fillField(this.fields.higherValue, '10000');
+    I.waitForElement(this.fields.statementOfValue);
+    I.fillField(this.fields.statementOfValue, '10000');
     await I.retryUntilExists(() => I.clickContinue(), statementOfTruth.fields.claim.name);
   }
 };

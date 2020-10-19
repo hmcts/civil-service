@@ -99,8 +99,7 @@ public class CaseDataBuilder {
             .applicantPreferredCourt("The court location")
             .build();
         claimValue = ClaimValue.builder()
-            .lowerValue(BigDecimal.valueOf(10000))
-            .higherValue(BigDecimal.valueOf(100000))
+            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
         personalInjuryType = ROAD_ACCIDENT;

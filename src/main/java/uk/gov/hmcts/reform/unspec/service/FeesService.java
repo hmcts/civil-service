@@ -10,42 +10,36 @@ import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
 public class FeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-    private static final int ROUNDING_SCALE = 2;
 
     private final FeesClient feesClient;
     private final FeesConfiguration feesConfiguration;
 
     public BigInteger getFeeAmountByClaimValue(ClaimValue claimValue) {
-        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue.getHigherValue());
+        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
 
         return getFeeAmountInPence(feeLookupResponseDto);
     }
 
     public FeeDto getFeeDataByClaimValue(ClaimValue claimValue) {
-        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue.getHigherValue());
+        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
 
         return buildFeeDto(feeLookupResponseDto);
     }
 
-    private FeeLookupResponseDto lookupFee(BigDecimal claimHigherValue) {
-        var claimHigherValuePounds = convertToPounds(claimHigherValue);
+    private FeeLookupResponseDto lookupFee(ClaimValue claimValue) {
+        var claimStatementOfValuePounds = claimValue.toPounds();
 
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),
-            claimHigherValuePounds
+            claimStatementOfValuePounds
         );
-    }
-
-    private BigDecimal convertToPounds(BigDecimal value) {
-        return value.divide(PENCE_PER_POUND, ROUNDING_SCALE, RoundingMode.UNNECESSARY);
     }
 
     private BigInteger getFeeAmountInPence(FeeLookupResponseDto feeLookupResponseDto) {

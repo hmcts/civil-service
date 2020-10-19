@@ -53,8 +53,7 @@ class FeesServiceTest {
     @Test
     void shouldReturnFeeAmount_whenValidClaimValue() {
         var claimValue = ClaimValue.builder()
-            .lowerValue(BigDecimal.valueOf(100))
-            .higherValue(BigDecimal.valueOf(5000))
+            .statementOfValueInPennies(BigDecimal.valueOf(5000))
             .build();
 
         BigInteger feeAmount = feesService.getFeeAmountByClaimValue(claimValue);
@@ -66,8 +65,7 @@ class FeesServiceTest {
     @Test
     void shouldReturnFeeData_whenValidClaimValue() {
         var claimValue = ClaimValue.builder()
-            .lowerValue(BigDecimal.valueOf(100))
-            .higherValue(BigDecimal.valueOf(5000))
+            .statementOfValueInPennies(BigDecimal.valueOf(5000))
             .build();
 
         FeeDto expectedFeeDto = FeeDto.builder()

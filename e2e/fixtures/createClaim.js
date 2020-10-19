@@ -73,8 +73,7 @@ module.exports = {
     },
     claimValue: {
       claimValue: {
-        lowerValue: '300',
-        higherValue: '500'
+        statementOfValueInPennies: '500'
       }
     },
     statementOfTruth: {
@@ -84,12 +83,4 @@ module.exports = {
       }
     }
   },
-  invalid: {
-    claimValue: {
-      claimValue: {
-        lowerValue: '1000',
-        higherValue: '500'
-      },
-    }
-  }
 };

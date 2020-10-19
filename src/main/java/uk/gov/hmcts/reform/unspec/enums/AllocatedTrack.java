@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.unspec.enums;
 
-import uk.gov.hmcts.reform.unspec.model.ClaimValue;
-
 import java.math.BigDecimal;
 
 public enum AllocatedTrack {
@@ -9,18 +7,18 @@ public enum AllocatedTrack {
     FAST_CLAIM,
     MULTI_CLAIM;
 
-    public static AllocatedTrack getAllocatedTrack(ClaimValue claimValue, ClaimType claimType) {
+    public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType) {
         if (claimType.isLowerFeeType()) {
-            if (isValueSmallerThan(claimValue.getHigherValue(), 1000)) {
+            if (isValueSmallerThan(statementOfValueInPounds, 1000)) {
                 return SMALL_CLAIM;
-            } else if (isValueWithinRange(claimValue.getHigherValue(), 1000, 25000)) {
+            } else if (isValueWithinRange(statementOfValueInPounds, 1000, 25000)) {
                 return FAST_CLAIM;
             }
         }
 
-        if (isValueSmallerThan(claimValue.getHigherValue(), 10000)) {
+        if (isValueSmallerThan(statementOfValueInPounds, 10000)) {
             return SMALL_CLAIM;
-        } else if (isValueWithinRange(claimValue.getHigherValue(), 10000, 25000)) {
+        } else if (isValueWithinRange(statementOfValueInPounds, 10000, 25000)) {
             return FAST_CLAIM;
         } else {
             return MULTI_CLAIM;

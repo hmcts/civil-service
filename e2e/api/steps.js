@@ -22,8 +22,6 @@ module.exports = {
     await assertValidData('CREATE_CLAIM', 'ClaimType', createClaimData.valid.claimType);
     await assertValidData('CREATE_CLAIM', 'PersonalInjuryType', createClaimData.valid.personalInjuryType);
     await assertValidData('CREATE_CLAIM', 'Upload', createClaimData.valid.upload);
-    await assertCallbackError('CREATE_CLAIM', 'ClaimValue', createClaimData.invalid.claimValue,
-      'CONTENT TBC: Higher value must not be lower than the lower value.');
     await assertValidData('CREATE_CLAIM', 'ClaimValue', createClaimData.valid.claimValue);
     await assertValidData('CREATE_CLAIM', 'StatementOfTruth', createClaimData.valid.statementOfTruth);
 

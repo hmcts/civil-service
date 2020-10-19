@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
@@ -28,7 +27,6 @@ import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +70,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "claim-value"), this::validateClaimValues,
             callbackKey(MID, "claimant"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::issueClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -88,20 +85,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         Party claimant = mapper.convertValue(data.get(CLAIMANT), Party.class);
         List<String> errors = dateOfBirthValidator.validate(claimant);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse validateClaimValues(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        List<String> errors = new ArrayList<>();
-
-        ClaimValue claimValue = caseData.getClaimValue();
-        if (claimValue.hasLargerLowerValue()) {
-            errors.add("CONTENT TBC: Higher value must not be lower than the lower value.");
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -136,8 +119,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         data.put(RESPONDENT, caseData.getRespondent1());
         data.put(CLAIMANT, caseData.getApplicant1());
         data.put("legacyCaseReference", referenceNumber);
+        data.put("allocatedTrack", getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
         List<String> errors = businessProcessService.updateBusinessProcess(data, CREATE_CLAIM);
-        data.put("allocatedTrack", getAllocatedTrack(caseData.getClaimValue(), caseData.getClaimType()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data)

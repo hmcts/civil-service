@@ -1,33 +1,29 @@
 package uk.gov.hmcts.reform.unspec.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.unspec.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
 @Data
 @Builder
-@RequiredArgsConstructor
 public class ClaimValue {
 
-    private final BigDecimal lowerValue;
-    private final BigDecimal higherValue;
+    private final BigDecimal statementOfValueInPennies;
 
-    public boolean hasLargerLowerValue() {
-        if (lowerValue == null || higherValue == null) {
-            return false;
-        }
+    @JsonCreator
+    public ClaimValue(@JsonProperty("statementOfValueInPennies") BigDecimal statementOfValueInPennies) {
+        this.statementOfValueInPennies = statementOfValueInPennies;
+    }
 
-        return lowerValue.compareTo(higherValue) > 0;
+    public BigDecimal toPounds() {
+        return MonetaryConversions.penniesToPounds(this.statementOfValueInPennies);
     }
 
     public String formData() {
-        BigDecimal higherAmount = MonetaryConversions.penniesToPounds(higherValue);
-        if (lowerValue == null) {
-            return "up to £" + higherAmount;
-        }
-        return "£" + MonetaryConversions.penniesToPounds(lowerValue) + " - £" + higherAmount;
+        return "up to £" + this.toPounds();
     }
 }
