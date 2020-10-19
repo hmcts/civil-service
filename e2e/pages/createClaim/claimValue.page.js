@@ -10,7 +10,7 @@ module.exports = {
 
   async enterClaimValue() {
     I.waitForElement(this.fields.statementOfValue);
-    I.fillField(this.fields.statementOfValue, '10000');
+    I.fillField(this.fields.statementOfValue, '30000');
     await I.retryUntilExists(() => I.clickContinue(), statementOfTruth.fields.claim.name);
   }
 };
