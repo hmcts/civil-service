@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.unspec.aspect.EventAllowed;
+import uk.gov.hmcts.reform.unspec.aspect.EventEmitter;
 import uk.gov.hmcts.reform.unspec.aspect.NoOngoingBusinessProcess;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -30,6 +31,7 @@ public class CallbackHandlerFactory {
 
     @EventAllowed
     @NoOngoingBusinessProcess
+    @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
         String eventId = callbackParams.getRequest().getEventId();
         return ofNullable(eventHandlers.get(eventId))

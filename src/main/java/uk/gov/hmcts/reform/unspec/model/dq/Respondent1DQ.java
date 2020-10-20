@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.unspec.model.dq;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.documents.Document;
 
 @Setter
+@Data
 @Builder
 public class Respondent1DQ implements DQ {
 

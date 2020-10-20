@@ -2,36 +2,31 @@ package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.service.EventEmitterService;
 import uk.gov.hmcts.reform.unspec.service.search.CaseReadyBusinessProcessSearchService;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 
-@SpringBootTest(classes = {JacksonAutoConfiguration.class, CaseDetailsConverter.class})
+@SpringBootTest(classes = {
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    PollingEventEmitterHandler.class})
 class PollingEventEmitterHandlerTest {
 
     @MockBean
@@ -43,39 +38,28 @@ class PollingEventEmitterHandlerTest {
     @MockBean
     private CaseReadyBusinessProcessSearchService searchService;
 
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-
     @MockBean
-    private RuntimeService runtimeService;
-
-    @MockBean
-    private MessageCorrelationBuilder messageCorrelationBuilder;
+    private EventEmitterService eventEmitterService;
 
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
 
+    @Autowired
     private PollingEventEmitterHandler pollingEventEmitterHandler;
+
+    private CaseDetails caseDetails1;
+    private CaseDetails caseDetails2;
+    private CaseDetails caseDetails3;
 
     @BeforeEach
     void init() {
-        pollingEventEmitterHandler = new PollingEventEmitterHandler(
-            searchService,
-            caseDetailsConverter,
-            applicationEventPublisher,
-            runtimeService
-        );
-        when(externalTask.getTopicName()).thenReturn("test");
-        when(searchService.getCases()).thenReturn(List.of(
-            CaseDetails.builder().id(1L).data(
-                Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT1"))).build(),
-            CaseDetails.builder().id(2L).data(
-                Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT2"))).build(),
-            CaseDetails.builder().id(3L).data(
-                Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build()
-        ));
-        when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
+        caseDetails1 = CaseDetails.builder().id(1L).data(
+            Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT1"))).build();
+        caseDetails2 = CaseDetails.builder().id(2L).data(
+            Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT2"))).build();
+        caseDetails3 = CaseDetails.builder().id(3L).data(
+            Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build();
+        when(searchService.getCases()).thenReturn(List.of(caseDetails1, caseDetails2, caseDetails3));
     }
 
     @Test
@@ -85,68 +69,21 @@ class PollingEventEmitterHandlerTest {
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
         verify(searchService).getCases();
-        verifyNoInteractions(runtimeService);
-        verifyNoInteractions(applicationEventPublisher);
+        verifyNoInteractions(eventEmitterService);
         verify(externalTaskService).complete(externalTask);
     }
 
     @Test
-    void shouldSendMessageAndTriggerEvents_whenCasesFound() {
+    void shouldEmitBusinessProcessEvent_whenCasesFound() {
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
         verify(searchService).getCases();
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT1");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
-        verify(applicationEventPublisher).publishEvent(
-            new DispatchBusinessProcessEvent(1L, businessProcessWithCamundaEvent("TEST_EVENT1")));
-
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT2");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 2L);
-        verify(applicationEventPublisher).publishEvent(
-            new DispatchBusinessProcessEvent(2L, businessProcessWithCamundaEvent("TEST_EVENT2")));
-
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT3");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 3L);
-        verify(applicationEventPublisher).publishEvent(
-            new DispatchBusinessProcessEvent(3L, businessProcessWithCamundaEvent("TEST_EVENT3")));
-
-        verify(messageCorrelationBuilder, times(3)).correlateStartMessage();
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails1));
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails2));
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails3));
         verify(externalTaskService).complete(externalTask);
 
-        verifyNoMoreInteractions(runtimeService);
-        verifyNoMoreInteractions(messageCorrelationBuilder);
-        verifyNoMoreInteractions(applicationEventPublisher);
-    }
-
-    @Test
-    void shouldSkipFailedCaseAndContinueProcess_whenExceptionThrownForCase() {
-        when(messageCorrelationBuilder.correlateStartMessage())
-            .thenReturn(mock(ProcessInstance.class))
-            .thenThrow(RuntimeException.class)
-            .thenReturn(mock(ProcessInstance.class));
-
-        pollingEventEmitterHandler.execute(externalTask, externalTaskService);
-
-        verify(searchService).getCases();
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT1");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
-        verify(applicationEventPublisher).publishEvent(
-            new DispatchBusinessProcessEvent(1L, businessProcessWithCamundaEvent("TEST_EVENT1")));
-
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT2");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 2L);
-
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT3");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 3L);
-        verify(applicationEventPublisher).publishEvent(
-            new DispatchBusinessProcessEvent(3L, businessProcessWithCamundaEvent("TEST_EVENT3")));
-
-        verify(messageCorrelationBuilder, times(3)).correlateStartMessage();
-        verify(externalTaskService).complete(externalTask);
-
-        verifyNoMoreInteractions(runtimeService);
-        verifyNoMoreInteractions(messageCorrelationBuilder);
-        verifyNoMoreInteractions(applicationEventPublisher);
+        verifyNoMoreInteractions(eventEmitterService);
     }
 
     private BusinessProcess businessProcessWithCamundaEvent(String camundaEvent) {
@@ -154,8 +91,7 @@ class PollingEventEmitterHandlerTest {
             .activityId("testActivityId")
             .processInstanceId("testInstanceId")
             .camundaEvent(camundaEvent)
-            .status(FINISHED)
+            .status(READY)
             .build();
     }
-
 }
