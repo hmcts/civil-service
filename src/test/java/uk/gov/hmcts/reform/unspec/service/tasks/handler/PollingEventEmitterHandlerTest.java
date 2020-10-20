@@ -96,17 +96,17 @@ class PollingEventEmitterHandlerTest {
 
         verify(searchService).getCases();
         verify(runtimeService).createMessageCorrelation("TEST_EVENT1");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
         verify(applicationEventPublisher).publishEvent(
             new DispatchBusinessProcessEvent(1L, businessProcessWithCamundaEvent("TEST_EVENT1")));
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT2");
-        verify(messageCorrelationBuilder).setVariable("caseId", 2L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 2L);
         verify(applicationEventPublisher).publishEvent(
             new DispatchBusinessProcessEvent(2L, businessProcessWithCamundaEvent("TEST_EVENT2")));
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT3");
-        verify(messageCorrelationBuilder).setVariable("caseId", 3L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 3L);
         verify(applicationEventPublisher).publishEvent(
             new DispatchBusinessProcessEvent(3L, businessProcessWithCamundaEvent("TEST_EVENT3")));
 
@@ -129,15 +129,15 @@ class PollingEventEmitterHandlerTest {
 
         verify(searchService).getCases();
         verify(runtimeService).createMessageCorrelation("TEST_EVENT1");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
         verify(applicationEventPublisher).publishEvent(
             new DispatchBusinessProcessEvent(1L, businessProcessWithCamundaEvent("TEST_EVENT1")));
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT2");
-        verify(messageCorrelationBuilder).setVariable("caseId", 2L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 2L);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT3");
-        verify(messageCorrelationBuilder).setVariable("caseId", 3L);
+        verify(messageCorrelationBuilder).setVariable("CCD_ID", 3L);
         verify(applicationEventPublisher).publishEvent(
             new DispatchBusinessProcessEvent(3L, businessProcessWithCamundaEvent("TEST_EVENT3")));
 

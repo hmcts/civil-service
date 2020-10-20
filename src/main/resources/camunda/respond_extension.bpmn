@@ -1,89 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="RESPOND_EXTENSION_PROCESS_ID" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1" name="start">
-      <bpmn:outgoing>Flow_1wqsxt3</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_19puodc" messageRef="Message_1ktm0wr" />
-    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartEvent_1" targetRef="RespondExtensionNotifyRespondentSolicitor1" />
     <bpmn:endEvent id="Event_13n9twk">
-      <bpmn:incoming>Flow_13auyms</bpmn:incoming>
+      <bpmn:incoming>Flow_1xdr8bm</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="RespondExtensionNotifyRespondentSolicitor1" targetRef="Event_13n9twk" />
     <bpmn:serviceTask id="RespondExtensionNotifyRespondentSolicitor1" name="Notify respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE</camunda:inputParameter>
+          <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_EXTENSION_RESPONSE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1xv9wkr</bpmn:incoming>
-      <bpmn:outgoing>Flow_13auyms</bpmn:outgoing>
+      <bpmn:incoming>Flow_0kvxp0b</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xdr8bm</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="StartBusinessProcessTaskId" name="StartBusinessProcess" camunda:type="external" camunda:topic="START_BUSINESS_PROCESS">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">START_BUSINESS_PROCESS</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1wqsxt3</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xv9wkr</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="Event_1q443bl" name="Abort" attachedToRef="StartBusinessProcessTaskId">
-      <bpmn:outgoing>Flow_1l77nwh</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1jom9x6" errorRef="Error_10s1ouk" />
-    </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_1wqsxt3" sourceRef="StartEvent_1" targetRef="StartBusinessProcessTaskId" />
-    <bpmn:sequenceFlow id="Flow_1xv9wkr" sourceRef="StartBusinessProcessTaskId" targetRef="RespondExtensionNotifyRespondentSolicitor1" />
-    <bpmn:sequenceFlow id="Flow_13auyms" sourceRef="RespondExtensionNotifyRespondentSolicitor1" targetRef="Event_13n9twk" />
-    <bpmn:endEvent id="Event_1afa2mh" name="Aborted">
-      <bpmn:incoming>Flow_1l77nwh</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1l77nwh" sourceRef="Event_1q443bl" targetRef="Event_1afa2mh" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0kvxp0b</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_19puodc" messageRef="Message_1ktm0wr" />
+    </bpmn:startEvent>
   </bpmn:process>
   <bpmn:message id="Message_1ktm0wr" name="RESPOND_EXTENSION" />
-  <bpmn:error id="Error_10s1ouk" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="RESPOND_EXTENSION_PROCESS_ID">
-      <bpmndi:BPMNEdge id="Flow_1l77nwh_di" bpmnElement="Flow_1l77nwh">
-        <di:waypoint x="330" y="175" />
-        <di:waypoint x="330" y="272" />
+      <bpmndi:BPMNEdge id="Flow_1xdr8bm_di" bpmnElement="Flow_1xdr8bm">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13auyms_di" bpmnElement="Flow_13auyms">
-        <di:waypoint x="570" y="117" />
-        <di:waypoint x="692" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1xv9wkr_di" bpmnElement="Flow_1xv9wkr">
-        <di:waypoint x="380" y="117" />
-        <di:waypoint x="470" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1wqsxt3_di" bpmnElement="Flow_1wqsxt3">
+      <bpmndi:BPMNEdge id="Flow_0kvxp0b_di" bpmnElement="Flow_0kvxp0b">
         <di:waypoint x="215" y="117" />
-        <di:waypoint x="280" y="117" />
+        <di:waypoint x="270" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="179" y="99" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="186" y="142" width="22" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
-        <dc:Bounds x="692" y="99" width="36" height="36" />
+        <dc:Bounds x="432" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="RespondExtensionNotifyRespondentSolicitor1">
-        <dc:Bounds x="470" y="77" width="100" height="80" />
+        <dc:Bounds x="270" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0iamgg9_di" bpmnElement="StartBusinessProcessTaskId">
-        <dc:Bounds x="280" y="77" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1afa2mh_di" bpmnElement="Event_1afa2mh">
-        <dc:Bounds x="312" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="311" y="315" width="39" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1q443bl_di" bpmnElement="Event_1q443bl">
-        <dc:Bounds x="312" y="139" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="358" y="182" width="27" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Event_03hme7p_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

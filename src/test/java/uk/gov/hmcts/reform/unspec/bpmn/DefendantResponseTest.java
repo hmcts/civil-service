@@ -1,89 +1,62 @@
 package uk.gov.hmcts.reform.unspec.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
-import static uk.gov.hmcts.reform.unspec.service.tasks.handler.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 class DefendantResponseTest extends BpmnBaseTest {
 
-    public static final String NOTIFY_APPLICANT_SOLICITOR_1 = "NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE";
-    public static final String DEFENDANT_RESPONSE = "NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE";
-    private static final String RESPONDENT_ACTIVITY_ID = "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1";
-    private static final String FULL_DEFENCE_ACTIVITY_ID = "DefendantResponseFullDefenceNotifyApplicantSolicitor1";
-    private static final String CLAIMANT_ACTIVITY_ID = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR_1 = "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE";
+    public static final String TOPIC_NAME = "processCaseEvent";
 
     public DefendantResponseTest() {
         super("defendant_response.bpmn", "DEFENDANT_RESPONSE_PROCESS_ID");
     }
 
     @Test
-    void shouldSuccessfullyCompleteOfflineDefendantResponse() {
+    void caseEventTaskShouldFireCaseEventExternalTask_whenStarted() {
         //assert process has started
         assertFalse(processInstance.isEnded());
+
+        //assert topic names
+        assertThat(getTopics()).containsOnly(TOPIC_NAME);
 
         //assert message start event
         assertThat(getProcessDefinitionByMessage("DEFENDANT_RESPONSE").getKey())
             .isEqualTo("DEFENDANT_RESPONSE_PROCESS_ID");
 
-        //complete the start business process
-        ExternalTask startBusinessTask = assertNextExternalTask(START_BUSINESS_TOPIC);
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, "MAIN.OFFLINE");
-        assertCompleteExternalTask(
-            startBusinessTask,
-            START_BUSINESS_TOPIC,
-            START_BUSINESS_EVENT,
-            START_BUSINESS_ACTIVITY,
-            variables
-        );
+        //get external tasks
+        List<ExternalTask> externalTasks = getExternalTasks();
+        assertThat(externalTasks).hasSize(1);
+        assertThat(externalTasks.get(0).getTopicName()).isEqualTo(TOPIC_NAME);
 
-        //complete the notification to respondent
-        ExternalTask forRespondent = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(forRespondent, PROCESS_CASE_EVENT,
-                                   NOTIFY_RESPONDENT_SOLICITOR_1, RESPONDENT_ACTIVITY_ID
-        );
+        //fetch and complete task
+        List<LockedExternalTask> lockedExternalTasks = fetchAndLockTask(TOPIC_NAME);
 
-        //complete the notification to claimant
-        ExternalTask forClaimant = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(forClaimant, PROCESS_CASE_EVENT, NOTIFY_APPLICANT_SOLICITOR_1, CLAIMANT_ACTIVITY_ID);
+        assertThat(lockedExternalTasks).hasSize(1);
+        assertThat(lockedExternalTasks.get(0).getVariables())
+            .containsEntry("CASE_EVENT", "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE");
+        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo(
+            "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1");
 
-        assertNoExternalTasksLeft();
-    }
+        completeTask(lockedExternalTasks.get(0).getId());
 
-    @Test
-    void shouldSuccessfullyCompleteOnlineFullDefenceResponse() {
-        //assert process has started
-        assertFalse(processInstance.isEnded());
+        //fetch and complete task
+        lockedExternalTasks = fetchAndLockTask(TOPIC_NAME);
 
-        //assert message start event
-        assertThat(getProcessDefinitionByMessage("DEFENDANT_RESPONSE").getKey())
-            .isEqualTo("DEFENDANT_RESPONSE_PROCESS_ID");
+        assertThat(lockedExternalTasks).hasSize(1);
+        assertThat(lockedExternalTasks.get(0).getVariables())
+            .containsEntry("CASE_EVENT", "NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE");
+        assertThat(lockedExternalTasks.get(0).getActivityId()).isEqualTo(
+            "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1");
+        completeTask(lockedExternalTasks.get(0).getId());
 
-        //complete the start business process
-        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
-
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, RESPONDED_TO_CLAIM.fullName());
-
-        assertCompleteExternalTask(
-            startBusiness,
-            START_BUSINESS_TOPIC,
-            START_BUSINESS_EVENT,
-            START_BUSINESS_ACTIVITY,
-            variables
-        );
-
-        //complete the notification to respondent
-        ExternalTask forRespondent = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(forRespondent, PROCESS_CASE_EVENT, DEFENDANT_RESPONSE, FULL_DEFENCE_ACTIVITY_ID);
-
-        assertNoExternalTasksLeft();
+        //assert no external tasks left
+        List<ExternalTask> externalTasksAfter = getExternalTasks();
+        assertThat(externalTasksAfter).isEmpty();
     }
 }

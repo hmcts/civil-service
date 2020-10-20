@@ -302,20 +302,6 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "START_BUSINESS_PROCESS",
-    "Name": "Start business process",
-    "Description": "Start business process",
-    "DisplayOrder": 12,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
-    "ShowSummary": "N",
-    "ShowEventNotes": "N"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "DISPATCH_BUSINESS_PROCESS",
     "Name": "Dispatch business process",
     "Description": "Set READY business process status to DISPATCHED",
