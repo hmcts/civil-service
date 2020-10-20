@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.unspec.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -19,7 +23,13 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.search.Query;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -29,26 +39,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    CoreCaseDataService.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
+})
 class CoreCaseDataServiceTest {
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "UNSPECIFIED_CLAIMS";
 
-    @Mock
+    @MockBean
     private SystemUpdateUserConfiguration userConfig;
 
-    @Mock
+    @MockBean
     private CoreCaseDataApi coreCaseDataApi;
 
-    @Mock
+    @MockBean
     private IdamClient idamClient;
 
-    @Mock
+    @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @InjectMocks
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private CoreCaseDataService service;
 
     @BeforeEach
@@ -63,45 +81,71 @@ class CoreCaseDataServiceTest {
         private static final String EVENT_ID = "MOVE_TO_STAYED";
         private static final String JURISDICTION = "CIVIL";
         private static final String EVENT_TOKEN = "eventToken";
-        private static final long CASE_ID = 1L;
+        private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
+        private final CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .data(caseData)
+            .build();
 
         @BeforeEach
         void setUp() {
             when(idamClient.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
 
             when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
-                CASE_TYPE, Long.toString(CASE_ID), EVENT_ID))
-                .thenReturn(buildStartEventResponse());
+                                                         CASE_TYPE, CASE_ID, EVENT_ID
+            )).thenReturn(buildStartEventResponse());
+
+            when(coreCaseDataApi.submitEventForCaseWorker(
+                USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                USER_ID,
+                JURISDICTION,
+                CASE_TYPE,
+                CASE_ID,
+                true,
+                buildCaseDataContent()
+                 )
+            ).thenReturn(caseDetails);
         }
 
         @Test
         void shouldStartAndSubmitEvent_WhenCalled() {
-            service.triggerEvent(CASE_ID, CaseEvent.valueOf(EVENT_ID));
+            service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
-                JURISDICTION, CASE_TYPE, Long.toString(CASE_ID), EVENT_ID);
-            verify(coreCaseDataApi).submitEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
-                CASE_TYPE, Long.toString(CASE_ID), true, buildCaseDataContent());
+                                                            JURISDICTION, CASE_TYPE, CASE_ID, EVENT_ID
+            );
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                USER_ID,
+                JURISDICTION,
+                CASE_TYPE,
+                CASE_ID,
+                true,
+                buildCaseDataContent()
+            );
         }
 
         private StartEventResponse buildStartEventResponse() {
             return StartEventResponse.builder()
                 .eventId(EVENT_ID)
                 .token(EVENT_TOKEN)
-                .caseDetails(CaseDetails.builder()
-                    .data(Map.of("data", "some data"))
-                    .build())
+                .caseDetails(caseDetails)
                 .build();
         }
 
         private CaseDataContent buildCaseDataContent() {
+            Map<String, Object> data = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+
             return CaseDataContent.builder()
                 .eventToken(EVENT_TOKEN)
-                .event(Event.builder()
-                    .id(EVENT_ID)
-                    .build())
-                .data(Map.of("data", "some data"))
+                .event(Event.builder().id(EVENT_ID).build())
+                .data(data)
                 .build();
         }
     }

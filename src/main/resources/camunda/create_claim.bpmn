@@ -1,46 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0rn46su" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
   <bpmn:process id="CREATE_CLAIM_PROCESS_ID" isExecutable="true">
     <bpmn:serviceTask id="CreateClaimNotifyRespondentSolicitor1" name="Notify respondent solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="CASE_EVENT">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_04568qf</bpmn:incoming>
+      <bpmn:incoming>Flow_0tvmtj7</bpmn:incoming>
       <bpmn:outgoing>Flow_08ehj83</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_04568qf" sourceRef="Event_0t2zome" targetRef="CreateClaimNotifyRespondentSolicitor1" />
     <bpmn:sequenceFlow id="Flow_08ehj83" sourceRef="CreateClaimNotifyRespondentSolicitor1" targetRef="Event_1148m43" />
     <bpmn:endEvent id="Event_1148m43">
       <bpmn:incoming>Flow_08ehj83</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:startEvent id="Event_0t2zome" name="Start">
-      <bpmn:outgoing>Flow_04568qf</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0tpdor1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1cb4oje" messageRef="Message_0slk3de" />
     </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0tvmtj7" sourceRef="StartBusinessProcessTaskId" targetRef="CreateClaimNotifyRespondentSolicitor1" />
+    <bpmn:serviceTask id="StartBusinessProcessTaskId" name="StartBusinessProcess" camunda:type="external" camunda:topic="START_BUSINESS_PROCESS">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">START_BUSINESS_PROCESS</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0tpdor1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tvmtj7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_0xn9cx1" name="Abort" attachedToRef="StartBusinessProcessTaskId">
+      <bpmn:outgoing>Flow_0lpgwyz</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0x3b32k" errorRef="Error_0t2ju7k" />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="Event_0iiw102" name="Aborted">
+      <bpmn:incoming>Flow_0lpgwyz</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0lpgwyz" sourceRef="Event_0xn9cx1" targetRef="Event_0iiw102" />
+    <bpmn:sequenceFlow id="Flow_0tpdor1" sourceRef="Event_0t2zome" targetRef="StartBusinessProcessTaskId" />
   </bpmn:process>
   <bpmn:message id="Message_0slk3de" name="CREATE_CLAIM" />
+  <bpmn:error id="Error_0t2ju7k" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CREATE_CLAIM_PROCESS_ID">
-      <bpmndi:BPMNEdge id="Flow_08ehj83_di" bpmnElement="Flow_08ehj83">
-        <di:waypoint x="340" y="120" />
-        <di:waypoint x="392" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_04568qf_di" bpmnElement="Flow_04568qf">
+      <bpmndi:BPMNEdge id="Flow_0tpdor1_di" bpmnElement="Flow_0tpdor1">
         <di:waypoint x="188" y="120" />
-        <di:waypoint x="240" y="120" />
+        <di:waypoint x="260" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lpgwyz_di" bpmnElement="Flow_0lpgwyz">
+        <di:waypoint x="310" y="178" />
+        <di:waypoint x="310" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tvmtj7_di" bpmnElement="Flow_0tvmtj7">
+        <di:waypoint x="360" y="120" />
+        <di:waypoint x="470" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08ehj83_di" bpmnElement="Flow_08ehj83">
+        <di:waypoint x="570" y="120" />
+        <di:waypoint x="712" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0bn79uc_di" bpmnElement="CreateClaimNotifyRespondentSolicitor1">
-        <dc:Bounds x="240" y="80" width="100" height="80" />
+        <dc:Bounds x="470" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1148m43_di" bpmnElement="Event_1148m43">
-        <dc:Bounds x="392" y="102" width="36" height="36" />
+        <dc:Bounds x="712" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1m02c2o_di" bpmnElement="Event_0t2zome">
         <dc:Bounds x="152" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="158" y="145" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oaugvz_di" bpmnElement="StartBusinessProcessTaskId">
+        <dc:Bounds x="260" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0iiw102_di" bpmnElement="Event_0iiw102">
+        <dc:Bounds x="292" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="291" y="315" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02d0u09_di" bpmnElement="Event_0xn9cx1">
+        <dc:Bounds x="292" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="338" y="185" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

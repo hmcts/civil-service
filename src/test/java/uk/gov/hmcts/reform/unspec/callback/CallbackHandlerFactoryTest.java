@@ -121,6 +121,10 @@ class CallbackHandlerFactoryTest {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CLAIM.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of(
+                "businessProcess",
+                BusinessProcess.builder().build()
+            )).build())
             .caseDetails(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
@@ -141,6 +145,10 @@ class CallbackHandlerFactoryTest {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of(
+                "businessProcess",
+                BusinessProcess.builder().activityId("CreateClaimNotifyRespondentSolicitor1").build()
+            )).build())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("CreateClaimNotifyRespondentSolicitor1").build()
@@ -164,6 +172,10 @@ class CallbackHandlerFactoryTest {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of(
+                "businessProcess",
+                BusinessProcess.builder().build()
+            )).build())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("unProcessedTask").build()
@@ -183,10 +195,14 @@ class CallbackHandlerFactoryTest {
     }
 
     @Test
-    void shouldProcessEvent_whenEventHasNoCamundaTask() {
+    void shouldProcessEvent_whenEventHasNoCamundaActivityId() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CLAIM.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of(
+                "businessProcess",
+                BusinessProcess.builder().build()
+            )).build())
             .caseDetails(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("unProcessedTask").build()

@@ -38,7 +38,7 @@ public class CallbackHandlerFactory {
     }
 
     private CallbackResponse processEvent(CallbackHandler handler, CallbackParams callbackParams, String eventId) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
+        Map<String, Object> data = callbackParams.getRequest().getCaseDetailsBefore().getData();
         BusinessProcess businessProcess = objectMapper.convertValue(data.get("businessProcess"), BusinessProcess.class);
         return handler.isEventAlreadyProcessed(businessProcess)
             ? AboutToStartOrSubmitCallbackResponse.builder()
