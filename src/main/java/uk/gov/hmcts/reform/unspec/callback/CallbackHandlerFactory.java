@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.unspec.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.unspec.aspect.EventAllowed;
 import uk.gov.hmcts.reform.unspec.aspect.NoOngoingBusinessProcess;
-import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
@@ -20,11 +20,11 @@ import static java.util.Optional.ofNullable;
 public class CallbackHandlerFactory {
 
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
-    private final ObjectMapper objectMapper;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
-    public CallbackHandlerFactory(ObjectMapper objectMapper, CallbackHandler... beans) {
-        this.objectMapper = objectMapper;
+    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter, CallbackHandler... beans) {
+        this.caseDetailsConverter = caseDetailsConverter;
         Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers));
     }
 
@@ -38,12 +38,18 @@ public class CallbackHandlerFactory {
     }
 
     private CallbackResponse processEvent(CallbackHandler handler, CallbackParams callbackParams, String eventId) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        BusinessProcess businessProcess = objectMapper.convertValue(data.get("businessProcess"), BusinessProcess.class);
-        return handler.isEventAlreadyProcessed(businessProcess)
-            ? AboutToStartOrSubmitCallbackResponse.builder()
+        return Optional.ofNullable(callbackParams.getRequest().getCaseDetailsBefore())
+            .map(caseDetailsConverter::toCaseData)
+            .map(CaseData::getBusinessProcess)
+            .map(handler::isEventAlreadyProcessed)
+            .filter(isProcessed -> isProcessed)
+            .map(isProcessed -> eventAlreadyProcessedResponse(eventId))
+            .orElse(handler.handle(callbackParams));
+    }
+
+    private CallbackResponse eventAlreadyProcessedResponse(String eventId) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(String.format("Event %s is already processed", eventId)))
-            .build()
-            : handler.handle(callbackParams);
+            .build();
     }
 }
