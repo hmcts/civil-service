@@ -9,8 +9,10 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CallbackVersion;
 import uk.gov.hmcts.reform.unspec.enums.CaseState;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.UserService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
@@ -33,6 +35,32 @@ public abstract class BaseCallbackHandlerTest {
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, String pageId) {
         return callbackParamsOf(data, CREATED, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type) {
+        return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, String pageId) {
+        return callbackParamsOf(caseData, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData,
+                                           CallbackType type,
+                                           CallbackVersion version,
+                                           String pageId,
+                                           Map<Params, Object> params
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .pageId(pageId)
+            .request(CallbackRequest.builder()
+                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                         .build())
+            .caseData(caseData)
+            .version(version)
+            .params(params)
+            .build();
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,

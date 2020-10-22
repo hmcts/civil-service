@@ -25,6 +25,11 @@ public class CallbackParamsBuilder {
     public CallbackParamsBuilder of(CallbackType type, CaseData caseData) {
         this.type = type;
         this.caseData = caseData;
+        this.request = CallbackRequest.builder()
+            .caseDetails(CaseDetailsBuilder.builder()
+                             .data(caseData)
+                             .build())
+            .build();
         return this;
     }
 

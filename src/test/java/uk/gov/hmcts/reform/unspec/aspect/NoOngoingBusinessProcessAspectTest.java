@@ -17,11 +17,9 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import java.util.List;
 
@@ -39,8 +37,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.START_BUSINESS_PROCE
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     NoOngoingBusinessProcessAspect.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    JacksonAutoConfiguration.class
 })
 class NoOngoingBusinessProcessAspectTest {
 
@@ -60,12 +57,10 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(ABOUT_TO_START)
-                .request(CallbackRequest.builder()
-                             .eventId(RESPOND_EXTENSION.name())
-                             .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
-                             .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateExtensionRequested().build())
+                .request(CallbackRequest.builder().eventId(RESPOND_EXTENSION.name()).build())
                 .build();
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);
@@ -81,15 +76,11 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(ABOUT_TO_START)
-                .request(CallbackRequest.builder()
-                             .eventId(CONFIRM_SERVICE.name())
-                             .caseDetails(CaseDetailsBuilder.builder().data(
-                                 CaseDataBuilder.builder()
-                                     .atStateClaimCreated()
-                                     .businessProcess(BusinessProcess.builder().status(status).build())
-                                     .build()).build())
-                             .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+                    .atStateClaimCreated()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .request(CallbackRequest.builder().eventId(CONFIRM_SERVICE.name()).build())
                 .build();
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
@@ -106,16 +97,13 @@ class NoOngoingBusinessProcessAspectTest {
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(ABOUT_TO_START)
-                .request(CallbackRequest.builder()
-                             .eventId(CONFIRM_SERVICE.name())
-                             .caseDetails(CaseDetailsBuilder.builder().data(
-                                 CaseDataBuilder.builder()
-                                     .atStateClaimCreated()
-                                     .businessProcess(BusinessProcess.builder().status(status).build())
-                                     .build()).build())
-                             .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+                    .atStateClaimCreated()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .request(CallbackRequest.builder().eventId(CONFIRM_SERVICE.name()).build())
                 .build();
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);
@@ -131,16 +119,13 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(SUBMITTED)
-                .request(CallbackRequest.builder()
-                             .eventId(CONFIRM_SERVICE.name())
-                             .caseDetails(CaseDetailsBuilder.builder().data(
-                                 CaseDataBuilder.builder()
-                                     .atStateClaimCreated()
-                                     .businessProcess(BusinessProcess.builder().status(status).build())
-                                     .build()).build())
-                             .build())
+                .of(SUBMITTED, CaseDataBuilder.builder()
+                    .atStateClaimCreated()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .request(CallbackRequest.builder().eventId(CONFIRM_SERVICE.name()).build())
                 .build();
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);
@@ -161,12 +146,12 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(ABOUT_TO_START)
-                .request(CallbackRequest.builder()
-                             .eventId(START_BUSINESS_PROCESS.name())
-                             .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
-                             .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+                    .atStateExtensionRequested()
+                    .build())
+                .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
                 .build();
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);
@@ -182,16 +167,13 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .type(ABOUT_TO_START)
-                .request(CallbackRequest.builder()
-                             .eventId(START_BUSINESS_PROCESS.name())
-                             .caseDetails(CaseDetailsBuilder.builder().data(
-                                 CaseDataBuilder.builder()
-                                     .atStateClaimCreated()
-                                     .businessProcess(BusinessProcess.builder().status(status).build())
-                                     .build()).build())
-                             .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+                    .atStateClaimCreated()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
                 .build();
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
+import uk.gov.hmcts.reform.unspec.model.CloseClaim;
 import uk.gov.hmcts.reform.unspec.model.CourtLocation;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.ResponseDocument;
@@ -19,12 +20,16 @@ import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
 import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
+import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
@@ -41,7 +46,13 @@ import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 public class CaseDataBuilder {
 
     public static final String LEGACY_CASE_REFERENCE = "000LR001";
+    public static final Long CASE_ID = 1594901956117591L;
+    public static final LocalDate DEEMED_SERVICE_DATE = LocalDate.now();
+    public static final LocalDateTime RESPONSE_DEADLINE = now().plusDays(14).atTime(23, 59, 59);
+    public static final LocalDateTime CLAIMANT_RESPONSE_DEADLINE = LocalDateTime.now().plusDays(120);
+
     // Create Claim
+    private Long ccdCaseReference;
     private SolicitorReferences solicitorReferences;
     private CourtLocation courtLocation;
     private Party applicant1;
@@ -58,6 +69,7 @@ public class CaseDataBuilder {
     private LocalDateTime confirmationOfServiceDeadline;
     private AllocatedTrack allocatedTrack;
     private CaseState ccdState;
+    private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     // Confirm Service
     private LocalDate deemedServiceDateToRespondentSolicitor1;
     private LocalDateTime respondentSolicitor1ResponseDeadline;
@@ -90,6 +102,111 @@ public class CaseDataBuilder {
     private String applicant1NotProceedingReason;
     private BusinessProcess businessProcess;
 
+    private CloseClaim withdrawClaim;
+    private CloseClaim discontinueClaim;
+
+    private Respondent1DQ respondent1DQ;
+
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionProposedDeadline(LocalDate responsedeadline) {
+        this.respondentSolicitor1claimResponseExtensionProposedDeadline = responsedeadline;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1ResponseDeadline(LocalDateTime respondentSolicitor1ResponseDeadline) {
+        this.respondentSolicitor1ResponseDeadline = respondentSolicitor1ResponseDeadline;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionAccepted(YesOrNo yesOrNo) {
+        this.respondentSolicitor1claimResponseExtensionAccepted = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionCounter(YesOrNo yesOrNo) {
+        this.respondentSolicitor1claimResponseExtensionCounter = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionAlreadyAgreed(YesOrNo yesOrNo) {
+        this.respondentSolicitor1claimResponseExtensionAlreadyAgreed = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionCounterDate(LocalDate date) {
+        this.respondentSolicitor1claimResponseExtensionCounterDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
+        this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaim(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaim = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder withdrawClaim(CloseClaim closeClaim) {
+        this.withdrawClaim = closeClaim;
+        return this;
+    }
+
+    public CaseDataBuilder disccontinueClaim(CloseClaim closeClaim) {
+        this.discontinueClaim = closeClaim;
+        return this;
+    }
+
+    public CaseDataBuilder claimValue(ClaimValue claimValue) {
+        this.claimValue = claimValue;
+        return this;
+    }
+
+    public CaseDataBuilder claimIssuedDate(LocalDate claimIssuedDate) {
+        this.claimIssuedDate = claimIssuedDate;
+        return this;
+    }
+
+    public CaseDataBuilder serviceDateToRespondentSolicitor1(LocalDate serviceDateToRespondentSolicitor1) {
+        this.serviceDateToRespondentSolicitor1 = serviceDateToRespondentSolicitor1;
+        return this;
+    }
+
+    public CaseDataBuilder serviceDateTimeToRespondentSolicitor1(LocalDateTime serviceDateTimeToRespondentSolicitor1) {
+        this.serviceDateTimeToRespondentSolicitor1 = serviceDateTimeToRespondentSolicitor1;
+        return this;
+    }
+
+    public CaseDataBuilder systemGeneratedCaseDocuments(List<Element<CaseDocument>> systemGeneratedCaseDocuments) {
+        this.systemGeneratedCaseDocuments = systemGeneratedCaseDocuments;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1(Party party) {
+        this.applicant1 = party;
+        return this;
+    }
+
+    public CaseDataBuilder serviceMethodToRespondentSolicitor1(ServiceMethod serviceMethodToRespondentSolicitor1) {
+        this.serviceMethodToRespondentSolicitor1 = serviceMethodToRespondentSolicitor1;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1(Party party) {
+        this.respondent1 = party;
+        return this;
+    }
+
+    public CaseDataBuilder servedDocumentsOther(String servedDocumentsOther) {
+        this.servedDocumentsOther = servedDocumentsOther;
+        return this;
+    }
+
+    public CaseDataBuilder legacyCaseReference(String legacyCaseReference) {
+        this.legacyCaseReference = legacyCaseReference;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
@@ -113,11 +230,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimCreated() {
         atStateClaimDraft();
         claimSubmittedDateTime = LocalDateTime.now();
-        claimIssuedDate = LocalDate.now();
+        claimIssuedDate = now();
         confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
         ccdState = CREATED;
+        ccdCaseReference = CASE_ID;
         return this;
     }
 
@@ -129,8 +247,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateServiceConfirmed() {
         atStateClaimCreated();
-        deemedServiceDateToRespondentSolicitor1 = LocalDate.now();
-        respondentSolicitor1ResponseDeadline = LocalDate.now().plusDays(14).atTime(23, 59, 59);
+        deemedServiceDateToRespondentSolicitor1 = DEEMED_SERVICE_DATE;
+        respondentSolicitor1ResponseDeadline = RESPONSE_DEADLINE;
         serviceMethodToRespondentSolicitor1 = ServiceMethodBuilder.builder().email().build();
         serviceLocationToRespondentSolicitor1 = ServiceLocation.builder().location(BUSINESS).build();
         serviceDateTimeToRespondentSolicitor1 = LocalDateTime.now();
@@ -143,7 +261,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondedToClaim() {
         atStateServiceConfirmed();
         respondent1ClaimResponseType = DefendantResponseType.FULL_DEFENCE;
-        applicantSolicitorResponseDeadlineToRespondentSolicitor1 = LocalDateTime.now().plusDays(120);
+        applicantSolicitorResponseDeadlineToRespondentSolicitor1 = CLAIMANT_RESPONSE_DEADLINE;
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
@@ -168,7 +286,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateExtensionRequested() {
         atStateServiceAcknowledge();
-        respondentSolicitor1claimResponseExtensionProposedDeadline = LocalDate.now().plusDays(21);
+        respondentSolicitor1claimResponseExtensionProposedDeadline = now().plusDays(21);
         respondentSolicitor1claimResponseExtensionAlreadyAgreed = NO;
         respondentSolicitor1claimResponseExtensionReason = "Need little more time";
         return this;
@@ -178,7 +296,7 @@ public class CaseDataBuilder {
         atStateExtensionRequested();
         respondentSolicitor1claimResponseExtensionAccepted = NO;
         respondentSolicitor1claimResponseExtensionCounter = YES;
-        respondentSolicitor1claimResponseExtensionCounterDate = LocalDate.now().plusDays(19);
+        respondentSolicitor1claimResponseExtensionCounterDate = now().plusDays(19);
         respondentSolicitor1claimResponseExtensionRejectionReason = "This seems reasonable";
         return this;
     }
@@ -239,6 +357,9 @@ public class CaseDataBuilder {
             .respondentSolicitor1claimResponseExtensionRejectionReason(
                 respondentSolicitor1claimResponseExtensionRejectionReason
             )
+            .respondentSolicitor1claimResponseExtensionCounterDate(
+                respondentSolicitor1claimResponseExtensionCounterDate
+            )
             // Defendant Response
             .respondent1ClaimResponseType(respondent1ClaimResponseType)
             .respondent1ClaimResponseDocument(respondent1ClaimResponseDocument)
@@ -252,6 +373,11 @@ public class CaseDataBuilder {
 
             .ccdState(ccdState)
             .businessProcess(businessProcess)
+            .ccdCaseReference(ccdCaseReference)
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
+            .withdrawClaim(withdrawClaim)
+            .discontinueClaim(discontinueClaim)
+            .respondent1DQ(respondent1DQ)
             .build();
     }
 }

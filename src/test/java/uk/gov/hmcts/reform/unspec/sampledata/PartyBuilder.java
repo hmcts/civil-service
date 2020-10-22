@@ -70,6 +70,16 @@ public class PartyBuilder {
         return this;
     }
 
+    public PartyBuilder individualDateOfBirth(LocalDate dateOfBirth) {
+        individualDateOfBirth = dateOfBirth;
+        return this;
+    }
+
+    public PartyBuilder soleTraderDateOfBirth(LocalDate dateOfBirth) {
+        soleTraderDateOfBirth = dateOfBirth;
+        return this;
+    }
+
     public Party build() {
         return Party.builder()
             .type(type)

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
@@ -46,7 +46,6 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     public static final String EXTENSION_ALREADY_AGREED = "respondentSolicitor1claimResponseExtensionAlreadyAgreed";
     public static final String LEGACY_CASE_REFERENCE = "legacyCaseReference";
 
-    private final ObjectMapper mapper;
     private final RequestExtensionValidator validator;
     private final BusinessProcessService businessProcessService;
 
@@ -62,8 +61,9 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
 
     private CallbackResponse updateResponseDeadline(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDate proposedDeadline = mapper.convertValue(data.get(PROPOSED_DEADLINE), LocalDate.class);
-        YesOrNo extensionAlreadyAgreed = mapper.convertValue(data.get(EXTENSION_ALREADY_AGREED), YesOrNo.class);
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate proposedDeadline = caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline();
+        YesOrNo extensionAlreadyAgreed = caseData.getRespondentSolicitor1claimResponseExtensionAlreadyAgreed();
         if (extensionAlreadyAgreed == YES) {
             data.put(RESPONSE_DEADLINE, proposedDeadline.atTime(MID_NIGHT));
         }
@@ -96,18 +96,12 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDate proposedDeadline = mapper.convertValue(
-            data.get(PROPOSED_DEADLINE),
-            LocalDate.class
-        );
-        YesOrNo extensionAlreadyAgreed = mapper.convertValue(data.get(EXTENSION_ALREADY_AGREED), YesOrNo.class);
-        String claimNumber = data.get(LEGACY_CASE_REFERENCE).toString();
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate proposedDeadline = caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline();
+        YesOrNo extensionAlreadyAgreed = caseData.getRespondentSolicitor1claimResponseExtensionAlreadyAgreed();
+        String claimNumber = caseData.getLegacyCaseReference();
+        LocalDate responseDeadline = caseData.getRespondentSolicitor1ResponseDeadline().toLocalDate();
 
-        LocalDate responseDeadline = mapper.convertValue(
-            data.get(RESPONSE_DEADLINE),
-            LocalDate.class
-        );
         String body = format(
             "<br /><p>You asked if you can respond before 4pm on %s %s"
                 + "<p>They can choose not to respond to your request, so if you don't get an email from us, "

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
@@ -41,14 +39,11 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 public class RespondToClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
-    public static final String RESPONDENT = "respondent1";
     public static final String CLAIMANT_RESPONSE_DEADLINE = "applicantSolicitorResponseDeadlineToRespondentSolicitor1";
 
-    private final ObjectMapper mapper;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final BusinessProcessService businessProcessService;
     private final UnavailableDateValidator unavailableDateValidator;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -61,14 +56,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "upload"), this::emptyCallbackWorkaround,
+            callbackKey(MID, "upload"), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::setClaimantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
         List<Element<UnavailableDate>> unavailableDates =
             ofNullable(caseData.getRespondent1DQ().getHearing().getUnavailableDates()).orElse(emptyList());
         List<String> errors = unavailableDateValidator.validate(unavailableDates);
@@ -78,13 +73,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse emptyCallbackWorkaround(CallbackParams callbackParams) {
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        Party respondent = mapper.convertValue(data.get(RESPONDENT), Party.class);
+        Party respondent = callbackParams.getCaseData().getRespondent1();
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -106,8 +96,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = mapper.convertValue(data.get(CLAIMANT_RESPONSE_DEADLINE), LocalDateTime.class);
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getApplicantSolicitorResponseDeadlineToRespondentSolicitor1();
 
         String claimNumber = "TBC";
 

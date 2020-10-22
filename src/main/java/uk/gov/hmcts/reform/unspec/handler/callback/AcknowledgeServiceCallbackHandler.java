@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -36,10 +35,8 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_SERVICE);
-    private static final String RESPONDENT = "respondent1";
     private static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
 
-    private final ObjectMapper mapper;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final WorkingDayIndicator workingDayIndicator;
     private final BusinessProcessService businessProcessService;
@@ -60,19 +57,17 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        Party respondent = mapper.convertValue(data.get(RESPONDENT), Party.class);
+        Party respondent = callbackParams.getCaseData().getRespondent1();
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
             .errors(errors)
             .build();
     }
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = mapper.convertValue(data.get(RESPONSE_DEADLINE), LocalDateTime.class);
+        LocalDateTime responseDeadline = callbackParams.getCaseData().getRespondentSolicitor1ResponseDeadline();
 
         LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
 
@@ -86,15 +81,14 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = mapper.convertValue(data.get(RESPONSE_DEADLINE), LocalDateTime.class);
+        LocalDateTime responseDeadline = callbackParams.getCaseData().getRespondentSolicitor1ResponseDeadline();
 
-        String formattedDeemedDateOfService = formatLocalDateTime(responseDeadline, DATE);
+        String formattedResponseDeadline = formatLocalDateTime(responseDeadline, DATE);
         String acknowledgmentOfServiceForm = "http://www.google.com";
 
         String body = format("<br />You need to respond before 4pm on %s."
                                  + "\n\n[Download the Acknowledgement of Service form](%s)",
-                             formattedDeemedDateOfService, acknowledgmentOfServiceForm
+                             formattedResponseDeadline, acknowledgmentOfServiceForm
         );
 
         return SubmittedCallbackResponse.builder()

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -26,8 +25,6 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DISPATCH_BUSINESS_PROCESS);
 
-    private final ObjectMapper mapper;
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::dispatchBusinessProcess);
@@ -40,7 +37,7 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
 
     private CallbackResponse dispatchBusinessProcess(CallbackParams callbackParams) {
         Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        BusinessProcess businessProcess = mapper.convertValue(data.get("businessProcess"), BusinessProcess.class);
+        BusinessProcess businessProcess = callbackParams.getCaseData().getBusinessProcess();
         if (businessProcess.getStatus() == READY) {
             data.put("businessProcess", BusinessProcess.builder()
                 .camundaEvent(businessProcess.getCamundaEvent())

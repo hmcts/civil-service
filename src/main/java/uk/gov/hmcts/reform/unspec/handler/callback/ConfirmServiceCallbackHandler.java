@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
@@ -58,7 +57,6 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
 
     private final Validator validator;
     private final CertificateOfServiceGenerator certificateOfServiceGenerator;
-    private final CaseDetailsConverter caseDetailsConverter;
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -89,35 +87,31 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkServedDocumentsOtherHasWhiteSpace(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         List<String> errors = new ArrayList<>();
-        var servedDocumentsOther = data.get("servedDocumentsOther");
+        String servedDocumentsOther = callbackParams.getCaseData().getServedDocumentsOther();
 
-        if (servedDocumentsOther != null && servedDocumentsOther.toString().isBlank()) {
+        if (servedDocumentsOther != null && servedDocumentsOther.isBlank()) {
             errors.add("CONTENT TBC: please enter a valid value for other documents");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
             .errors(errors)
             .build();
     }
 
     private CallbackResponse validateServiceDate(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = validator.validate(caseData, ConfirmServiceDateGroup.class).stream()
             .map(ConstraintViolation::getMessage)
             .collect(Collectors.toList());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
             .errors(errors)
             .build();
     }
 
     private CallbackResponse prepareCertificateOfService(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
         ServiceMethod serviceMethod = caseData.getServiceMethodToRespondentSolicitor1();
         LocalDateTime serviceDate;
         if (serviceMethod.requiresDateEntry()) {
@@ -157,7 +151,7 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
 
         LocalDate deemedDateOfService = caseData.getDeemedServiceDateToRespondentSolicitor1();
         String formattedDeemedDateOfService = formatLocalDate(deemedDateOfService, DATE);

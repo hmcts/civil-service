@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
@@ -36,12 +34,9 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.fromFullNam
 public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
-    public static final String APPLICANT_1_PROCEEDING = "applicant1ProceedWithClaim";
 
-    private final ObjectMapper mapper;
     private final BusinessProcessService businessProcessService;
     private final StateFlowEngine stateFlowEngine;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -59,7 +54,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleNotifications(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (fromFullName(stateFlowEngine.evaluate(caseData).getState().getName()) == FlowState.Main.FULL_DEFENCE) {
             errors = businessProcessService.updateBusinessProcess(caseDetails.getData(), CLAIMANT_RESPONSE);
@@ -72,8 +67,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        YesOrNo proceeding = mapper.convertValue(data.get(APPLICANT_1_PROCEEDING), YesOrNo.class);
+        YesOrNo proceeding = callbackParams.getCaseData().getApplicant1ProceedWithClaim();
 
         String claimNumber = "TBC";
         String dqLink = "http://www.google.com";

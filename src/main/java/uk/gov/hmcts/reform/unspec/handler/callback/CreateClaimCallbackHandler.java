@@ -82,8 +82,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        Party claimant = mapper.convertValue(data.get(CLAIMANT), Party.class);
+        Party claimant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(claimant);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -129,7 +128,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
         Long documentSize = ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
             .filter(c -> c.getDocumentType() == DocumentType.SEALED_CLAIM)
             .findFirst()
