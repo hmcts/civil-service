@@ -6,31 +6,48 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 
+@SpringBootTest(classes = {
+    CaseEventTaskHandler.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
+})
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
 
-    private static final Long CASE_ID = 1L;
+    private static final String CASE_ID = "1";
 
     @Mock
     private ExternalTask mockExternalTask;
     @Mock
     private ExternalTaskService externalTaskService;
-    @Mock
+    @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @InjectMocks
+    @Autowired
     private CaseEventTaskHandler caseEventTaskHandler;
 
     @BeforeEach
@@ -38,11 +55,12 @@ class CaseEventTaskHandlerTest {
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getWorkerId()).thenReturn("worker");
         when(mockExternalTask.getActivityId()).thenReturn("activityId");
-        when(mockExternalTask.getAllVariables())
-            .thenReturn(Map.of(
-                "CCD_ID", CASE_ID,
-                "CASE_EVENT", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
-            ));
+
+        Map<String, Object> variables = Map.of("caseId", CASE_ID,
+                                               "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+        );
+
+        when(mockExternalTask.getAllVariables()).thenReturn(variables);
     }
 
     @Nested
@@ -50,13 +68,21 @@ class CaseEventTaskHandlerTest {
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE)))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
             caseEventTaskHandler.execute(mockExternalTask, externalTaskService);
 
-            verify(coreCaseDataService).triggerEvent(
-                eq(CASE_ID),
-                eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE),
-                anyMap()
-            );
+            verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE));
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockExternalTask);
         }
     }

@@ -23,7 +23,7 @@ public class EventEmitterService {
         log.info(String.format("Emitting %s camunda event for case: %d", camundaEvent, caseId));
         try {
             runtimeService.createMessageCorrelation(camundaEvent)
-                .setVariable("CCD_ID", caseId)
+                .setVariable("caseId", caseId)
                 .correlateStartMessage();
             applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
             log.info("Camunda event emitted successfully");

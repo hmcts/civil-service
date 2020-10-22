@@ -51,7 +51,7 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
+        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
     }
@@ -68,7 +68,7 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).setVariable("CCD_ID", 1L);
+        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verifyNoInteractions(applicationEventPublisher);
     }
