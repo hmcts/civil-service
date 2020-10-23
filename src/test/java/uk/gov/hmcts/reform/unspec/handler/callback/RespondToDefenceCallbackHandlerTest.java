@@ -21,9 +21,6 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
-import java.util.List;
-import java.util.Map;
-
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +70,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(List.of());
+            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(CaseData.builder().build());
             clearInvocations(businessProcessService);
         }
 
@@ -83,7 +80,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
-            verify(businessProcessService).updateBusinessProcess(Map.of(), CLAIMANT_RESPONSE);
+            verify(businessProcessService).updateBusinessProcess(caseData, CLAIMANT_RESPONSE);
         }
 
         @Test
@@ -98,7 +95,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
-        public static final String APPLICANT_1_PROCEEDING = "applicant1ProceedWithClaim";
 
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {

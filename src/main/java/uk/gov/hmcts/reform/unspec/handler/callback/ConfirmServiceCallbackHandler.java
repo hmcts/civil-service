@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
@@ -58,6 +59,7 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final CertificateOfServiceGenerator certificateOfServiceGenerator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -76,13 +78,12 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse prepopulateServedDocuments(CallbackParams callbackParams) {
-        List<ServedDocuments> servedDocuments = List.of(ServedDocuments.CLAIM_FORM);
-
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        data.put("servedDocuments", servedDocuments);
+        CaseData caseData = callbackParams.getCaseData().toBuilder()
+            .servedDocuments(List.of(ServedDocuments.CLAIM_FORM))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
+            .data(caseDetailsConverter.toMap(caseData))
             .build();
     }
 
@@ -119,34 +120,29 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
         } else {
             serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();
         }
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-
         LocalDate deemedDateOfService = deadlinesCalculator.calculateDeemedDateOfService(
             serviceDate, serviceMethod.getType());
         LocalDateTime responseDeadline = deadlinesCalculator.calculateDefendantResponseDeadline(deemedDateOfService);
 
-        data.put("deemedServiceDateToRespondentSolicitor1", deemedDateOfService);
-        data.put("respondentSolicitor1ResponseDeadline", responseDeadline);
-
-        CaseData caseDateUpdated = caseData.toBuilder()
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .deemedServiceDateToRespondentSolicitor1(deemedDateOfService)
-            .respondentSolicitor1ResponseDeadline(responseDeadline)
-            .build();
+            .respondentSolicitor1ResponseDeadline(responseDeadline);
 
         CaseDocument certificateOfService = certificateOfServiceGenerator.generate(
-            caseDateUpdated,
+            caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         if (ObjectUtils.isEmpty(systemGeneratedCaseDocuments)) {
-            data.put("systemGeneratedCaseDocuments", wrapElements(certificateOfService));
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(certificateOfService));
         } else {
             systemGeneratedCaseDocuments.add(element(certificateOfService));
-            data.put("systemGeneratedCaseDocuments", systemGeneratedCaseDocuments);
+            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
+            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
             .build();
     }
 

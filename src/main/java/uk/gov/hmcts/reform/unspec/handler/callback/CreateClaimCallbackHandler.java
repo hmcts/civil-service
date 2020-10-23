@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
@@ -53,10 +51,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
         + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
         + " 4pm if you're doing this on the due day";
-    public static final String RESPONDENT = "respondent1";
-    public static final String CLAIMANT = "applicant1";
 
-    private final ObjectMapper mapper;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -91,39 +86,30 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse issueClaim(CallbackParams callbackParams) {
-        CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         LocalDateTime submittedAt = LocalDateTime.now();
         LocalDate issueDate = issueDateCalculator.calculateIssueDay(submittedAt);
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        CaseData caseData = callbackParams.getCaseData();
         String referenceNumber = referenceNumberRepository.getReferenceNumber();
+        LocalDateTime confirmationOfServiceDeadline = deadlinesCalculator.calculateConfirmationOfServiceDeadline(
+            issueDate);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+            .claimIssuedDate(issueDate)
+            .legacyCaseReference(referenceNumber)
+            .claimSubmittedDateTime(submittedAt)
+            .confirmationOfServiceDeadline(confirmationOfServiceDeadline)
+            .allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
-            caseData.toBuilder()
-                .claimIssuedDate(issueDate)
-                .legacyCaseReference(referenceNumber)
-                .claimSubmittedDateTime(submittedAt)
-                .build(),
+            caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        caseDataBuilder.systemGeneratedCaseDocuments(ElementUtils.wrapElements(sealedClaim));
 
-        Map<String, Object> data = caseDetails.getData();
-        data.put("claimSubmittedDateTime", submittedAt);
-        data.put("claimIssuedDate", issueDate);
-        data.put(
-            "confirmationOfServiceDeadline",
-            deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate)
-        );
-        data.put("systemGeneratedCaseDocuments", ElementUtils.wrapElements(sealedClaim));
-
-        data.put(RESPONDENT, caseData.getRespondent1());
-        data.put(CLAIMANT, caseData.getApplicant1());
-        data.put("legacyCaseReference", referenceNumber);
-        data.put("allocatedTrack", getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-        List<String> errors = businessProcessService.updateBusinessProcess(data, CREATE_CLAIM);
+        CaseData updatedCaseData = businessProcessService.updateBusinessProcess(caseDataBuilder.build(), CREATE_CLAIM);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
-            .errors(errors)
+            .data(caseDetailsConverter.toMap(updatedCaseData))
             .build();
     }
 

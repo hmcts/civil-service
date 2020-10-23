@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
@@ -22,18 +23,14 @@ import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
@@ -46,12 +43,11 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     AcknowledgeServiceCallbackHandler.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
-    DateOfBirthValidator.class
+    DateOfBirthValidator.class,
+    CaseDetailsConverter.class,
+    BusinessProcessService.class
 })
 class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
-
-    @MockBean
-    private BusinessProcessService businessProcessService;
 
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
@@ -140,31 +136,36 @@ class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(List.of());
             when(workingDayIndicator.getNextWorkingDay(any())).thenReturn(now().plusDays(14));
-            clearInvocations(businessProcessService);
         }
 
         @Test
         void shouldSetNewResponseDeadline_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("respondentSolicitor1ResponseDeadline")
-                .isEqualTo(now().atTime(MID_NIGHT).plusDays(14));
+                .isEqualTo(now().atTime(MID_NIGHT).plusDays(14).toString());
         }
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            Map<String, Object> data = new HashMap<>(Map.of(
-                "respondentSolicitor1ResponseDeadline", RESPONSE_DEADLINE
-            ));
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
-            handler.handle(callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            verify(businessProcessService).updateBusinessProcess(data, ACKNOWLEDGE_SERVICE);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(ACKNOWLEDGE_SERVICE.name());
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
         }
     }
 

@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
@@ -35,11 +37,11 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_SERVICE);
-    private static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final WorkingDayIndicator workingDayIndicator;
     private final BusinessProcessService businessProcessService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,17 +68,17 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
-        LocalDateTime responseDeadline = callbackParams.getCaseData().getRespondentSolicitor1ResponseDeadline();
-
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getRespondentSolicitor1ResponseDeadline();
         LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+            .respondentSolicitor1ResponseDeadline(newResponseDate.atTime(MID_NIGHT));
 
-        data.put(RESPONSE_DEADLINE, newResponseDate.atTime(MID_NIGHT));
-        List<String> errors = businessProcessService.updateBusinessProcess(data, ACKNOWLEDGE_SERVICE);
+        CaseData caseDataUpdated = businessProcessService.updateBusinessProcess(
+            caseDataBuilder.build(), ACKNOWLEDGE_SERVICE);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
-            .errors(errors)
+            .data(caseDetailsConverter.toMap(caseDataUpdated))
             .build();
     }
 

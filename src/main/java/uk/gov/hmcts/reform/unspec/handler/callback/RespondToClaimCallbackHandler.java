@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
@@ -17,13 +18,13 @@ import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
@@ -39,11 +40,11 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 public class RespondToClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
-    public static final String CLAIMANT_RESPONSE_DEADLINE = "applicantSolicitorResponseDeadlineToRespondentSolicitor1";
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final BusinessProcessService businessProcessService;
     private final UnavailableDateValidator unavailableDateValidator;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -83,15 +84,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setClaimantResponseDeadline(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         //TODO: There will be in separate ticket for response deadline when requirement is confirmed
-        LocalDate claimantResponseDeadLine = LocalDate.now();
-        data.put(CLAIMANT_RESPONSE_DEADLINE, claimantResponseDeadLine.atTime(16, 0));
-        List<String> errors = businessProcessService.updateBusinessProcess(data, DEFENDANT_RESPONSE);
+        caseDataBuilder.applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0));
+        CaseData caseData = businessProcessService.updateBusinessProcess(caseDataBuilder.build(), DEFENDANT_RESPONSE);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
-            .errors(errors)
+            .data(caseDetailsConverter.toMap(caseData))
             .build();
     }
 

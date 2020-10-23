@@ -9,15 +9,12 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +23,7 @@ import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {BusinessProcessService.class, JacksonAutoConfiguration.class})
+@ContextConfiguration(classes = {BusinessProcessService.class})
 class BusinessProcessServiceTest {
 
     @Autowired
@@ -34,31 +31,30 @@ class BusinessProcessServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"FINISHED"})
-    void shouldAddErrorAndNotUpdateBusinessProcess_whenBusinessProcessStatusIsNotFinishedNorNull(BusinessProcessStatus
-                                                                                          status) {
+    void shouldNotUpdateBusinessProcess_whenBusinessProcessStatusIsNotFinishedNorNull(BusinessProcessStatus status) {
         BusinessProcess businessProcess = buildBusinessProcessWithStatus(status);
-        Map<String, Object> data = new HashMap<>(Map.of("businessProcess", businessProcess));
+        CaseData caseData = CaseData.builder()
+            .businessProcess(businessProcess)
+            .build();
 
-        List<String> errors = service.updateBusinessProcess(data, CREATE_CLAIM);
+        CaseData caseDataUpdated = service.updateBusinessProcess(caseData, CREATE_CLAIM);
 
-        assertThat(errors).containsOnly("Business Process Error");
-        assertThat(data).isEqualTo(Map.of("businessProcess", businessProcess));
+        assertThat(caseDataUpdated.getBusinessProcess()).isEqualTo(businessProcess);
     }
 
     @ParameterizedTest
     @ArgumentsSource(GetBusinessProcessArguments.class)
     void shouldNotAddErrorAndUpdateBusinessProcess_whenBusinessProcessStatusFinishedOrNull(BusinessProcess
                                                                                                businessProcess) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("businessProcess", businessProcess);
+        CaseData caseData = CaseData.builder().businessProcess(businessProcess).build();
 
-        List<String> errors = service.updateBusinessProcess(data, CREATE_CLAIM);
+        CaseData caseDataUpdated = service.updateBusinessProcess(caseData, CREATE_CLAIM);
 
-        assertThat(errors).isEmpty();
-        assertThat(data.get("businessProcess")).extracting("status").isEqualTo(READY);
-        assertThat(data.get("businessProcess")).extracting("camundaEvent").isEqualTo(CREATE_CLAIM.name());
-        assertThat(data.get("businessProcess")).extracting("activityId").isNull();
-        assertThat(data.get("businessProcess")).extracting("processInstanceId").isNull();
+        assertThat(caseDataUpdated.getBusinessProcess()).extracting("status").isEqualTo(READY);
+        assertThat(caseDataUpdated.getBusinessProcess()).extracting("camundaEvent").isEqualTo(CREATE_CLAIM.name());
+        assertThat(caseDataUpdated.getBusinessProcess()).extracting("activityId").isNull();
+        assertThat(caseDataUpdated.getBusinessProcess()).extracting("processInstanceId").isNull();
+
     }
 
     static class GetBusinessProcessArguments implements ArgumentsProvider {

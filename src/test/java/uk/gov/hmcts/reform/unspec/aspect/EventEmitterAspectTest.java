@@ -11,17 +11,14 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.service.EventEmitterService;
-
-import java.util.Map;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -66,11 +63,12 @@ class EventEmitterAspectTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessCamundaEvent_whenBusinessProcessStatusIsNotReady(BusinessProcessStatus status) {
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().status(status).build())
+            .build();
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .type(SUBMITTED)
-            .request(CallbackRequest.builder().caseDetails(CaseDetails.builder().data(
-                Map.of("businessProcess", BusinessProcess.builder().status(status).build())
-            ).build()).build()).build();
+            .of(SUBMITTED, caseData)
+            .build();
 
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
@@ -81,17 +79,16 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldEmitBusinessProcessCamundaEvent_whenCallbackIsSubmittedAndBusinessProcessStatusIsReady() {
-        CaseDetails caseDetails = CaseDetails.builder().data(
-            Map.of("businessProcess", BusinessProcess.builder().status(READY).build())
-        ).build();
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().status(READY).build())
+            .build();
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .type(SUBMITTED)
-            .request(CallbackRequest.builder().caseDetails(caseDetails).build())
+            .of(SUBMITTED, caseData)
             .build();
 
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
-        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails));
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData);
         verify(proceedingJoinPoint).proceed();
     }
 }

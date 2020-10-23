@@ -36,6 +36,9 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -99,14 +102,14 @@ class CoreCaseDataServiceTest {
             )).thenReturn(buildStartEventResponse());
 
             when(coreCaseDataApi.submitEventForCaseWorker(
-                USER_AUTH_TOKEN,
-                SERVICE_AUTH_TOKEN,
-                USER_ID,
-                JURISDICTION,
-                CASE_TYPE,
-                CASE_ID,
-                true,
-                buildCaseDataContent()
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
                  )
             ).thenReturn(caseDetails);
         }
@@ -119,14 +122,14 @@ class CoreCaseDataServiceTest {
                                                             JURISDICTION, CASE_TYPE, CASE_ID, EVENT_ID
             );
             verify(coreCaseDataApi).submitEventForCaseWorker(
-                USER_AUTH_TOKEN,
-                SERVICE_AUTH_TOKEN,
-                USER_ID,
-                JURISDICTION,
-                CASE_TYPE,
-                CASE_ID,
-                true,
-                buildCaseDataContent()
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
             );
         }
 
@@ -146,6 +149,7 @@ class CoreCaseDataServiceTest {
                 .eventToken(EVENT_TOKEN)
                 .event(Event.builder().id(EVENT_ID).build())
                 .data(data)
+                .ignoreWarning(true)
                 .build();
         }
     }

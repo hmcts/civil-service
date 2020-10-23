@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @Builder
 public class ClaimValue {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal statementOfValueInPennies;
 
     @JsonCreator

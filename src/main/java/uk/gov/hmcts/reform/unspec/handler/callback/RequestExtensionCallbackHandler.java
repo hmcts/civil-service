@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
@@ -43,11 +44,11 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
 
     public static final String PROPOSED_DEADLINE = "respondentSolicitor1claimResponseExtensionProposedDeadline";
     public static final String RESPONSE_DEADLINE = "respondentSolicitor1ResponseDeadline";
-    public static final String EXTENSION_ALREADY_AGREED = "respondentSolicitor1claimResponseExtensionAlreadyAgreed";
     public static final String LEGACY_CASE_REFERENCE = "legacyCaseReference";
 
     private final RequestExtensionValidator validator;
     private final BusinessProcessService businessProcessService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -60,18 +61,20 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse updateResponseDeadline(CallbackParams callbackParams) {
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetails().getData();
         CaseData caseData = callbackParams.getCaseData();
         LocalDate proposedDeadline = caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline();
         YesOrNo extensionAlreadyAgreed = caseData.getRespondentSolicitor1claimResponseExtensionAlreadyAgreed();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (extensionAlreadyAgreed == YES) {
-            data.put(RESPONSE_DEADLINE, proposedDeadline.atTime(MID_NIGHT));
+            caseDataBuilder.respondentSolicitor1ResponseDeadline(proposedDeadline.atTime(MID_NIGHT));
         }
-        List<String> errors = businessProcessService.updateBusinessProcess(data, REQUEST_EXTENSION);
+        CaseData caseDataUpdated = businessProcessService.updateBusinessProcess(
+            caseDataBuilder.build(),
+            REQUEST_EXTENSION
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data)
-            .errors(errors)
+            .data(caseDetailsConverter.toMap(caseDataUpdated))
             .build();
     }
 

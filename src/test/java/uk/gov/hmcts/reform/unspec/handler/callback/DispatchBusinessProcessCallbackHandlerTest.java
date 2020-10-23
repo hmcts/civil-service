@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
@@ -20,7 +22,9 @@ import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.DISPATCHED;
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 
 @SpringBootTest(classes = {
-    DispatchBusinessProcessCallbackHandler.class
+    DispatchBusinessProcessCallbackHandler.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
 })
 class DispatchBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -32,23 +36,23 @@ class DispatchBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldDispatchBusinessProcess_whenStatusIsReady() {
+            BusinessProcess businessProcess = BusinessProcess.builder()
+                .camundaEvent("testCamundaEvent")
+                .activityId("testActivityId")
+                .processInstanceId("testProcessInstanceId")
+                .status(READY)
+                .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("testCamundaEvent")
-                                     .activityId("testActivityId")
-                                     .processInstanceId("testProcessInstanceId")
-                                     .status(READY)
-                                     .build())
+                .businessProcess(businessProcess)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(DISPATCHED);
-            assertThat(response.getData()).extracting("businessProcess").extracting("camundaEvent").isEqualTo(
-                "testCamundaEvent");
-            assertThat(response.getData()).extracting("businessProcess").extracting("activityId").isNull();
-            assertThat(response.getData()).extracting("businessProcess").extracting("processInstanceId").isNull();
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent", "activityId", "processInstanceId")
+                .containsExactly(DISPATCHED.name(), "testCamundaEvent", null, null);
         }
 
         @ParameterizedTest
