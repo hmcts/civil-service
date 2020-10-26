@@ -18,7 +18,7 @@
     "ID": "LitigationFriend",
     "ListElementCode": "hasSameAddressAsLitigant",
     "FieldType": "YesOrNo",
-    "ElementLabel": "Are the claimant and litigation friend address the same?",
+    "ElementLabel": "Is the claimant and litigation friend address the same?",
     "FieldShowCondition": "required = \"Yes\"",
     "SecurityClassification": "Public"
   },

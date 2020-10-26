@@ -11,7 +11,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "eligibilityQuestions",
-    "Label": "## Issue civil court proceedings\nTo use this service you must be:\n* issuing a claim for an unspecified (unfixed) amount of money\n* serving the claim yourself, with a UK postal address and an email address\n* able to pay the full issue fee using payment by account\n* issuing and conducting the claim in English\n* representing a claimant who has no civil proceedings order, civil restraint order or all proceedings order against them\n* representing a claimant who isn’t seeking Help With Fees\n\nBoth claimant and defendant must:\n* have an address in England or Wales\n* be 18 or older and not a protected party\n\nThe claim you’re issuing must not:\n* ordinarily follow the Part 8 procedure\n* be brought under the Consumer Credit Act 1974\n* be against the crown\n\nIf this claim doesn't meet these conditions, select 'Cancel'",
+    "Label": "## Issue civil court proceedings\n### Who can use this service\nUse this service if you’re representing a claimant and:\n* issuing a claim for an unspecified (unfixed) amount of money\n* able to pay the full issue fee using fee account\n* serving the claim form yourself to a defendant who lives in the UK\n* serving a claim form in English\n* have an email and UK postal address\n\n### About the claimant\n The claimant must: \n* have a litigation friend if they are a child under 18\n* have an address in England or Wales\n* not have a civil restraint, all or civil proceedings order against them\n\n### About the claim\nThe claim must not be against the crown or ordinarily follow the Part 8 procedure.",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
