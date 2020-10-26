@@ -19,12 +19,12 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.unspec.config.DocumentManagementConfiguration;
-import uk.gov.hmcts.reform.unspec.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.service.UserService;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -75,7 +75,7 @@ public class DocumentManagementService {
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTimeHelper.nowInUTC())
+                .createdDatetime(LocalDateTime.now())
                 .documentSize(document.size)
                 .createdBy(UNSPEC)
                 .build();
