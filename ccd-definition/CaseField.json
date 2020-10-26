@@ -358,7 +358,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1ClaimResponseDocument",
-    "Label": "Upload your response",
+    "Label": "Upload defence",
     "FieldType": "ResponseDocument",
     "SecurityClassification": "Public"
   },
