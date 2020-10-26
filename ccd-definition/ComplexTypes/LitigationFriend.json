@@ -29,5 +29,15 @@
     "FieldShowCondition": "required = \"Yes\" AND hasSameAddressAsLitigant = \"No\"",
     "ElementLabel": "Litigation friend's address",
     "SecurityClassification": "Public"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "FieldShowCondition": "required = \"Yes\"",
+    "ElementLabel": "Upload the certificate of suitability",
+    "SecurityClassification": "Public",
+    "Min": 1
   }
 ]

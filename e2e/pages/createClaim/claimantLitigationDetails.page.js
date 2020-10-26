@@ -19,10 +19,11 @@ module.exports = {
         no: 'No'
       }
     },
-    litigantInFriendAddress: '#applicant1LitigationFriend_primaryAddress_primaryAddress'
+    litigantInFriendAddress: '#applicant1LitigationFriend_primaryAddress_primaryAddress',
+    certificateOfSuitability: '#applicant1LitigationFriend_certificateOfSuitability_0'
   },
 
-  async enterLitigantFriendWithDifferentAddressToClaimant(address) {
+  async enterLitigantFriendWithDifferentAddressToClaimant(address, file) {
     I.waitForElement(this.fields.childClaimant.id);
     await within(this.fields.childClaimant.id, () => {
       I.click(this.fields.childClaimant.options.yes);
@@ -37,6 +38,11 @@ module.exports = {
     await within(this.fields.litigantInFriendAddress, () => {
       postcodeLookup.enterAddressManually(address);
     });
+
+    await I.addAnotherElementToCollection();
+    I.waitForElement(this.fields.certificateOfSuitability);
+    I.attachFile(this.fields.certificateOfSuitability, file);
+    await I.waitForInvisible(locate('.error-message').withText('Uploading...'));
 
     await I.clickContinue();
   }
