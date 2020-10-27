@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.model.ApplicantNotProceedingReason;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
@@ -99,7 +100,7 @@ public class CaseDataBuilder {
     // Claimant Response
     private YesOrNo applicant1ProceedWithClaim;
     private ResponseDocument applicant1DefenceResponseDocument;
-    private String applicant1NotProceedingReason;
+    private ApplicantNotProceedingReason applicant1NotProceedingReason;
     private BusinessProcess businessProcess;
 
     private CloseClaim withdrawClaim;
