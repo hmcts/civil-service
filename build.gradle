@@ -298,7 +298,7 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.5.15'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.15'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.5.15'
 
