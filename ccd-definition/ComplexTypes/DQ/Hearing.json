@@ -12,24 +12,26 @@
     "ListElementCode": "hearingLengthHours",
     "FieldType": "Number",
     "ElementLabel": "How many hours?",
-    "HintText": "Enter a numeric value, for example 3",
+    "HintText": "Enter a numeric value less than 7, for example 3",
     "FieldShowCondition": "hearingLength = \"LESS_THAN_DAY\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Max": 6
   },
   {
     "ID": "Hearing",
     "ListElementCode": "hearingLengthDays",
     "FieldType": "Number",
     "ElementLabel": "How many days?",
-    "HintText": "Enter a numeric value, for example 3",
+    "HintText": "Enter a numeric value less than 29, for example 10",
     "FieldShowCondition": "hearingLength = \"MORE_THAN_DAY\"",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Max": 28
   },
   {
     "ID": "Hearing",
     "ListElementCode": "unavailableDatesRequired",
     "FieldType": "YesOrNo",
-    "ElementLabel": "Are there any days within the next 12 months when you, your client, or an expert or a witness couldn't attend a hearing?",
+    "ElementLabel": "Are there any days within the next 12 months when you, your client, or an expert or a witness can't attend a hearing?",
     "SecurityClassification": "Public"
   },
   {

@@ -8,7 +8,7 @@
   },
   {
     "ID": "Experts",
-    "ListElementCode": "exportReportsSent",
+    "ListElementCode": "expertReportsSent",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "ExpertReportsSent",
     "ElementLabel": "Have you already sent expert reports or similar to other parties?",

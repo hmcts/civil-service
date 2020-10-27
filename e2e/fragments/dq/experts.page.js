@@ -11,8 +11,8 @@ module.exports = {
           no: 'No'
         }
       },
-      exportReportsSent: {
-        id: `#${party}DQExperts_exportReportsSent`,
+      expertReportsSent: {
+        id: `#${party}DQExperts_expertReportsSent`,
         options: {
           yes: 'Yes',
           no: 'No'
@@ -43,8 +43,8 @@ module.exports = {
       I.click(this.fields(party).expertRequired.options.yes);
     });
 
-    await within(this.fields(party).exportReportsSent.id, () => {
-      I.click(this.fields(party).exportReportsSent.options.yes);
+    await within(this.fields(party).expertReportsSent.id, () => {
+      I.click(this.fields(party).expertReportsSent.options.yes);
     });
 
     await within(this.fields(party).jointExpertSuitable.id, () => {

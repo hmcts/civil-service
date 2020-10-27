@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.validation.groups.ConfirmServiceDateGroup;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.HasServiceDateTheSameAsOrAfterIssueDate;
@@ -98,6 +99,9 @@ public class CaseData {
 
     @JsonUnwrapped
     private final Respondent1DQ respondent1DQ;
+
+    @JsonUnwrapped
+    private final Applicant1DQ applicant1DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null

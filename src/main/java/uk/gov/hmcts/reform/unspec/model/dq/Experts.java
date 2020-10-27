@@ -13,7 +13,7 @@ import java.util.List;
 public class Experts {
 
     private final YesOrNo expertRequired;
-    private final ExpertReportsSent exportReportsSent;
+    private final ExpertReportsSent expertReportsSent;
     private final YesOrNo jointExpertSuitable;
     private final List<Element<Expert>> details;
 }

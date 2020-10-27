@@ -539,5 +539,110 @@
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQFileDirectionsQuestionnaire",
+    "Label": "File directions questionnaire",
+    "FieldType": "FileDirectionsQuestionnaire",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDisclosureOfElectronicDocuments",
+    "Label": "Disclosure of electronic documents",
+    "FieldType": "DisclosureOfElectronicDocuments",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDisclosureOfNonElectronicDocumentsLabel",
+    "Label": "## Disclosure of non-electronic documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDisclosureOfNonElectronicDocuments",
+    "Label": "What directions are proposed for disclosure?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDisclosureReport",
+    "Label": "Disclosure report",
+    "FieldType": "DisclosureReport",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQExperts",
+    "Label": "Experts",
+    "FieldType": "Experts",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQWitnesses",
+    "Label": "Witnesses",
+    "FieldType": "Witnesses",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQHearing",
+    "Label": "Hearing",
+    "FieldType": "Hearing",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDraftDirectionsLabel",
+    "Label": "## Upload draft directions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQDraftDirections",
+    "Label": "Upload file",
+    "HintText": "We accept documents sized 10MB or smaller, in these formats: pdf, doc, docx, jpg, jpeg, xls, xlsx, png.",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQHearingSupport",
+    "Label": "Hearing support requirements",
+    "FieldType": "HearingSupportRequirements",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQFurtherInformation",
+    "Label": "Further information",
+    "FieldType": "FurtherInformation",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQStatementOfTruth",
+    "Label": "Statement of truth",
+    "FieldType": "StatementOfTruth",
+    "SecurityClassification": "Public"
   }
 ]

@@ -117,7 +117,7 @@ class Respondent1DQTest {
     private Experts experts() {
         return Experts.builder()
             .expertRequired(YesOrNo.YES)
-            .exportReportsSent(ExpertReportsSent.YES)
+            .expertReportsSent(ExpertReportsSent.YES)
             .jointExpertSuitable(YesOrNo.YES)
             .details(wrapElements(Expert.builder()
                 .name("John Smith")

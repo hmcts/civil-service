@@ -23,7 +23,7 @@ module.exports = {
           }
         }],
         'expertRequired': 'Yes',
-        'exportReportsSent': 'Yes',
+        'expertReportsSent': 'Yes',
         'jointExpertSuitable': 'Yes'
       },
     },

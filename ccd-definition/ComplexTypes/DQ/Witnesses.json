@@ -3,7 +3,7 @@
     "ID": "Witnesses",
     "ListElementCode": "witnessesToAppear",
     "FieldType": "YesOrNo",
-    "ElementLabel": "Do you have witnesses you want to appear at the hearing?",
+    "ElementLabel": "Are there any witnesses who should attend the hearing?",
     "SecurityClassification": "Public"
   },
   {

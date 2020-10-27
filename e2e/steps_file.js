@@ -176,6 +176,16 @@ module.exports = function () {
       await caseViewPage.startEvent('View and respond to defence');
       await proceedPage.proceedWithClaim();
       await uploadResponseDocumentPage.uploadResponseDocuments(config.testFile);
+      await fileDirectionsQuestionnairePage.fileDirectionsQuestionnaire(parties.APPLICANT_SOLICITOR_1);
+      await disclosureOfElectronicDocumentsPage.enterDisclosureOfElectronicDocuments(parties.APPLICANT_SOLICITOR_1);
+      await disclosureOfNonElectronicDocumentsPage.enterDirectionsProposedForDisclosure(parties.APPLICANT_SOLICITOR_1);
+      await expertsPage.enterExpertInformation(parties.APPLICANT_SOLICITOR_1);
+      await witnessPage.enterWitnessInformation(parties.APPLICANT_SOLICITOR_1);
+      await hearingPage.enterHearingInformation(parties.APPLICANT_SOLICITOR_1);
+      await draftDirectionsPage.enterDraftDirections(parties.APPLICANT_SOLICITOR_1);
+      await hearingSupportRequirementsPage.selectRequirements(parties.APPLICANT_SOLICITOR_1);
+      await furtherInformationPage.enterFurtherInformation(parties.APPLICANT_SOLICITOR_1);
+      await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await event.returnToCaseDetails();
     },

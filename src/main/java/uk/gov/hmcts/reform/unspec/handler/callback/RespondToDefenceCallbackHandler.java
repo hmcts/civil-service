@@ -12,17 +12,23 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
+import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
@@ -36,6 +42,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private final BusinessProcessService businessProcessService;
     private final StateFlowEngine stateFlowEngine;
+    private final UnavailableDateValidator unavailableDateValidator;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
@@ -47,9 +54,21 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(ABOUT_TO_SUBMIT), this::handleNotifications,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<Element<UnavailableDate>> unavailableDates =
+            ofNullable(caseData.getApplicant1DQ().getHearing().getUnavailableDates()).orElse(emptyList());
+        List<String> errors = unavailableDateValidator.validate(unavailableDates);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse handleNotifications(CallbackParams callbackParams) {
