@@ -27,10 +27,12 @@ public abstract class BpmnBaseTest {
     public static final String START_BUSINESS_EVENT = "START_BUSINESS_PROCESS";
     public static final String START_BUSINESS_ACTIVITY = "StartBusinessProcessTaskId";
     public static final String PROCESS_CASE_EVENT = "processCaseEvent";
+    public static final String END_BUSINESS_PROCESS = "END_BUSINESS_PROCESS";
 
     public final String bpmnFileName;
     public final String processId;
     public Deployment deployment;
+    public Deployment endBusinessProcessDeployment;
     public static ProcessEngine engine;
 
     public ProcessInstance processInstance;
@@ -50,6 +52,10 @@ public abstract class BpmnBaseTest {
     @BeforeEach
     void setup() {
         //deploy process
+        endBusinessProcessDeployment = engine.getRepositoryService()
+            .createDeployment()
+            .addClasspathResource(String.format(DIAGRAM_PATH, "end_business_process.bpmn"))
+            .deploy();
         deployment = engine.getRepositoryService()
             .createDeployment()
             .addClasspathResource(String.format(DIAGRAM_PATH, bpmnFileName))
@@ -59,6 +65,7 @@ public abstract class BpmnBaseTest {
 
     @AfterEach
     void tearDown() {
+        engine.getRepositoryService().deleteDeployment(endBusinessProcessDeployment.getId());
         engine.getRepositoryService().deleteDeployment(deployment.getId());
     }
 
@@ -200,5 +207,19 @@ public abstract class BpmnBaseTest {
     public void assertNoExternalTasksLeft() {
         List<ExternalTask> externalTasksAfter = getExternalTasks();
         assertThat(externalTasksAfter).isEmpty();
+    }
+
+    /**
+     * Completes the external task with topic name END_BUSINESS_PROCESS.
+     *
+     * @param externalTask the id of the external task to complete.
+     */
+    public void completeBusinessProcess(ExternalTask externalTask) {
+        assertThat(externalTask.getTopicName()).isEqualTo("END_BUSINESS_PROCESS");
+
+        List<LockedExternalTask> lockedEndBusinessProcessTask = fetchAndLockTask("END_BUSINESS_PROCESS");
+
+        assertThat(lockedEndBusinessProcessTask).hasSize(1);
+        completeTask(lockedEndBusinessProcessTask.get(0).getId());
     }
 }

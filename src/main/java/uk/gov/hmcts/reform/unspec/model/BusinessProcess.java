@@ -44,4 +44,13 @@ public class BusinessProcess {
         this.activityId = activityId;
         return this;
     }
+
+    @JsonIgnore
+    public BusinessProcess reset() {
+        this.activityId = null;
+        this.processInstanceId = null;
+        this.status = BusinessProcessStatus.FINISHED;
+
+        return this;
+    }
 }

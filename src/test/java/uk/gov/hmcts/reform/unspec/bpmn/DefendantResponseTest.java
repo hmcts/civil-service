@@ -54,6 +54,10 @@ class DefendantResponseTest extends BpmnBaseTest {
         ExternalTask forClaimant = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(forClaimant, PROCESS_CASE_EVENT, NOTIFY_APPLICANT_SOLICITOR_1, CLAIMANT_ACTIVITY_ID);
 
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
         assertNoExternalTasksLeft();
     }
 
@@ -83,6 +87,10 @@ class DefendantResponseTest extends BpmnBaseTest {
         //complete the notification to respondent
         ExternalTask forRespondent = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(forRespondent, PROCESS_CASE_EVENT, DEFENDANT_RESPONSE, FULL_DEFENCE_ACTIVITY_ID);
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
 
         assertNoExternalTasksLeft();
     }

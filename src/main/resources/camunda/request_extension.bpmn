@@ -6,19 +6,6 @@
       <bpmn:messageEventDefinition id="MessageEventDefinition_0hvzew0" messageRef="Message_1m9uzfu" />
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_0kvxp0b" sourceRef="StartBusinessProcessTaskId" targetRef="RequestExtensionNotifyApplicantSolicitor1" />
-    <bpmn:endEvent id="Event_13n9twk">
-      <bpmn:incoming>Flow_1xdr8bm</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1xdr8bm" sourceRef="RequestExtensionNotifyApplicantSolicitor1" targetRef="Event_13n9twk" />
-    <bpmn:serviceTask id="RequestExtensionNotifyApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0kvxp0b</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xdr8bm</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="StartBusinessProcessTaskId" name="StartBusinessProcess" camunda:type="external" camunda:topic="START_BUSINESS_PROCESS">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -37,11 +24,40 @@
       <bpmn:incoming>Flow_0rzybzn</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0rzybzn" sourceRef="Event_1a7mdpp" targetRef="Event_0n7sy1w" />
+    <bpmn:serviceTask id="RequestExtensionNotifyApplicantSolicitor1" name="Send email applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_FOR_REQUEST_FOR_EXTENSION</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kvxp0b</bpmn:incoming>
+      <bpmn:outgoing>Flow_15o1b71</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_15o1b71" sourceRef="RequestExtensionNotifyApplicantSolicitor1" targetRef="Activity_1xyawja" />
+    <bpmn:endEvent id="Event_0a4ru5o">
+      <bpmn:incoming>Flow_1yiy8ib</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1yiy8ib" sourceRef="Activity_1xyawja" targetRef="Event_0a4ru5o" />
+    <bpmn:callActivity id="Activity_1xyawja" name="End Business Process" calledElement="EndBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_15o1b71</bpmn:incoming>
+      <bpmn:outgoing>Flow_1yiy8ib</bpmn:outgoing>
+    </bpmn:callActivity>
   </bpmn:process>
   <bpmn:message id="Message_1m9uzfu" name="REQUEST_EXTENSION" />
   <bpmn:error id="Error_00df5rf" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="REQUEST_EXTENSION_PROCESS_ID">
+      <bpmndi:BPMNEdge id="Flow_1yiy8ib_di" bpmnElement="Flow_1yiy8ib">
+        <di:waypoint x="760" y="117" />
+        <di:waypoint x="852" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15o1b71_di" bpmnElement="Flow_15o1b71">
+        <di:waypoint x="570" y="117" />
+        <di:waypoint x="660" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0rzybzn_di" bpmnElement="Flow_0rzybzn">
         <di:waypoint x="330" y="175" />
         <di:waypoint x="330" y="252" />
@@ -49,10 +65,6 @@
       <bpmndi:BPMNEdge id="Flow_0whuwhz_di" bpmnElement="Flow_0whuwhz">
         <di:waypoint x="215" y="117" />
         <di:waypoint x="280" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1xdr8bm_di" bpmnElement="Flow_1xdr8bm">
-        <di:waypoint x="570" y="117" />
-        <di:waypoint x="642" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0kvxp0b_di" bpmnElement="Flow_0kvxp0b">
         <di:waypoint x="380" y="117" />
@@ -64,12 +76,6 @@
           <dc:Bounds x="186" y="142" width="22" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_13n9twk_di" bpmnElement="Event_13n9twk">
-        <dc:Bounds x="642" y="99" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="RequestExtensionNotifyApplicantSolicitor1">
-        <dc:Bounds x="470" y="77" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1dq2v3g_di" bpmnElement="StartBusinessProcessTaskId">
         <dc:Bounds x="280" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -78,6 +84,15 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="311" y="295" width="39" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="RequestExtensionNotifyApplicantSolicitor1">
+        <dc:Bounds x="470" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0a4ru5o_di" bpmnElement="Event_0a4ru5o">
+        <dc:Bounds x="852" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oqt68l_di" bpmnElement="Activity_1xyawja">
+        <dc:Bounds x="660" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1a7mdpp_di" bpmnElement="Event_1a7mdpp">
         <dc:Bounds x="312" y="139" width="36" height="36" />
