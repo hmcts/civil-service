@@ -301,7 +301,7 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.15'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.6.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
