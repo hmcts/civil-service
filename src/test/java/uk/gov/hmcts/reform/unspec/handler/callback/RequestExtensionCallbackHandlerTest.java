@@ -62,26 +62,14 @@ class RequestExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnError_whenExtensionIsAlreadyRequested() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateExtensionRequested().build();
+        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateRespondedToClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("You can only request an extension once");
-        }
-
-        @Test
-        void shouldReturnNoError_WhenExtensionIsRequestedFirstTime() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateServiceAcknowledge().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
     }
 

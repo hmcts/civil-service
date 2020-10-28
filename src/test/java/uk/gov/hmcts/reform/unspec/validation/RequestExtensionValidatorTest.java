@@ -6,11 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
-import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,16 +14,12 @@ import java.util.List;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 
 @SpringBootTest(classes = {
     RequestExtensionValidator.class,
-    JacksonAutoConfiguration.class,
-    FlowStateAllowedEventService.class,
-    StateFlowEngine.class,
-    CaseDetailsConverter.class
+    JacksonAutoConfiguration.class
 })
 class RequestExtensionValidatorTest {
 
@@ -121,32 +112,6 @@ class RequestExtensionValidatorTest {
             LocalDateTime responseDeadline = now().plusDays(7).atTime(16, 0);
 
             List<String> errors = validator.validateProposedDeadline(proposedDeadline, responseDeadline);
-
-            assertThat(errors).isEmpty();
-        }
-    }
-
-    @Nested
-    class ExtensionAlreadyRequested {
-
-        @Test
-        void shouldReturnErrors_whenExtensionAlreadyRequested() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .state(CREATED)
-                .data(CaseDataBuilder.builder().atStateExtensionRequested().build())
-                .build();
-
-            List<String> errors = validator.validateAlreadyRequested(caseDetails);
-
-            assertThat(errors)
-                .containsOnly("You can only request an extension once");
-        }
-
-        @Test
-        void shouldReturnNoError_whenExtensionRequestedFirstTime() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateServiceAcknowledge().build();
-
-            List<String> errors = validator.validateAlreadyRequested(caseDetails);
 
             assertThat(errors).isEmpty();
         }

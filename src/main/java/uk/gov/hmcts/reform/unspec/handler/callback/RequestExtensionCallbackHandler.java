@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
@@ -53,7 +52,7 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::aboutToStart,
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "propose-deadline"), this::validateRequestedDeadline,
             callbackKey(ABOUT_TO_SUBMIT), this::updateResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -81,14 +80,6 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
-        CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validator.validateAlreadyRequested(caseDetails))
-            .build();
     }
 
     private CallbackResponse validateRequestedDeadline(CallbackParams callbackParams) {
