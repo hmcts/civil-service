@@ -1,50 +1,47 @@
 package uk.gov.hmcts.reform.unspec.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.unspec.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.request.RequestData;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentsService {
 
-    private final ObjectMapper mapper;
     private final FeesService feesService;
     private final PaymentsClient paymentsClient;
     private final RequestData requestData;
     private final PaymentsConfiguration paymentsConfiguration;
 
-    public PaymentDto createCreditAccountPayment(CaseDetails caseDetails) {
-        //TODO: update to use CaseData model (no mapping should be required here)
-        ClaimValue claimValue = mapper.convertValue(caseDetails.getData().get("claimValue"), ClaimValue.class);
+    public PaymentDto createCreditAccountPayment(CaseData caseData) {
+        //temporarily hardcoded
+        ClaimValue claimValue = ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(10000)).build();
         FeeDto feeDto = feesService.getFeeDataByClaimValue(claimValue);
 
         return paymentsClient.createCreditAccountPayment(
             requestData.authorisation(),
-            buildRequest(caseDetails, feeDto)
+            buildRequest(caseData, feeDto)
         );
     }
 
-    private CreditAccountPaymentRequest buildRequest(CaseDetails caseDetails, FeeDto feeDto) {
-        var caseData = caseDetails.getData();
-
-        // TODO: update with case data fields used
+    private CreditAccountPaymentRequest buildRequest(CaseData caseData, FeeDto feeDto) {
         return CreditAccountPaymentRequest.builder()
-            .accountNumber(caseData.get("pbaNumber").toString())
+            .accountNumber(caseData.getPbaNumber().name())
             .amount(feeDto.getCalculatedAmount())
-            .caseReference(caseData.get("caseReference").toString())
-            .ccdCaseNumber(String.valueOf(caseDetails.getId()))
-            .customerReference(caseData.get("customerReference").toString())
-            .description(caseData.get("description").toString())
-            .organisationName(caseData.get("organisationName").toString())
+            .caseReference(caseData.getLegacyCaseReference())
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .customerReference("Test Customer Reference")
+            .description("Claim issue payment")
+            .organisationName("Test Organisation Name")
             .service(paymentsConfiguration.getService())
             .siteId(paymentsConfiguration.getSiteId())
             .fees(new FeeDto[]{feeDto})

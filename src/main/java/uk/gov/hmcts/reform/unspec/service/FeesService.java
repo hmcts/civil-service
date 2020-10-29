@@ -33,12 +33,10 @@ public class FeesService {
     }
 
     private FeeLookupResponseDto lookupFee(ClaimValue claimValue) {
-        var claimStatementOfValuePounds = claimValue.toPounds();
-
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),
-            claimStatementOfValuePounds
+            claimValue.toPounds()
         );
     }
 

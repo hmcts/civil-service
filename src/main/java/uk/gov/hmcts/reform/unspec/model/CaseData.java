@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.enums.DefendantResponseType;
+import uk.gov.hmcts.reform.unspec.enums.PbaNumber;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
@@ -43,6 +44,7 @@ public class CaseData {
     private final Party respondent1;
     private final Party respondent2;
     private final ClaimValue claimValue;
+    private final PbaNumber pbaNumber;
     private final ClaimType claimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;

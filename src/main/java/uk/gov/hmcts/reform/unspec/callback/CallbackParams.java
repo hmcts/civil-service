@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Map;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 public class CallbackParams {
 

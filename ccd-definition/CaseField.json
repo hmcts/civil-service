@@ -644,5 +644,22 @@
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "paymentReference",
+    "Label": "Successful PBA payment reference",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "pbaNumber",
+    "Label": "Select a Payment by Account number from the list",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "PbaNumber",
+    "SecurityClassification": "Public"
   }
 ]

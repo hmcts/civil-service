@@ -23,6 +23,7 @@ module.exports = {
     await assertValidData('CREATE_CLAIM', 'PersonalInjuryType', createClaimData.valid.personalInjuryType);
     await assertValidData('CREATE_CLAIM', 'Upload', createClaimData.valid.upload);
     await assertValidData('CREATE_CLAIM', 'ClaimValue', createClaimData.valid.claimValue);
+    await assertValidData('CREATE_CLAIM', 'PbaNumber', createClaimData.valid.pbaNumber);
     await assertValidData('CREATE_CLAIM', 'StatementOfTruth', createClaimData.valid.statementOfTruth);
 
     await assertSubmittedEvent('CREATE_CLAIM', 'CREATED', {

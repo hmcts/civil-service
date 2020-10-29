@@ -51,10 +51,10 @@ fees:
     event: issue
 
 payments:
+  enabled: false
   api:
-    # TODO: update once f&p onboarding is completed
-    site_id:
-    service:
+    site_id: AAA7
+    service: UNSPEC
 
 idam:
   s2s-auth:
@@ -120,6 +120,7 @@ fees:
     url: http://localhost:8765
 
 payments:
+  enabled: true
   api:
     url: http://localhost:8765
 

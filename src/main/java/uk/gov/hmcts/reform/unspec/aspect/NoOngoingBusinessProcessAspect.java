@@ -31,20 +31,19 @@ public class NoOngoingBusinessProcessAspect {
         CallbackParams callbackParams
     ) throws Throwable {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        if (callbackParams.getType() == SUBMITTED || caseEvent.isCamundaEvent()) {
-            return joinPoint.proceed();
-        }
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.hasNoOngoingBusinessProcess() || caseEvent.isCamundaEvent()) {
+        if (callbackParams.getType() == SUBMITTED
+            || caseEvent.isCamundaEvent()
+            || caseData.hasNoOngoingBusinessProcess()) {
             return joinPoint.proceed();
-        } else {
-            log.info(format(
-                "%s is not allowed on the case %s due to ongoing business process",
-                caseEvent.getDisplayName(), caseData.getCcdCaseReference()
-            ));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_MESSAGE))
-                .build();
         }
+        log.info(format(
+            "%s is not allowed on the case %s due to ongoing business process",
+            caseEvent.getDisplayName(),
+            caseData.getCcdCaseReference()
+        ));
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(List.of(ERROR_MESSAGE))
+            .build();
     }
 }
