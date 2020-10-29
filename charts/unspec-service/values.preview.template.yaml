@@ -153,3 +153,5 @@ camunda-bpm:
       CAMUNDA_DB_USER_NAME: hmcts
       CAMUNDA_DB_PASSWORD: hmcts
       CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      CAMUNDA_DB_CONN_OPTIONS: ""
