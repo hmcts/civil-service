@@ -171,12 +171,11 @@ password: demo
 
 The REST API is available at `http:localhost:9404/engine-rest/`. The REST API documentation is available [here](https://docs.camunda.org/manual/latest/reference/rest/).
 
-To upload a bpmn diagram via the REST API there is a script located in `./bin directory`.
-Run `./bin/import-bpmn-diagram.sh "the name of the diagram"` to upload it to Camunda. The diagram must exist within
-`src/main/resources`. By setting `CAMUNDA_BASE_URL` env variable you can also use this script to upload diagrams to
+To upload all bpmn diagrams via the REST API there is a script located in `./bin directory`.
+Run `./bin/import-bpmn-diagram.sh .` to upload it to Camunda. The diagram must exist within
+`src/main/resources/camunda`. By setting `CAMUNDA_BASE_URL` env variable you can also use this script to upload diagrams to
 Camunda in other environments.
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 

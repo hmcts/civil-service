@@ -9,7 +9,7 @@ echo "export SERVICE_AUTH_PROVIDER_API_BASE_URL=http://rpe-service-auth-provider
 echo "export IDAM_API_BASE_URL=https://idam-api.demo.platform.hmcts.net"
 echo "export CCD_IDAM_REDIRECT_URL=https://www-ccd.demo.platform.hmcts.net/oauth2redirect"
 echo "export CCD_DEFINITION_STORE_API_BASE_URL=http://ccd-definition-store-api-demo.service.core-compute-demo.internal"
-echo "export CAMUNDA_BASE_URL=https://camunda-api-demo.service.core-compute-demo.internal"
+echo "export CAMUNDA_BASE_URL=http://camunda-api-demo.service.core-compute-demo.internal"
 
 # definition placeholders
 echo "export CCD_DEF_CASE_SERVICE_BASE_URL=http://unspec-service-demo.service.core-compute-demo.internal"
