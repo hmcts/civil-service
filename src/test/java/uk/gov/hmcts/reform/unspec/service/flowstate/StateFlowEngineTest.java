@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +17,10 @@ import uk.gov.hmcts.reform.unspec.stateflow.StateFlow;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_RESPONDED;
@@ -207,6 +210,40 @@ class StateFlowEngineTest {
                 .build();
 
             assertThat(stateFlowEngine.hasTransitionedTo(caseDetails, state)).isEqualTo(expected);
+        }
+    }
+
+    @Nested
+    class EvaluateWithDrawClaim {
+
+        @EnumSource(value = FlowState.Main.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"DRAFT", "CLAIM_DISCONTINUED"})
+        @ParameterizedTest(name = "{index} => should withdraw claim after claim state {0}")
+        void shouldReturnValidState_whenCaseIsWithdrawnAfter(FlowState.Main flowState) {
+            CaseData caseData = CaseDataBuilder.builder().withdrawClaimFrom(flowState).build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(FlowState.fromFullName(stateFlow.getState().getName()))
+                .isEqualTo(CLAIM_WITHDRAWN);
+        }
+    }
+
+    @Nested
+    class EvaluateDiscontinueClaim {
+
+        @EnumSource(value = FlowState.Main.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"DRAFT", "CLAIM_WITHDRAWN"})
+        @ParameterizedTest(name = "{index} => should discontinue claim after claim state {0}")
+        void shouldReturnValidState_whenCaseIsDiscontinuedAfter(FlowState.Main flowState) {
+            CaseData caseData = CaseDataBuilder.builder().discontinueClaimFrom(flowState).build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(FlowState.fromFullName(stateFlow.getState().getName()))
+                .isEqualTo(CLAIM_DISCONTINUED);
         }
     }
 }

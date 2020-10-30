@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
@@ -148,11 +150,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withdrawClaim(CloseClaim closeClaim) {
-        this.withdrawClaim = closeClaim;
-        return this;
-    }
-
     public CaseDataBuilder disccontinueClaim(CloseClaim closeClaim) {
         this.discontinueClaim = closeClaim;
         return this;
@@ -208,6 +205,88 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState(FlowState.Main flowState) {
+        switch (flowState) {
+            case DRAFT:
+                return atStateClaimDraft();
+            case CLAIM_ISSUED:
+                return atStateClaimCreated();
+            case CLAIM_STAYED:
+                return atStateClaimStayed();
+            case SERVICE_CONFIRMED:
+                return atStateServiceConfirmed();
+            case SERVICE_ACKNOWLEDGED:
+                return atStateServiceAcknowledge();
+            case EXTENSION_REQUESTED:
+                return atStateExtensionRequested();
+            case EXTENSION_RESPONDED:
+                return atStateExtensionResponded();
+            case RESPONDED_TO_CLAIM:
+                return atStateRespondedToClaim();
+            case FULL_DEFENCE:
+                return atStateFullDefence();
+            case CLAIM_WITHDRAWN:
+                return atStateClaimWithdrawn();
+            case CLAIM_DISCONTINUED:
+                return atStateClaimDiscontinued();
+            default:
+                throw new IllegalArgumentException("Invalid internal state: " + flowState);
+        }
+    }
+
+    public CaseDataBuilder atStateClaimDiscontinued() {
+        atStateClaimCreated();
+        return discontinueClaim();
+    }
+
+    public CaseDataBuilder discontinueClaim() {
+        this.ccdState = CLOSED;
+        this.discontinueClaim = CloseClaim.builder()
+            .date(LocalDate.now())
+            .reason("My reason")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder discontinueClaimFrom(FlowState.Main flowState) {
+        atState(flowState);
+        this.ccdState = CLOSED;
+        this.discontinueClaim = CloseClaim.builder()
+            .date(LocalDate.now())
+            .reason("My reason")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimWithdrawn() {
+        atStateClaimCreated();
+        return withdrawClaim();
+    }
+
+    public CaseDataBuilder withdrawClaim(CloseClaim closeClaim) {
+        this.withdrawClaim = closeClaim;
+        return this;
+    }
+
+    public CaseDataBuilder withdrawClaim() {
+        this.ccdState = CLOSED;
+        this.withdrawClaim = CloseClaim.builder()
+            .date(LocalDate.now())
+            .reason("My reason")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder withdrawClaimFrom(FlowState.Main flowState) {
+        atState(flowState);
+        this.ccdState = CLOSED;
+        this.withdrawClaim = CloseClaim.builder()
+            .date(LocalDate.now())
+            .reason("My reason")
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
@@ -242,7 +321,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimStayed() {
         atStateClaimCreated();
-        ccdState = STAYED;
+        this.ccdState = STAYED;
         return this;
     }
 

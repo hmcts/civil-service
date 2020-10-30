@@ -29,7 +29,9 @@ public interface FlowState {
         EXTENSION_REQUESTED,
         EXTENSION_RESPONDED,
         RESPONDED_TO_CLAIM,
-        FULL_DEFENCE;
+        FULL_DEFENCE,
+        CLAIM_WITHDRAWN,
+        CLAIM_DISCONTINUED;
 
         public static final String FLOW_NAME = "MAIN";
 
