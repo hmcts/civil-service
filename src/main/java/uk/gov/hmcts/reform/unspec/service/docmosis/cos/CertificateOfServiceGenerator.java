@@ -84,9 +84,13 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
         return SolicitorReferences
             .builder()
             .applicantSolicitor1Reference(
-                ofNullable(solicitorReferences.getApplicantSolicitor1Reference()).orElse("Not Provided"))
+                ofNullable(solicitorReferences)
+                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                    .orElse("Not Provided"))
             .respondentSolicitor1Reference(
-                ofNullable(solicitorReferences.getRespondentSolicitor1Reference()).orElse("Not Provided"))
+                ofNullable(solicitorReferences)
+                    .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                    .orElse("Not Provided"))
             .build();
     }
 

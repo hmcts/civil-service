@@ -88,6 +88,17 @@ class CertificateOfServiceGeneratorTest {
     class PrepareSolicitorReferences {
 
         @Test
+        void shouldPopulateNotProvided_whenSolicitorReferencesIsNull() {
+            SolicitorReferences solicitorReferences = null;
+            SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);
+            assertAll(
+                "SolicitorReferences not provided",
+                () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+            );
+        }
+
+        @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
             SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
             SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);

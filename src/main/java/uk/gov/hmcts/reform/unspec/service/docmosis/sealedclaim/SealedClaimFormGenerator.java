@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Claimant;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Defendant;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementS
 import uk.gov.hmcts.reform.unspec.utils.CaseNameUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 
@@ -65,6 +67,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     @Override
     public SealedClaimForm getTemplateData(CaseData caseData) {
+        Optional<SolicitorReferences> solicitorReferences = Optional.ofNullable(caseData.getSolicitorReferences());
         return SealedClaimForm.builder()
             .claimants(getClaimants(caseData))
             .defendants(geDefendants(caseData))
@@ -76,8 +79,12 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getClaimIssuedDate())
             .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
-            .claimantExternalReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
-            .defendantExternalReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .claimantExternalReference(solicitorReferences
+                                           .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                           .orElse(""))
+            .defendantExternalReference(solicitorReferences
+                                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                                            .orElse(""))
             .caseName(CaseNameUtils.toCaseName.apply(caseData))
             .build();
     }
