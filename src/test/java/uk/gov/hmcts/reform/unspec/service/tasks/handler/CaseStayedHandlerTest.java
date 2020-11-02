@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 
+import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,12 @@ import uk.gov.hmcts.reform.unspec.service.search.CaseStayedSearchService;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -24,7 +31,7 @@ import static org.mockito.Mockito.when;
 class CaseStayedHandlerTest {
 
     @Mock
-    private ExternalTask mockExternalTask;
+    private ExternalTask mockTask;
 
     @Mock
     private ExternalTaskService externalTaskService;
@@ -40,47 +47,62 @@ class CaseStayedHandlerTest {
 
     @BeforeEach
     void init() {
-        when(mockExternalTask.getTopicName()).thenReturn("test");
-        when(mockExternalTask.getWorkerId()).thenReturn("worker");
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getWorkerId()).thenReturn("worker");
     }
 
     @Test
     void shouldEmitMoveCaseToStayedEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder()
-                                                    .id(caseId)
-                                                    .data(data)
-                                                    .build());
+        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
-        caseStayedFinder.execute(mockExternalTask, externalTaskService);
+        caseStayedFinder.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new MoveCaseToStayedEvent(caseId));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
     void shouldNotEmitMoveCaseToStayedEvent_WhenNoCasesFound() {
         when(searchService.getCases()).thenReturn(List.of());
 
-        caseStayedFinder.execute(mockExternalTask, externalTaskService);
+        caseStayedFinder.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
-    void shouldCatchError_whenException() {
+    void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
         String errorMessage = "there was an error";
 
-        when(mockExternalTask.getRetries()).thenReturn(null);
+        when(mockTask.getRetries()).thenReturn(null);
         when(searchService.getCases()).thenAnswer(invocation -> {
             throw new Exception(errorMessage);
         });
 
-        caseStayedFinder.execute(mockExternalTask, externalTaskService);
+        caseStayedFinder.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService).handleFailure(mockExternalTask, "worker", errorMessage, 2, 500L);
+        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService).handleFailure(mockTask, "worker", errorMessage, 2, 500L);
+    }
+
+    @Test
+    void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
+        String errorMessage = "there was an error";
+
+        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+
+        caseStayedFinder.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService, never()).handleFailure(
+            any(ExternalTask.class),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyLong()
+        );
     }
 }

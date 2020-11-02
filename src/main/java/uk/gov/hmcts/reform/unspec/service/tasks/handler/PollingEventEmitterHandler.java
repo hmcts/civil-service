@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -18,22 +16,23 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${polling.event.emitter.enabled:true}")
-public class PollingEventEmitterHandler implements ExternalTaskHandler {
+public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
 
     @Override
-    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
-        final String taskName = externalTask.getTopicName();
-
+    public void handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", taskName, cases.size());
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
         cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .forEach(eventEmitterService::emitBusinessProcessCamundaEvent);
+    }
 
-        externalTaskService.complete(externalTask);
+    @Override
+    public int getMaxAttempts() {
+        return 1;
     }
 }

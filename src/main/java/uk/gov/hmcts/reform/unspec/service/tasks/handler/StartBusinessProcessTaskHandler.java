@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -19,33 +17,37 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.unspec.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.unspec.stateflow.StateFlow;
 
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class StartBusinessProcessTaskHandler implements ExternalTaskHandler {
+public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
     public static final String FLOW_STATE = "flowState";
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
 
+    private VariableMap variables;
+
     @Override
-    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void handleTask(ExternalTask externalTask) {
         CaseData caseData = startBusinessProcess(externalTask);
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
-        externalTaskService.complete(externalTask, variables);
+        variables = Variables.createVariables();
+        variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(caseData).getState().getName());
+    }
+
+    @Override
+    public VariableMap getVariableMap() {
+        return variables;
     }
 
     private CaseData startBusinessProcess(ExternalTask externalTask) {
         Map<String, Object> allVariables = externalTask.getAllVariables();
-        ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
+        ExternalTaskInput externalTaskInput = mapper.convertValue(allVariables, ExternalTaskInput.class);
         String caseId = externalTaskInput.getCaseId();
         CaseEvent caseEvent = externalTaskInput.getCaseEvent();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);

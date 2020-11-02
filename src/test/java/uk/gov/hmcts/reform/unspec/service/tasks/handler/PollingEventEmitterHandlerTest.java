@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.unspec.service.search.CaseReadyBusinessProcessSearchS
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -82,6 +83,24 @@ class PollingEventEmitterHandlerTest {
         verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails2));
         verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails3));
         verify(externalTaskService).complete(externalTask);
+
+        verifyNoMoreInteractions(eventEmitterService);
+    }
+
+    @Test
+    void shouldHave0Retries_whenException() {
+        String errorMessage = "there was an error";
+
+        //Mockito instance of external task returns 0 instead of null
+        when(externalTask.getRetries()).thenReturn(null);
+        when(searchService.getCases()).thenAnswer(invocation -> {
+            throw new Exception(errorMessage);
+        });
+
+        pollingEventEmitterHandler.execute(externalTask, externalTaskService);
+
+        verify(externalTaskService, never()).complete(externalTask);
+        verify(externalTaskService).handleFailure(externalTask, null, errorMessage, 0, 500L);
 
         verifyNoMoreInteractions(eventEmitterService);
     }
