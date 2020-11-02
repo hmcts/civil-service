@@ -9,3 +9,23 @@ Scenario('Create claim', async (api) => {
 Scenario('Confirm service', async (api) => {
   await api.confirmService();
 });
+
+Scenario('Acknowledge service', async (api) => {
+  await api.acknowledgeService();
+});
+
+Scenario('Request extension', async (api) => {
+  await api.requestExtension();
+});
+
+Scenario('Respond extension', async (api) => {
+  await api.respondExtension();
+});
+
+Scenario('Defendant response', async (api) => {
+  await api.defendantResponse();
+});
+
+Scenario('Claimant response', async (api) => {
+  await api.claimantResponse();
+});

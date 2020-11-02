@@ -64,7 +64,7 @@
     "PageFieldDisplayOrder": 1,
     "PageShowCondition": "applicant1ProceedWithClaim = \"Yes\"",
     "DisplayContext": "COMPLEX",
-    "PageID": "DefenceResponseDocument",
+    "PageID": "ApplicantDefenceResponseDocument",
     "ShowSummaryChangeOption": "Y"
   },
   {

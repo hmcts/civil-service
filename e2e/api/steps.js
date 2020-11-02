@@ -3,71 +3,169 @@ const assert = require('assert').strict;
 const request = require('./request.js');
 const testingSupport = require('./testingSupport.js');
 
-const createClaimData = require('../fixtures/createClaim.js');
-const confirmServiceData = require('../fixtures/confirmService.js');
+const data = {
+  CREATE_CLAIM: require('../fixtures/events/createClaim.js'),
+  CONFIRM_SERVICE: require('../fixtures/events/confirmService.js'),
+  ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
+  REQUEST_EXTENSION: require('../fixtures/events/requestExtension.js'),
+  RESPOND_EXTENSION: require('../fixtures/events/respondExtension.js'),
+  DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
+  CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
+};
 
-let caseId;
+let caseId, eventName;
 let caseData = {};
 
 module.exports = {
   createClaim: async (user) => {
+    eventName = 'CREATE_CLAIM';
     await request.setupTokens(user);
-    await request.startEvent('CREATE_CLAIM');
+    await request.startEvent(eventName);
 
-    await assertValidData('CREATE_CLAIM', 'References', createClaimData.valid.references);
-    await assertValidData('CREATE_CLAIM', 'Court', createClaimData.valid.court);
-    await assertValidData('CREATE_CLAIM', 'Claimant', createClaimData.valid.claimant);
-    await assertValidData('CREATE_CLAIM', 'ClaimantLitigationFriend', createClaimData.valid.applicant1LitigationFriend);
-    await assertValidData('CREATE_CLAIM', 'Defendant', createClaimData.valid.defendant);
-    await assertValidData('CREATE_CLAIM', 'ClaimType', createClaimData.valid.claimType);
-    await assertValidData('CREATE_CLAIM', 'PersonalInjuryType', createClaimData.valid.personalInjuryType);
-    await assertValidData('CREATE_CLAIM', 'Upload', createClaimData.valid.upload);
-    await assertValidData('CREATE_CLAIM', 'ClaimValue', createClaimData.valid.claimValue);
-    await assertValidData('CREATE_CLAIM', 'PbaNumber', createClaimData.valid.pbaNumber);
-    await assertValidData('CREATE_CLAIM', 'StatementOfTruth', createClaimData.valid.statementOfTruth);
+    await validateEventPages();
 
-    await assertSubmittedEvent('CREATE_CLAIM', 'CREATED', {
+    await assertSubmittedEvent('CREATED', {
       header: 'Your claim has been issued',
       body: 'Follow these steps to serve a claim'
     });
   },
 
   confirmService: async () => {
+    eventName = 'CONFIRM_SERVICE';
     await testingSupport.resetBusinessProcess(caseId);
-    await request.startEvent('CONFIRM_SERVICE', caseId);
+    await request.startEvent(eventName, caseId);
+    deleteCaseFields('servedDocumentFiles');
 
-    delete caseData.servedDocumentFiles;
-    await assertValidData('CONFIRM_SERVICE', 'ServedDocuments', confirmServiceData.valid.servedDocuments);
-    await assertValidData('CONFIRM_SERVICE', 'Upload', confirmServiceData.valid.upload);
-    await assertValidData('CONFIRM_SERVICE', 'Method', confirmServiceData.valid.method);
-    await assertValidData('CONFIRM_SERVICE', 'Location', confirmServiceData.valid.location);
-    await assertCallbackError('CONFIRM_SERVICE', 'Date', confirmServiceData.invalid.date.yesterday,
+    await validateEventPages();
+
+    await assertCallbackError('ServedDocuments', data[eventName].invalid.ServedDocuments.blankOtherDocuments,
+      'CONTENT TBC: please enter a valid value for other documents');
+    await assertCallbackError('Date', data[eventName].invalid.Date.yesterday,
       'The date must not be before issue date of claim');
-    await assertCallbackError('CONFIRM_SERVICE', 'Date', confirmServiceData.invalid.date.tomorrow,
+    await assertCallbackError('Date', data[eventName].invalid.Date.tomorrow,
       'The date must not be in the future');
-    await assertValidData('CONFIRM_SERVICE', 'Date', confirmServiceData.valid.date);
-    await assertValidData('CONFIRM_SERVICE', 'StatementOfTruth', confirmServiceData.valid.statementOfTruth);
 
-    await assertSubmittedEvent('CONFIRM_SERVICE', 'CREATED', {
+    await assertSubmittedEvent('CREATED', {
       header: 'You\'ve confirmed service',
       body: 'Deemed date of service'
+    });
+  },
+
+  acknowledgeService: async () => {
+    eventName = 'ACKNOWLEDGE_SERVICE';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+
+    await validateEventPages();
+
+    await assertCallbackError('ConfirmDetails', data[eventName].invalid.ConfirmDetails.futureDateOfBirth,
+      'The date entered cannot be in the future');
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'You\'ve acknowledged service',
+      body: 'You need to respond before'
+    });
+  },
+
+  requestExtension: async () => {
+    eventName = 'REQUEST_EXTENSION';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+
+    await validateEventPages();
+
+    await assertCallbackError('ProposeDeadline', data[eventName].invalid.ProposeDeadline.past,
+      'The proposed deadline must be a date in the future');
+    await assertCallbackError('ProposeDeadline',data[eventName].invalid.ProposeDeadline.beforeCurrentDeadline,
+      'The proposed deadline must be after the current deadline');
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'You asked for extra time to respond',
+      body: 'You asked if you can respond before 4pm on'
+    });
+  },
+
+  respondExtension: async () => {
+    eventName = 'RESPOND_EXTENSION';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+
+    await validateEventPages();
+
+    await assertCallbackError('Counter', data[eventName].invalid.Counter.past,
+      'The proposed deadline must be a date in the future');
+    await assertCallbackError('Counter',data[eventName].invalid.Counter.beforeCurrentDeadline,
+      'The proposed deadline must be after the current deadline');
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'You\'ve responded to the request for more time',
+      body: 'The defendant must respond before 4pm on'
+    });
+  },
+
+  defendantResponse: async () => {
+    eventName = 'DEFENDANT_RESPONSE';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+    deleteCaseFields('respondent1', 'solicitorReferences');
+
+    await validateEventPages();
+
+    await assertCallbackError('ConfirmDetails', data[eventName].invalid.ConfirmDetails.futureDateOfBirth,
+      'The date entered cannot be in the future');
+    await assertCallbackError('Hearing', data[eventName].invalid.Hearing.past,
+      'The date cannot be in the past and must not be more than a year in the future');
+    await assertCallbackError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
+      'The date cannot be in the past and must not be more than a year in the future');
+
+    await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
+      header: 'You\'ve submitted your response',
+      body: 'We will let you know when they respond.'
+    });
+  },
+
+  claimantResponse: async () => {
+    eventName = 'CLAIMANT_RESPONSE';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+
+    await validateEventPages();
+
+    await assertCallbackError('Hearing', data[eventName].invalid.Hearing.past,
+      'The date cannot be in the past and must not be more than a year in the future');
+    await assertCallbackError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
+      'The date cannot be in the past and must not be more than a year in the future');
+
+    await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
+      header: 'You\'ve decided to proceed with the claim',
+      body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     });
   }
 };
 
-const assertValidData = async (eventName, pageId, eventData, expectedDataSetByCallback = {}) => {
-  caseData = Object.assign(caseData, eventData);
+const validateEventPages = async () => {
+  for (let pageId of Object.keys(data[eventName].valid)) {
+    await assertValidData(pageId);
+  }
+};
+
+const assertValidData = async (pageId) => {
+  const validDataForPage = data[eventName].valid[pageId];
+  caseData = {...caseData, ...validDataForPage};
+
   const response = await request.validatePage(eventName, pageId, caseData);
   const responseBody = await response.json();
-  caseData = Object.assign(caseData, expectedDataSetByCallback);
+
+  if (response.status !== 200) {
+    console.log(responseBody);
+  }
 
   assert.equal(response.status, 200);
   assert.deepEqual(responseBody.data, caseData);
 };
 
-const assertCallbackError = async (eventName, pageId, eventData, expectedErrorMessage) => {
-  caseData = Object.assign(caseData, eventData);
-  const response = await request.validatePage(eventName, pageId, caseData);
+const assertCallbackError = async (pageId, eventData, expectedErrorMessage) => {
+  const response = await request.validatePage(eventName, pageId, {...caseData, ...eventData});
   const responseBody = await response.json();
 
   assert.equal(response.status, 422);
@@ -75,19 +173,30 @@ const assertCallbackError = async (eventName, pageId, eventData, expectedErrorMe
   assert.equal(responseBody.callbackErrors[0], expectedErrorMessage);
 };
 
-const assertSubmittedEvent = async (eventName, expectedState, submittedCallbackResponse) => {
+const assertSubmittedEvent = async (expectedState, submittedCallbackResponseContains) => {
   const response = await request.submitEvent(eventName, caseData, caseId);
   const responseBody = await response.json();
+
+  if (response.status !== 201) {
+    console.log(responseBody);
+  }
 
   assert.equal(response.status, 201);
   assert.equal(responseBody.state, expectedState);
   assert.equal(responseBody.callback_response_status_code, 200);
-  assert.equal(responseBody.after_submit_callback_response.confirmation_header.includes(submittedCallbackResponse.header), true);
-  assert.equal(responseBody.after_submit_callback_response.confirmation_body.includes(submittedCallbackResponse.body), true);
+  assert.equal(responseBody.after_submit_callback_response.confirmation_header.includes(submittedCallbackResponseContains.header), true);
+  assert.equal(responseBody.after_submit_callback_response.confirmation_body.includes(submittedCallbackResponseContains.body), true);
 
-  caseData = Object.assign(caseData, responseBody.case_data);
+  caseData = {...caseData, ...responseBody.case_data};
   if (eventName === 'CREATE_CLAIM') {
     caseId = responseBody.id;
     console.log('Case created: ' + caseId);
   }
+};
+
+// Mid event will not return case fields that were already filled in another event if they're present on currently processed event.
+// This happens until these case fields are set again as a part of current event (note that this data is not removed from the case).
+// Therefore these case fields need to be removed from caseData, as caseData object is used to make assertions
+const deleteCaseFields = (...caseFields) => {
+  caseFields.forEach(caseField => delete caseData[caseField]);
 };
