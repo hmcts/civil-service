@@ -15,6 +15,7 @@
     "HintText": "Enter a numeric value less than 7, for example 3",
     "FieldShowCondition": "hearingLength = \"LESS_THAN_DAY\"",
     "SecurityClassification": "Public",
+    "Min": 1,
     "Max": 6
   },
   {
@@ -25,6 +26,7 @@
     "HintText": "Enter a numeric value less than 29, for example 10",
     "FieldShowCondition": "hearingLength = \"MORE_THAN_DAY\"",
     "SecurityClassification": "Public",
+    "Min": 1,
     "Max": 28
   },
   {
