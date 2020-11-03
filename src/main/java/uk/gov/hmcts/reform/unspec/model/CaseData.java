@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.validation.groups.ConfirmServiceDateGroup;
-import uk.gov.hmcts.reform.unspec.validation.interfaces.HasServiceDateTheSameAsOrAfterIssueDate;
+import uk.gov.hmcts.reform.unspec.validation.interfaces.HasDeemedDateOfServiceTheSameAsOrAfterIssueDate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.FINISHED;
 
 @Data
 @Builder(toBuilder = true)
-@HasServiceDateTheSameAsOrAfterIssueDate(groups = ConfirmServiceDateGroup.class)
+@HasDeemedDateOfServiceTheSameAsOrAfterIssueDate(groups = ConfirmServiceDateGroup.class)
 public class CaseData {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

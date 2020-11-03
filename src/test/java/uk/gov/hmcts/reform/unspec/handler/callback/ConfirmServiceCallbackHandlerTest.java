@@ -113,6 +113,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class ServiceDate {
 
+            private static final String PAGE_ID = "service-date";
             private final LocalDate today = LocalDate.now();
             private final LocalDate futureDate = today.plusYears(1);
 
@@ -123,7 +124,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .serviceDateToRespondentSolicitor1(claimIssueDate.plusDays(1))
                     .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(POST).build())
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "service-date");
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -137,7 +138,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .serviceDateToRespondentSolicitor1(today)
                     .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(POST).build())
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "service-date");
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -151,7 +152,7 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .serviceDateToRespondentSolicitor1(futureDate)
                     .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(POST).build())
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "service-date");
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -162,10 +163,10 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
                 CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed()
                     .claimIssuedDate(claimIssueDate)
-                    .serviceDateToRespondentSolicitor1(claimIssueDate.minusDays(1))
+                    .serviceDateToRespondentSolicitor1(claimIssueDate.minusDays(3))
                     .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(POST).build())
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "service-date");
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
