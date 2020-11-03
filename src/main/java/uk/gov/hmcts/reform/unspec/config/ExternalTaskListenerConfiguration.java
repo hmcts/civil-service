@@ -28,7 +28,7 @@ public class ExternalTaskListenerConfiguration {
     public ExternalTaskClient client() {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
-            .asyncResponseTimeout(120000)
+            .asyncResponseTimeout(29000)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
             .baseUrl(baseUrl)
             .build();
