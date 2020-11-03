@@ -9,6 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.0'
   id 'au.com.dius.pact' version '4.1.9'
   id "io.freefair.lombok" version "5.3.0"
+  id "org.flywaydb.flyway" version "7.1.1"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -250,7 +251,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.17.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.17.0'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.5.7'
+  implementation group: 'org.flywaydb', name: 'flyway-core'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
