@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
@@ -23,25 +21,23 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.END_BUSINESS_PROCESS
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EndBusinessProcessTaskHandler implements ExternalTaskHandler {
+public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
 
     @Override
-    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void handleTask(ExternalTask externalTask) {
         Map<String, Object> allVariables = externalTask.getAllVariables();
         ExternalTaskInput externalTaskInput = mapper.convertValue(allVariables, ExternalTaskInput.class);
         String caseId = externalTaskInput.getCaseId();
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
-
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
 
         coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-        externalTaskService.complete(externalTask);
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
