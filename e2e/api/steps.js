@@ -165,7 +165,7 @@ const assertValidData = async (pageId) => {
 };
 
 const assertCallbackError = async (pageId, eventData, expectedErrorMessage) => {
-  const response = await request.validatePage(eventName, pageId, {...caseData, ...eventData});
+  const response = await request.validatePage(eventName, pageId, {...caseData, ...eventData}, 422);
   const responseBody = await response.json();
 
   assert.equal(response.status, 422);

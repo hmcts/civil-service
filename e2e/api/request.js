@@ -49,15 +49,14 @@ module.exports = {
       .then(response => response.json()).then(data => data.token);
   },
 
-  validatePage: async (eventName, pageId, caseData) => {
+  validatePage: async (eventName, pageId, caseData, expectedStatus = 200) => {
     return restHelper.request(`${getCcdDataStoreBaseUrl()}/validate?pageId=${eventName}${pageId}`, getRequestHeaders(),
       {
         data: caseData,
         event: {id: eventName},
         event_data: caseData,
         event_token: tokens.ccdEvent
-      }
-    );
+      }, 'POST', expectedStatus);
   },
 
   submitEvent: async (eventName, caseData, caseId) => {
@@ -72,6 +71,6 @@ module.exports = {
         event: {id: eventName},
         event_data: caseData,
         event_token: tokens.ccdEvent
-      });
+      }, 'POST', 201);
   }
 };
