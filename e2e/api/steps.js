@@ -174,6 +174,7 @@ const assertCallbackError = async (pageId, eventData, expectedErrorMessage) => {
 };
 
 const assertSubmittedEvent = async (expectedState, submittedCallbackResponseContains) => {
+  await request.startEvent(eventName, caseId);
   const response = await request.submitEvent(eventName, caseData, caseId);
   const responseBody = await response.json();
 
