@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 public enum ClaimType {
     PERSONAL_INJURY(FeeType.LOWER),
     CLINICAL_NEGLIGENCE(FeeType.LOWER),
+    PROFESSIONAL_NEGLIGENCE(FeeType.LOWER),
     BREACH_OF_CONTRACT(FeeType.HIGHER),
+    CONSUMER(FeeType.HIGHER),
     CONSUMER_CREDIT(FeeType.HIGHER),
     OTHER(FeeType.HIGHER);
 
