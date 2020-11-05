@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.handler.callback.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.unspec.handler.callback.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.unspec.handler.callback.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.handler.callback.notification.NotificationData.SOLICITOR_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
@@ -39,9 +42,10 @@ class AcknowledgeServiceApplicantNotificationHandlerTest extends BaseCallbackHan
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorResponseToCase()).thenReturn("template-id");
+            when(notificationsProperties.getDefendantSolicitorAcknowledgeService()).thenReturn("template-id");
             when(notificationsProperties.getClaimantSolicitorEmail()).thenReturn("claimantsolicitor@example.com");
             when(notificationsProperties.getDefendantSolicitorEmail()).thenReturn("defendantsolicitor@example.com");
         }
@@ -56,8 +60,18 @@ class AcknowledgeServiceApplicantNotificationHandlerTest extends BaseCallbackHan
             verify(notificationService).sendMail(
                 "claimantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
+                getNotificationDataMap(caseData),
                 "acknowledge-service-applicant-notification-000LR001"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+                SOLICITOR_REFERENCE, "claimant solicitor",
+                RESPONSE_DEADLINE, caseData.getRespondentSolicitor1ResponseDeadline().toString()
             );
         }
     }

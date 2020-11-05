@@ -51,7 +51,7 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
 
         notificationService.sendMail(
             notificationsProperties.getClaimantSolicitorEmail(),
-            notificationsProperties.getSolicitorResponseToCase(),
+            notificationsProperties.getDefendantSolicitorAcknowledgeService(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -62,7 +62,9 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, "claimant solicitor"
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            SOLICITOR_REFERENCE, "claimant solicitor",
+            RESPONSE_DEADLINE, caseData.getRespondentSolicitor1ResponseDeadline().toString()
         );
     }
 }
