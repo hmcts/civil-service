@@ -121,7 +121,7 @@
     "Description": "View and respond to defendant",
     "DisplayOrder": 8,
     "PreConditionState(s)": "AWAITING_CLAIMANT_INTENTION",
-    "PostConditionState": "*",
+    "PostConditionState": "STAYED",
     "SecurityClassification": "Public",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",

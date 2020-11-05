@@ -177,14 +177,14 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
                 .isNotNull()
-                .isEqualTo(FULL_DEFENCE.fullName());
+                .isEqualTo(CLAIM_STAYED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(5)
+                .hasSize(6)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_ISSUED.fullName(),
                     SERVICE_CONFIRMED.fullName(), RESPONDED_TO_CLAIM.fullName(),
-                    FULL_DEFENCE.fullName()
+                    FULL_DEFENCE.fullName(), CLAIM_STAYED.fullName()
                 );
         }
     }

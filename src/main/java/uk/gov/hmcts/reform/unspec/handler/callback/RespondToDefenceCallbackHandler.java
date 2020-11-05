@@ -73,7 +73,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (fromFullName(stateFlowEngine.evaluate(caseData).getState().getName()) == FlowState.Main.FULL_DEFENCE) {
+        if (fromFullName(stateFlowEngine.evaluate(caseData).getState().getName()) == FlowState.Main.CLAIM_STAYED) {
             caseData = businessProcessService.updateBusinessProcess(caseData, CLAIMANT_RESPONSE);
         }
 
@@ -83,9 +83,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        YesOrNo proceeding = callbackParams.getCaseData().getApplicant1ProceedWithClaim();
+        CaseData caseData = callbackParams.getCaseData();
+        YesOrNo proceeding = caseData.getApplicant1ProceedWithClaim();
 
-        String claimNumber = "TBC";
+        String claimNumber = caseData.getLegacyCaseReference();
         String dqLink = "http://www.google.com";
 
         String body = getBody(proceeding);
@@ -101,7 +102,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
         if (proceeding == YES) {
             return "# You've decided to proceed with the claim%n## Claim number: %s";
         }
-        return "# You've decided not to proceed with the claim%n## Claim number: %s";
+        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
     }
 
     private String getBody(YesOrNo proceeding) {
@@ -109,6 +110,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
             return "<br />We'll review the case. We'll contact you to tell you what to do next.%n%n"
                 + "[Download directions questionnaire](%s)";
         }
-        return "CONTENT TBC";
+        return "<br />If you do want to proceed you need to do it within: %n%n"
+            + "- 14 days if the claim is allocated to a small claims track%n"
+            + "- 28 days if the claim is allocated to a fast or multi track%n%n"
+            + "The case will be stayed if you do not proceed within the allowed timescale.";
     }
 }

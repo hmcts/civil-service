@@ -70,7 +70,7 @@ class FlowStateAllowedEventServiceTest {
                 Arguments.of(CaseDataBuilder.builder().atStateExtensionRequested().build(), EXTENSION_REQUESTED),
                 Arguments.of(CaseDataBuilder.builder().atStateExtensionResponded().build(), EXTENSION_RESPONDED),
                 Arguments.of(CaseDataBuilder.builder().atStateRespondedToClaim().build(), RESPONDED_TO_CLAIM),
-                Arguments.of(CaseDataBuilder.builder().atStateFullDefence().build(), FULL_DEFENCE)
+                Arguments.of(CaseDataBuilder.builder().atStateFullDefence().build(), CLAIM_STAYED)
             );
         }
     }

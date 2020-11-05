@@ -70,6 +70,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
             .state(FULL_DEFENCE)
+                .transitionTo(CLAIM_STAYED)
             .state(CLAIM_STAYED)
             .state(CLAIM_WITHDRAWN)
             .state(CLAIM_DISCONTINUED)

@@ -136,7 +136,7 @@ module.exports = {
     await assertCallbackError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
       'The date cannot be in the past and must not be more than a year in the future');
 
-    await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
+    await assertSubmittedEvent('STAYED', {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     });
