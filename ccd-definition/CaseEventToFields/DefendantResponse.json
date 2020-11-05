@@ -107,7 +107,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "FileDirectionsQuestionnaire",
-    "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
+    "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND allocatedTrack !=\"SMALL_CLAIM\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -131,7 +131,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "READONLY",
     "PageID": "DisclosureOfNonElectronicDocuments",
-    "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
+    "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND allocatedTrack !=\"SMALL_CLAIM\"",
     "ShowSummaryChangeOption": "N"
   },
   {
