@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.DISPATCHED;
@@ -31,12 +33,28 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::dispatchBusinessProcess);
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::checkIfBusinessProcessStarted,
+            callbackKey(ABOUT_TO_SUBMIT), this::dispatchBusinessProcess
+        );
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse checkIfBusinessProcessStarted(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        if (caseData.getBusinessProcess().getStatusOrDefault() != READY) {
+            errors.add("Business process already started");
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse dispatchBusinessProcess(CallbackParams callbackParams) {

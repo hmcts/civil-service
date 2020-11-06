@@ -88,7 +88,7 @@ class EventEmitterAspectTest {
 
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
-        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData);
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData, false);
         verify(proceedingJoinPoint).proceed();
     }
 }

@@ -79,9 +79,18 @@ class PollingEventEmitterHandlerTest {
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
         verify(searchService).getCases();
-        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails1));
-        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails2));
-        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDetailsConverter.toCaseData(caseDetails3));
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(
+            caseDetailsConverter.toCaseData(caseDetails1),
+            true
+        );
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(
+            caseDetailsConverter.toCaseData(caseDetails2),
+            true
+        );
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(
+            caseDetailsConverter.toCaseData(caseDetails3),
+            true
+        );
         verify(externalTaskService).complete(externalTask);
 
         verifyNoMoreInteractions(eventEmitterService);

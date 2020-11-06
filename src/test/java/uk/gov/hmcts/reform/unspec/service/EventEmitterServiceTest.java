@@ -48,12 +48,29 @@ class EventEmitterServiceTest {
             .ccdCaseReference(1L)
             .build();
 
-        eventEmitterService.emitBusinessProcessCamundaEvent(caseData);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
         verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
+    }
+
+    @Test
+    void shouldSendMessageAndNotTriggerEvent_whenNotTrue() {
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
+        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        CaseData caseData = CaseData.builder()
+            .businessProcess(businessProcess)
+            .ccdCaseReference(1L)
+            .build();
+
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
+
+        verify(runtimeService).createMessageCorrelation("TEST_EVENT");
+        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
+        verify(messageCorrelationBuilder).correlateStartMessage();
+        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
@@ -65,7 +82,7 @@ class EventEmitterServiceTest {
             .ccdCaseReference(1L)
             .build();
 
-        eventEmitterService.emitBusinessProcessCamundaEvent(caseData);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
         verify(messageCorrelationBuilder).setVariable("caseId", 1L);

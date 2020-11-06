@@ -28,7 +28,7 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
         cases.stream()
             .map(caseDetailsConverter::toCaseData)
-            .forEach(eventEmitterService::emitBusinessProcessCamundaEvent);
+            .forEach(mappedCase -> eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true));
     }
 
     @Override

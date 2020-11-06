@@ -27,7 +27,7 @@ public class EventEmitterAspect {
         if (callbackParams.getType() == SUBMITTED) {
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() == READY) {
-                eventEmitterService.emitBusinessProcessCamundaEvent(caseData);
+                eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
             }
         }
         return joinPoint.proceed();
