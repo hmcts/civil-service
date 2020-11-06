@@ -128,6 +128,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "serviceNamedPersonToRespondentSolicitor1",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "serviceLocationToRespondentSolicitor1",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"

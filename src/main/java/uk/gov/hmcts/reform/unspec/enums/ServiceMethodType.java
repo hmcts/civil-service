@@ -10,6 +10,8 @@ public enum ServiceMethodType {
     DOCUMENT_EXCHANGE(2, DateOrDateTime.DATE, "Document exchange"),
     FAX(0, DateOrDateTime.DATE_TIME, "Fax"),
     EMAIL(0, DateOrDateTime.DATE_TIME, "Email"),
+    PERSONAL_SERVICE(0, DateOrDateTime.DATE_TIME, "Personal service"),
+    LEAVING_AT_PERMITTED_ADDRESS(0, DateOrDateTime.DATE_TIME, "Leaving at permitted address"),
     OTHER(2, DateOrDateTime.DATE_TIME, "Other");
 
     private final int days;
