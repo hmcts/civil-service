@@ -41,6 +41,8 @@ const uploadResponsePage = require('./pages/respondToClaim/uploadResponseDocumen
 const proceedPage = require('./pages/respondToDefence/proceed.page');
 const uploadResponseDocumentPage = require('./pages/respondToDefence/uploadResponseDocument.page');
 
+const defendantLitigationFriendPage = require('./pages/addDefendantLitigationFriend/defendantLitigationDetails.page');
+
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
 const event = require('./fragments/event');
@@ -193,6 +195,13 @@ module.exports = function () {
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');
+    },
+
+    async addDefendantLitigationFriend() {
+      await testingSupport.resetBusinessProcess(caseId);
+      await caseViewPage.startEvent('Add litigation friend');
+      await defendantLitigationFriendPage.enterLitigantFriendWithDifferentAddressToDefendant(address, TEST_FILE_PATH);
+      await this.click('Submit');
     },
 
     async clickContinue() {

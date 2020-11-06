@@ -1,32 +1,23 @@
 [
   {
     "ID": "LitigationFriend",
-    "ListElementCode": "required",
-    "FieldType": "YesOrNo",
-    "ElementLabel": "Is the claimant a child?",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "LitigationFriend",
     "ListElementCode": "fullName",
     "FieldType": "Text",
     "ElementLabel": "Litigation friend's full name",
-    "FieldShowCondition": "required = \"Yes\"",
     "SecurityClassification": "Public"
   },
   {
     "ID": "LitigationFriend",
     "ListElementCode": "hasSameAddressAsLitigant",
     "FieldType": "YesOrNo",
-    "ElementLabel": "Is the claimant and litigation friend address the same?",
-    "FieldShowCondition": "required = \"Yes\"",
+    "ElementLabel": "Is the litigant and litigation friend address the same?",
     "SecurityClassification": "Public"
   },
   {
     "ID": "LitigationFriend",
     "ListElementCode": "primaryAddress",
     "FieldType": "AddressUK",
-    "FieldShowCondition": "required = \"Yes\" AND hasSameAddressAsLitigant = \"No\"",
+    "FieldShowCondition": "hasSameAddressAsLitigant = \"No\"",
     "ElementLabel": "Litigation friend's address",
     "SecurityClassification": "Public"
   },
@@ -35,7 +26,6 @@
     "ListElementCode": "certificateOfSuitability",
     "FieldType": "Collection",
     "FieldTypeParameter": "Document",
-    "FieldShowCondition": "required = \"Yes\"",
     "ElementLabel": "Upload the certificate of suitability",
     "SecurityClassification": "Public",
     "Min": 1

@@ -11,6 +11,7 @@ const data = {
   RESPOND_EXTENSION: require('../fixtures/events/respondExtension.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
+  ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
 };
 
 let caseId, eventName;
@@ -140,8 +141,17 @@ module.exports = {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     });
+  },
+
+  addDefendantLitigationFriend: async () => {
+    eventName = 'ADD_DEFENDANT_LITIGATION_FRIEND';
+    await testingSupport.resetBusinessProcess(caseId);
+    await request.startEvent(eventName, caseId);
+
+    await validateEventPages();
   }
 };
+
 
 const validateEventPages = async () => {
   for (let pageId of Object.keys(data[eventName].valid)) {

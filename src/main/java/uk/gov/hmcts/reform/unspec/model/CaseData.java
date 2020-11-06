@@ -110,4 +110,6 @@ public class CaseData {
             || businessProcess.getStatus() == null
             || businessProcess.getStatus() == FINISHED;
     }
+
+    private final LitigationFriend respondent1LitigationFriend;
 }

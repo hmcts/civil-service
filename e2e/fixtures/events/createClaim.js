@@ -29,9 +29,11 @@ module.exports = {
         }
       }
     },
+    ClaimantLitigationFriendRequired: {
+      applicant1LitigationFriendRequired: 'Yes',
+    },
     ClaimantLitigationFriend: {
       applicant1LitigationFriend: {
-        required: 'Yes',
         fullName: 'Bob the litigant friend',
         hasSameAddressAsLitigant: 'No',
         primaryAddress: {
