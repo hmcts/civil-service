@@ -192,7 +192,7 @@ module.exports = function () {
       await furtherInformationPage.enterFurtherInformation(parties.APPLICANT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
-      await event.returnToCaseDetails();
+      await this.click('Close and Return to case details');
     },
 
     async clickContinue() {
