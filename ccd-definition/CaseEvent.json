@@ -367,5 +367,20 @@
     "SecurityClassification": "Public",
     "ShowSummary": "N",
     "ShowEventNotes": "N"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "GENERATE_CERTIFICATE_OF_SERVICE",
+    "Name": "Generate cos",
+    "Description": "Generates certificate of service after confirm service event",
+    "DisplayOrder": 26,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "comment": "name needs to be less than 30 characters, 'Generate certificate of service' is 31"
   }
 ]

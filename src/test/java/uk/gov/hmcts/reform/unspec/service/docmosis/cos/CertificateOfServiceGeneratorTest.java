@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.cos;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,17 +55,15 @@ class CertificateOfServiceGeneratorTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
     @Autowired
     private CertificateOfServiceGenerator generator;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     void shouldGenerateCertificateOfService_whenValidDataIsProvided() {
-
         when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N215)))
             .thenReturn(new DocmosisDocument(N215.getDocumentTitle(), bytes));
 

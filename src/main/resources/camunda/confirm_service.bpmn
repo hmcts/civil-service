@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0md8je5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="CONFIRM_SERVICE_PROCESS_ID" isExecutable="true">
+    <bpmn:startEvent id="Event_13mnm9t" name="Start">
+      <bpmn:outgoing>Flow_0kmqnoz</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1ltsxqi" messageRef="Message_06jvaoy" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="StartBusinessProcessTaskId" name="StartBusinessProcess" camunda:type="external" camunda:topic="START_BUSINESS_PROCESS">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">START_BUSINESS_PROCESS</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kmqnoz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t5tfh9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_1woz4jh" name="Abort" attachedToRef="StartBusinessProcessTaskId">
+      <bpmn:outgoing>Flow_14583du</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1rky77f" errorRef="Error_0reyf6h" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0kmqnoz" sourceRef="Event_13mnm9t" targetRef="StartBusinessProcessTaskId" />
+    <bpmn:endEvent id="Event_1rdw38r" name="Abortd">
+      <bpmn:incoming>Flow_14583du</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_14583du" sourceRef="Event_1woz4jh" targetRef="Event_1rdw38r" />
+    <bpmn:serviceTask id="GenerateCertificateOfService" name="Generate Certificate of Service" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">GENERATE_CERTIFICATE_OF_SERVICE</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1t5tfh9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o7sh5h</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1t5tfh9" sourceRef="StartBusinessProcessTaskId" targetRef="GenerateCertificateOfService" />
+    <bpmn:callActivity id="Activity_1r1owoe" name="End Business Process" calledElement="EndBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="variables" value="all" />
+        </camunda:properties>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1o7sh5h</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ljqldp</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1o7sh5h" sourceRef="GenerateCertificateOfService" targetRef="Activity_1r1owoe" />
+    <bpmn:endEvent id="Event_12lb061">
+      <bpmn:incoming>Flow_1ljqldp</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ljqldp" sourceRef="Activity_1r1owoe" targetRef="Event_12lb061" />
+  </bpmn:process>
+  <bpmn:message id="Message_0gtgs0h" name="ACKNOWLEDGE_SERVICE" />
+  <bpmn:message id="Message_06jvaoy" name="CONFIRM_SERVICE" />
+  <bpmn:error id="Error_0reyf6h" name="StartBusinessAbort" errorCode="ABORT" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CONFIRM_SERVICE_PROCESS_ID">
+      <bpmndi:BPMNEdge id="Flow_1t5tfh9_di" bpmnElement="Flow_1t5tfh9">
+        <di:waypoint x="360" y="120" />
+        <di:waypoint x="450" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14583du_di" bpmnElement="Flow_14583du">
+        <di:waypoint x="310" y="178" />
+        <di:waypoint x="310" y="232" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kmqnoz_di" bpmnElement="Flow_0kmqnoz">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="260" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o7sh5h_di" bpmnElement="Flow_1o7sh5h">
+        <di:waypoint x="550" y="120" />
+        <di:waypoint x="620" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ljqldp_di" bpmnElement="Flow_1ljqldp">
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="772" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_13mnm9t_di" bpmnElement="Event_13mnm9t">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="145" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vc3qo5_di" bpmnElement="StartBusinessProcessTaskId">
+        <dc:Bounds x="260" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rdw38r_di" bpmnElement="Event_1rdw38r">
+        <dc:Bounds x="292" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="294" y="275" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s5aldj_di" bpmnElement="GenerateCertificateOfService">
+        <dc:Bounds x="450" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_12lb061_di" bpmnElement="Event_12lb061">
+        <dc:Bounds x="772" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1r1owoe_di" bpmnElement="Activity_1r1owoe">
+        <dc:Bounds x="620" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1woz4jh_di" bpmnElement="Event_1woz4jh">
+        <dc:Bounds x="292" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="338" y="185" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
