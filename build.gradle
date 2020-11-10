@@ -10,14 +10,88 @@ plugins {
   id 'au.com.dius.pact' version '4.1.10'
   id "io.freefair.lombok" version "5.3.0"
   id "org.flywaydb.flyway" version "7.1.1"
+  id 'net.ltgt.apt' version '0.21'
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 allprojects {
+
   sourceCompatibility = '11'
   targetCompatibility = '11'
+
+  apply plugin: 'java'
+  apply plugin: 'jacoco'
+  apply plugin: 'checkstyle'
+  apply plugin: 'io.spring.dependency-management'
+  apply plugin: 'org.springframework.boot'
+  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: 'com.github.ben-manes.versions'
+  apply plugin: 'net.ltgt.apt'
+
+  checkstyle {
+    maxWarnings = 0
+    toolVersion = '8.29'
+    getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+  }
+
+  jacoco {
+    toolVersion = '0.8.5' // jacocoMavenPluginVersion
+    reportsDir = file("$buildDir/reports/jacoco")
+  }
+
+// before committing a change, make sure task still works
+  dependencyUpdates {
+    def isNonStable = { String version ->
+      def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { qualifier -> version.toUpperCase().contains(qualifier) }
+      def regex = /^[0-9,.v-]+$/
+      return !stableKeyword && !(version ==~ regex)
+    }
+    rejectVersionIf { selection -> // <---- notice how the closure argument is named
+      return isNonStable(selection.candidate.version) && !isNonStable(selection.currentVersion)
+    }
+  }
+
+// https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+  dependencyCheck {
+    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
+    // range of 0-10 fails the build, anything greater and it doesn't fail the build
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
+    suppressionFile = 'config/owasp/suppressions.xml'
+
+    analyzers {
+      // Disable scanning of .NET related binaries
+      assemblyEnabled = false
+    }
+  }
+
+  dependencyManagement {
+    dependencies {
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.67'
+      // CVE-2018-10237 - Unbounded memory allocation
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.6'
+      // CVE-2020-26945 - Mishandles deserialization of object streams.
+      dependencySet(group: 'com.google.guava', version: '30.0-jre') {
+        entry 'guava'
+      }
+    }
+  }
+
+  repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven {
+      url "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
+    maven {
+      url  "http://repo.spring.io/milestone"
+    }
+    maven {
+      url  "https://repo.spring.io/libs-milestone"
+    }
+  }
 }
 
 sourceSets {
@@ -136,21 +210,6 @@ task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, lintUserInterfaceTests, runFunctionalTests))
 }
 
-checkstyle {
-  maxWarnings = 0
-  toolVersion = '8.29'
-  getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
-}
-
-jacocoTestReport {
-  executionData(test, integration)
-  reports {
-    xml.enabled = true
-    csv.enabled = false
-    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-  }
-}
-
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 
 sonarqube {
@@ -158,60 +217,25 @@ sonarqube {
     property "sonar.projectName", "UNSPEC :: service"
     property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/TestingSupportController.java, **/*ExternalTaskListener.java, **/stereotypes/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/TestingSupportController.java, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
   }
 }
 
-// before committing a change, make sure task still works
-dependencyUpdates {
-  def isNonStable = { String version ->
-    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { qualifier -> version.toUpperCase().contains(qualifier) }
-    def regex = /^[0-9,.v-]+$/
-    return !stableKeyword && !(version ==~ regex)
+jacocoTestReport {
+  executionData(test, integration)
+  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+  subprojects.each {
+    sourceSets it.sourceSets.main
   }
-  rejectVersionIf { selection -> // <---- notice how the closure argument is named
-    return isNonStable(selection.candidate.version) && !isNonStable(selection.currentVersion)
-  }
-}
-
-// https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
-dependencyCheck {
-  // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-  // range of 0-10 fails the build, anything greater and it doesn't fail the build
-  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-  suppressionFile = 'config/owasp/suppressions.xml'
-
-  analyzers {
-    // Disable scanning of .NET related binaries
-    assemblyEnabled = false
+  reports {
+    xml.enabled = true
+    csv.enabled = false
+    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
 }
 
-dependencyManagement {
-  dependencies {
-    dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.67'
-    // CVE-2018-10237 - Unbounded memory allocation
-    dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.6'
-    // CVE-2020-26945 - Mishandles deserialization of object streams.
-    dependencySet(group: 'com.google.guava', version: '30.0-jre') {
-      entry 'guava'
-    }
-  }
-}
-
-repositories {
-  mavenLocal()
-  jcenter()
-  mavenCentral()
-  maven {
-    url "https://dl.bintray.com/hmcts/hmcts-maven"
-  }
-  maven {
-    url  "http://repo.spring.io/milestone"
-  }
-  maven {
-    url  "https://repo.spring.io/libs-milestone"
-  }
+jacocoTestReport.dependsOn {
+  subprojects*.test
 }
 
 def versions = [
@@ -236,6 +260,7 @@ ext.libraries = [
 ]
 
 dependencies {
+  implementation project(':sendgrid-client')
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
