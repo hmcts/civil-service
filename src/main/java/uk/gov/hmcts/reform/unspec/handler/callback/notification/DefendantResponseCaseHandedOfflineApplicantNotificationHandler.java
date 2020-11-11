@@ -16,17 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 
 @Service
 @RequiredArgsConstructor
 public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
-    public static final String TASK_ID = "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1";
-    private static final String REFERENCE_TEMPLATE =
-        "defendant-response-case-handed-offline-respondent-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
+    public static final String TASK_ID = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -34,7 +33,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantSolicitorForCaseHandedOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSolicitorForCaseHandedOffline
         );
     }
 
@@ -48,11 +47,11 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getDefendantSolicitorEmail(),
+            notificationsProperties.getClaimantSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -65,7 +64,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, "defendant solicitor"
+            SOLICITOR_REFERENCE, "claimant solicitor"
         );
     }
 }

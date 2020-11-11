@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.unspec.model.ClaimValue;
 import uk.gov.hmcts.reform.unspec.model.CloseClaim;
 import uk.gov.hmcts.reform.unspec.model.CourtLocation;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.model.ResponseDocument;
 import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
@@ -36,7 +37,10 @@ import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
+import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.CLAIM_FORM;
@@ -73,6 +77,7 @@ public class CaseDataBuilder {
     private AllocatedTrack allocatedTrack;
     private CaseState ccdState;
     private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    private PaymentDetails paymentDetails;
     // Confirm Service
     private LocalDate deemedServiceDateToRespondentSolicitor1;
     private LocalDateTime respondentSolicitor1ResponseDeadline;
@@ -209,6 +214,12 @@ public class CaseDataBuilder {
         switch (flowState) {
             case DRAFT:
                 return atStateClaimDraft();
+            case PENDING_CASE_ISSUED:
+                return atStatePendingCaseIssued();
+            case PAYMENT_SUCCESSFUL:
+                return atStatePaymentSuccessful();
+            case PAYMENT_FAILED:
+                return atStatePaymentFailed();
             case CLAIM_ISSUED:
                 return atStateClaimCreated();
             case CLAIM_STAYED:
@@ -307,21 +318,47 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimCreated() {
+    public CaseDataBuilder atStatePendingCaseIssued() {
         atStateClaimDraft();
         claimSubmittedDateTime = LocalDateTime.now();
         claimIssuedDate = now();
         confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
-        ccdState = CREATED;
+        ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
+        return this;
+    }
+
+    public CaseDataBuilder atStatePaymentFailed() {
+        atStatePendingCaseIssued();
+
+        paymentDetails = PaymentDetails.builder()
+            .status(FAILED)
+            .errorMessage("Your account is deleted")
+            .errorCode("CA-E0004")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStatePaymentSuccessful() {
+        atStatePendingCaseIssued();
+        paymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimCreated() {
+        atStatePaymentSuccessful();
+        ccdState = CREATED;
         return this;
     }
 
     public CaseDataBuilder atStateClaimStayed() {
         atStateClaimCreated();
-        this.ccdState = STAYED;
+        ccdState = STAYED;
         return this;
     }
 
@@ -408,6 +445,7 @@ public class CaseDataBuilder {
             .applicant1(applicant1)
             .respondent1(respondent1)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
+            .paymentDetails(paymentDetails)
             // Confirm Service
             .deemedServiceDateToRespondentSolicitor1(deemedServiceDateToRespondentSolicitor1)
             .respondentSolicitor1ResponseDeadline(respondentSolicitor1ResponseDeadline)

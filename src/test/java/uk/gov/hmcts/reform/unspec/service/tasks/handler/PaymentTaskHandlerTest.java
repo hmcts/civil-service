@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.unspec.service.tasks.handler;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.util.Map;
 
@@ -30,11 +33,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MAKE_PBA_PAYMENT;
+import static uk.gov.hmcts.reform.unspec.service.tasks.handler.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
     PaymentTaskHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    StateFlowEngine.class
 })
 @ExtendWith(SpringExtension.class)
 class PaymentTaskHandlerTest {
@@ -65,9 +70,11 @@ class PaymentTaskHandlerTest {
 
         @Test
         void shouldTriggerMakePbaPaymentCCDEvent_whenHandlerIsExecuted() {
-            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            CaseData caseData = new CaseDataBuilder().atStatePendingCaseIssued()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.PENDING_CASE_ISSUED");
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
@@ -80,7 +87,7 @@ class PaymentTaskHandlerTest {
 
             verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(MAKE_PBA_PAYMENT));
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-            verify(externalTaskService).complete(mockExternalTask);
+            verify(externalTaskService).complete(mockExternalTask, variables);
         }
     }
 }

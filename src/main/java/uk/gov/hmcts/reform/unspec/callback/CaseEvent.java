@@ -39,7 +39,8 @@ public enum CaseEvent {
     END_BUSINESS_PROCESS("End business process", CAMUNDA),
     TESTING_SUPPORT_RESET_BUSINESS_PROCESS("Reset business process", USER),
     MAKE_PBA_PAYMENT("Make PBA payment", CAMUNDA),
-    GENERATE_CERTIFICATE_OF_SERVICE("Generate certificate of service", CAMUNDA);
+    GENERATE_CERTIFICATE_OF_SERVICE("Generate certificate of service", CAMUNDA),
+    NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT("Notify failed payment", CAMUNDA);
 
     private final String displayName;
     private final UserType userType;

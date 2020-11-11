@@ -2,10 +2,18 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "PENDING_CASE_ISSUED",
+    "Name": "Pending claim issued",
+    "Description": "Pending claim issued",
+    "DisplayOrder": 1
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "CREATED",
     "Name": "Claim created",
     "Description": "Case is created",
-    "DisplayOrder": 1
+    "DisplayOrder": 2
   },
   {
     "LiveFrom": "01/01/2017",
@@ -13,7 +21,7 @@
     "ID": "STAYED",
     "Name": "Stayed",
     "Description": "Case is in stayed state",
-    "DisplayOrder": 2
+    "DisplayOrder": 3
   },
   {
     "LiveFrom": "01/01/2017",
@@ -21,7 +29,7 @@
     "ID": "AWAITING_CLAIMANT_INTENTION",
     "Name": "Awaiting claimant intention",
     "Description": "Awaiting claimant intention",
-    "DisplayOrder": 3
+    "DisplayOrder": 4
   },
   {
     "LiveFrom": "01/01/2017",
@@ -29,6 +37,6 @@
     "ID": "CLOSED",
     "Name": "Closed",
     "Description": "Case is closed",
-    "DisplayOrder": 3
+    "DisplayOrder": 5
   }
 ]

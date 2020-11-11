@@ -4,8 +4,6 @@
 
 const output = require('codeceptjs').output;
 
-const testingSupport = require('./api/testingSupport.js');
-
 const config = require('./config.js');
 const parties = require('./helpers/party.js');
 const loginPage = require('./pages/login.page');
@@ -65,7 +63,11 @@ const address = require('./fixtures/address.js');
 
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
+
+const STATE_LOCATOR = '#wb-case-type > option';
+const CASE_NUMBER_INPUT_LOCATOR = 'input[type$="number"]';
 const CASE_HEADER = 'ccd-case-header > h1';
+
 const TEST_FILE_PATH = './e2e/fixtures/examplePDF.pdf';
 
 let caseId;
@@ -84,6 +86,21 @@ module.exports = function () {
 
         loginPage.signIn(user);
       }, signedInSelector);
+    },
+
+    async goToCase(caseId) {
+        this.click('Case list');
+
+        this.waitForElement(STATE_LOCATOR);
+        this.selectOption('state', 'Any');
+
+        this.waitForElement(CASE_NUMBER_INPUT_LOCATOR);
+        this.fillField(CASE_NUMBER_INPUT_LOCATOR, caseId);
+        this.click('Apply');
+
+        const caseLinkLocator = `a[href$="/cases/case-details/${caseId}"]`;
+        this.waitForElement(caseLinkLocator);
+        this.click(caseLinkLocator);
     },
 
     grabCaseNumber: async function () {
@@ -115,8 +132,7 @@ module.exports = function () {
     },
 
     async confirmService() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Confirm service');
+      await caseViewPage.startEvent('Confirm service', caseId);
       await servedDocumentsPage.enterServedDocuments();
       await uploadDocumentsPage.uploadServedDocuments(TEST_FILE_PATH);
       await serviceMethodPage.selectPostMethod();
@@ -128,8 +144,7 @@ module.exports = function () {
     },
 
     async acknowledgeService() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Acknowledge service');
+      await caseViewPage.startEvent('Acknowledge service', caseId);
       await defendantDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await responseIntentionPage.selectResponseIntention();
@@ -138,8 +153,7 @@ module.exports = function () {
     },
 
     async requestExtension() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Request extension');
+      await caseViewPage.startEvent('Request extension', caseId);
       await proposeDeadline.enterExtensionProposedDeadline();
       await extensionAlreadyAgreed.selectAlreadyAgreed();
       await event.submit('Ask for extension', 'You asked for extra time to respond');
@@ -147,8 +161,7 @@ module.exports = function () {
     },
 
     async respondToExtension() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Respond to extension request');
+      await caseViewPage.startEvent('Respond to extension request', caseId);
       await respondToExtensionPage.selectDoNotAccept();
       await counterExtensionPage.enterCounterDate();
       await rejectionReasonPage.enterResponse();
@@ -157,8 +170,7 @@ module.exports = function () {
     },
 
     async respondToClaim() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Respond to claim');
+      await caseViewPage.startEvent('Respond to claim', caseId);
       await responseTypePage.selectFullDefence();
       await uploadResponsePage.uploadResponseDocuments(TEST_FILE_PATH);
       await defendantDetails.verifyDetails();
@@ -179,8 +191,7 @@ module.exports = function () {
     },
 
     async respondToDefence() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('View and respond to defence');
+      await caseViewPage.startEvent('View and respond to defence', caseId);
       await proceedPage.proceedWithClaim();
       await uploadResponseDocumentPage.uploadResponseDocuments(TEST_FILE_PATH);
       await fileDirectionsQuestionnairePage.fileDirectionsQuestionnaire(parties.APPLICANT_SOLICITOR_1);
@@ -198,8 +209,7 @@ module.exports = function () {
     },
 
     async addDefendantLitigationFriend() {
-      await testingSupport.resetBusinessProcess(caseId);
-      await caseViewPage.startEvent('Add litigation friend');
+      await caseViewPage.startEvent('Add litigation friend', caseId);
       await defendantLitigationFriendPage.enterLitigantFriendWithDifferentAddressToDefendant(address, TEST_FILE_PATH);
       await this.click('Submit');
     },

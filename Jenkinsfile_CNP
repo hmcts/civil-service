@@ -117,6 +117,12 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.UNSPEC_SERVICE_URL="http://unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    dir("${WORKSPACE}/bin") {
+      sh """
+    eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
+    ./import-bpmn-diagram.sh ${WORKSPACE}
+  """
+    }
   }
 
   after('functionalTest:preview') {
@@ -127,6 +133,7 @@ withPipeline(type, product, component) {
     env.URL = "https://manage-case.aat.platform.hmcts.net"
     archiveCoreCaseDataDefinitions('staging')
     uploadCoreCaseDataDefinitions('staging')
+    uploadBpmnDiagrams('aat')
   }
 
   after('smoketest:aat') {
@@ -145,7 +152,6 @@ withPipeline(type, product, component) {
     env.URL = "https://manage-case.aat.platform.hmcts.net"
     archiveCoreCaseDataDefinitions('aat')
     uploadCoreCaseDataDefinitions('aat')
-    uploadBpmnDiagrams('aat')
   }
 
   before('buildinfra:demo') {

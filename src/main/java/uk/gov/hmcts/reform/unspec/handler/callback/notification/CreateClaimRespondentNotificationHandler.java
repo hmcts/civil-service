@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedO
 public class CreateClaimRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-    public static final String TASK_ID = "CreateClaimNotifyRespondentSolicitor1";
+    public static final String TASK_ID = "CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
     private final NotificationService notificationService;

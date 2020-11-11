@@ -1,7 +1,6 @@
 const assert = require('assert').strict;
 
 const request = require('./request.js');
-const testingSupport = require('./testingSupport.js');
 
 const data = {
   CREATE_CLAIM: require('../fixtures/events/createClaim.js'),
@@ -25,7 +24,7 @@ module.exports = {
 
     await validateEventPages();
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
       header: 'Your claim has been issued',
       body: 'Follow these steps to serve a claim'
     });
@@ -33,7 +32,6 @@ module.exports = {
 
   confirmService: async () => {
     eventName = 'CONFIRM_SERVICE';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
     deleteCaseFields('servedDocumentFiles');
 
@@ -54,7 +52,7 @@ module.exports = {
 
   acknowledgeService: async () => {
     eventName = 'ACKNOWLEDGE_SERVICE';
-    await testingSupport.resetBusinessProcess(caseId);
+    deleteCaseFields('systemGeneratedCaseDocuments');
     await request.startEvent(eventName, caseId);
 
     await validateEventPages();
@@ -70,7 +68,6 @@ module.exports = {
 
   requestExtension: async () => {
     eventName = 'REQUEST_EXTENSION';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
 
     await validateEventPages();
@@ -88,7 +85,6 @@ module.exports = {
 
   respondExtension: async () => {
     eventName = 'RESPOND_EXTENSION';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
 
     await validateEventPages();
@@ -106,7 +102,6 @@ module.exports = {
 
   defendantResponse: async () => {
     eventName = 'DEFENDANT_RESPONSE';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
     deleteCaseFields('respondent1', 'solicitorReferences');
 
@@ -127,7 +122,6 @@ module.exports = {
 
   claimantResponse: async () => {
     eventName = 'CLAIMANT_RESPONSE';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
 
     await validateEventPages();
@@ -145,7 +139,6 @@ module.exports = {
 
   addDefendantLitigationFriend: async () => {
     eventName = 'ADD_DEFENDANT_LITIGATION_FRIEND';
-    await testingSupport.resetBusinessProcess(caseId);
     await request.startEvent(eventName, caseId);
 
     await validateEventPages();
