@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MAKE_PBA_PAYMENT;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.tasks.handler.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 class CreateClaimTest extends BpmnBaseTest {
@@ -39,7 +39,7 @@ class CreateClaimTest extends BpmnBaseTest {
             .isEqualTo("CREATE_CLAIM_PROCESS_ID");
 
         VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, PAYMENT_SUCCESSFUL.fullName());
+        variables.putValue(FLOW_STATE, CLAIM_ISSUED.fullName());
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);

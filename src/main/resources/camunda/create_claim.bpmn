@@ -54,18 +54,6 @@
       <bpmn:incoming>Flow_11ung1u</bpmn:incoming>
       <bpmn:outgoing>Flow_0378r6q</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_1tjkoh7">
-      <bpmn:incoming>Flow_0378r6q</bpmn:incoming>
-      <bpmn:outgoing>Flow_13gsvoo</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1rm2cb6</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0378r6q" sourceRef="CreateClaimMakePayment" targetRef="Gateway_1tjkoh7" />
-    <bpmn:sequenceFlow id="Flow_13gsvoo" sourceRef="Gateway_1tjkoh7" targetRef="CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PAYMENT_SUCCESSFUL"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1rm2cb6" sourceRef="Gateway_1tjkoh7" targetRef="CreateClaimPaymentFailedNotifyApplicantSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PAYMENT_FAILED"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:serviceTask id="CreateClaimPaymentFailedNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -87,6 +75,18 @@
       <bpmn:incoming>Flow_0wci5qk</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0wci5qk" sourceRef="Activity_1lsvm9g" targetRef="Event_1ub69h5" />
+    <bpmn:exclusiveGateway id="Gateway_1tjkoh7">
+      <bpmn:incoming>Flow_0378r6q</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rm2cb6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_13gsvoo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1rm2cb6" sourceRef="Gateway_1tjkoh7" targetRef="CreateClaimPaymentFailedNotifyApplicantSolicitor1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PAYMENT_FAILED"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_13gsvoo" sourceRef="Gateway_1tjkoh7" targetRef="CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.CLAIM_ISSUED"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0378r6q" sourceRef="CreateClaimMakePayment" targetRef="Gateway_1tjkoh7" />
   </bpmn:process>
   <bpmn:message id="Message_0slk3de" name="CREATE_CLAIM" />
   <bpmn:error id="Error_0t2ju7k" name="StartBusinessAbort" errorCode="ABORT" />
