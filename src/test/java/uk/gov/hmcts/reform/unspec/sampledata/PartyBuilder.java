@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.unspec.model.Party.Type.SOLE_TRADER;
 
 public class PartyBuilder {
 
+    public  static final LocalDate DATE_OF_BIRTH = LocalDate.now().minusYears(20);
+
     private Party.Type type;
     private String individualTitle;
     private String individualFirstName;
@@ -31,12 +33,27 @@ public class PartyBuilder {
         return new PartyBuilder();
     }
 
+    public PartyBuilder ofType(Party.Type type) {
+        switch (type) {
+            case INDIVIDUAL:
+                return individual();
+            case SOLE_TRADER:
+                return soleTrader();
+            case COMPANY:
+                return company();
+            case ORGANISATION:
+                return organisation();
+            default:
+                throw new IllegalArgumentException("Invalid party type: " + type);
+        }
+    }
+
     public PartyBuilder soleTrader() {
         type = SOLE_TRADER;
         soleTraderTitle = "Mr.";
         soleTraderFirstName = "Sole";
         soleTraderLastName = "Trader";
-        soleTraderDateOfBirth = LocalDate.now().minusYears(20);
+        soleTraderDateOfBirth = DATE_OF_BIRTH;
         soleTraderTradingAs = "Sole Trader co";
         partyName = soleTraderTitle + " " + soleTraderFirstName + " " + soleTraderLastName;
         primaryAddress = AddressBuilder.builder().build();
@@ -64,7 +81,7 @@ public class PartyBuilder {
         individualTitle = "Mr.";
         individualFirstName = "John";
         individualLastName = "Rambo";
-        individualDateOfBirth = LocalDate.now().minusYears(20);
+        individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;
         primaryAddress = AddressBuilder.builder().build();
         return this;

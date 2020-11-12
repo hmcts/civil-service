@@ -3,9 +3,12 @@ package uk.gov.hmcts.reform.unspec.utils;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.unspec.model.Party;
 
-public class PartyNameUtils {
+import java.time.LocalDate;
+import java.util.Optional;
 
-    private PartyNameUtils() {
+public class PartyUtils {
+
+    private PartyUtils() {
         //NO-OP
     }
 
@@ -32,5 +35,18 @@ public class PartyNameUtils {
 
     private static String getTitle(String title) {
         return StringUtils.isBlank(title) ? "" : title + " ";
+    }
+
+    public static Optional<LocalDate> getDateOfBirth(Party party) {
+        switch (party.getType()) {
+            case INDIVIDUAL:
+                return Optional.ofNullable(party.getIndividualDateOfBirth());
+            case SOLE_TRADER:
+                return Optional.ofNullable(party.getSoleTraderDateOfBirth());
+            case COMPANY:
+            case ORGANISATION:
+            default:
+                return Optional.empty();
+        }
     }
 }

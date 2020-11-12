@@ -93,6 +93,9 @@ notifications:
   claimantSolicitorEmail: claimantsolicitor@gmail.com
   defendantSolicitorEmail: defendantsolicitor@gmail.com
 
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:false}
+
 testing:
   support:
     enabled: ${TESTING_SUPPORT_ENABLED:false}

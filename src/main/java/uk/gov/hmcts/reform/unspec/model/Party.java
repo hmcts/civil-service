@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.unspec.validation.groups.DateOfBirthGroup;
 import java.time.LocalDate;
 import javax.validation.constraints.PastOrPresent;
 
-import static uk.gov.hmcts.reform.unspec.utils.PartyNameUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
 @Builder(toBuilder = true)
