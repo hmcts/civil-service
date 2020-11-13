@@ -1,6 +1,6 @@
 const MAX_RETRY_TIMEOUT = 30000;
 
-const retry = (fn, retryTimeout = 5000, remainingRetries = 5, err = null) => {
+const retry = (fn, retryTimeout = 5000, remainingRetries = 10, err = null) => {
   if (!remainingRetries) {
     return Promise.reject(err);
   }
