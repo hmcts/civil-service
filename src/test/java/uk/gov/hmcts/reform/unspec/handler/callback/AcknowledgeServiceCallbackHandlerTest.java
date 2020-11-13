@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
@@ -45,7 +44,6 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
-    BusinessProcessService.class
 })
 class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 

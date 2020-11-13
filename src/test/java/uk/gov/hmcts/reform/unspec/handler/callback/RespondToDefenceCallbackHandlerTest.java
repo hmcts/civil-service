@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
@@ -30,16 +27,12 @@ import java.time.LocalDate;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
@@ -51,13 +44,9 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    BusinessProcessService.class,
     StateFlowEngine.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
-
-    @MockBean
-    private BusinessProcessService businessProcessService;
 
     @Autowired
     private RespondToDefenceCallbackHandler handler;
@@ -163,28 +152,24 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(businessProcessService.updateBusinessProcess(any(), any())).thenReturn(CaseData.builder().build());
-            clearInvocations(businessProcessService);
-        }
-
         @Test
         void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateFullDefence().build();
+            var params = callbackParamsOf(CaseDataBuilder.builder().atStateFullDefence().build(), ABOUT_TO_SUBMIT);
 
-            handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(businessProcessService).updateBusinessProcess(caseData, CLAIMANT_RESPONSE);
+            assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY.name());
+            assertThat(response.getData()).extracting("businessProcess").extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE.name());
         }
 
         @Test
         void shouldNotUpdateBusinessProcess_whenNotAtFullDefenceState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
+            var params = callbackParamsOf(CaseDataBuilder.builder().atStateRespondedToClaim().build(), ABOUT_TO_SUBMIT);
 
-            handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verifyNoInteractions(businessProcessService);
+            assertThat(response.getData()).doesNotContainKey("businessProcess");
         }
     }
 

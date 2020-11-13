@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
@@ -40,7 +40,6 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final WorkingDayIndicator workingDayIndicator;
-    private final BusinessProcessService businessProcessService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
@@ -71,11 +70,10 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondentSolicitor1ResponseDeadline();
         LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .respondentSolicitor1ResponseDeadline(newResponseDate.atTime(MID_NIGHT));
-
-        CaseData caseDataUpdated = businessProcessService.updateBusinessProcess(
-            caseDataBuilder.build(), ACKNOWLEDGE_SERVICE);
+        CaseData caseDataUpdated = caseData.toBuilder()
+            .respondentSolicitor1ResponseDeadline(newResponseDate.atTime(MID_NIGHT))
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_SERVICE))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDetailsConverter.toMap(caseDataUpdated))

@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
@@ -50,7 +49,6 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    BusinessProcessService.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 

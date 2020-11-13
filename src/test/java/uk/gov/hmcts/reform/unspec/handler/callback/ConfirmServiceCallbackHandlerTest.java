@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 
@@ -50,7 +49,6 @@ import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.RESPONSE_DEA
     ValidationAutoConfiguration.class,
     DeadlinesCalculator.class,
     CaseDetailsConverter.class,
-    BusinessProcessService.class
 })
 class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 

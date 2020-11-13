@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.validation.groups.ConfirmServiceDateGroup;
 
@@ -51,7 +51,6 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final BusinessProcessService businessProcessService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -106,24 +105,22 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     private CallbackResponse calculateServiceDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         ServiceMethod serviceMethod = caseData.getServiceMethodToRespondentSolicitor1();
-        LocalDateTime serviceDate;
+        LocalDateTime serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();;
         if (serviceMethod.requiresDateEntry()) {
             serviceDate = caseData.getServiceDateToRespondentSolicitor1().atStartOfDay();
-        } else {
-            serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();
         }
         LocalDate deemedDateOfService = deadlinesCalculator.calculateDeemedDateOfService(
             serviceDate, serviceMethod.getType());
         LocalDateTime responseDeadline = deadlinesCalculator.calculateDefendantResponseDeadline(deemedDateOfService);
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+        CaseData caseDataUpdated = caseData.toBuilder()
             .deemedServiceDateToRespondentSolicitor1(deemedDateOfService)
-            .respondentSolicitor1ResponseDeadline(responseDeadline);
-
-        CaseData updatedData = businessProcessService.updateBusinessProcess(caseDataBuilder.build(), CONFIRM_SERVICE);
+            .respondentSolicitor1ResponseDeadline(responseDeadline)
+            .businessProcess(BusinessProcess.ready(CONFIRM_SERVICE))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(updatedData))
+            .data(caseDetailsConverter.toMap(caseDataUpdated))
             .build();
     }
 

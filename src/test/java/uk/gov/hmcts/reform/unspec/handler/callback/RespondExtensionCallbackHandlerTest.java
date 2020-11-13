@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
@@ -44,7 +43,6 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
     FlowStateAllowedEventService.class,
     StateFlowEngine.class,
     CaseDetailsConverter.class,
-    BusinessProcessService.class
 })
 class RespondExtensionCallbackHandlerTest extends BaseCallbackHandlerTest {
 

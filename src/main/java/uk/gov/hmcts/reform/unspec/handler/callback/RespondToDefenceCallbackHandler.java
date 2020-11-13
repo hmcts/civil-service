@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
@@ -39,8 +39,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.fromFullNam
 public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
-
-    private final BusinessProcessService businessProcessService;
     private final StateFlowEngine stateFlowEngine;
     private final UnavailableDateValidator unavailableDateValidator;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -74,7 +72,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     private CallbackResponse handleNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (fromFullName(stateFlowEngine.evaluate(caseData).getState().getName()) == FlowState.Main.CLAIM_STAYED) {
-            caseData = businessProcessService.updateBusinessProcess(caseData, CLAIMANT_RESPONSE);
+            caseData = caseData.toBuilder().businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE)).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

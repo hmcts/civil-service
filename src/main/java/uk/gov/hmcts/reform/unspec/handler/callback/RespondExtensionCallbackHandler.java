@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -40,7 +40,6 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
     public static final String EXTENSION_REASON = "respondentSolicitor1claimResponseExtensionReason";
 
     private final RequestExtensionValidator validator;
-    private final BusinessProcessService businessProcessService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
@@ -88,7 +87,8 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         YesOrNo proposedDeadlineAccepted = caseData.getRespondentSolicitor1claimResponseExtensionAccepted();
         YesOrNo providedCounterDate = caseData.getRespondentSolicitor1claimResponseExtensionCounter();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(RESPOND_EXTENSION));
         if (proposedDeadlineAccepted == YesOrNo.YES) {
             caseDataBuilder.respondentSolicitor1ResponseDeadline(
                 caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline().atTime(MID_NIGHT)
@@ -101,11 +101,8 @@ public class RespondExtensionCallbackHandler extends CallbackHandler {
             );
         }
 
-        CaseData updatedCaseData = businessProcessService
-            .updateBusinessProcess(caseDataBuilder.build(), RESPOND_EXTENSION);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(updatedCaseData))
+            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
             .build();
     }
 

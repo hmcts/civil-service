@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.RequestExtensionValidator;
 
 import java.time.LocalDate;
@@ -46,7 +46,6 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
     public static final String LEGACY_CASE_REFERENCE = "legacyCaseReference";
 
     private final RequestExtensionValidator validator;
-    private final BusinessProcessService businessProcessService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
@@ -63,17 +62,14 @@ public class RequestExtensionCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate proposedDeadline = caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline();
         YesOrNo extensionAlreadyAgreed = caseData.getRespondentSolicitor1claimResponseExtensionAlreadyAgreed();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(REQUEST_EXTENSION));
         if (extensionAlreadyAgreed == YES) {
             caseDataBuilder.respondentSolicitor1ResponseDeadline(proposedDeadline.atTime(MID_NIGHT));
         }
-        CaseData caseDataUpdated = businessProcessService.updateBusinessProcess(
-            caseDataBuilder.build(),
-            REQUEST_EXTENSION
-        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseDataUpdated))
+            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
             .build();
     }
 

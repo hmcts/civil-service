@@ -10,11 +10,11 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
-import uk.gov.hmcts.reform.unspec.service.BusinessProcessService;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
@@ -42,7 +42,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final BusinessProcessService businessProcessService;
     private final UnavailableDateValidator unavailableDateValidator;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -84,10 +83,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setClaimantResponseDeadline(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         //TODO: There will be in separate ticket for response deadline when requirement is confirmed
-        caseDataBuilder.applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0));
-        CaseData caseData = businessProcessService.updateBusinessProcess(caseDataBuilder.build(), DEFENDANT_RESPONSE);
+        CaseData caseData = callbackParams.getCaseData().toBuilder()
+            .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0))
+            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDetailsConverter.toMap(caseData))
