@@ -64,7 +64,8 @@ const address = require('./fixtures/address.js');
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
 
-const STATE_LOCATOR = '#wb-case-type > option';
+const TYPE_LOCATOR = '#wb-case-type > option';
+const STATE_LOCATOR = '#wb-case-state > option';
 const CASE_NUMBER_INPUT_LOCATOR = 'input[type$="number"]';
 const CASE_HEADER = 'ccd-case-header > h1';
 
@@ -91,6 +92,9 @@ module.exports = function () {
     async goToCase(caseId) {
         this.click('Case list');
 
+        this.waitForElement(TYPE_LOCATOR);
+        this.selectOption('case-type', 'Unspecified Claims');
+
         this.waitForElement(STATE_LOCATOR);
         this.selectOption('state', 'Any');
 
@@ -101,6 +105,7 @@ module.exports = function () {
         const caseLinkLocator = `a[href$="/cases/case-details/${caseId}"]`;
         this.waitForElement(caseLinkLocator);
         this.click(caseLinkLocator);
+        this.waitForElement(CASE_HEADER);
     },
 
     grabCaseNumber: async function () {
@@ -150,6 +155,14 @@ module.exports = function () {
       await responseIntentionPage.selectResponseIntention();
       await event.submit('Acknowledge service', 'You\'ve acknowledged service');
       await event.returnToCaseDetails();
+    },
+
+    async addDefendantLitigationFriend() {
+      await caseViewPage.startEvent('Add litigation friend', caseId);
+      await defendantLitigationFriendPage.enterLitigantFriendWithDifferentAddressToDefendant(address, TEST_FILE_PATH);
+      this.waitForText('Submit');
+      this.click('Submit');
+      this.waitForElement(CASE_HEADER);
     },
 
     async requestExtension() {
@@ -206,12 +219,6 @@ module.exports = function () {
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');
-    },
-
-    async addDefendantLitigationFriend() {
-      await caseViewPage.startEvent('Add litigation friend', caseId);
-      await defendantLitigationFriendPage.enterLitigantFriendWithDifferentAddressToDefendant(address, TEST_FILE_PATH);
-      await this.click('Submit');
     },
 
     async clickContinue() {

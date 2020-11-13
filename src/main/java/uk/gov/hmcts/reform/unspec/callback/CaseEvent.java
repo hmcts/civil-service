@@ -15,6 +15,7 @@ public enum CaseEvent {
     RESPOND_EXTENSION("Respond to extension request", USER),
     MOVE_TO_STAYED("Move case to stayed", USER),
     ACKNOWLEDGE_SERVICE("Acknowledge service", USER),
+    ADD_DEFENDANT_LITIGATION_FRIEND("Add defendant litigation friend", USER),
     DEFENDANT_RESPONSE("Respond to claim", USER),
     CLAIMANT_RESPONSE("View and respond to defence", USER),
     WITHDRAW_CLAIM("Withdraw claim", USER),

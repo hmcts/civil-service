@@ -365,6 +365,7 @@
     "PreConditionState(s)": "CREATED;AWAITING_CLAIMANT_INTENTION",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
     "ShowSummary": "N",
     "ShowEventNotes": "N"
   },
