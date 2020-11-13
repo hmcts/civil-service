@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sendgrid;
+package uk.gov.hmcts.reform.unspec.sendgrid;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

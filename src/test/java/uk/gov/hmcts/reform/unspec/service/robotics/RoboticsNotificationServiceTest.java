@@ -10,11 +10,11 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.sendgrid.EmailData;
-import uk.gov.hmcts.reform.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.unspec.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.sendgrid.EmailData;
+import uk.gov.hmcts.reform.unspec.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 

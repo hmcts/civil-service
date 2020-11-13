@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sendgrid;
+package uk.gov.hmcts.reform.unspec.sendgrid;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;

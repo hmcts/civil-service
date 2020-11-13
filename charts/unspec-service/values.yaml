@@ -56,3 +56,4 @@ java:
         - docmosis-api-key
         - cmc-db-password
         - gov-notify-api-key
+        - sendgrid-api-key

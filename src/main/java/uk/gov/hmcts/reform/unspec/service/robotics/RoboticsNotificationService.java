@@ -6,18 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sendgrid.EmailData;
-import uk.gov.hmcts.reform.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.unspec.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.unspec.sendgrid.EmailData;
+import uk.gov.hmcts.reform.unspec.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
 import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sendgrid.EmailAttachment.json;
+import static uk.gov.hmcts.reform.unspec.sendgrid.EmailAttachment.json;
 
 @Slf4j
 @Service

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sendgrid.config;
+package uk.gov.hmcts.reform.unspec.sendgrid.config;
 
 import com.sendgrid.SendGrid;
 import org.junit.jupiter.api.AfterEach;
