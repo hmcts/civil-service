@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -22,8 +21,6 @@ import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
@@ -32,8 +29,6 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
@@ -56,11 +51,6 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnTyp
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000LR001";
-
-    @MockBean
-    IssueDateCalculator issueDateCalculator;
-    @MockBean
-    DeadlinesCalculator deadlinesCalculator;
 
     @Autowired
     private CreateClaimCallbackHandler handler;
@@ -148,18 +138,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        private final LocalDate claimIssuedDate = now();
-        private final LocalDateTime confirmationOfServiceDeadline = now().atTime(23, 59, 59);
-
         private CallbackParams params;
         private CaseData caseData;
 
         @BeforeEach
         void setup() {
-
-            when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(claimIssuedDate);
-            when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class)))
-                .thenReturn(confirmationOfServiceDeadline);
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
         }
@@ -168,12 +151,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).containsEntry("claimIssuedDate", claimIssuedDate.toString());
             assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
-            assertThat(response.getData()).containsEntry(
-                "confirmationOfServiceDeadline",
-                confirmationOfServiceDeadline.toString()
-            );
             assertThat(response.getData()).containsKey("claimSubmittedDateTime");
         }
 

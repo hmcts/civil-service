@@ -321,8 +321,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePendingCaseIssued() {
         atStateClaimDraft();
         claimSubmittedDateTime = LocalDateTime.now();
-        claimIssuedDate = now();
-        confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
@@ -352,6 +350,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimCreated() {
         atStatePaymentSuccessful();
+        claimIssuedDate = now();
+        confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         ccdState = CREATED;
         return this;
     }

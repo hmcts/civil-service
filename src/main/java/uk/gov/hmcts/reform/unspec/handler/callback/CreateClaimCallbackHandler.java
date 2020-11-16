@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
-import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
@@ -49,8 +47,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final IssueDateCalculator issueDateCalculator;
-    private final DeadlinesCalculator deadlinesCalculator;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
 
@@ -59,7 +55,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "claimant"), this::validateDateOfBirth,
-            callbackKey(ABOUT_TO_SUBMIT), this::issueClaim,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -78,16 +74,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse issueClaim(CallbackParams callbackParams) {
-        LocalDateTime submittedAt = LocalDateTime.now();
-        LocalDate issueDate = issueDateCalculator.calculateIssueDay(submittedAt);
+    private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .claimIssuedDate(issueDate)
-            .claimSubmittedDateTime(submittedAt)
             .legacyCaseReference(referenceNumberRepository.getReferenceNumber())
-            .confirmationOfServiceDeadline(deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate))
+            .claimSubmittedDateTime(LocalDateTime.now())
             .allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()))
             .businessProcess(BusinessProcess.ready(CREATE_CLAIM));
 
