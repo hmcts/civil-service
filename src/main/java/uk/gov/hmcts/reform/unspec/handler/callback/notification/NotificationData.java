@@ -7,9 +7,9 @@ import java.util.Map;
 public interface NotificationData {
 
     String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
-    String CLAIMANT_NAME = "claimantName";
-    String DEFENDANT_NAME = "defendantName";
-    String DEFENDANT_SOLICITOR_NAME = "defendantSolicitorName";
+    String APPLICANT_NAME = "claimantName";
+    String RESPONDENT_NAME = "defendantName";
+    String RESPONDENT_SOLICITOR_NAME = "defendantSolicitorName";
     String ISSUED_ON = "issuedOn";
     String RESPONSE_DEADLINE = "responseDeadline";
     String SOLICITOR_REFERENCE = "solicitorReference";

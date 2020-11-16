@@ -32,7 +32,7 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSolicitorForServiceAcknowledgement
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForServiceAcknowledgement
         );
     }
 
@@ -46,12 +46,12 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantSolicitorForServiceAcknowledgement(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForServiceAcknowledgement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getClaimantSolicitorEmail(),
-            notificationsProperties.getDefendantSolicitorAcknowledgeService(),
+            notificationsProperties.getApplicantSolicitorEmail(),
+            notificationsProperties.getRespondentSolicitorAcknowledgeService(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -62,7 +62,7 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             SOLICITOR_REFERENCE, "claimant solicitor",
             RESPONSE_DEADLINE, caseData.getRespondentSolicitor1ResponseDeadline().toString()
         );

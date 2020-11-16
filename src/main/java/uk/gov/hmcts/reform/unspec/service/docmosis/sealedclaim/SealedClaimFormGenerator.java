@@ -7,9 +7,9 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Claimant;
-import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Defendant;
+import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Applicant;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
@@ -69,38 +69,38 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     public SealedClaimForm getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = Optional.ofNullable(caseData.getSolicitorReferences());
         return SealedClaimForm.builder()
-            .claimants(getClaimants(caseData))
-            .defendants(geDefendants(caseData))
+            .applicants(getApplicants(caseData))
+            .respondents(getRespondents(caseData))
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(TEMP_CLAIM_DETAILS)
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
-            .claimantRepresentative(TEMP_REPRESENTATIVE)
+            .applicantRepresentative(TEMP_REPRESENTATIVE)
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getClaimIssuedDate())
             .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
-            .claimantExternalReference(solicitorReferences
+            .applicantExternalReference(solicitorReferences
                                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                                            .orElse(""))
-            .defendantExternalReference(solicitorReferences
+            .respondentExternalReference(solicitorReferences
                                             .map(SolicitorReferences::getRespondentSolicitor1Reference)
                                             .orElse(""))
             .caseName(CaseNameUtils.toCaseName.apply(caseData))
             .build();
     }
 
-    private List<Defendant> geDefendants(CaseData caseData) {
+    private List<Respondent> getRespondents(CaseData caseData) {
         Party respondent = caseData.getRespondent1();
-        return List.of(Defendant.builder()
+        return List.of(Respondent.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(TEMP_REPRESENTATIVE)
                            .build());
     }
 
-    private List<Claimant> getClaimants(CaseData caseData) {
+    private List<Applicant> getApplicants(CaseData caseData) {
         Party applicant = caseData.getApplicant1();
-        return List.of(Claimant.builder()
+        return List.of(Applicant.builder()
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .build());

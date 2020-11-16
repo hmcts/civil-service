@@ -37,7 +37,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantSolicitorForClaimIssue
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimIssue
         );
     }
 
@@ -51,14 +51,14 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantSolicitorForClaimIssue(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             ofNullable(caseData.getServiceMethodToRespondentSolicitor1())
                 .map(ServiceMethod::getEmail)
                 .orElse("civilunspecified@gmail.com"), //TODO need correct email address here
-            notificationsProperties.getDefendantSolicitorClaimIssueEmailTemplate(),
+            notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -69,9 +69,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_SOLICITOR_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            RESPONDENT_SOLICITOR_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            APPLICANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             ISSUED_ON, formatLocalDate(caseData.getClaimIssuedDate(), DATE)
         );
     }

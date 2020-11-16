@@ -24,25 +24,25 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimIssuedDate() != null;
 
-    public static final Predicate<CaseData> claimantConfirmService = caseData ->
+    public static final Predicate<CaseData> applicantConfirmService = caseData ->
         caseData.getDeemedServiceDateToRespondentSolicitor1() != null
             && Objects.isNull(caseData.getWithdrawClaim())
             && Objects.isNull(caseData.getDiscontinueClaim());
 
-    public static final Predicate<CaseData> defendantAcknowledgeService = caseData ->
+    public static final Predicate<CaseData> respondentAcknowledgeService = caseData ->
         caseData.getRespondent1ClaimResponseIntentionType() != null
             && caseData.getRespondent1ClaimResponseDocument() == null;
 
-    public static final Predicate<CaseData> defendantRespondToClaim = caseData ->
+    public static final Predicate<CaseData> respondentRespondToClaim = caseData ->
         caseData.getRespondent1ClaimResponseDocument() != null;
 
-    public static final Predicate<CaseData> defendantAskForAnExtension = caseData ->
+    public static final Predicate<CaseData> respondentAskForAnExtension = caseData ->
         caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline() != null;
 
-    public static final Predicate<CaseData> claimantRespondToRequestForExtension = caseData ->
+    public static final Predicate<CaseData> applicantRespondToRequestForExtension = caseData ->
         caseData.getRespondentSolicitor1claimResponseExtensionAccepted() != null;
 
-    public static final Predicate<CaseData> claimantRespondToDefence = caseData ->
+    public static final Predicate<CaseData> applicantRespondToDefence = caseData ->
         caseData.getApplicant1ProceedWithClaim() != null
             && caseData.getApplicant1DefenceResponseDocument() != null;
 

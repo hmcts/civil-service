@@ -33,7 +33,7 @@ public class ClaimantResponseApplicantNotificationHandler extends CallbackHandle
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantForCaseTransferredToLocalCourt
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseTransferredToLocalCourt
         );
     }
 
@@ -47,11 +47,11 @@ public class ClaimantResponseApplicantNotificationHandler extends CallbackHandle
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getClaimantSolicitorEmail(),
+            notificationsProperties.getApplicantSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

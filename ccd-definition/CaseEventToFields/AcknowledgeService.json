@@ -3,7 +3,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "ACKNOWLEDGE_SERVICE",
-    "CaseFieldID": "defendantDetails",
+    "CaseFieldID": "respondentDetails",
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "READONLY",
     "PageID": "ConfirmNameAddress",

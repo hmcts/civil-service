@@ -57,7 +57,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "upload"), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::setClaimantResponseDeadline,
+            callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -82,7 +82,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse setClaimantResponseDeadline(CallbackParams callbackParams) {
+    private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         //TODO: There will be in separate ticket for response deadline when requirement is confirmed
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0))

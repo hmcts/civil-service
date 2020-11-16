@@ -34,7 +34,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantSolicitorForCaseHandedOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseHandedOffline
         );
     }
 
@@ -48,11 +48,11 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getDefendantSolicitorEmail(),
+            notificationsProperties.getRespondentSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

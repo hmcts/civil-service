@@ -44,7 +44,7 @@ const defendantLitigationFriendPage = require('./pages/addDefendantLitigationFri
 const statementOfTruth = require('./fragments/statementOfTruth');
 const party = require('./fragments/party');
 const event = require('./fragments/event');
-const defendantDetails = require('./fragments/defendantDetails.page');
+const respondentDetails = require('./fragments/respondentDetails.page');
 const confirmDetailsPage = require('./fragments/confirmDetails.page');
 
 // DQ fragments
@@ -123,7 +123,7 @@ module.exports = function () {
       await solicitorReferencesPage.enterReferences();
       await chooseCourtPage.enterCourt();
       await party.enterParty('applicant1', address);
-      await claimantLitigationDetails.enterLitigantFriendWithDifferentAddressToClaimant(address, TEST_FILE_PATH);
+      await claimantLitigationDetails.enterLitigantFriendWithDifferentAddressToApplicant(address, TEST_FILE_PATH);
       await party.enterParty('respondent1', address);
       await claimTypePage.selectClaimType();
       await personalInjuryTypePage.selectPersonalInjuryType();
@@ -151,7 +151,7 @@ module.exports = function () {
 
     async acknowledgeService() {
       await caseViewPage.startEvent('Acknowledge service', caseId);
-      await defendantDetails.verifyDetails();
+      await respondentDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await responseIntentionPage.selectResponseIntention();
       await event.submit('Acknowledge service', 'You\'ve acknowledged service');
@@ -187,7 +187,7 @@ module.exports = function () {
       await caseViewPage.startEvent('Respond to claim', caseId);
       await responseTypePage.selectFullDefence();
       await uploadResponsePage.uploadResponseDocuments(TEST_FILE_PATH);
-      await defendantDetails.verifyDetails();
+      await respondentDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await fileDirectionsQuestionnairePage.fileDirectionsQuestionnaire(parties.RESPONDENT_SOLICITOR_1);
       await disclosureOfElectronicDocumentsPage.enterDisclosureOfElectronicDocuments(parties.RESPONDENT_SOLICITOR_1);

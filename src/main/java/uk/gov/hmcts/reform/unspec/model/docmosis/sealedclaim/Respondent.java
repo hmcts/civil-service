@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.unspec.model.Address;
 
 @Data
 @Builder(toBuilder = true)
-public class Defendant {
+public class Respondent {
 
     private final String name;
     private final Address primaryAddress;

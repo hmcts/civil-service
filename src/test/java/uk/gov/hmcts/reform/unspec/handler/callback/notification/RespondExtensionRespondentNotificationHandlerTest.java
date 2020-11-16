@@ -42,12 +42,12 @@ class RespondExtensionRespondentNotificationHandlerTest extends BaseCallbackHand
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSolicitorResponseToCase()).thenReturn("template-id");
-            when(notificationsProperties.getClaimantSolicitorEmail()).thenReturn("claimantsolicitor@example.com");
-            when(notificationsProperties.getDefendantSolicitorEmail()).thenReturn("defendantsolicitor@example.com");
+            when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn("claimantsolicitor@example.com");
+            when(notificationsProperties.getRespondentSolicitorEmail()).thenReturn("defendantsolicitor@example.com");
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
+        void shouldNotifyRespondentSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateExtensionResponded().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

@@ -45,7 +45,7 @@ public class DeadlinesCalculator {
         return serviceMethod == FAX || serviceMethod == EMAIL;
     }
 
-    public LocalDateTime calculateDefendantResponseDeadline(@NonNull LocalDate deemedDateOfService) {
+    public LocalDateTime calculateRespondentResponseDeadline(@NonNull LocalDate deemedDateOfService) {
         LocalDate responseDeadline = deemedDateOfService.plusDays(14);
         return calculateFirstWorkingDay(responseDeadline).atTime(MID_NIGHT);
     }

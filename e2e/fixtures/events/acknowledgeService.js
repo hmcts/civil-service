@@ -12,7 +12,7 @@ module.exports = {
         individualTitle: 'Sir',
         individualDateOfBirth: date(-1),
         primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - defendant'}`,
+          AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
           AddressLine2: address.buildingAndStreet.lineTwo,
           AddressLine3: address.buildingAndStreet.lineThree,
           PostTown: address.town,
@@ -40,7 +40,7 @@ module.exports = {
           individualTitle: 'Sir',
           individualDateOfBirth: date(1),
           primaryAddress: {
-            AddressLine1: `${address.buildingAndStreet.lineOne + ' - defendant'}`,
+            AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
             AddressLine2: address.buildingAndStreet.lineTwo,
             AddressLine3: address.buildingAndStreet.lineThree,
             PostTown: address.town,

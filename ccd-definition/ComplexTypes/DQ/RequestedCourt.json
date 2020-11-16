@@ -1,7 +1,7 @@
 [
   {
     "ID": "RequestedCourt",
-    "ListElementCode": "claimantRequestedCourt",
+    "ListElementCode": "applicantRequestedCourt",
     "FieldType": "Label",
     "ElementLabel": "### Court name \n ${courtLocation.applicantPreferredCourt}",
     "SecurityClassification": "Public"

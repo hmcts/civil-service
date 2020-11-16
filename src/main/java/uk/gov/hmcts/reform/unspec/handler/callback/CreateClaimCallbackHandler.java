@@ -54,7 +54,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "claimant"), this::validateDateOfBirth,
+            callbackKey(MID, "applicant"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -66,8 +66,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party claimant = callbackParams.getCaseData().getApplicant1();
-        List<String> errors = dateOfBirthValidator.validate(claimant);
+        Party applicant = callbackParams.getCaseData().getApplicant1();
+        List<String> errors = dateOfBirthValidator.validate(applicant);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

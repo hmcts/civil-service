@@ -63,7 +63,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "DEFENDANT_RESPONSE",
-    "CaseFieldID": "defendantDetails",
+    "CaseFieldID": "respondentDetails",
     "PageLabel": "Confirm defendant details",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,

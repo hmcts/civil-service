@@ -139,7 +139,7 @@ public class DeadlinesCalculatorTest {
     }
 
     @Nested
-    class DefendantResponseDeadline {
+    class RespondentResponseDeadline {
 
         @ParameterizedTest(name = "{index} => should return responseDeadline {1} when deemedDateOfService {0}")
         @ArgumentsSource(ResponseDeadLineArgumentsProvider.class)
@@ -147,7 +147,7 @@ public class DeadlinesCalculatorTest {
             LocalDate deemedDateOfService,
             LocalDateTime expectedResponseDeadline
         ) {
-            LocalDateTime responseDeadline = calculator.calculateDefendantResponseDeadline(deemedDateOfService);
+            LocalDateTime responseDeadline = calculator.calculateRespondentResponseDeadline(deemedDateOfService);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -158,7 +158,7 @@ public class DeadlinesCalculatorTest {
         void shouldThrowNullPointerException_whenDeemedDateOfServiceIsNull() {
             Exception exception = assertThrows(
                 NullPointerException.class,
-                () -> calculator.calculateDefendantResponseDeadline(null)
+                () -> calculator.calculateRespondentResponseDeadline(null)
             );
 
             assertEquals("deemedDateOfService is marked non-null but is null", exception.getMessage());

@@ -10,45 +10,45 @@ public class CaseNameUtils {
 
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData ->
-        fetchClaimantName(caseData) + " v " + fetchDefendantName(caseData);
+        fetchApplicantName(caseData) + " v " + fetchRespondentName(caseData);
 
     private CaseNameUtils() {
         //NO-OP
     }
 
-    public static String fetchDefendantName(CaseData caseData) {
-        StringBuilder defendantNameBuilder = new StringBuilder();
+    public static String fetchRespondentName(CaseData caseData) {
+        StringBuilder respondentNameBuilder = new StringBuilder();
         if (caseData.getRespondent2() != null) {
-            defendantNameBuilder.append("1 ");
-            defendantNameBuilder.append(caseData.getRespondent1().getPartyName());
-            soleTraderCompany(caseData.getRespondent1(), defendantNameBuilder);
-            defendantNameBuilder.append(" & 2 ");
-            defendantNameBuilder.append(caseData.getRespondent2().getPartyName());
-            soleTraderCompany(caseData.getRespondent2(), defendantNameBuilder);
+            respondentNameBuilder.append("1 ");
+            respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
+            soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
+            respondentNameBuilder.append(" & 2 ");
+            respondentNameBuilder.append(caseData.getRespondent2().getPartyName());
+            soleTraderCompany(caseData.getRespondent2(), respondentNameBuilder);
         } else {
-            defendantNameBuilder.append(caseData.getRespondent1().getPartyName());
-            soleTraderCompany(caseData.getRespondent1(), defendantNameBuilder);
+            respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
+            soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
         }
 
-        return defendantNameBuilder.toString();
+        return respondentNameBuilder.toString();
     }
 
-    public static String fetchClaimantName(CaseData caseData) {
-        StringBuilder claimantNameBuilder = new StringBuilder();
+    public static String fetchApplicantName(CaseData caseData) {
+        StringBuilder applicantNameBuilder = new StringBuilder();
 
         if (caseData.getApplicant2() != null) {
-            claimantNameBuilder.append("1 ");
-            claimantNameBuilder.append(caseData.getApplicant1().getPartyName());
-            soleTraderCompany(caseData.getApplicant1(), claimantNameBuilder);
-            claimantNameBuilder.append(" & 2 ");
-            claimantNameBuilder.append(caseData.getApplicant2().getPartyName());
-            soleTraderCompany(caseData.getApplicant2(), claimantNameBuilder);
+            applicantNameBuilder.append("1 ");
+            applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
+            soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
+            applicantNameBuilder.append(" & 2 ");
+            applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
+            soleTraderCompany(caseData.getApplicant2(), applicantNameBuilder);
         } else {
-            claimantNameBuilder.append(caseData.getApplicant1().getPartyName());
-            soleTraderCompany(caseData.getApplicant1(), claimantNameBuilder);
+            applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
+            soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
         }
 
-        return claimantNameBuilder.toString();
+        return applicantNameBuilder.toString();
     }
 
     private static void soleTraderCompany(Party party, StringBuilder stringBuilder) {

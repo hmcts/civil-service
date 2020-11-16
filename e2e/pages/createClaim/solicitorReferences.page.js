@@ -3,14 +3,14 @@ const {I} = inject();
 module.exports = {
 
   fields: {
-    claimantReference: '#solicitorReferences_applicantSolicitor1Reference',
-    defendantReference: '#solicitorReferences_respondentSolicitor1Reference',
+    applicantReference: '#solicitorReferences_applicantSolicitor1Reference',
+    respondentReference: '#solicitorReferences_respondentSolicitor1Reference',
   },
 
   async enterReferences() {
-    I.waitForElement(this.fields.claimantReference);
-    I.fillField(this.fields.claimantReference, 'Claimant Reference');
-    I.fillField(this.fields.defendantReference, 'Defendant Reference');
+    I.waitForElement(this.fields.applicantReference);
+    I.fillField(this.fields.applicantReference, 'Applicant Reference');
+    I.fillField(this.fields.respondentReference, 'Respondent Reference');
     await I.clickContinue();
   }
 };

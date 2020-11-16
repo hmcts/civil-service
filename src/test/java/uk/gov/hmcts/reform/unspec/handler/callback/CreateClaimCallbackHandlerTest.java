@@ -74,9 +74,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventClaimantCallback {
+    class MidEventApplicantCallback {
 
-        private static final String PAGE_ID = "claimant";
+        private static final String PAGE_ID = "applicant";
 
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {

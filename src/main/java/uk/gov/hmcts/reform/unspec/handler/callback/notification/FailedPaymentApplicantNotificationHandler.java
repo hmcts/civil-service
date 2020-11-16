@@ -50,7 +50,7 @@ public class FailedPaymentApplicantNotificationHandler extends CallbackHandler i
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getClaimantSolicitorEmail(),
+            notificationsProperties.getApplicantSolicitorEmail(),
             notificationsProperties.getFailedPayment(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

@@ -19,7 +19,7 @@ module.exports = {
         type: 'COMPANY',
         companyName: 'Test Inc',
         primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - claimant'}`,
+          AddressLine1: `${address.buildingAndStreet.lineOne + ' - applicant'}`,
           AddressLine2: address.buildingAndStreet.lineTwo,
           AddressLine3: address.buildingAndStreet.lineThree,
           PostTown: address.town,
@@ -55,7 +55,7 @@ module.exports = {
         individualTitle: 'Sir',
         individualDateOfBirth: null,
         primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - defendant'}`,
+          AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
           AddressLine2: address.buildingAndStreet.lineTwo,
           AddressLine3: address.buildingAndStreet.lineThree,
           PostTown: address.town,

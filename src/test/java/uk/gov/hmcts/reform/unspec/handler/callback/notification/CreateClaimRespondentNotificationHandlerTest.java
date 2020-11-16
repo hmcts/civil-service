@@ -39,7 +39,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
     class AboutToSubmitCallback {
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
+        void shouldNotifyRespondentSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -47,7 +47,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 eq(SERVICE_EMAIL),
-                eq(notificationsProperties.getDefendantSolicitorClaimIssueEmailTemplate()),
+                eq(notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate()),
                 anyMap(),
                 eq("create-claim-respondent-notification-000LR001")
             );

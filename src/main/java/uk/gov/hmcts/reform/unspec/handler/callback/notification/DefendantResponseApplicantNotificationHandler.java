@@ -32,7 +32,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSolicitorForDefendantResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForDefendantResponse
         );
     }
 
@@ -46,11 +46,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantSolicitorForDefendantResponse(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getClaimantSolicitorEmail(),
+            notificationsProperties.getApplicantSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

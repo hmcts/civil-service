@@ -22,12 +22,12 @@ public class SealedClaimForm implements DocmosisData {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final List<Claimant> claimants;
-    private final Representative claimantRepresentative;
-    private final List<Defendant> defendants;
+    private final List<Applicant> applicants;
+    private final Representative applicantRepresentative;
+    private final List<Respondent> respondents;
     private final String referenceNumber;
-    private final String claimantExternalReference;
-    private final String defendantExternalReference;
+    private final String applicantExternalReference;
+    private final String respondentExternalReference;
     private final String caseName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)

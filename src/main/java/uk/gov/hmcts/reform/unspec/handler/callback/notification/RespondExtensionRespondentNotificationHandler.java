@@ -32,7 +32,7 @@ public class RespondExtensionRespondentNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantSolicitorForExtensionResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForExtensionResponse
         );
     }
 
@@ -46,11 +46,11 @@ public class RespondExtensionRespondentNotificationHandler extends CallbackHandl
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantSolicitorForExtensionResponse(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitorForExtensionResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getDefendantSolicitorEmail(),
+            notificationsProperties.getRespondentSolicitorEmail(),
             notificationsProperties.getSolicitorResponseToCase(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
