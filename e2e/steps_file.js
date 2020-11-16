@@ -64,6 +64,7 @@ const address = require('./fixtures/address.js');
 const baseUrl = process.env.URL || 'http://localhost:3333';
 const signedInSelector = 'exui-header';
 
+const CASE_LIST = 'exui-case-list';
 const TYPE_LOCATOR = '#wb-case-type > option';
 const STATE_LOCATOR = '#wb-case-state > option';
 const CASE_NUMBER_INPUT_LOCATOR = 'input[type$="number"]';
@@ -219,6 +220,7 @@ module.exports = function () {
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');
+      this.waitForElement(CASE_LIST);
     },
 
     async clickContinue() {
