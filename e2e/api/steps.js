@@ -74,7 +74,7 @@ module.exports = {
 
     await assertCallbackError('ProposeDeadline', data[eventName].invalid.ProposeDeadline.past,
       'The proposed deadline must be a date in the future');
-    await assertCallbackError('ProposeDeadline',data[eventName].invalid.ProposeDeadline.beforeCurrentDeadline,
+    await assertCallbackError('ProposeDeadline', data[eventName].invalid.ProposeDeadline.beforeCurrentDeadline,
       'The proposed deadline must be after the current deadline');
 
     await assertSubmittedEvent('CREATED', {
@@ -91,7 +91,7 @@ module.exports = {
 
     await assertCallbackError('Counter', data[eventName].invalid.Counter.past,
       'The proposed deadline must be a date in the future');
-    await assertCallbackError('Counter',data[eventName].invalid.Counter.beforeCurrentDeadline,
+    await assertCallbackError('Counter', data[eventName].invalid.Counter.beforeCurrentDeadline,
       'The proposed deadline must be after the current deadline');
 
     await assertSubmittedEvent('CREATED', {

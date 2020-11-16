@@ -172,7 +172,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "confirmationOfServiceDeadline",
     "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "R"
+    "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",

@@ -68,5 +68,12 @@
     "CaseEventID": "ADD_DEFENDANT_LITIGATION_FRIEND",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "GENERATE_CLAIM_FORM",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "R"
   }
 ]
