@@ -33,7 +33,7 @@
     "ID": "Hearing",
     "ListElementCode": "unavailableDatesRequired",
     "FieldType": "YesOrNo",
-    "ElementLabel": "Are there any days within the next 12 months when you, your client, or an expert or a witness can't attend a hearing?",
+    "ElementLabel": "Are there any dates when you, your client, experts or any witnesses are unavailable?",
     "SecurityClassification": "Public"
   },
   {
