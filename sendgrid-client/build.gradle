@@ -42,7 +42,7 @@ tasks.withType(Test) {
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
-  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.6.8'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.7.0'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
