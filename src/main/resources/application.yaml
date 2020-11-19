@@ -149,6 +149,9 @@ docmosis:
   tornado:
     url: http://localhost:5433
 
+sendgrid:
+  api-key: fake-key
+
 testing:
   support:
     enabled: true
