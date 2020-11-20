@@ -39,6 +39,7 @@ public class CertificateOfServiceForm implements DocmosisData {
     private final Representative respondentRepresentative;
     private final String serviceMethod;
     private final String servedLocation;
+    private final String onWhomServed;
     private final String documentsServed;
     private final StatementOfTruth statementOfTruth;
     private final Representative applicantRepresentative;

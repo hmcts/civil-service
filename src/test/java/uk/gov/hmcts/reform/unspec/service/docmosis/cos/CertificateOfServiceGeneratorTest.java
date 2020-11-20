@@ -166,6 +166,11 @@ class CertificateOfServiceGeneratorTest {
 
             assertEquals(ServiceLocationType.OTHER.getLabel() + " - " + serviceLocation.getOther(), location);
         }
+
+        @Test
+        void shouldReturnNull_whenLocationIsNull() {
+            assertThat(generator.prepareServedLocation(null)).isNull();
+        }
     }
 
     @Nested

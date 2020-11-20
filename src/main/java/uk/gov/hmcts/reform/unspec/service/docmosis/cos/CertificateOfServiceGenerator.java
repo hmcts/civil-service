@@ -73,6 +73,7 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
             .respondentName(CaseNameUtils.fetchRespondentName(caseData))
             .respondentRepresentative(TEMP_REPRESENTATIVE)
             .serviceMethod(caseData.getServiceMethodToRespondentSolicitor1().getType().getLabel())
+            .onWhomServed(caseData.getServiceNamedPersonToRespondentSolicitor1())
             .servedLocation(prepareServedLocation(caseData.getServiceLocationToRespondentSolicitor1()))
             .documentsServed(prepareDocumentList(caseData.getServedDocuments(), caseData.getServedDocumentsOther()))
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
@@ -95,6 +96,9 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
     }
 
     public String prepareServedLocation(ServiceLocation serviceLocation) {
+        if (serviceLocation == null) {
+            return null;
+        }
         if (serviceLocation.getLocation() == ServiceLocationType.OTHER) {
             return ServiceLocationType.OTHER.getLabel() + " - " + serviceLocation.getOther();
         }

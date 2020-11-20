@@ -60,6 +60,7 @@ public class CaseData {
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     private final ServiceMethod serviceMethodToRespondentSolicitor1;
+    private final String serviceNamedPersonToRespondentSolicitor1;
 
     @PastOrPresent(message = "The date must not be in the future", groups = ConfirmServiceDateGroup.class)
     private final LocalDate serviceDateToRespondentSolicitor1;
