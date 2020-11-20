@@ -39,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,6 +75,8 @@ class CoreCaseDataServiceTest {
 
     @BeforeEach
     void init() {
+        clearInvocations(authTokenGenerator);
+        clearInvocations(idamClient);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
         when(idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
     }
@@ -171,6 +174,23 @@ class CoreCaseDataServiceTest {
 
             assertThat(casesFound).isEqualTo(cases);
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString());
+            verify(idamClient).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        }
+    }
+
+    @Nested
+    class GetCase {
+
+        @Test
+        void shouldReturnCase_WhenInvoked() {
+            CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
+            when(coreCaseDataApi.getCase(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, "1"))
+                .thenReturn(expectedCaseDetails);
+
+            CaseDetails caseDetails = service.getCase(1L);
+
+            assertThat(caseDetails).isEqualTo(expectedCaseDetails);
+            verify(coreCaseDataApi).getCase(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, "1");
             verify(idamClient).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         }
     }

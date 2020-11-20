@@ -62,8 +62,8 @@ const furtherInformationPage = require('./fragments/dq/furtherInformation.page')
 const address = require('./fixtures/address.js');
 
 const baseUrl = process.env.URL || 'http://localhost:3333';
-const signedInSelector = 'exui-header';
 
+const SIGNED_IN_SELECTOR = 'exui-header';
 const CASE_LIST = 'exui-case-list';
 const TYPE_LOCATOR = '#wb-case-type > option';
 const STATE_LOCATOR = '#wb-case-state > option';
@@ -82,12 +82,12 @@ module.exports = function () {
       await this.retryUntilExists(async () => {
         this.amOnPage(baseUrl);
 
-        if (await this.hasSelector(signedInSelector)) {
+        if (await this.hasSelector(SIGNED_IN_SELECTOR)) {
           this.click('Sign out');
         }
 
         loginPage.signIn(user);
-      }, signedInSelector);
+      }, SIGNED_IN_SELECTOR);
     },
 
     async goToCase(caseId) {

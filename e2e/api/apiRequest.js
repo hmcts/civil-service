@@ -2,6 +2,7 @@ const config = require('../config.js');
 
 const restHelper = require('./restHelper.js');
 const totp = require('totp-generator');
+const {waitForFinishedBusinessProcess} = require('./testingSupport');
 
 const tokens = {};
 const getCcdDataStoreBaseUrl = () => `${config.url.ccdDataStore}/caseworkers/${tokens.userId}/jurisdictions/${config.definition.jurisdiction}/case-types/${config.definition.caseType}`;
@@ -15,12 +16,12 @@ const getRequestHeaders = () => {
 
 module.exports = {
   setupTokens: async (user) => {
-    tokens.userAuth = await restHelper.request(
+    tokens.userAuth = await restHelper.retriedRequest(
       `${config.url.idamApi}/loginUser?username=${user.email}&password=${user.password}`,
       {'Content-Type': 'application/x-www-form-urlencoded'})
       .then(response => response.json()).then(data => data.access_token);
 
-    tokens.userId = await restHelper.request(
+    tokens.userId = await restHelper.retriedRequest(
       `${config.url.idamApi}/o/userinfo`,
       {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -28,7 +29,7 @@ module.exports = {
       })
       .then(response => response.json()).then(data => data.uid);
 
-    tokens.s2sAuth = await restHelper.request(
+    tokens.s2sAuth = await restHelper.retriedRequest(
       `${config.url.authProviderApi}/lease`,
       {'Content-Type': 'application/json'},
       {
@@ -41,16 +42,17 @@ module.exports = {
   startEvent: async (eventName, caseId) => {
     let url = getCcdDataStoreBaseUrl();
     if (caseId) {
+      await waitForFinishedBusinessProcess(caseId);
       url += `/cases/${caseId}`;
     }
     url += `/event-triggers/${eventName}/token`;
 
-    tokens.ccdEvent = await restHelper.request(url, getRequestHeaders(), null, 'GET')
+    tokens.ccdEvent = await restHelper.retriedRequest(url, getRequestHeaders(), null, 'GET')
       .then(response => response.json()).then(data => data.token);
   },
 
   validatePage: async (eventName, pageId, caseData, expectedStatus = 200) => {
-    return restHelper.request(`${getCcdDataStoreBaseUrl()}/validate?pageId=${eventName}${pageId}`, getRequestHeaders(),
+    return restHelper.retriedRequest(`${getCcdDataStoreBaseUrl()}/validate?pageId=${eventName}${pageId}`, getRequestHeaders(),
       {
         data: caseData,
         event: {id: eventName},
@@ -65,7 +67,7 @@ module.exports = {
       url += `/${caseId}/events`;
     }
 
-    return restHelper.request(url, getRequestHeaders(),
+    return restHelper.retriedRequest(url, getRequestHeaders(),
       {
         data: caseData,
         event: {id: eventName},

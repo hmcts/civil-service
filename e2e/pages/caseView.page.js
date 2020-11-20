@@ -1,8 +1,7 @@
 const {I} = inject();
+const {waitForFinishedBusinessProcess} = require('../api/testingSupport');
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+const EVENT_TRIGGER_LOCATOR = 'ccd-case-event-trigger';
 
 module.exports = {
 
@@ -15,15 +14,10 @@ module.exports = {
   goButton: 'Go',
 
   async startEvent(event, caseId) {
-    await I.retryUntilExists(async () => {
-      await sleep(5000);
-      await I.goToCase(caseId);
-    }, locate('option').withText(event), 20);
-
-    await I.retryUntilExists(async () => {
-      await I.goToCase(caseId);
-      I.selectOption(this.fields.eventDropdown, event);
-      I.click(this.goButton);
-    }, 'ccd-case-event-trigger', 20);
+    await waitForFinishedBusinessProcess(caseId);
+    await I.goToCase(caseId);
+    I.selectOption(this.fields.eventDropdown, event);
+    I.click(this.goButton);
+    I.waitForElement(EVENT_TRIGGER_LOCATOR);
   }
 };

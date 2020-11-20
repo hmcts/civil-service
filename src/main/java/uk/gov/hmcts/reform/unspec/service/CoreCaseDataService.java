@@ -77,6 +77,11 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
+    public CaseDetails getCase(Long caseId) {
+        String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
+    }
+
     private UserAuthContent getSystemUpdateUser() {
         String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = idamClient.getUserInfo(userToken).getUid();
