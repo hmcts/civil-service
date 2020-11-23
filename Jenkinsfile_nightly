@@ -19,6 +19,9 @@ properties([
       description: 'The URL of ccd data store'),
     string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-aat.internal',
       description: 'The URL of unspec service'),
+    string(name: 'SECURITY_RULES',
+      defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
+      description: 'The security rules to use'),
     string(name: 'FUNCTIONAL_TESTS_WORKERS',
       defaultValue: '5',
       description: 'Number of workers running functional tests'),
@@ -54,20 +57,11 @@ withNightlyPipeline(type, product, component) {
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
   env.CCD_DATA_STORE_URL = params.CCD_DATA_STORE_URL
   env.UNSPEC_SERVICE_URL = params.UNSPEC_SERVICE_URL
+  env.URL_FOR_SECURITY_SCAN = params.CASE_SERVICE_URL
   loadVaultSecrets(secrets)
 
-  enableFullFunctionalTest()
+  //enableMutationTest()
 
-  before('fullFunctionalTest') {
-    env.PROXY = params.PROXY_SERVER
-    env.PARALLEL_CHUNKS = params.FUNCTIONAL_TESTS_WORKERS
-    env.MOCKED_PAYMENTS = false
-    env.TEST_RETRIES = 2
-  }
-
-
-  after('fullFunctionalTest') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
+  enableSecurityScan()
 }
 
