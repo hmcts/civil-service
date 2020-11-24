@@ -14,7 +14,7 @@ public class Respondent1DQ implements DQ {
 
     private final FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
     private final DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
-    private final String respondent1DQDisclosureOfNonElectronicDocuments;
+    private final DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
     private final DisclosureReport respondent1DQDisclosureReport;
     private final Experts respondent1DQExperts;
     private final Witnesses respondent1DQWitnesses;
@@ -39,7 +39,7 @@ public class Respondent1DQ implements DQ {
 
     @Override
     @JsonProperty("respondent1DQDisclosureOfNonElectronicDocuments")
-    public String getDisclosureOfNonElectronicDocuments() {
+    public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return respondent1DQDisclosureOfNonElectronicDocuments;
     }
 

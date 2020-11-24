@@ -53,8 +53,12 @@ class Respondent1DQTest {
             .build();
     }
 
-    private String disclosureOfNonElectronicDocuments() {
-        return "non electronic documents";
+    private DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments() {
+        return DisclosureOfNonElectronicDocuments.builder()
+            .directionsForDisclosureProposed(YesOrNo.YES)
+            .standardDirectionsRequired(YesOrNo.YES)
+            .bespokeDirections("non electronic documents")
+            .build();
     }
 
     private Witnesses witnesses() {

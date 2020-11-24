@@ -9,7 +9,7 @@ public interface DQ {
 
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 
-    String getDisclosureOfNonElectronicDocuments();
+    DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments();
 
     DisclosureReport getDisclosureReport();
 

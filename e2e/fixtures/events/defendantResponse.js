@@ -48,7 +48,11 @@ module.exports = {
       }
     },
     DisclosureOfNonElectronicDocuments: {
-      respondent1DQDisclosureOfNonElectronicDocuments: 'None'
+      respondent1DQDisclosureOfNonElectronicDocuments: {
+        directionsForDisclosureProposed: 'Yes',
+        standardDirectionsRequired: 'Yes',
+        bespokeDirections: 'directions'
+      }
     },
     Experts: {
       respondent1DQExperts: {

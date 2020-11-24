@@ -107,21 +107,9 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CLAIMANT_RESPONSE",
-    "CaseFieldID": "applicant1DQDisclosureOfNonElectronicDocumentsLabel",
-    "PageDisplayOrder": 5,
-    "PageFieldDisplayOrder": 1,
-    "DisplayContext": "READONLY",
-    "PageID": "DisclosureOfNonElectronicDocuments",
-    "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND applicant1ProceedWithClaim = \"Yes\" AND allocatedTrack!=\"SMALL_CLAIM\"",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "CLAIMANT_RESPONSE",
     "CaseFieldID": "applicant1DQDisclosureOfNonElectronicDocuments",
     "PageDisplayOrder": 5,
-    "PageFieldDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
     "DisplayContext": "OPTIONAL",
     "PageID": "DisclosureOfNonElectronicDocuments",
     "ShowSummaryChangeOption": "Y"

@@ -464,17 +464,9 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "respondent1DQDisclosureOfNonElectronicDocumentsLabel",
-    "Label": "## Disclosure of non-electronic documents",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQDisclosureOfNonElectronicDocuments",
-    "Label": "What directions are proposed for disclosure?",
-    "FieldType": "Text",
+    "Label": "Disclosure of non-electronic documents",
+    "FieldType": "DisclosureOfNonElectronicDocuments",
     "SecurityClassification": "Public"
   },
   {
@@ -586,8 +578,8 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQDisclosureOfNonElectronicDocuments",
-    "Label": "What directions are proposed for disclosure?",
-    "FieldType": "Text",
+    "Label": "Disclosure of non-electronic documents",
+    "FieldType": "DisclosureOfNonElectronicDocuments",
     "SecurityClassification": "Public"
   },
   {

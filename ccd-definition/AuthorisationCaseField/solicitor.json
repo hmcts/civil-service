@@ -359,13 +359,6 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent1DQDisclosureOfNonElectronicDocumentsLabel",
-    "UserRole": "caseworker-civil-solicitor",
-    "CRUD": "R"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "respondent1DQDisclosureOfNonElectronicDocuments",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
@@ -453,13 +446,6 @@
     "CaseFieldID": "applicant1DQDisclosureOfElectronicDocuments",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant1DQDisclosureOfNonElectronicDocumentsLabel",
-    "UserRole": "caseworker-civil-solicitor",
-    "CRUD": "R"
   },
   {
     "LiveFrom": "01/01/2017",
