@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.payments.client.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.unspec.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
-import uk.gov.hmcts.reform.unspec.request.RequestData;
 
 import java.math.BigDecimal;
 
@@ -46,9 +45,6 @@ class PaymentsServiceTest {
     private PaymentsClient paymentsClient;
 
     @Mock
-    private RequestData requestData;
-
-    @Mock
     private PaymentsConfiguration paymentsConfiguration;
 
     @InjectMocks
@@ -58,16 +54,8 @@ class PaymentsServiceTest {
     void setUp() {
         given(feesService.getFeeDataByClaimValue(any())).willReturn(FEE_DATA);
         given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
-        given(requestData.authorisation()).willReturn(AUTH_TOKEN);
         given(paymentsConfiguration.getService()).willReturn(SERVICE);
         given(paymentsConfiguration.getSiteId()).willReturn(SITE_ID);
-
-        paymentsService = new PaymentsService(
-            feesService,
-            paymentsClient,
-            requestData,
-            paymentsConfiguration
-        );
     }
 
     @Test
@@ -93,7 +81,7 @@ class PaymentsServiceTest {
             .statementOfValueInPennies(BigDecimal.valueOf(10000))
             .build();
 
-        PaymentDto paymentResponse = paymentsService.createCreditAccountPayment(caseData);
+        PaymentDto paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
 
         verify(feesService).getFeeDataByClaimValue(expectedClaimValue);
         verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);

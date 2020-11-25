@@ -51,7 +51,6 @@ fees:
     event: issue
 
 payments:
-  enabled: false
   api:
     site_id: AAA7
     service: UNSPEC
@@ -125,7 +124,6 @@ fees:
     url: http://localhost:8765
 
 payments:
-  enabled: true
   api:
     url: http://localhost:8765
 
