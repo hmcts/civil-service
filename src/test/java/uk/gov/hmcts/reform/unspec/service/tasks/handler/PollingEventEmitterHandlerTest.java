@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.unspec.service.search.CaseReadyBusinessProcessSearchS
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -109,7 +111,13 @@ class PollingEventEmitterHandlerTest {
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
         verify(externalTaskService, never()).complete(externalTask);
-        verify(externalTaskService).handleFailure(externalTask, null, errorMessage, 0, 500L);
+        verify(externalTaskService).handleFailure(
+            eq(externalTask),
+            eq(errorMessage),
+            anyString(),
+            eq(0),
+            eq(500L)
+        );
 
         verifyNoMoreInteractions(eventEmitterService);
     }

@@ -8,6 +8,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
@@ -38,14 +40,14 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
                 );
                 log.info("External task '{}' finished", topicName);
             } catch (Exception e) {
-                log.error("Completing external task '{}' errored due to {}", topicName, e);
+                log.error("Completing external task '{}' errored", topicName, e);
             }
         } catch (BpmnError e) {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
-            log.error("Bpmn error for external task '{}' due to {}", topicName, e);
+            log.error("Bpmn error for external task '{}'", topicName, e);
         } catch (Exception e) {
             handleFailure(externalTask, externalTaskService, e);
-            log.error("External task '{}' errored due to {}", topicName, e);
+            log.error("External task '{}' errored", topicName, e);
         }
     }
 
@@ -62,8 +64,8 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
 
         externalTaskService.handleFailure(
             externalTask,
-            externalTask.getWorkerId(),
             e.getMessage(),
+            Arrays.toString(e.getStackTrace()),
             remainingRetries - 1,
             calculateExponentialRetryTimeout(500, maxRetries, remainingRetries)
         );

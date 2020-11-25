@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -86,7 +87,13 @@ class CaseStayedHandlerTest {
         caseStayedFinder.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(mockTask, "worker", errorMessage, 2, 500L);
+        verify(externalTaskService).handleFailure(
+            eq(mockTask),
+            eq(errorMessage),
+            anyString(),
+            eq(2),
+            eq(500L)
+        );
     }
 
     @Test
