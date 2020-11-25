@@ -217,7 +217,7 @@ sonarqube {
     property "sonar.projectName", "UNSPEC :: service"
     property "sonar.projectKey", "unspec-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/TestingSupportController.java, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }

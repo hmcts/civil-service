@@ -2,6 +2,7 @@ const config = require('../config.js');
 const restHelper = require('./restHelper');
 
 const {retry} = require('./retryHelper');
+let incidentMessage;
 
 module.exports =  {
   waitForFinishedBusinessProcess: async caseId => {
@@ -17,12 +18,17 @@ module.exports =  {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`,
         }, null, 'GET')
-        .then(async response => await response.json()).then(businessProcess => {
-        if (businessProcess.status !== 'FINISHED') {
-          throw new Error(`Ongoing business process: ${businessProcess.camundaEvent}, status: ${businessProcess.status},`
-            + ` process instance id: ${businessProcess.processInstanceId}`);
-        }
+        .then(async response => await response.json()).then(response => {
+          let businessProcess = response.businessProcess;
+          if (response.incidentMessage) {
+            incidentMessage = response.incidentMessage;
+          } else if (businessProcess.status !== 'FINISHED') {
+            throw new Error(`Ongoing business process: ${businessProcess.camundaEvent}, status: ${businessProcess.status},`
+              + ` process instance: ${businessProcess.processInstanceId}, last finished activity: ${businessProcess.activityId}`);
+          }
       });
     });
+    if (incidentMessage)
+      throw new Error(`Business process failed for case: ${caseId}, incident message: ${incidentMessage}`);
   }
 };
