@@ -33,6 +33,7 @@ public abstract class BpmnBaseTest {
     public final String processId;
     public Deployment deployment;
     public Deployment endBusinessProcessDeployment;
+    public Deployment startBusinessProcessDeployment;
     public static ProcessEngine engine;
 
     public ProcessInstance processInstance;
@@ -52,6 +53,10 @@ public abstract class BpmnBaseTest {
     @BeforeEach
     void setup() {
         //deploy process
+        startBusinessProcessDeployment = engine.getRepositoryService()
+            .createDeployment()
+            .addClasspathResource(String.format(DIAGRAM_PATH, "start_business_process.bpmn"))
+            .deploy();
         endBusinessProcessDeployment = engine.getRepositoryService()
             .createDeployment()
             .addClasspathResource(String.format(DIAGRAM_PATH, "end_business_process.bpmn"))
@@ -65,6 +70,7 @@ public abstract class BpmnBaseTest {
 
     @AfterEach
     void tearDown() {
+        engine.getRepositoryService().deleteDeployment(startBusinessProcessDeployment.getId());
         engine.getRepositoryService().deleteDeployment(endBusinessProcessDeployment.getId());
         engine.getRepositoryService().deleteDeployment(deployment.getId());
     }

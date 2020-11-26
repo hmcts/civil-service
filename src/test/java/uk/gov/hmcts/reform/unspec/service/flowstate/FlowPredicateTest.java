@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applica
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToRequestForExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimIssued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimTakenOffline;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWithdrawn;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
@@ -234,6 +235,22 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsNotAtStateClaimDiscontinued(FlowState.Main flowState) {
             CaseData caseData = CaseDataBuilder.builder().atState(flowState).build();
             assertFalse(claimDiscontinued.test(caseData));
+        }
+    }
+
+    @Nested
+    class ClaimTakenOffline {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateProceedsOffline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline().build();
+            assertTrue(claimTakenOffline.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataNotAtStateProceedsOffline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateFullDefence().build();
+            assertFalse(claimTakenOffline.test(caseData));
         }
     }
 }

@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTEN
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
@@ -241,6 +242,8 @@ public class CaseDataBuilder {
                 return atStateClaimWithdrawn();
             case CLAIM_DISCONTINUED:
                 return atStateClaimDiscontinued();
+            case PROCEEDS_WITH_OFFLINE_JOURNEY:
+                return atStateProceedsOffline();
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -384,6 +387,12 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         ccdState = AWAITING_CLAIMANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOffline() {
+        atStateRespondedToClaim();
+        ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
         return this;
     }
 

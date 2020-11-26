@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
@@ -56,6 +57,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDiscontinued = caseData ->
         caseData.getDiscontinueClaim() != null
             && caseData.getCcdState() == CLOSED;
+
+    public static final Predicate<CaseData> claimTakenOffline = caseData ->
+        caseData.getCcdState() == PROCEEDS_WITH_OFFLINE_JOURNEY;
 
     private FlowPredicate() {
         //Utility class

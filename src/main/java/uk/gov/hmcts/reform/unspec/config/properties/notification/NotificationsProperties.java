@@ -29,4 +29,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentSolicitorEmail;
+
+    @NotEmpty
+    private String applicantSolicitorCaseStrikeOut;
+
+    @NotEmpty
+    private String respondentSolicitorCaseStrikeOut;
 }

@@ -89,6 +89,8 @@ notifications:
   solicitorResponseToCase: "a2b3d626-bf20-406e-ac8c-8d8a5ea43c66"
   respondentSolicitorAcknowledgeService: "6ba538b6-f3f6-4943-862d-b436c0c3d741"
   failedPayment: "d32446d7-9f97-4d3b-8708-5639ebc27da3"
+  applicantSolicitorCaseStrikeOut: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
+  respondentSolicitorCaseStrikeOut: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
   applicantSolicitorEmail: claimantsolicitor@gmail.com
   respondentSolicitorEmail: defendantsolicitor@gmail.com
 

@@ -703,5 +703,13 @@
     "Label": "Details of PBA payment",
     "FieldType": "PaymentDetails",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicantSolicitorSecondResponseDeadlineToRespondentSolicitor1",
+    "Label": "Case strikeout deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
   }
 ]

@@ -5,6 +5,7 @@ public enum CaseState {
     CREATED,
     STAYED,
     AWAITING_CLAIMANT_INTENTION,
-    CLOSED
+    CLOSED,
+    PROCEEDS_WITH_OFFLINE_JOURNEY
 }
 

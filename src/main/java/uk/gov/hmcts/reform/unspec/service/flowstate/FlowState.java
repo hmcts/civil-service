@@ -34,7 +34,8 @@ public interface FlowState {
         RESPONDED_TO_CLAIM,
         FULL_DEFENCE,
         CLAIM_WITHDRAWN,
-        CLAIM_DISCONTINUED;
+        CLAIM_DISCONTINUED,
+        PROCEEDS_WITH_OFFLINE_JOURNEY;
 
         public static final String FLOW_NAME = "MAIN";
 
