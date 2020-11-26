@@ -47,8 +47,10 @@ module.exports = {
     }
     url += `/event-triggers/${eventName}/token`;
 
-    tokens.ccdEvent = await restHelper.retriedRequest(url, getRequestHeaders(), null, 'GET')
-      .then(response => response.json()).then(data => data.token);
+    let response = await restHelper.retriedRequest(url, getRequestHeaders(), null, 'GET')
+      .then(response => response.json());
+    tokens.ccdEvent = response.token;
+    return response.case_details.case_data || {};
   },
 
   validatePage: async (eventName, pageId, caseData, expectedStatus = 200) => {
