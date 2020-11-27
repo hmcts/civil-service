@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_18h9iji" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="ACKNOWLEDGE_SERVICE_PROCESS_ID" isExecutable="true">
     <bpmn:serviceTask id="AcknowledgeServiceNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -7,7 +7,7 @@
           <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_FOR_SERVICE_ACKNOWLEDGEMENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1nzbhv9</bpmn:incoming>
+      <bpmn:incoming>Flow_0dikpym</bpmn:incoming>
       <bpmn:outgoing>Flow_06qap0k</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="StartBusinessProcessTaskId" name="StartBusinessProcess" camunda:type="external" camunda:topic="START_BUSINESS_PROCESS">
@@ -17,7 +17,7 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0himnjt</bpmn:incoming>
-      <bpmn:outgoing>Flow_1nzbhv9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0co3dcf</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_0hembkx" name="Abort" attachedToRef="StartBusinessProcessTaskId">
       <bpmn:outgoing>Flow_0iccpmp</bpmn:outgoing>
@@ -27,7 +27,6 @@
       <bpmn:incoming>Flow_0iccpmp</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0iccpmp" sourceRef="Event_0hembkx" targetRef="Event_0sk0aqp" />
-    <bpmn:sequenceFlow id="Flow_1nzbhv9" sourceRef="StartBusinessProcessTaskId" targetRef="AcknowledgeServiceNotifyApplicantSolicitor1" />
     <bpmn:startEvent id="Event_0vk0w99" name="Start">
       <bpmn:outgoing>Flow_0himnjt</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1dvrj2w" messageRef="Message_07sm7e9" />
@@ -48,34 +47,46 @@
       <bpmn:incoming>Flow_06qap0k</bpmn:incoming>
       <bpmn:outgoing>Flow_0x2wz2v</bpmn:outgoing>
     </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0co3dcf" sourceRef="StartBusinessProcessTaskId" targetRef="AcknowledgeServiceGenerateAcknowledgementOfService" />
+    <bpmn:sequenceFlow id="Flow_0dikpym" sourceRef="AcknowledgeServiceGenerateAcknowledgementOfService" targetRef="AcknowledgeServiceNotifyApplicantSolicitor1" />
+    <bpmn:serviceTask id="AcknowledgeServiceGenerateAcknowledgementOfService" name="Generate Acknowledgement of Service" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">GENERATE_ACKNOWLEDGEMENT_OF_SERVICE</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0co3dcf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dikpym</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:error id="Error_0lou1w7" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmn:message id="Message_07sm7e9" name="ACKNOWLEDGE_SERVICE" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ACKNOWLEDGE_SERVICE_PROCESS_ID">
       <bpmndi:BPMNEdge id="Flow_0x2wz2v_di" bpmnElement="Flow_0x2wz2v">
-        <di:waypoint x="780" y="117" />
-        <di:waypoint x="862" y="117" />
+        <di:waypoint x="880" y="117" />
+        <di:waypoint x="932" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06qap0k_di" bpmnElement="Flow_06qap0k">
-        <di:waypoint x="600" y="117" />
-        <di:waypoint x="680" y="117" />
+        <di:waypoint x="730" y="117" />
+        <di:waypoint x="780" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0himnjt_di" bpmnElement="Flow_0himnjt">
         <di:waypoint x="198" y="117" />
         <di:waypoint x="320" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1nzbhv9_di" bpmnElement="Flow_1nzbhv9">
-        <di:waypoint x="420" y="117" />
-        <di:waypoint x="500" y="117" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0iccpmp_di" bpmnElement="Flow_0iccpmp">
         <di:waypoint x="370" y="175" />
         <di:waypoint x="370" y="272" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="AcknowledgeServiceNotifyApplicantSolicitor1">
-        <dc:Bounds x="500" y="77" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0co3dcf_di" bpmnElement="Flow_0co3dcf">
+        <di:waypoint x="420" y="117" />
+        <di:waypoint x="480" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dikpym_di" bpmnElement="Flow_0dikpym">
+        <di:waypoint x="580" y="117" />
+        <di:waypoint x="630" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_05v1xe4_di" bpmnElement="StartBusinessProcessTaskId">
         <dc:Bounds x="320" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -92,10 +103,16 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1h61h5s_di" bpmnElement="Event_1h61h5s">
-        <dc:Bounds x="862" y="99" width="36" height="36" />
+        <dc:Bounds x="932" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1j68eid_di" bpmnElement="Activity_0471ljk">
-        <dc:Bounds x="680" y="77" width="100" height="80" />
+        <dc:Bounds x="780" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="AcknowledgeServiceNotifyApplicantSolicitor1">
+        <dc:Bounds x="630" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0phbsqq_di" bpmnElement="AcknowledgeServiceGenerateAcknowledgementOfService">
+        <dc:Bounds x="480" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0hembkx_di" bpmnElement="Event_0hembkx">
         <dc:Bounds x="352" y="139" width="36" height="36" />
