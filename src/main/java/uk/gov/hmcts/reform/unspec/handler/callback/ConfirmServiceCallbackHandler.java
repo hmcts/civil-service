@@ -105,7 +105,7 @@ public class ConfirmServiceCallbackHandler extends CallbackHandler {
     private CallbackResponse calculateServiceDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         ServiceMethod serviceMethod = caseData.getServiceMethodToRespondentSolicitor1();
-        LocalDateTime serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();;
+        LocalDateTime serviceDate = caseData.getServiceDateTimeToRespondentSolicitor1();
         if (serviceMethod.requiresDateEntry()) {
             serviceDate = caseData.getServiceDateToRespondentSolicitor1().atStartOfDay();
         }

@@ -117,8 +117,8 @@ public class CaseDataBuilder {
 
     private Respondent1DQ respondent1DQ;
 
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionProposedDeadline(LocalDate responsedeadline) {
-        this.respondentSolicitor1claimResponseExtensionProposedDeadline = responsedeadline;
+    public CaseDataBuilder respondentSolicitor1claimResponseExtensionProposedDeadline(LocalDate responseDeadline) {
+        this.respondentSolicitor1claimResponseExtensionProposedDeadline = responseDeadline;
         return this;
     }
 

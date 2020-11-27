@@ -6,7 +6,7 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 def type = "java"
 def product = "unspec"
 def component = "service"
-AppPipelineConfig pipelineConf;
+AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -62,7 +62,7 @@ def uploadBpmnDiagrams(String env) {
   }
 }
 withPipeline(type, product, component) {
-  pipelineConf = config;
+  pipelineConf = config
   disableLegacyDeployment()
   enableAksStagingDeployment()
   enableSlackNotifications('#unspec_notification')

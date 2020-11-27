@@ -10,13 +10,13 @@ import lombok.Value;
 public class Document {
 
     @JsonProperty("document_url")
-    private String documentUrl;
+    String documentUrl;
 
     @JsonProperty("document_binary_url")
-    private String documentBinaryUrl;
+    String documentBinaryUrl;
 
     @JsonProperty("document_filename")
-    private String documentFileName;
+    String documentFileName;
 
     @JsonCreator
     public Document(String documentUrl, String documentBinaryUrl, String documentFileName) {

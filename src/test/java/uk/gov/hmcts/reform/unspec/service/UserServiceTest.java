@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.service;
+package uk.gov.hmcts.reform.unspec.service;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;

@@ -116,7 +116,7 @@ class StateFlowTest {
             when(mockedStateMachine.hasStateMachineError()).thenReturn(true);
             StateFlow stateFlow = new StateFlow(mockedStateMachine);
 
-            Exception exception = assertThrows(StateFlowException.class, () -> stateFlow.getState());
+            Exception exception = assertThrows(StateFlowException.class, stateFlow::getState);
             String expectedMessage = "The state machine is at error state.";
             String actualMessage = exception.getMessage();
 

@@ -184,13 +184,11 @@ class SendGridClientTest {
             when(sendGrid.api(any(Request.class)))
                 .thenReturn(new Response(400, "bad request", Map.of()));
 
-            Exception exception = assertThrows(
+            EmailSendFailedException emailSendFailedException = assertThrows(
                 EmailSendFailedException.class,
                 () -> sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA)
             );
 
-            assertTrue(exception instanceof EmailSendFailedException);
-            EmailSendFailedException emailSendFailedException = (EmailSendFailedException) exception;
             Throwable causeThrowable = emailSendFailedException.getCause();
             assertTrue(causeThrowable instanceof HttpException);
             HttpException cause = (HttpException) causeThrowable;
