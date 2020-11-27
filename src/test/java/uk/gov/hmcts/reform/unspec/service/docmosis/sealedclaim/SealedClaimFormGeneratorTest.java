@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -58,14 +59,13 @@ class SealedClaimFormGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
-        when(documentManagementService
-                 .uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, SEALED_CLAIM))))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
-        verify(documentManagementService).uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, SEALED_CLAIM)));
-        verify(documentGeneratorService).generateDocmosisDocument(any(DocmosisData.class), eq(N1));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
 }

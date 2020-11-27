@@ -53,10 +53,10 @@ module.exports = {
 
   acknowledgeService: async () => {
     eventName = 'ACKNOWLEDGE_SERVICE';
-    deleteCaseFields('systemGeneratedCaseDocuments');
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);
     caseData = returnedCaseData;
+    deleteCaseFields('systemGeneratedCaseDocuments');
 
     await validateEventPages();
 
@@ -74,6 +74,7 @@ module.exports = {
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);
     caseData = returnedCaseData;
+    deleteCaseFields('systemGeneratedCaseDocuments');
 
     await validateEventPages();
 

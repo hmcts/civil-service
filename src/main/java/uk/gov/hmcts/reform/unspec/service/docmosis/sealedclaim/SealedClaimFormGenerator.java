@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.unspec.utils.CaseNameUtils;
+import uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +85,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .respondentExternalReference(solicitorReferences
                                             .map(SolicitorReferences::getRespondentSolicitor1Reference)
                                             .orElse(""))
-            .caseName(CaseNameUtils.toCaseName.apply(caseData))
+            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .build();
     }
 

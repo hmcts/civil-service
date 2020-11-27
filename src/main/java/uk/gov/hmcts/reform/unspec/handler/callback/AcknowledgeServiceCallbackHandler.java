@@ -38,6 +38,9 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_SERVICE);
 
+    public static final String CONFIRMATION_SUMMARY = "<br />You need to respond before 4pm on %s."
+        + "\n\n[Download the Acknowledgement of Service form](%s)";
+
     private final DateOfBirthValidator dateOfBirthValidator;
     private final WorkingDayIndicator workingDayIndicator;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -81,14 +84,12 @@ public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        LocalDateTime responseDeadline = callbackParams.getCaseData().getRespondentSolicitor1ResponseDeadline();
+        CaseData caseData = callbackParams.getCaseData();
 
-        String formattedResponseDeadline = formatLocalDateTime(responseDeadline, DATE);
-        String acknowledgmentOfServiceForm = "http://www.google.com";
-
-        String body = format("<br />You need to respond before 4pm on %s."
-                                 + "\n\n[Download the Acknowledgement of Service form](%s)",
-                             formattedResponseDeadline, acknowledgmentOfServiceForm
+        String body = format(
+            CONFIRMATION_SUMMARY,
+            formatLocalDateTime(caseData.getRespondentSolicitor1ResponseDeadline(), DATE),
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference())
         );
 
         return SubmittedCallbackResponse.builder()

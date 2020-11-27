@@ -182,8 +182,9 @@ class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader("# You've acknowledged service")
                     .confirmationBody(format(
                         "<br />You need to respond before 4pm on %s."
-                            + "\n\n[Download the Acknowledgement of Service form](http://www.google.com)",
-                        formatLocalDateTime(RESPONSE_DEADLINE, DATE)
+                            + "\n\n[Download the Acknowledgement of Service form]"
+                            + "(/cases/case-details/%s#CaseDocuments)",
+                        formatLocalDateTime(RESPONSE_DEADLINE, DATE), caseData.getCcdCaseReference()
                     ))
                     .build());
         }

@@ -14,9 +14,9 @@ import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.ServiceLocationType;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
-import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.unspec.model.docmosis.cos.CertificateOfServiceForm;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -28,7 +28,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -68,7 +67,7 @@ class CertificateOfServiceGeneratorTest {
             .thenReturn(new DocmosisDocument(N215.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE))))
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
@@ -76,67 +75,9 @@ class CertificateOfServiceGeneratorTest {
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(documentManagementService)
-            .uploadDocument(eq(BEARER_TOKEN), eq(new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE)));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, CERTIFICATE_OF_SERVICE));
         verify(documentGeneratorService)
-            .generateDocmosisDocument(any(DocmosisData.class), eq(N215));
-    }
-
-    @Nested
-    class PrepareSolicitorReferences {
-
-        @Test
-        void shouldPopulateNotProvided_whenSolicitorReferencesIsNull() {
-            SolicitorReferences solicitorReferences = null;
-            SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);
-            assertAll(
-                "SolicitorReferences not provided",
-                () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
-            );
-        }
-
-        @Test
-        void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
-            SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
-            SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);
-            assertAll(
-                "SolicitorReferences not provided",
-                () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
-            );
-        }
-
-        @Test
-        void shouldPopulateProvidedValues_whenSolicitorReferencesAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .respondentSolicitor1Reference("Respondent ref")
-                .build();
-
-            SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);
-            assertAll(
-                "SolicitorReferences provided",
-                () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Respondent ref", result.getRespondentSolicitor1Reference())
-            );
-        }
-
-        @Test
-        void shouldPopulateNotProvided_whenOneReferencesNotAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .build();
-
-            SolicitorReferences result = generator.prepareSolicitorReferences(solicitorReferences);
-
-            assertAll(
-                "SolicitorReferences one is provided",
-                () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
-            );
-        }
+            .generateDocmosisDocument(any(CertificateOfServiceForm.class), eq(N215));
     }
 
     @Nested

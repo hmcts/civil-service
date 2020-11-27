@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.unspec.enums.ServiceLocationType;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
-import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.cos.CertificateOfServiceForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
@@ -17,12 +16,11 @@ import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.unspec.utils.CaseNameUtils;
+import uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.OTHER;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N215;
 
@@ -64,13 +62,13 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
     @Override
     public CertificateOfServiceForm getTemplateData(CaseData caseData) {
         return CertificateOfServiceForm.builder()
-            .caseName(CaseNameUtils.toCaseName.apply(caseData))
+            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(prepareSolicitorReferences(caseData.getSolicitorReferences()))
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .dateServed(caseData.getServiceDateToRespondentSolicitor1())
             .deemedDateOfService(caseData.getDeemedServiceDateToRespondentSolicitor1())
-            .applicantName(CaseNameUtils.fetchApplicantName(caseData))
-            .respondentName(CaseNameUtils.fetchRespondentName(caseData))
+            .applicantName(DocmosisTemplateDataUtils.fetchApplicantName(caseData))
+            .respondentName(DocmosisTemplateDataUtils.fetchRespondentName(caseData))
             .respondentRepresentative(TEMP_REPRESENTATIVE)
             .serviceMethod(caseData.getServiceMethodToRespondentSolicitor1().getType().getLabel())
             .onWhomServed(caseData.getServiceNamedPersonToRespondentSolicitor1())
@@ -78,20 +76,6 @@ public class CertificateOfServiceGenerator implements TemplateDataGenerator<Cert
             .documentsServed(prepareDocumentList(caseData.getServedDocuments(), caseData.getServedDocumentsOther()))
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .applicantRepresentative(TEMP_REPRESENTATIVE)
-            .build();
-    }
-
-    public SolicitorReferences prepareSolicitorReferences(SolicitorReferences solicitorReferences) {
-        return SolicitorReferences
-            .builder()
-            .applicantSolicitor1Reference(
-                ofNullable(solicitorReferences)
-                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                    .orElse("Not Provided"))
-            .respondentSolicitor1Reference(
-                ofNullable(solicitorReferences)
-                    .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                    .orElse("Not Provided"))
             .build();
     }
 
