@@ -27,5 +27,7 @@ public interface DQ {
 
     FurtherInformation getFurtherInformation();
 
+    WelshLanguageRequirements getWelshLanguageRequirements();
+
     StatementOfTruth getStatementOfTruth();
 }

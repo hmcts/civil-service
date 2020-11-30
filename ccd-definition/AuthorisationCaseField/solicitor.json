@@ -429,6 +429,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondent1DQLanguage",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "respondent1DQStatementOfTruth",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
@@ -507,6 +514,13 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "applicant1DQFurtherInformation",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "applicant1DQLanguage",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
   },

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.unspec.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.enums.dq.HearingLength;
+import uk.gov.hmcts.reform.unspec.enums.dq.Language;
 import uk.gov.hmcts.reform.unspec.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
@@ -34,6 +35,7 @@ class Respondent1DQTest {
         assertEquals(requestedCourt(), dq.getRequestedCourt());
         assertEquals(statementOfTruth(), dq.getStatementOfTruth());
         assertEquals(witnesses(), dq.getWitnesses());
+        assertEquals(welshLanguageRequirements(), dq.getWelshLanguageRequirements());
     }
 
     private Respondent1DQ buildRespondent1Dq() {
@@ -50,6 +52,7 @@ class Respondent1DQTest {
             .respondent1DQRequestedCourt(requestedCourt())
             .respondent1DQStatementOfTruth(statementOfTruth())
             .respondent1DQWitnesses(witnesses())
+            .respondent1DQLanguage(welshLanguageRequirements())
             .build();
     }
 
@@ -153,6 +156,15 @@ class Respondent1DQTest {
             .agreementLikely(YesOrNo.YES)
             .reachedAgreement(YesOrNo.NO)
             .reasonForNoAgreement("reason")
+            .build();
+    }
+
+    private WelshLanguageRequirements welshLanguageRequirements() {
+        return WelshLanguageRequirements.builder()
+            .isPartyWelsh(YesOrNo.YES)
+            .court(Language.WELSH)
+            .documents(Language.WELSH)
+            .evidence(Language.WELSH)
             .build();
     }
 }

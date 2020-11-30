@@ -58,6 +58,7 @@ const draftDirectionsPage = require('./fragments/dq/draftDirections.page');
 const requestedCourtPage = require('./fragments/dq/requestedCourt.page');
 const hearingSupportRequirementsPage = require('./fragments/dq/hearingSupportRequirements.page');
 const furtherInformationPage = require('./fragments/dq/furtherInformation.page');
+const welshLanguageRequirementsPage = require('./fragments/dq/language.page');
 
 const address = require('./fixtures/address.js');
 
@@ -199,6 +200,7 @@ module.exports = function () {
       await requestedCourtPage.selectSpecificCourtForHearing(parties.RESPONDENT_SOLICITOR_1);
       await hearingSupportRequirementsPage.selectRequirements(parties.RESPONDENT_SOLICITOR_1);
       await furtherInformationPage.enterFurtherInformation(parties.RESPONDENT_SOLICITOR_1);
+      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.RESPONDENT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.RESPONDENT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit response', 'You\'ve submitted your response');
       await event.returnToCaseDetails();
@@ -217,6 +219,7 @@ module.exports = function () {
       await draftDirectionsPage.enterDraftDirections(parties.APPLICANT_SOLICITOR_1);
       await hearingSupportRequirementsPage.selectRequirements(parties.APPLICANT_SOLICITOR_1);
       await furtherInformationPage.enterFurtherInformation(parties.APPLICANT_SOLICITOR_1);
+      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.APPLICANT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');

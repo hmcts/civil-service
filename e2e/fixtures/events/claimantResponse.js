@@ -80,6 +80,14 @@ module.exports = {
         reasonForFutureApplications: 'Nothing'
       }
     },
+    Language: {
+      applicant1DQLanguage: {
+        isPartyWelsh: 'Yes',
+        evidence: 'WELSH',
+        court: 'WELSH',
+        documents: 'WELSH'
+      }
+    }
   },
   invalid: {
     Hearing: {

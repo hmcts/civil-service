@@ -23,6 +23,7 @@ public class Applicant1DQ implements DQ {
     private final RequestedCourt applicant1DQRequestedCourt;
     private final HearingSupport applicant1DQHearingSupport;
     private final FurtherInformation applicant1DQFurtherInformation;
+    private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
 
     @Override
@@ -88,6 +89,12 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQFurtherInformation")
     public FurtherInformation getFurtherInformation() {
         return applicant1DQFurtherInformation;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQLanguage")
+    public WelshLanguageRequirements getWelshLanguageRequirements() {
+        return applicant1DQLanguage;
     }
 
     @Override

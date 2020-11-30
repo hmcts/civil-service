@@ -111,6 +111,14 @@ module.exports = {
         reasonForFutureApplications: 'Nothing'
       }
     },
+    Language: {
+      respondent1DQLanguage: {
+        isPartyWelsh: 'Yes',
+        evidence: 'WELSH',
+        court: 'WELSH',
+        documents: 'WELSH'
+      }
+    },
     StatementOfTruth: {
       respondent1DQStatementOfTruth: {
         name: 'John Doe',

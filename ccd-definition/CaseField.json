@@ -545,6 +545,14 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1DQLanguage",
+    "Label": "Welsh language",
+    "FieldType": "Language",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQStatementOfTruth",
     "Label": "Statement of truth",
     "FieldType": "StatementOfTruth",
@@ -645,6 +653,14 @@
     "ID": "applicant1DQFurtherInformation",
     "Label": "Further information",
     "FieldType": "FurtherInformation",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1DQLanguage",
+    "Label": "Welsh language",
+    "FieldType": "Language",
     "SecurityClassification": "Public"
   },
   {
