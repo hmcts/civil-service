@@ -1,15 +1,2 @@
 [
-{
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "TESTING_SUPPORT_RESET_BUSINESS_PROCESS",
-    "Name": "Reset business process",
-    "Description": "Testing support event for resetting business process",
-    "DisplayOrder": 20,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "ShowSummary": "N",
-    "ShowEventNotes": "N"
-  }
 ]
