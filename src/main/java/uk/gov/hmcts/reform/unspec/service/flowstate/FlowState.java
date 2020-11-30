@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.unspec.service.flowstate;
 
-import static org.springframework.util.StringUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasLength;
 
 public interface FlowState {
 
     String fullName();
 
     static FlowState fromFullName(String fullName) {
-        if (isEmpty(fullName)) {
+        if (!hasLength(fullName)) {
             throw new IllegalArgumentException("Invalid full name:" + fullName);
         }
         int lastIndexOfDot = fullName.lastIndexOf('.');
