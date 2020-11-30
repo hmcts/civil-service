@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.search;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.model.search.Query;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
@@ -20,10 +21,17 @@ public class CaseStayedSearchService extends ElasticSearchService {
     public Query query(int startIndex) {
         return new Query(
             boolQuery()
-                .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now-112d"))
-                .must(matchQuery("state", "CREATED")),
+                .must(rangeQuery("last_modified").lt("now-6M"))
+                .must(beValidState()),
             List.of("reference"),
             startIndex
         );
+    }
+
+    public BoolQueryBuilder beValidState() {
+        return boolQuery()
+            .minimumShouldMatch(1)
+            .should(matchQuery("state", "CREATED"))
+            .should(matchQuery("state", "AWAITING_RESPONDENT_ACTION"));
     }
 }

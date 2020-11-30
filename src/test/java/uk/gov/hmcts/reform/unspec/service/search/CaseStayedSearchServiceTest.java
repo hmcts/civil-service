@@ -20,8 +20,11 @@ class CaseStayedSearchServiceTest extends ElasticSearchServiceTest {
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("data.confirmationOfServiceDeadline").lt("now-112d"))
-            .must(matchQuery("state", "CREATED"));
+            .must(rangeQuery("last_modified").lt("now-6M"))
+            .must(boolQuery()
+                        .minimumShouldMatch(1)
+                        .should(matchQuery("state", "CREATED"))
+                        .should(matchQuery("state", "AWAITING_RESPONDENT_ACTION")));
 
         return new Query(query, List.of("reference"), fromValue);
     }

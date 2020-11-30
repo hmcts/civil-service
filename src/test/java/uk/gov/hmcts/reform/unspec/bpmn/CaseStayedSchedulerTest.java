@@ -15,11 +15,11 @@ class CaseStayedSchedulerTest extends BpmnBaseTest {
     public static final String TOPIC_NAME = "CASE_STAYED_FINDER";
 
     public CaseStayedSchedulerTest() {
-        super("case_stayed_scheduler.bpmn", "Process_05o55pg");
+        super("case_stayed_scheduler.bpmn", "CASE_STAYED_SCHEDULER");
     }
 
     @Test
-    void caseStayedSchedulerBmpnShouldFireCaseStayedExternalTask_whenStarted() {
+    void caseStayedSchedulerBpmnShouldFireCaseStayedExternalTask_whenStarted() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -33,8 +33,7 @@ class CaseStayedSchedulerTest extends BpmnBaseTest {
         assertThat(jobDefinitions).hasSize(1);
         assertThat(jobDefinitions.get(0).getJobType()).isEqualTo("timer-start-event");
 
-        //TODO update CRON schedule.
-        assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: 0 0/5 * * * ?");
+        assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: 0 0 2 ? * * *");
 
         //get external tasks
         List<ExternalTask> externalTasks = getExternalTasks();
