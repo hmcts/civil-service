@@ -39,7 +39,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
     public static final String CONFIRMATION_SUMMARY = "<br />Follow these steps to serve a claim:"
-        + "\n* <a href=\"%s\" target=\"_blank\">[Download the sealed claim form]</a>"
+        + "\n* <a href=\"%s\" target=\"_blank\">Download the sealed claim form</a>"
         + "\n* Send the form, particulars of claim and "
         + "<a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) to the defendant by %s"
         + "\n* Confirm service online within 21 days of sending the form, particulars and response pack, before"
