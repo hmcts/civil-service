@@ -71,18 +71,6 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CLAIMANT_RESPONSE",
-    "CaseFieldID": "applicant1NotProceedingReason",
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageShowCondition": "applicant1ProceedWithClaim = \"No\"",
-    "DisplayContext": "OPTIONAL",
-    "PageID": "NotProceedingWithClaimReason",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "CLAIMANT_RESPONSE",
     "CaseFieldID": "applicant1DQFileDirectionsQuestionnaire",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,

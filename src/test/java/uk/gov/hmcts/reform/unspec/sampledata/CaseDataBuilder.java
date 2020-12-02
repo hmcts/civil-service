@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.unspec.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
-import uk.gov.hmcts.reform.unspec.model.ApplicantNotProceedingReason;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
@@ -109,7 +108,6 @@ public class CaseDataBuilder {
     // Claimant Response
     private YesOrNo applicant1ProceedWithClaim;
     private ResponseDocument applicant1DefenceResponseDocument;
-    private ApplicantNotProceedingReason applicant1NotProceedingReason;
     private BusinessProcess businessProcess;
 
     private CloseClaim withdrawClaim;
@@ -498,7 +496,6 @@ public class CaseDataBuilder {
             // Claimant Response
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
-            .applicant1NotProceedingReason(applicant1NotProceedingReason)
 
             .ccdState(ccdState)
             .businessProcess(businessProcess)
