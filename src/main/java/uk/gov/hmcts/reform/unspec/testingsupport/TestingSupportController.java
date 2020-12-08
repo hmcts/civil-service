@@ -41,7 +41,9 @@ public class TestingSupportController {
                     .map(camundaRestEngineClient::getIncidentMessage)
                     .ifPresent(businessProcessInfo::setIncidentMessage);
             } catch (FeignException e) {
-                businessProcessInfo.setIncidentMessage(e.contentUTF8());
+                if (e.status() != 404) {
+                    businessProcessInfo.setIncidentMessage(e.contentUTF8());
+                }
             }
         }
 
