@@ -29,7 +29,7 @@ const retriedRequest = async (url, headers, body, method = 'POST', expectedStatu
       }
       return response;
     });
-  },3);
+  });
 };
 
 module.exports = {request, retriedRequest};

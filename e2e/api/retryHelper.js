@@ -1,6 +1,6 @@
 const MAX_RETRY_TIMEOUT = 30000;
 
-const retry = (fn, remainingRetries = 10, retryTimeout = 5000, err = null) => {
+const retry = (fn, remainingRetries = 3, retryTimeout = 5000, err = null) => {
   if (!remainingRetries) {
     return Promise.reject(err);
   }
@@ -10,7 +10,7 @@ const retry = (fn, remainingRetries = 10, retryTimeout = 5000, err = null) => {
   return fn().catch(async err => {
     console.log(`${err.message}, retrying in ${retryTimeout / 1000} seconds (Retries left: ${remainingRetries})`);
     await sleep(retryTimeout);
-    return retry(fn, remainingRetries - 1, 2 * retryTimeout, err);
+    return retry(fn, remainingRetries - 1, retryTimeout, err);
   });
 };
 
