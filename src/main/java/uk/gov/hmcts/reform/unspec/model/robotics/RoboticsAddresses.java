@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class RoboticsAddresses {
 
-    private final RoboticsAddress contactAddress;
+    private RoboticsAddress contactAddress;
 }

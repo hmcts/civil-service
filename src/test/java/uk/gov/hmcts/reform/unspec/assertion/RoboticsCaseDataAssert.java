@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.unspec.utils.PartyUtils;
 
 import java.util.Optional;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.reform.unspec.assertion.CustomAssertions.assertThat;
 
 public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert, RoboticsCaseData> {
@@ -43,12 +44,12 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         assertParty("respondent1", actual.getLitigiousParties().get(1), expected.getRespondent1());
 
         assertSolicitor(
-            "applicant1" + "." + "solicitorPartyReference",
+            "applicant1" + "." + "reference",
             actual.getSolicitors().get(0),
             expected.getSolicitorReferences().getApplicantSolicitor1Reference()
         );
         assertSolicitor(
-            "respondent1" + "." + "solicitorPartyReference",
+            "respondent1" + "." + "reference",
             actual.getSolicitors().get(1),
             expected.getSolicitorReferences().getRespondentSolicitor1Reference()
         );
@@ -59,7 +60,7 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
     private void assertSolicitor(String fieldName, Solicitor solicitor, String reference) {
         compare(
             fieldName,
-            solicitor.getSolicitorPartyReference(),
+            solicitor.getReference(),
             Optional.ofNullable(reference)
         );
     }
@@ -76,22 +77,22 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         }
 
         compare(
-            "litigiousPartyName",
-            litigiousParty.getLitigiousPartyName(),
+            "name",
+            litigiousParty.getName(),
             Optional.ofNullable(party.getPartyName())
         );
         compare(
-            "litigiousPartyType",
-            litigiousParty.getLitigiousPartyType(),
+            "type",
+            litigiousParty.getType(),
             Optional.ofNullable(party.getType().getDisplayValue())
         );
         compare(
-            "litigiousPartyDateOfBirth",
-            litigiousParty.getLitigiousPartyDateOfBirth(),
-            PartyUtils.getDateOfBirth(party)
+            "dateOfBirth",
+            litigiousParty.getDateOfBirth(),
+            PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE))
         );
 
-        assertThat(litigiousParty.getLitigiousPartyAddresses().getContactAddress())
+        assertThat(litigiousParty.getAddresses().getContactAddress())
             .isEqualTo(party.getPrimaryAddress());
     }
 }

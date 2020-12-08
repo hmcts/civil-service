@@ -7,10 +7,10 @@ import lombok.Data;
 @Builder
 public class RoboticsAddress {
 
-    private final String addressLine1;
-    private final String addressLine2;
-    private final String addressLine3;
-    private final String addressLine4;
-    private final String addressLine5;
-    private final String postCode;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String addressLine4;
+    private String addressLine5;
+    private String postCode;
 }

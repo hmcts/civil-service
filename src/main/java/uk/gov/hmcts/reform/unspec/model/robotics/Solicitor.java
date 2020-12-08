@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.model.robotics;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,14 +8,15 @@ import lombok.Data;
 @Builder
 public class Solicitor {
 
-    private String solicitorPartyOrganisationID;
-    private String solicitorPartyName;
-    private RoboticsAddresses solicitorPartyAddresses;
-    private String solicitorPartyContactDX;
-    private String solicitorPartyContactTelephoneNumber;
-    private String solicitorPartyContactFaxNumber;
-    private String solicitorPartyContactEmailAddress;
-    private String solicitorPartyPreferredMethodOfCommunication;
-    private String solicitorPartyReference;
-    private boolean solicitorIsPayee;
+    @JsonProperty("organisationID")
+    private String organisationId;
+    private String name;
+    private RoboticsAddresses addresses;
+    private String contactDX;
+    private String contactTelephoneNumber;
+    private String contactFaxNumber;
+    private String contactEmailAddress;
+    private String preferredMethodOfCommunication;
+    private String reference;
+    private boolean isPayee;
 }

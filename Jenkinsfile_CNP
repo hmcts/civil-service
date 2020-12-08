@@ -61,6 +61,16 @@ def uploadBpmnDiagrams(String env) {
   """
   }
 }
+
+def validateRpaContract() {
+  sh """ ./gradlew contract """
+}
+
+def publishRpaContract() {
+  env.PACT_BROKER_FULL_URL="https://pact-broker.platform.hmcts.net/"
+  sh """ ./gradlew pactPublish """
+}
+
 withPipeline(type, product, component) {
   pipelineConf = config
   disableLegacyDeployment()
@@ -98,6 +108,7 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
+    validateRpaContract()
     sh """
       eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/add-roles-preview.sh
@@ -130,6 +141,7 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:aat') {
+    validateRpaContract()
     env.URL = "https://manage-case.aat.platform.hmcts.net"
     archiveCoreCaseDataDefinitions('staging')
     uploadCoreCaseDataDefinitions('staging')
@@ -153,6 +165,7 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
     archiveCoreCaseDataDefinitions('aat')
     uploadCoreCaseDataDefinitions('aat')
+    publishRpaContract()
   }
 
   before('buildinfra:demo') {
