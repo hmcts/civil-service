@@ -70,6 +70,14 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1Represented",
+    "Label": "Does the defendant have a legal representative?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimValue",
     "Label": "Enter expected claim value",
     "FieldType": "ClaimValue",

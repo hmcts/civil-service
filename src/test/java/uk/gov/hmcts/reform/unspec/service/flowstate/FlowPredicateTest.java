@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWi
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeService;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAskForAnExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentRespondToClaim;
@@ -39,6 +41,25 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsAtDraftSate() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             assertFalse(pendingCaseIssued.test(caseData));
+        }
+    }
+
+    @Nested
+    class Respondent1NotRepresented {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtIssuedSate() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            assertTrue(respondent1NotRepresented.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataIsAtDraftSate() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            assertFalse(respondent1NotRepresented.test(caseData));
         }
     }
 

@@ -13,6 +13,7 @@ const solicitorReferencesPage = require('./pages/createClaim/solicitorReferences
 const chooseCourtPage = require('./pages/createClaim/chooseCourt.page');
 const claimantLitigationDetails = require('./pages/createClaim/claimantLitigationDetails.page');
 const claimTypePage = require('./pages/createClaim/claimType.page');
+const respondentRepresentedPage = require('./pages/createClaim/isRespondentRepresented.page');
 const personalInjuryTypePage = require('./pages/createClaim/personalInjuryType.page');
 const uploadParticularsOfClaim = require('./pages/createClaim/uploadParticularsOfClaim.page');
 const claimValuePage = require('./pages/createClaim/claimValue.page');
@@ -126,6 +127,7 @@ module.exports = function () {
       await party.enterParty('applicant1', address);
       await claimantLitigationDetails.enterLitigantFriendWithDifferentAddressToApplicant(address, TEST_FILE_PATH);
       await party.enterParty('respondent1', address);
+      await respondentRepresentedPage.enterRespondentRepresented();
       await claimTypePage.selectClaimType();
       await personalInjuryTypePage.selectPersonalInjuryType();
       await uploadParticularsOfClaim.upload(TEST_FILE_PATH);

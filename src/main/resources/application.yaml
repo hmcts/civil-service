@@ -91,6 +91,7 @@ notifications:
   failedPayment: "d32446d7-9f97-4d3b-8708-5639ebc27da3"
   applicantSolicitorCaseStrikeOut: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
   respondentSolicitorCaseStrikeOut: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
+  claimantSolicitorCaseWillProgressOffline: "290461ee-7b1d-404d-9b19-e46b1f6458d1"
   applicantSolicitorEmail: claimantsolicitor@gmail.com
   respondentSolicitorEmail: defendantsolicitor@gmail.com
 

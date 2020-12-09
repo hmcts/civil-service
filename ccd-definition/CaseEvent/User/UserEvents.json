@@ -7,6 +7,7 @@
     "Description": "Case created, post actions triggered",
     "DisplayOrder": 1,
     "PostConditionState": "PENDING_CASE_ISSUED",
+    "Comment": "Event will move to PROCEEDS_WITH_OFFLINE_JOURNEY if claim is raised against litigant in person",
     "SecurityClassification": "Public",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",

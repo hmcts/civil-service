@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWi
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeService;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAskForAnExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentRespondToClaim;
@@ -49,6 +50,7 @@ public class StateFlowEngine {
     public StateFlow build() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
+                .transitionTo(PROCEEDS_WITH_OFFLINE_JOURNEY).onlyIf(respondent1NotRepresented)
                 .transitionTo(PENDING_CASE_ISSUED).onlyIf(pendingCaseIssued)
             .state(PENDING_CASE_ISSUED)
                 .transitionTo(PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)

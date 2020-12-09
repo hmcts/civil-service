@@ -90,11 +90,23 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondent1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "LegalRepresentation",
+    "PageDisplayOrder": 7,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimType",
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimType",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -106,7 +118,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimType",
-    "PageDisplayOrder": 7,
+    "PageDisplayOrder": 8,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "claimType = \"OTHER\""
@@ -119,7 +131,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "PersonalInjuryType",
-    "PageDisplayOrder": 8,
+    "PageDisplayOrder": 9,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "PageShowCondition": "claimType = \"PERSONAL_INJURY\""
@@ -132,7 +144,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "MANDATORY",
     "PageID": "PersonalInjuryType",
-    "PageDisplayOrder": 8,
+    "PageDisplayOrder": 9,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "FieldShowCondition": "personalInjuryType = \"PERSONAL_INJURY_OTHER\""
@@ -145,7 +157,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "Upload",
-    "PageDisplayOrder": 9,
+    "PageDisplayOrder": 10,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -157,7 +169,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimValue",
-    "PageDisplayOrder": 10,
+    "PageDisplayOrder": 11,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -169,7 +181,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 11,
+    "PageDisplayOrder": 12,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -181,7 +193,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "StatementOfTruth",
-    "PageDisplayOrder": 12,
+    "PageDisplayOrder": 13,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   }

@@ -3,7 +3,7 @@ const config = require('../config.js');
 Feature('CCD API tests @api-tests');
 
 Scenario('Create claim', async (api) => {
-  await api.createClaim(config.solicitorUser);
+  await api.createClaimWithRepresentedRespondent(config.solicitorUser);
 });
 
 Scenario('Confirm service', async (api) => {
@@ -28,4 +28,8 @@ Scenario('Defendant response', async (api) => {
 
 Scenario('Claimant response', async (api) => {
   await api.claimantResponse();
+});
+
+Scenario('Create claim where respondent is litigant in person', async (api) => {
+  await api.createClaimWithRespondentLitigantInPerson(config.solicitorUser);
 });

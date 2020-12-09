@@ -45,7 +45,8 @@ public enum CaseEvent {
     NOTIFY_APPLICANT_SOLICITOR1_CASE_STRIKE_OUT("Notify case strike out", CAMUNDA),
     NOTIFY_RESPONDENT_SOLICITOR1_CASE_STRIKE_OUT("Notify case strike out", CAMUNDA),
     MOVE_CLAIM_TO_STRUCK_OUT("Strike out claim", USER),
-    GENERATE_ACKNOWLEDGEMENT_OF_SERVICE("Generate acknowledgement of service", CAMUNDA);
+    GENERATE_ACKNOWLEDGEMENT_OF_SERVICE("Generate acknowledgement of service", CAMUNDA),
+    NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON("Notify handed offline", CAMUNDA);
 
     private final String displayName;
     private final UserType userType;

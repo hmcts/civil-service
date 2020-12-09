@@ -35,4 +35,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentSolicitorCaseStrikeOut;
+
+    @NotEmpty
+    private String claimantSolicitorCaseWillProgressOffline;
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -60,6 +61,25 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName());
+        }
+
+        @Test
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PROCEEDS_WITH_OFFLINE_JOURNEY.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PROCEEDS_WITH_OFFLINE_JOURNEY.fullName());
         }
 
         @Test
