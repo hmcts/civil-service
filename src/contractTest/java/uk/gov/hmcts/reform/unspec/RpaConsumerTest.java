@@ -23,7 +23,7 @@ class RpaConsumerTest extends BaseRpaTest {
 
         assertThat(payload, validateJson());
 
-        String description = "a request to fake endpoint with Robotics data for case stayed RPA";
+        String description = "Robotics case data for civil unspecified at case stayed";
         PactVerificationResult result = getPactVerificationResult(payload, description);
 
         assertEquals(PactVerificationResult.Ok.INSTANCE, result);

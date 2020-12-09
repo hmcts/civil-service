@@ -26,7 +26,9 @@ public abstract class BaseRpaTest {
     protected RoboticsDataMapper roboticsDataMapper = new RoboticsDataMapper(new RoboticsAddressMapper());
 
     protected PactVerificationResult getPactVerificationResult(String payload, String description) {
-        Map<String, String> headers = Map.of("title", description, "version", VERSION);
+        Map<String, String> headers = Map.of("Content-Type", "application/json",
+                                             "title", description,
+                                             "version", VERSION);
         RequestResponsePact pact = preparePact(description, payload, headers);
         PactTestRun pactTestRun = preparePactTestRun(payload, headers);
 
