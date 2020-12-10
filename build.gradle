@@ -398,7 +398,7 @@ pact {
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash()]
     version = project.pactVersion
   }
 }
