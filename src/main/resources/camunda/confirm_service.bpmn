@@ -49,7 +49,6 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1ljqldp" sourceRef="Activity_1r1owoe" targetRef="Event_12lb061" />
   </bpmn:process>
-  <bpmn:message id="Message_0gtgs0h" name="ACKNOWLEDGE_SERVICE" />
   <bpmn:message id="Message_06jvaoy" name="CONFIRM_SERVICE" />
   <bpmn:error id="Error_0reyf6h" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

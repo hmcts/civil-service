@@ -23,7 +23,17 @@ import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfElectronicDocuments;
+import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.unspec.model.dq.Experts;
+import uk.gov.hmcts.reform.unspec.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.unspec.model.dq.FurtherInformation;
+import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
+import uk.gov.hmcts.reform.unspec.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.unspec.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.unspec.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.unspec.model.dq.Witnesses;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -49,6 +59,7 @@ import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.PARTICULARS_OF_CL
 import static uk.gov.hmcts.reform.unspec.enums.ServiceLocationType.BUSINESS;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.unspec.enums.dq.HearingLength.ONE_DAY;
 
 public class CaseDataBuilder {
 
@@ -106,6 +117,7 @@ public class CaseDataBuilder {
     private RespondentResponseType respondent1ClaimResponseType;
     private ResponseDocument respondent1ClaimResponseDocument;
     private LocalDateTime applicantSolicitorResponseDeadlineToRespondentSolicitor1;
+    private Respondent1DQ respondent1DQ;
     // Claimant Response
     private YesOrNo applicant1ProceedWithClaim;
     private ResponseDocument applicant1DefenceResponseDocument;
@@ -113,8 +125,6 @@ public class CaseDataBuilder {
 
     private CloseClaim withdrawClaim;
     private CloseClaim discontinueClaim;
-
-    private Respondent1DQ respondent1DQ;
 
     public CaseDataBuilder respondentSolicitor1claimResponseExtensionProposedDeadline(LocalDate responseDeadline) {
         this.respondentSolicitor1claimResponseExtensionProposedDeadline = responseDeadline;
@@ -390,6 +400,27 @@ public class CaseDataBuilder {
         applicantSolicitorResponseDeadlineToRespondentSolicitor1 = APPLICANT_RESPONSE_DEADLINE;
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .build();
         ccdState = AWAITING_CLAIMANT_INTENTION;
         return this;

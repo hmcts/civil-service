@@ -72,9 +72,9 @@ class CreateClaimTest extends BpmnBaseTest {
         );
 
         //complete the document generation
-        ExternalTask notification = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            notification,
+            documentGeneration,
             PROCESS_CASE_EVENT,
             GENERATE_CLAIM_FORM,
             CLAIM_FORM_ACTIVITY_ID

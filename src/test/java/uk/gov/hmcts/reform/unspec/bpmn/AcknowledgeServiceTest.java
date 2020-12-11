@@ -30,9 +30,9 @@ class AcknowledgeServiceTest extends BpmnBaseTest {
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
         assertCompleteExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
 
-        //complete the certificate generation
-        ExternalTask certificateGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(certificateGeneration, PROCESS_CASE_EVENT, GENERATE_ACKNOWLEDGEMENT_OF_SERVICE,
+        //complete the document generation
+        ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(documentGeneration, PROCESS_CASE_EVENT, GENERATE_ACKNOWLEDGEMENT_OF_SERVICE,
                                    GENERATE_CERTIFICATE_ACTIVITY_ID);
 
         //complete the notification to applicant

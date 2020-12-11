@@ -726,5 +726,13 @@
     "Label": "Case strikeout deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "defendantResponseDate",
+    "Label": "Defendant response date",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
   }
 ]

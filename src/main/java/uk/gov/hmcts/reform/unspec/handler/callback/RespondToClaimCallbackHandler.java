@@ -86,6 +86,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
         //TODO: There will be in separate ticket for response deadline when requirement is confirmed
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0))
+            .defendantResponseDate(now())
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
             .build();
 
