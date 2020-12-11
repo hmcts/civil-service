@@ -55,8 +55,6 @@ module.exports = {
 
     await assertCallbackError('ServedDocuments', data[eventName].invalid.ServedDocuments.blankOtherDocuments,
       'CONTENT TBC: please enter a valid value for other documents');
-    await assertCallbackError('Date', data[eventName].invalid.Date.threeDaysBeforeToday,
-      'The date must not be before issue date of claim');
     await assertCallbackError('Date', data[eventName].invalid.Date.tomorrow,
       'The date must not be in the future');
 

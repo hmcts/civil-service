@@ -155,20 +155,6 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getErrors()).containsOnly("The date must not be in the future");
             }
-
-            @Test
-            void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
-                CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed()
-                    .claimIssuedDate(claimIssueDate)
-                    .serviceDateToRespondentSolicitor1(claimIssueDate.minusDays(3))
-                    .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(POST).build())
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getErrors()).containsOnly("The date must not be before issue date of claim");
-            }
         }
 
         @Nested
@@ -217,20 +203,6 @@ class ConfirmServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getErrors()).containsOnly("The date must not be in the future");
-            }
-
-            @Test
-            void shouldReturnError_whenServiceDateIsBeforeClaimIssueDate() {
-                CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed()
-                    .claimIssuedDate(claimIssueDate)
-                    .serviceDateTimeToRespondentSolicitor1(claimIssueDate.atTime(12, 0).minusDays(1))
-                    .serviceMethodToRespondentSolicitor1(ServiceMethod.builder().type(FAX).build())
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "service-date");
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getErrors()).containsOnly("The date must not be before issue date of claim");
             }
         }
     }
