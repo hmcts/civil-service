@@ -17,11 +17,12 @@ import uk.gov.hmcts.reform.unspec.model.docmosis.dq.Witnesses;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
+import uk.gov.hmcts.reform.unspec.model.dq.DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.unspec.utils.MonetaryConversions;
 
@@ -32,6 +33,7 @@ import java.util.Locale;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N181;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.unwrapElements;
 
 @Service
@@ -40,6 +42,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final StateFlowEngine stateFlowEngine;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
@@ -57,7 +60,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        DQ dq = state.equals(RESPONDED_TO_CLAIM.fullName()) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -65,16 +69,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getDefendantResponseDate())
             .applicant(getApplicant(caseData))
-            .fileDirectionsQuestionnaire(respondent1DQ.getFileDirectionQuestionnaire())
-            .disclosureOfElectronicDocuments(respondent1DQ.getDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(respondent1DQ.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(respondent1DQ))
-            .witnesses(getWitnesses(respondent1DQ))
-            .hearing(getHearing(respondent1DQ))
-            .hearingSupport(getHearingSupport(respondent1DQ))
-            .furtherInformation(respondent1DQ.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(respondent1DQ))
-            .statementOfTruth(respondent1DQ.getStatementOfTruth())
+            .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+            .experts(getExperts(dq))
+            .witnesses(getWitnesses(dq))
+            .hearing(getHearing(dq))
+            .hearingSupport(getHearingSupport(dq))
+            .furtherInformation(dq.getFurtherInformation())
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .statementOfTruth(dq.getStatementOfTruth())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
@@ -87,8 +91,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private Experts getExperts(Respondent1DQ respondent1DQ) {
-        var experts = respondent1DQ.getExperts();
+    private Experts getExperts(DQ dq) {
+        var experts = dq.getExperts();
         return Experts.builder()
             .expertRequired(experts.getExpertRequired())
             .expertReportsSent(
@@ -96,12 +100,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .map(ExpertReportsSent::getDisplayedValue)
                     .orElse(""))
             .jointExpertSuitable(experts.getJointExpertSuitable())
-            .details(getExpertsDetails(respondent1DQ))
+            .details(getExpertsDetails(dq))
             .build();
     }
 
-    private List<Expert> getExpertsDetails(Respondent1DQ respondent1DQ) {
-        return unwrapElements(respondent1DQ.getExperts().getDetails())
+    private List<Expert> getExpertsDetails(DQ dq) {
+        return unwrapElements(dq.getExperts().getDetails())
             .stream()
             .map(expert -> Expert.builder()
                 .name(expert.getName())
@@ -113,25 +117,25 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .collect(toList());
     }
 
-    private Witnesses getWitnesses(Respondent1DQ respondent1DQ) {
-        var witnesses = respondent1DQ.getWitnesses();
+    private Witnesses getWitnesses(DQ dq) {
+        var witnesses = dq.getWitnesses();
         return Witnesses.builder()
             .witnessesToAppear(witnesses.getWitnessesToAppear())
             .details(unwrapElements(witnesses.getDetails()))
             .build();
     }
 
-    private Hearing getHearing(Respondent1DQ respondent1DQ) {
-        var hearing = respondent1DQ.getHearing();
+    private Hearing getHearing(DQ dq) {
+        var hearing = dq.getHearing();
         return Hearing.builder()
-            .hearingLength(getHearingLength(respondent1DQ))
+            .hearingLength(getHearingLength(dq))
             .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
             .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
             .build();
     }
 
-    private String getHearingLength(Respondent1DQ respondent1DQ) {
-        var hearing = respondent1DQ.getHearing();
+    private String getHearingLength(DQ dq) {
+        var hearing = dq.getHearing();
         switch (hearing.getHearingLength()) {
             case LESS_THAN_DAY:
                 return hearing.getHearingLengthHours() + " hours";
@@ -142,13 +146,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
     }
 
-    private String getHearingSupport(Respondent1DQ respondent1DQ) {
+    private String getHearingSupport(DQ dq) {
         var stringBuilder = new StringBuilder();
-        ofNullable(respondent1DQ.getHearingSupport())
+        ofNullable(dq.getHearingSupport())
             .map(HearingSupport::getRequirements)
             .orElse(List.of())
             .forEach(requirement -> {
-                var hearingSupport = respondent1DQ.getHearingSupport();
+                var hearingSupport = dq.getHearingSupport();
                 stringBuilder.append(requirement.getDisplayedValue());
                 switch (requirement) {
                     case SIGN_INTERPRETER:
@@ -168,8 +172,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(Respondent1DQ respondent1DQ) {
-        var welshLanguageRequirements = respondent1DQ.getWelshLanguageRequirements();
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         return WelshLanguageRequirements.builder()
             .isPartyWelsh(welshLanguageRequirements.getIsPartyWelsh())
             .evidence(ofNullable(

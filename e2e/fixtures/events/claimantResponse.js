@@ -87,6 +87,12 @@ module.exports = {
         court: 'WELSH',
         documents: 'WELSH'
       }
+    },
+    StatementOfTruth: {
+      applicant1DQStatementOfTruth: {
+        name: 'James Bond',
+        role: 'Spy'
+      }
     }
   },
   invalid: {

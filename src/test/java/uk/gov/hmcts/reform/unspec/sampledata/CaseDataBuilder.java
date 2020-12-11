@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.unspec.model.dq.Experts;
@@ -118,6 +119,7 @@ public class CaseDataBuilder {
     private ResponseDocument respondent1ClaimResponseDocument;
     private LocalDateTime applicantSolicitorResponseDeadlineToRespondentSolicitor1;
     private Respondent1DQ respondent1DQ;
+    private Applicant1DQ applicant1DQ;
     // Claimant Response
     private YesOrNo applicant1ProceedWithClaim;
     private ResponseDocument applicant1DefenceResponseDocument;
@@ -158,6 +160,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
         this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQ(Applicant1DQ applicant1DQ) {
+        this.applicant1DQ = applicant1DQ;
         return this;
     }
 
@@ -438,6 +445,27 @@ public class CaseDataBuilder {
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
+        applicant1DQ = Applicant1DQ.builder()
+            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                         .explainedToClient(List.of("OTHER"))
+                                                         .oneMonthStayRequested(NO)
+                                                         .reactionProtocolCompliedWith(YES)
+                                                         .build())
+            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                             .reachedAgreement(YES)
+                                                             .build())
+            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                .directionsForDisclosureProposed(NO)
+                                                                .build())
+            .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
+            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .applicant1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .applicant1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
+            .build();
         return this;
     }
 
@@ -543,6 +571,7 @@ public class CaseDataBuilder {
             .withdrawClaim(withdrawClaim)
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
+            .applicant1DQ(applicant1DQ)
             .build();
     }
 }
