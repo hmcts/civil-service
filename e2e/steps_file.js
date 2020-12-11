@@ -67,6 +67,7 @@ const baseUrl = process.env.URL || 'http://localhost:3333';
 
 const SIGNED_IN_SELECTOR = 'exui-header';
 const CASE_LIST = 'exui-case-list';
+const JURISDICTION_LOCATOR = '#wb-jurisdiction > option';
 const TYPE_LOCATOR = '#wb-case-type > option';
 const STATE_LOCATOR = '#wb-case-state > option';
 const CASE_NUMBER_INPUT_LOCATOR = 'input[type$="number"]';
@@ -94,6 +95,9 @@ module.exports = function () {
 
     async goToCase(caseId) {
         this.click('Case list');
+
+        this.waitForElement(JURISDICTION_LOCATOR);
+        this.selectOption('jurisdiction', 'Civil');
 
         this.waitForElement(TYPE_LOCATOR);
         this.selectOption('case-type', 'Unspecified Claims');
