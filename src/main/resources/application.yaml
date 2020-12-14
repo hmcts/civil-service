@@ -218,3 +218,12 @@ notifications:
 testing:
   support:
     enabled: true
+---
+
+spring:
+  profiles: idam-stub
+idam:
+  web:
+    url: http://ccd-test-stubs-service:5555
+  api:
+    url: http://ccd-test-stubs-service:5555

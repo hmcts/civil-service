@@ -1,6 +1,7 @@
 const assert = require('assert').strict;
 
 const apiRequest = require('./apiRequest.js');
+const {waitForFinishedBusinessProcess} = require('../api/testingSupport');
 
 const data = {
   CREATE_CLAIM: require('../fixtures/events/createClaim.js'),
@@ -160,6 +161,7 @@ module.exports = {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     });
+    await waitForFinishedBusinessProcess(caseId);
   },
 
   addDefendantLitigationFriend: async () => {

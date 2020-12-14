@@ -1,7 +1,13 @@
 const config = require('../config.js');
+const {waitForFinishedBusinessProcess} = require('../api/testingSupport');
+
+const caseEventMessage = eventName => `Case ${caseNumber} has been updated with event: ${eventName}`;
+const caseId = () => `${caseNumber.split('-').join('').replace(/#/, '')}`;
+
+const CASE_HEADER = 'ccd-case-header > h1';
+const CASE_LIST = 'exui-case-list';
 
 let caseNumber;
-const caseEventMessage = eventName => `Case ${caseNumber} has been updated with event: ${eventName}`;
 
 Feature('Claim creation @claim-tests');
 
@@ -10,7 +16,7 @@ Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.createCase();
 
   caseNumber = await I.grabCaseNumber();
-  await I.see(`Case ${caseNumber.split('-').join('')} has been created.`);
+  await I.see(`Case #${caseId()} has been created.`);
 });
 
 Scenario('Solicitor confirms service', async (I) => {
@@ -45,5 +51,12 @@ Scenario('Solicitor responds to claim', async (I) => {
 
 Scenario('Solicitor responds to defence', async (I) => {
   await I.respondToDefence();
-  await I.see('Case List');
+  if (config.idamStub.enabled) {
+    I.waitForElement(CASE_HEADER);
+    await I.see(caseEventMessage('View and respond to defence'));
+  } else {
+    I.waitForElement(CASE_LIST);
+    await I.see('Case List');
+  }
+  await waitForFinishedBusinessProcess(caseId());
 });

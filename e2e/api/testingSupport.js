@@ -1,4 +1,5 @@
 const config = require('../config.js');
+const idamHelper = require('./idamHelper');
 const restHelper = require('./restHelper');
 
 const {retry} = require('./retryHelper');
@@ -9,10 +10,7 @@ const RETRY_TIMEOUT_MS = 1000;
 
 module.exports =  {
   waitForFinishedBusinessProcess: async caseId => {
-    const authToken = await restHelper.retriedRequest(
-      `${config.url.idamApi}/loginUser?username=${config.solicitorUser.email}&password=${config.solicitorUser.password}`,
-      {'Content-Type': 'application/x-www-form-urlencoded'})
-      .then(response => response.json()).then(data => data.access_token);
+    const authToken = await idamHelper.accessToken(config.solicitorUser);
 
     await retry(() => {
       return restHelper.request(

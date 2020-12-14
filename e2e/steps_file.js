@@ -66,7 +66,6 @@ const address = require('./fixtures/address.js');
 const baseUrl = process.env.URL || 'http://localhost:3333';
 
 const SIGNED_IN_SELECTOR = 'exui-header';
-const CASE_LIST = 'exui-case-list';
 const JURISDICTION_LOCATOR = '#wb-jurisdiction > option';
 const TYPE_LOCATOR = '#wb-case-type > option';
 const STATE_LOCATOR = '#wb-case-state > option';
@@ -85,11 +84,14 @@ module.exports = function () {
       await this.retryUntilExists(async () => {
         this.amOnPage(baseUrl);
 
-        if (await this.hasSelector(SIGNED_IN_SELECTOR)) {
-          this.click('Sign out');
+        if (!config.idamStub.enabled) {
+          if (await this.hasSelector(SIGNED_IN_SELECTOR)) {
+            this.click('Sign out');
+          }
+
+          loginPage.signIn(user);
         }
 
-        loginPage.signIn(user);
       }, SIGNED_IN_SELECTOR);
     },
 
@@ -229,7 +231,6 @@ module.exports = function () {
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');
-      this.waitForElement(CASE_LIST);
     },
 
     async clickContinue() {
