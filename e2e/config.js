@@ -1,6 +1,6 @@
 /*global process*/
 
-const defaultPassword = 'Password12';
+const defaultPassword = 'Password12!';
 
 module.exports = {
   proxyServer: process.env.PROXY_SERVER,
@@ -21,7 +21,7 @@ module.exports = {
   },
   solicitorUser: {
     password: defaultPassword,
-    email: 'solicitor@example.com'
+    email: 'claimantsolicitor@gmail.com'
   },
   definition: {
     jurisdiction: 'CIVIL',
