@@ -69,6 +69,7 @@ public class CaseDataBuilder {
     public static final LocalDate DEEMED_SERVICE_DATE = LocalDate.now();
     public static final LocalDateTime RESPONSE_DEADLINE = now().plusDays(14).atTime(23, 59, 59);
     public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = LocalDateTime.now().plusDays(120);
+    public static final LocalDate CLAIM_ISSUED_DATE = now();
 
     // Create Claim
     private Long ccdCaseReference;
@@ -376,7 +377,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimCreated() {
         atStatePaymentSuccessful();
-        claimIssuedDate = now();
+        claimIssuedDate = CLAIM_ISSUED_DATE;
         confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         ccdState = CREATED;
         return this;

@@ -69,9 +69,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_SOLICITOR_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            RESPONDENT_SOLICITOR_NAME, "Placeholder name",
             APPLICANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             ISSUED_ON, formatLocalDate(caseData.getClaimIssuedDate(), DATE)
         );
     }
