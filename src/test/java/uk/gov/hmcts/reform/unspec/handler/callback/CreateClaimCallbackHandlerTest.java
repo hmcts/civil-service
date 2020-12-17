@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,29 +9,42 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.Fee;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
+import uk.gov.hmcts.reform.unspec.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.unspec.service.FeesService;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
@@ -57,6 +71,12 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnTyp
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000LR001";
+
+    @MockBean
+    private FeesService feesService;
+
+    @MockBean
+    private OrganisationService organisationService;
 
     @Autowired
     private CreateClaimCallbackHandler handler;
@@ -138,6 +158,80 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventFeeCallback {
+
+        private final String pageId = "fee";
+        private final Fee feeData = Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(BigDecimal.valueOf(100))
+            .build();
+        private final Organisation organisation = Organisation.builder()
+            .paymentAccount(List.of("12345", "98765"))
+            .build();
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        @BeforeEach
+        void setup() {
+            given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
+        }
+
+        @Test
+        void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("claimFee")
+                .extracting("calculatedAmountInPence", "code", "version")
+                .containsExactly(
+                    String.valueOf(feeData.getCalculatedAmountInPence()),
+                    feeData.getCode(),
+                    feeData.getVersion()
+                );
+
+            DynamicList dynamicList = getDynamicList(response);
+
+            List<String> actualPbas = dynamicList.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            assertThat(actualPbas).containsOnly("12345", "98765");
+            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
+        }
+
+        @Test
+        void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("claimFee")
+                .extracting("calculatedAmountInPence", "code", "version")
+                .containsExactly(
+                    String.valueOf(feeData.getCalculatedAmountInPence()),
+                    feeData.getCode(),
+                    feeData.getVersion()
+                );
+
+            assertThat(getDynamicList(response))
+                .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+        }
+
+        private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
+            return mapper.convertValue(response.getData().get("applicantSolicitor1PbaAccounts"), DynamicList.class);
         }
     }
 

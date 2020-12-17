@@ -7,12 +7,12 @@ import lombok.Data;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
-import uk.gov.hmcts.reform.unspec.enums.PbaNumber;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
+import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
@@ -43,7 +43,9 @@ public class CaseData {
     private final Party respondent2;
     private final YesOrNo respondent1Represented;
     private final ClaimValue claimValue;
-    private final PbaNumber pbaNumber;
+    private final Fee claimFee;
+    private final String paymentReference;
+    private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
@@ -117,4 +119,7 @@ public class CaseData {
     private final YesOrNo applicant1LitigationFriendRequired;
 
     private final LitigationFriend applicant1LitigationFriend;
+
+    //CCD UI flag
+    private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
 }

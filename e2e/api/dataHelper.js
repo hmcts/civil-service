@@ -21,5 +21,12 @@ module.exports = {
       id: uuid.v1(),
       value: object
     };
+  },
+
+  listElement: string => {
+    return {
+      code: uuid.v1(),
+      label: string
+    };
   }
 };

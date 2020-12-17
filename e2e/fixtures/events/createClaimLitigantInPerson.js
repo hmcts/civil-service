@@ -1,5 +1,7 @@
-const {document, element} = require('../../api/dataHelper');
+const {document, element, listElement} = require('../../api/dataHelper');
 const address = require('../address');
+
+const selectedPba = listElement('PBA0077597');
 
 module.exports = {
   valid: {
@@ -85,7 +87,14 @@ module.exports = {
       }
     },
     PbaNumber: {
-      pbaNumber: 'PBA0077597'
+      applicantSolicitor1PbaAccounts: {
+        list_items: [
+          selectedPba,
+          listElement('PBA0078094')
+        ],
+        value: selectedPba
+
+      }
     },
     StatementOfTruth: {
       applicantSolicitor1ClaimStatementOfTruth: {

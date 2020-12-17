@@ -16,6 +16,7 @@ const personalInjuryTypePage = require('./pages/createClaim/personalInjuryType.p
 const uploadParticularsOfClaim = require('./pages/createClaim/uploadParticularsOfClaim.page');
 const claimValuePage = require('./pages/createClaim/claimValue.page');
 const pbaNumberPage = require('./pages/createClaim/pbaNumber.page');
+const paymentReferencePage = require('./pages/createClaim/paymentReference.page');
 
 const servedDocumentsPage = require('./pages/confirmService/servedDocuments.page');
 const uploadDocumentsPage = require('./pages/confirmService/uploadDocuments.page');
@@ -80,7 +81,7 @@ module.exports = function () {
       await this.retryUntilExists(async () => {
         this.amOnPage(config.url.manageCase);
 
-        if (!config.idamStub.enabled) {
+        if (!config.idamStub.enabled || config.idamStub.enabled === 'false') {
           if (await this.hasSelector(SIGNED_IN_SELECTOR)) {
             this.click('Sign out');
           }
@@ -135,6 +136,7 @@ module.exports = function () {
       await uploadParticularsOfClaim.upload(TEST_FILE_PATH);
       await claimValuePage.enterClaimValue();
       await pbaNumberPage.selectPbaNumber();
+      await paymentReferencePage.updatePaymentReference();
       await statementOfTruth.enterNameAndRole('claim');
       await event.submit('Issue claim', 'Your claim has been issued');
       await event.returnToCaseDetails();

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
@@ -16,7 +17,11 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
+import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.unspec.service.FeesService;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
@@ -26,8 +31,12 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
@@ -58,6 +67,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
+    private final FeesService feesService;
+    private final OrganisationService organisationService;
     private final StateFlowEngine stateFlowEngine;
 
     @Override
@@ -65,6 +76,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "applicant"), this::validateDateOfBirth,
+            callbackKey(MID, "fee"), this::calculateFee,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -82,6 +94,32 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private CallbackResponse calculateFee(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+        String paymentReference = ofNullable(caseData.getPaymentReference())
+            .orElse(references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""));
+
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> pbaNumbers = getPbaAccounts(authToken);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+            .claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YesOrNo.YES : YesOrNo.NO)
+            .paymentReference(paymentReference);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
+            .build();
+    }
+
+    private List<String> getPbaAccounts(String authToken) {
+        return organisationService.findOrganisation(authToken)
+            .map(Organisation::getPaymentAccount)
+            .orElse(emptyList());
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {

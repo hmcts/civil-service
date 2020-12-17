@@ -4,7 +4,7 @@ module.exports = {
 
   fields: {
     pbaNumber: {
-      id: '#pbaNumber',
+      id: '#applicantSolicitor1PbaAccounts',
       options: {
         activeAccount: 'PBA0077597'
       }

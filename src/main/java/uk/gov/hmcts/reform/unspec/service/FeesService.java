@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.fees.client.FeesClient;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
-import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.unspec.config.FeesConfiguration;
 import uk.gov.hmcts.reform.unspec.model.ClaimValue;
+import uk.gov.hmcts.reform.unspec.model.Fee;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +20,7 @@ public class FeesService {
     private final FeesClient feesClient;
     private final FeesConfiguration feesConfiguration;
 
-    public BigInteger getFeeAmountByClaimValue(ClaimValue claimValue) {
-        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
-
-        return getFeeAmountInPence(feeLookupResponseDto);
-    }
-
-    public FeeDto getFeeDataByClaimValue(ClaimValue claimValue) {
+    public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
         FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
 
         return buildFeeDto(feeLookupResponseDto);
@@ -40,15 +34,13 @@ public class FeesService {
         );
     }
 
-    private BigInteger getFeeAmountInPence(FeeLookupResponseDto feeLookupResponseDto) {
-        var feeAmountPounds = feeLookupResponseDto.getFeeAmount();
+    private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
+        BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
+            .multiply(PENCE_PER_POUND)
+            .setScale(0, RoundingMode.UNNECESSARY);
 
-        return feeAmountPounds.multiply(PENCE_PER_POUND).toBigInteger();
-    }
-
-    private FeeDto buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
-        return FeeDto.builder()
-            .calculatedAmount(feeLookupResponseDto.getFeeAmount())
+        return Fee.builder()
+            .calculatedAmountInPence(calculatedAmount)
             .code(feeLookupResponseDto.getCode())
             .version(feeLookupResponseDto.getVersion().toString())
             .build();
