@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis;
 
 public enum DocmosisTemplates {
-    N1("CV-UNS-GOR-ENG-0001.docx", "sealed_claim_form_%s.pdf"),
-    N9("CV-UNS-AOS-ENG-0001.docx", "acknowledgement_of_service_form_%s.pdf"),
-    N215("CV-UNS-COS-ENG-0001.docx", "certificate_of_service_form_%s.pdf"),
+    N1("CV-UNS-CLM-ENG-00655.docx", "sealed_claim_form_%s.pdf"),
+    N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_service_form_%s.pdf"),
+    N215("CV-UNS-GNO-ENG-00654.docx", "certificate_of_service_form_%s.pdf"),
     N181("CV-UNS-HRN-ENG-00651.docx", "directions_questionnaire_form_%s.pdf");
 
     private final String template;
