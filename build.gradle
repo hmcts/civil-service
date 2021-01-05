@@ -356,7 +356,7 @@ dependencies {
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
-  contractTestCompile group: 'com.networknt', name: 'json-schema-validator', version: '1.0.45'
+  contractTestCompile group: 'com.networknt', name: 'json-schema-validator', version: '1.0.46'
   contractTestCompile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.12.0'
   contractTestCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
