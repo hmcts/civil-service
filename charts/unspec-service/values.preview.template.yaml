@@ -36,6 +36,7 @@ java:
         - docmosis-api-key
         - gov-notify-api-key
         - sendgrid-api-key
+        - launch-darkly-sdk-key
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -49,6 +50,7 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-${SERVICE_FQDN}/engine-rest/
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
+    LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr

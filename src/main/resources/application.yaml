@@ -98,6 +98,11 @@ notifications:
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
+  offline-mode: false
+  env: ${LAUNCH_DARKLY_ENV:default}
+
 testing:
   support:
     enabled: ${TESTING_SUPPORT_ENABLED:false}
@@ -152,6 +157,9 @@ docmosis:
 
 sendgrid:
   api-key: fake-key
+
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:fake-key}
 
 testing:
   support:
