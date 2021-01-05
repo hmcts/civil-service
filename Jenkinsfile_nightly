@@ -23,7 +23,7 @@ properties([
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
       description: 'The security rules to use'),
     string(name: 'FUNCTIONAL_TESTS_WORKERS',
-      defaultValue: '5',
+      defaultValue: '1',
       description: 'Number of workers running functional tests'),
   ])
 ])
@@ -63,5 +63,11 @@ withNightlyPipeline(type, product, component) {
   //enableMutationTest()
 
   enableSecurityScan()
+
+  enableFullFunctionalTest(200)
+
+  after('fullFunctionalTest') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
 }
 

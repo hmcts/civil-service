@@ -15,7 +15,6 @@ module.exports = {
 
   async startEvent(event, caseId) {
     await waitForFinishedBusinessProcess(caseId);
-    await I.goToCase(caseId);
     I.selectOption(this.fields.eventDropdown, event);
     I.click(this.goButton);
     I.waitForElement(EVENT_TRIGGER_LOCATOR);
