@@ -7,7 +7,8 @@ module.exports = {
 
   async submit(buttonText, expectedMessage) {
     I.waitForText(buttonText);
-    await I.retryUntilExists(() => I.click(buttonText), CONFIRMATION_HEADER);
+    await I.retryUntilInvisible(() => I.click(buttonText), locate('.error-summary'));
+    await I.waitForElement(CONFIRMATION_HEADER);
     await within(CONFIRMATION_HEADER, () => {
       I.see(expectedMessage);
     });

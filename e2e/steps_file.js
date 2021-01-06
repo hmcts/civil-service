@@ -206,7 +206,36 @@ module.exports = function () {
     },
 
     async clickContinue() {
-      await this.click('Continue');
+      await this.retryUntilInvisible(() => this.click('Continue'), locate('.error-summary'));
+    },
+
+    /**
+     * Retries defined action util element described by the locator is invisible. If element is not invisible
+     * after 4 tries (run + 3 retries) this step throws an error. Use cases include checking no error present on page.
+     *
+     * Warning: action logic should avoid framework steps that stop test execution upon step failure as it will
+     *          stop test execution even if there are retries still available. Catching step error does not help.
+     *
+     * @param action - an action that will be retried until either condition is met or max number of retries is reached
+     * @param locator - locator for an element that is expected to be invisible upon successful execution of an action
+     * @param maxNumberOfRetries - maximum number to retry the function for before failing
+     * @returns {Promise<void>} - promise holding no result if resolved or error if rejected
+     */
+    async retryUntilInvisible(action, locator, maxNumberOfRetries = 3) {
+      for (let tryNumber = 1; tryNumber <= maxNumberOfRetries; tryNumber++) {
+        output.log(`retryUntilInvisible(${locator}): starting try #${tryNumber}`);
+        await action();
+
+        if (await this.hasSelector(locator) > 0) {
+          output.print(`retryUntilInvisible(${locator}): error present after try #${tryNumber} was executed`);
+        } else {
+          output.log(`retryUntilInvisible(${locator}): error not present after try #${tryNumber} was executed`);
+          break;
+        }
+        if (tryNumber === maxNumberOfRetries) {
+          throw new Error(`Maximum number of tries (${maxNumberOfRetries}) has been reached in search for ${locator}`);
+        }
+      }
     },
 
     async addAnotherElementToCollection() {
