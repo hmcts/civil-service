@@ -1,59 +1,8 @@
-const {document, element, listElement} = require('../../api/dataHelper');
-const address = require('../address');
+const {document, element, listElement, buildAddress} = require('../../api/dataHelper');
 
 const selectedPba = listElement('PBA0077597');
-
-module.exports = {
-  midEventData: {
-    ClaimValue: {
-      applicantSolicitor1PbaAccounts: {
-        list_items: [
-          selectedPba,
-          listElement('PBA0078094')
-        ]
-      },
-      applicantSolicitor1PbaAccountsIsEmpty: 'No',
-      claimFee: {
-        calculatedAmountInPence: '150000',
-        code: 'FEE0209',
-        version: '1'
-      },
-      paymentReference: 'Applicant test reference',
-      applicant1: {
-        type: 'COMPANY',
-        companyName: 'Test Inc',
-        partyName: 'Test Inc',
-        partyTypeDisplayValue: 'Company',
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - applicant'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
-      },
-      respondent1: {
-        type: 'INDIVIDUAL',
-        individualFirstName: 'John',
-        individualLastName: 'Doe',
-        individualTitle: 'Sir',
-        partyName: 'Sir John Doe',
-        partyTypeDisplayValue: 'Individual',
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
-      }
-    },
-  },
-  valid: {
+const createClaimData = legalRepresentation => {
+  return {
     References: {
       solicitorReferences: {
         applicantSolicitor1Reference: 'Applicant test reference',
@@ -69,15 +18,7 @@ module.exports = {
       applicant1: {
         type: 'COMPANY',
         companyName: 'Test Inc',
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - applicant'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
+        primaryAddress: buildAddress('applicant')
       }
     },
     ClaimantLitigationFriendRequired: {
@@ -87,15 +28,7 @@ module.exports = {
       applicant1LitigationFriend: {
         fullName: 'Bob the litigant friend',
         hasSameAddressAsLitigant: 'No',
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - litigant friend'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
+        primaryAddress: buildAddress('litigant friend')
       }
     },
     Defendant: {
@@ -105,19 +38,11 @@ module.exports = {
         individualLastName: 'Doe',
         individualTitle: 'Sir',
         individualDateOfBirth: null,
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
+        primaryAddress: buildAddress('respondent')
       }
     },
     LegalRepresentation: {
-      respondent1Represented: 'Yes'
+      respondent1Represented: `${legalRepresentation}`
     },
     ClaimType: {
       claimType: 'PERSONAL_INJURY'
@@ -154,5 +79,52 @@ module.exports = {
         role: 'Test Solicitor'
       }
     },
+  };
+};
+
+module.exports = {
+  createClaim: {
+    midEventData: {
+      ClaimValue: {
+        applicantSolicitor1PbaAccounts: {
+          list_items: [
+            selectedPba,
+            listElement('PBA0078094')
+          ]
+        },
+        applicantSolicitor1PbaAccountsIsEmpty: 'No',
+        claimFee: {
+          calculatedAmountInPence: '150000',
+          code: 'FEE0209',
+          version: '1'
+        },
+        paymentReference: 'Applicant test reference',
+        applicant1: {
+          type: 'COMPANY',
+          companyName: 'Test Inc',
+          partyName: 'Test Inc',
+          partyTypeDisplayValue: 'Company',
+          primaryAddress: buildAddress('applicant')
+        },
+        respondent1: {
+          type: 'INDIVIDUAL',
+          individualFirstName: 'John',
+          individualLastName: 'Doe',
+          individualTitle: 'Sir',
+          partyName: 'Sir John Doe',
+          partyTypeDisplayValue: 'Individual',
+          primaryAddress: buildAddress('respondent')
+        }
+      },
+    },
+    valid: {
+      ...createClaimData('Yes'),
+      PaymentReference: {
+        paymentReference: 'Applicant test reference'
+      }
+    }
+  },
+  createClaimLitigantInPerson: {
+    valid: createClaimData('No')
   },
 };

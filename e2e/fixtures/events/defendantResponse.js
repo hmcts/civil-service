@@ -1,5 +1,4 @@
-const {date, document, element} = require('../../api/dataHelper');
-const address = require('../address');
+const { date, document, element, buildAddress } = require('../../api/dataHelper');
 
 module.exports = {
   valid: {
@@ -19,15 +18,7 @@ module.exports = {
         individualLastName: 'Doe',
         individualTitle: 'Sir',
         individualDateOfBirth: date(-1),
-        primaryAddress: {
-          AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
-          AddressLine2: address.buildingAndStreet.lineTwo,
-          AddressLine3: address.buildingAndStreet.lineThree,
-          PostTown: address.town,
-          County: address.county,
-          Country: address.country,
-          PostCode: address.postcode
-        }
+        primaryAddress: buildAddress('respondent')
       },
       solicitorReferences: {
         applicantSolicitor1Reference: 'Applicant test reference',
@@ -135,15 +126,7 @@ module.exports = {
           individualLastName: 'Doe',
           individualTitle: 'Sir',
           individualDateOfBirth: date(1),
-          primaryAddress: {
-            AddressLine1: `${address.buildingAndStreet.lineOne + ' - respondent'}`,
-            AddressLine2: address.buildingAndStreet.lineTwo,
-            AddressLine3: address.buildingAndStreet.lineThree,
-            PostTown: address.town,
-            County: address.county,
-            Country: address.country,
-            PostCode: address.postcode
-          }
+          primaryAddress: buildAddress('respondent')
         }
       }
     },

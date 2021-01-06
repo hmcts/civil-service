@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 const config = require('../config.js');
+const address = require('../fixtures/address');
 
 module.exports = {
   date: (days = 0) => {
@@ -27,6 +28,18 @@ module.exports = {
     return {
       code: uuid.v1(),
       label: string
+    };
+  },
+
+  buildAddress: postFixLineOne => {
+    return {
+      AddressLine1: `${address.buildingAndStreet.lineOne + ' - ' + postFixLineOne}`,
+      AddressLine2: address.buildingAndStreet.lineTwo,
+      AddressLine3: address.buildingAndStreet.lineThree,
+      PostTown: address.town,
+      County: address.county,
+      Country: address.country,
+      PostCode: address.postcode
     };
   }
 };
