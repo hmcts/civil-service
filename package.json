@@ -17,17 +17,19 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "chai": "^4.2.0",
     "codeceptjs": "^2.6.6",
+    "deep-equal-in-any-order": "^1.0.28",
     "eslint": "^7.3.1",
     "eslint-plugin-codeceptjs": "^1.3.0",
+    "http-proxy-agent": "^4.0.1",
+    "https-proxy-agent": "^5.0.0",
     "husky": "^4.2.5",
     "mocha-multi": "^1.1.3",
     "mochawesome": "^6.1.1",
-    "puppeteer": "^4.0.1",
     "node-fetch": "^2.6.1",
+    "puppeteer": "^4.0.1",
     "totp-generator": "^0.0.7",
-    "http-proxy-agent": "^4.0.1",
-    "https-proxy-agent": "^5.0.0",
     "uuid": "^3.4.0"
   }
 }

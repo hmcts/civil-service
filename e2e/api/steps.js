@@ -1,4 +1,10 @@
 const assert = require('assert').strict;
+const deepEqualInAnyOrder = require('deep-equal-in-any-order');
+const chai = require('chai');
+
+chai.use(deepEqualInAnyOrder);
+
+const { expect } = chai;
 
 const apiRequest = require('./apiRequest.js');
 const {waitForFinishedBusinessProcess} = require('../api/testingSupport');
@@ -13,6 +19,13 @@ const data = {
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
   ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
+};
+
+const midEventFieldForPage = {
+  ClaimValue: {
+    id: 'applicantSolicitor1PbaAccounts',
+    dynamicList: true
+  }
 };
 
 let caseId, eventName;
@@ -188,7 +201,11 @@ const assertValidData = async (data, pageId) => {
   const responseBody = await response.json();
 
   assert.equal(response.status, 200);
-  addIssueClaimMidEventFields(pageId, responseBody);
+
+  // eslint-disable-next-line no-prototype-builtins
+  if (midEventFieldForPage.hasOwnProperty(pageId)) {
+    addMidEventFields(pageId, responseBody);
+  }
 
   assert.deepEqual(responseBody.data, caseData);
 };
@@ -233,12 +250,28 @@ const deleteCaseFields = (...caseFields) => {
   caseFields.forEach(caseField => delete caseData[caseField]);
 };
 
-function addIssueClaimMidEventFields(pageId, responseBody) {
-  if (pageId === 'ClaimValue') {
-    const midEventData = data[eventName].midEventData[pageId];
-    caseData = {...caseData, ...midEventData};
+function addMidEventFields(pageId, responseBody) {
+  const midEventData = data[eventName].midEventData[pageId];
+  const midEventField = midEventFieldForPage[pageId];
 
-    responseBody.data['applicantSolicitor1PbaAccounts'] = caseData.applicantSolicitor1PbaAccounts;
+  if (midEventField.dynamicList === true) {
+    assertDynamicListListItemsHaveExpectedLabels(responseBody, midEventField.id, midEventData);
   }
+
+  caseData = {...caseData, ...midEventData};
+  responseBody.data[midEventField.id] = caseData[midEventField.id];
+}
+
+function assertDynamicListListItemsHaveExpectedLabels(responseBody, dynamicListFieldName, midEventData) {
+  const actualDynamicElementLabels = removeUuidsFromDynamicList(responseBody.data, dynamicListFieldName);
+  const expectedDynamicElementLabels = removeUuidsFromDynamicList(midEventData, dynamicListFieldName);
+
+  expect(actualDynamicElementLabels).to.deep.equalInAnyOrder(expectedDynamicElementLabels);
+}
+
+function removeUuidsFromDynamicList(data, dynamicListField) {
+  const dynamicElements = data[dynamicListField].list_items;
+  // eslint-disable-next-line no-unused-vars
+  return dynamicElements.map(({code, ...item}) => item);
 }
 
