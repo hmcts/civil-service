@@ -13,8 +13,8 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
-import static uk.gov.hmcts.reform.unspec.handler.callback.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.user.RequestExtensionCallbackHandler.PROPOSED_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.handler.callback.user.RequestExtensionCallbackHandler.RESPONSE_DEADLINE;
 
 @Service
 @RequiredArgsConstructor
