@@ -39,7 +39,7 @@ public class NoOngoingBusinessProcessAspect {
         }
         log.info(format(
             "%s is not allowed on the case %s due to ongoing business process",
-            caseEvent.getDisplayName(),
+            caseEvent.name(),
             caseData.getCcdCaseReference()
         ));
         return AboutToStartOrSubmitCallbackResponse.builder()

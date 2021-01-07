@@ -49,7 +49,7 @@ public class EventAllowedAspect {
         } else {
             log.info(format(
                 "%s is not allowed on the case id %s",
-                caseEvent.getDisplayName(), caseDetails.getId()
+                caseEvent.name(), caseDetails.getId()
             ));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_MESSAGE))
