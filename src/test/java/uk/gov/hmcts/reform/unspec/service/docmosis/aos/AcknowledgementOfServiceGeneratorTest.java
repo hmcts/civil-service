@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.aos;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementS
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -28,6 +31,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N9;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.toCaseName;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -84,5 +89,40 @@ class AcknowledgementOfServiceGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
         verify(documentGeneratorService)
             .generateDocmosisDocument(expectedDocmosisData, N9);
+    }
+
+    @Nested
+    class GetTemplateData {
+
+        @Test
+        void whenCaseIsAtServiceAcknowledge_shouldGetAcknowledgementOfServiceFormData() {
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
+
+            var templateData = generator.getTemplateData(caseData);
+
+            assertThatFieldsAreCorrect(templateData, caseData);
+        }
+
+        private void assertThatFieldsAreCorrect(AcknowledgementOfServiceForm templateData, CaseData caseData) {
+            Assertions.assertAll(
+                "AcknowledgementOfService data should be as expected",
+                () -> assertEquals(templateData.getCaseName(), toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
+                () -> assertEquals(
+                    templateData.getSolicitorReferences(),
+                    fetchSolicitorReferences(caseData.getSolicitorReferences())
+                ),
+                () -> assertEquals(templateData.getClaimIssuedDate(), caseData.getClaimIssuedDate()),
+                () -> assertEquals(
+                    templateData.getResponseDeadline(),
+                    caseData.getRespondentSolicitor1ResponseDeadline().toLocalDate()
+                ),
+                () -> assertEquals(templateData.getRespondent(), Respondent.builder()
+                    .name(caseData.getRespondent1().getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .build()
+                )
+            );
+        }
     }
 }

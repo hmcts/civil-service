@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.cos;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,11 +13,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.ServiceLocationType;
+import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.cos.CertificateOfServiceForm;
+import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,8 +37,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.OTHER;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.CERTIFICATE_OF_SERVICE;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N215;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.fetchApplicantName;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.fetchRespondentName;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
+import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.toCaseName;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -139,6 +148,95 @@ class CertificateOfServiceGeneratorTest {
             String documentList = generator.prepareDocumentList(servedDocuments, "Some other");
 
             assertEquals(ServedDocuments.CLAIM_FORM.getLabel() + "\n" + "Other - Some other", documentList);
+        }
+    }
+
+    @Nested
+    class GetTemplateData {
+
+        @Test
+        void whenCaseIsAtStateServiceConfirmed_shouldGetCertificateOfServiceData() {
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+
+            var templateData = generator.getTemplateData(caseData);
+
+            assertThatFieldsAreCorrect(templateData, caseData);
+        }
+
+        private void assertThatFieldsAreCorrect(CertificateOfServiceForm templateData, CaseData caseData) {
+            Assertions.assertAll(
+                "CertificateOfService data should be as expected",
+                () -> assertEquals(templateData.getCaseName(), toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
+                () -> assertEquals(
+                    templateData.getSolicitorReferences(),
+                    fetchSolicitorReferences(caseData.getSolicitorReferences())
+                ),
+                () -> assertEquals(templateData.getDateServed(), caseData.getServiceDateToRespondentSolicitor1()),
+                () -> assertEquals(
+                    templateData.getDeemedDateOfService(),
+                    caseData.getDeemedServiceDateToRespondentSolicitor1()
+                ),
+                () -> assertEquals(templateData.getApplicantName(), fetchApplicantName(caseData)),
+                () -> assertEquals(templateData.getRespondentName(), fetchRespondentName(caseData)),
+                () -> assertEquals(
+                    templateData.getServiceMethod(),
+                    caseData.getServiceMethodToRespondentSolicitor1().getType().getLabel()
+                ),
+                () -> assertEquals(
+                    templateData.getOnWhomServed(),
+                    caseData.getServiceNamedPersonToRespondentSolicitor1()
+                ),
+                () -> assertEquals(
+                    templateData.getServedLocation(),
+                    prepareServedLocation(caseData.getServiceLocationToRespondentSolicitor1())
+                ),
+                () -> assertEquals(
+                    templateData.getDocumentsServed(),
+                    prepareDocumentList(caseData.getServedDocuments(), caseData.getServedDocumentsOther())
+                ),
+                () -> assertEquals(
+                    templateData.getStatementOfTruth(),
+                    caseData.getApplicantSolicitor1ClaimStatementOfTruth()
+                ),
+                () -> assertEquals(templateData.getApplicantRepresentative(), getRepresentative()),
+                () -> assertEquals(templateData.getRespondentRepresentative(), getRepresentative())
+            );
+        }
+
+        private Representative getRepresentative() {
+            return Representative.builder()
+                .contactName("MiguelSpooner")
+                .dxAddress("DX 751Newport")
+                .organisationName("DBE Law")
+                .phoneNumber("0800 206 1592")
+                .emailAddress("jim.smith@slatergordon.com")
+                .serviceAddress(Address.builder()
+                                    .addressLine1("AdmiralHouse")
+                                    .addressLine2("Queensway")
+                                    .postTown("Newport")
+                                    .postCode("NP204AG")
+                                    .build())
+                .build();
+        }
+
+        private String prepareServedLocation(ServiceLocation serviceLocation) {
+            if (serviceLocation == null) {
+                return null;
+            }
+            if (serviceLocation.getLocation() == ServiceLocationType.OTHER) {
+                return ServiceLocationType.OTHER.getLabel() + " - " + serviceLocation.getOther();
+            }
+            return serviceLocation.getLocation().getLabel();
+        }
+
+        private String prepareDocumentList(List<ServedDocuments> servedDocuments, String otherServedDocuments) {
+            String withoutOther = servedDocuments.stream()
+                .filter(doc -> doc != OTHER)
+                .map(ServedDocuments::getLabel)
+                .collect(Collectors.joining("\n"));
+
+            return servedDocuments.contains(OTHER) ? withoutOther + "\nOther - " + otherServedDocuments : withoutOther;
         }
     }
 }
