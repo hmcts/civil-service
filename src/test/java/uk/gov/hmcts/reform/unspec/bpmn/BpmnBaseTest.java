@@ -28,6 +28,7 @@ public abstract class BpmnBaseTest {
     public static final String START_BUSINESS_ACTIVITY = "StartBusinessProcessTaskId";
     public static final String PROCESS_CASE_EVENT = "processCaseEvent";
     public static final String END_BUSINESS_PROCESS = "END_BUSINESS_PROCESS";
+    public static final String ERROR_CODE = "TEST_CODE";
 
     public final String bpmnFileName;
     public final String processId;
@@ -153,6 +154,15 @@ public abstract class BpmnBaseTest {
     }
 
     /**
+     * Fails an external task with the given id and variables by throwing bpmn error.
+     *
+     * @param taskId the id of the external task to complete.
+     */
+    public void failTask(String taskId) {
+        engine.getExternalTaskService().handleBpmnError(taskId, WORKER_ID, ERROR_CODE);
+    }
+
+    /**
      * Get external task for topic name.
      */
     public ExternalTask assertNextExternalTask(String topicName) {
@@ -196,18 +206,24 @@ public abstract class BpmnBaseTest {
         String activityId,
         VariableMap variables
     ) {
-        assertThat(externalTask.getTopicName()).isEqualTo(topicName);
-
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(topicName);
 
-        assertThat(lockedProcessTask).hasSize(1);
-
-        assertThat(lockedProcessTask.get(0).getVariables())
-            .containsEntry("caseEvent", caseEvent);
-
-        assertThat(lockedProcessTask.get(0).getActivityId()).isEqualTo(activityId);
+        assertExternalTask(externalTask, topicName, caseEvent, activityId, lockedProcessTask);
 
         completeTask(lockedProcessTask.get(0).getId(), variables);
+    }
+
+    public void assertFailExternalTask(
+        ExternalTask externalTask,
+        String topicName,
+        String caseEvent,
+        String activityId
+    ) {
+        List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(topicName);
+
+        assertExternalTask(externalTask, topicName, caseEvent, activityId, lockedProcessTask);
+
+        failTask(lockedProcessTask.get(0).getId());
     }
 
     public void assertNoExternalTasksLeft() {
@@ -227,5 +243,21 @@ public abstract class BpmnBaseTest {
 
         assertThat(lockedEndBusinessProcessTask).hasSize(1);
         completeTask(lockedEndBusinessProcessTask.get(0).getId());
+    }
+
+    private void assertExternalTask(
+        ExternalTask externalTask,
+        String topicName,
+        String caseEvent,
+        String activityId,
+        List<LockedExternalTask> lockedProcessTask
+    ) {
+        assertThat(externalTask.getTopicName()).isEqualTo(topicName);
+
+        assertThat(lockedProcessTask).hasSize(1);
+
+        assertThat(lockedProcessTask.get(0).getVariables()).containsEntry("caseEvent", caseEvent);
+
+        assertThat(lockedProcessTask.get(0).getActivityId()).isEqualTo(activityId);
     }
 }

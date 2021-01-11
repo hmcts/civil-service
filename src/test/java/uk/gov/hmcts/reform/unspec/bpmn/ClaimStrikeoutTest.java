@@ -1,12 +1,19 @@
 package uk.gov.hmcts.reform.unspec.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static uk.gov.hmcts.reform.unspec.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_WITH_OFFLINE_JOURNEY;
 
 class ClaimStrikeoutTest extends BpmnBaseTest {
+
+    public static final String MESSAGE_NAME = "MOVE_CLAIM_TO_STRUCK_OUT";
+    public static final String PROCESS_ID = "CLAIM_STRIKEOUT_PROCESS_ID";
 
     public static final String NOTIFY_RESPONDENT_SOLICITOR_1 = "NOTIFY_RESPONDENT_SOLICITOR1_CASE_STRIKE_OUT";
     public static final String RESPONDENT_SOLICITOR_1_ACTIVITY_ID = "ClaimStrikeoutNotifyRespondentSolicitor1";
@@ -23,8 +30,7 @@ class ClaimStrikeoutTest extends BpmnBaseTest {
         assertFalse(processInstance.isEnded());
 
         //assert message start event
-        assertThat(getProcessDefinitionByMessage("MOVE_CLAIM_TO_STRUCK_OUT").getKey())
-            .isEqualTo("CLAIM_STRIKEOUT_PROCESS_ID");
+        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
@@ -51,6 +57,24 @@ class ClaimStrikeoutTest extends BpmnBaseTest {
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldAbort_whenStartBusinessProcessThrowsAnError() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
+
+        VariableMap variables = Variables.createVariables();
+        variables.putValue(FLOW_STATE, PROCEEDS_WITH_OFFLINE_JOURNEY.fullName());
+
+        //fail the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertFailExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
 
         assertNoExternalTasksLeft();
     }
