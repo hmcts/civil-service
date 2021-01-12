@@ -11,6 +11,7 @@
     "ListElementCode": "statementOfValueInPennies",
     "FieldType": "MoneyGBP",
     "ElementLabel": "Statement of value",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Min": 100
   }
 ]
