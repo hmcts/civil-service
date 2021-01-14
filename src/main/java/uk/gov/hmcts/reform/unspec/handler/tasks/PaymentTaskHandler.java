@@ -57,13 +57,13 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
-        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-        data.put("businessProcess", businessProcess);
+        Map<String, Object> caseData = startEventResponse.getCaseDetails().getData();
+        caseData.put("businessProcess", businessProcess);
 
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId()).build())
-            .data(data)
+            .data(caseData)
             .build();
     }
 }
