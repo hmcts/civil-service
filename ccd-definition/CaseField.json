@@ -752,5 +752,37 @@
     "Label": "Defendant response date",
     "FieldType": "Date",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1OrganisationPolicy",
+    "Label": "Applicant 1 organisation policy",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant2OrganisationPolicy",
+    "Label": "Applicant 2 organisation policy",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1OrganisationPolicy",
+    "Label": "Respondent 1 organisation policy",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent2OrganisationPolicy",
+    "Label": "Respondent 2 organisation policy",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public"
   }
 ]

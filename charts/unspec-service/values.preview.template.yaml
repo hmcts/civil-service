@@ -122,6 +122,7 @@ ccd:
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,unspec_service
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
+        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: unspec_service
       keyVaults: []
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
   ccd-definition-store-api:
