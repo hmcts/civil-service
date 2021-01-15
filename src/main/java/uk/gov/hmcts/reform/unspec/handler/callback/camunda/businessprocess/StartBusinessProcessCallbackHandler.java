@@ -44,12 +44,7 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
         switch (businessProcess.getStatusOrDefault()) {
             case READY:
             case DISPATCHED: {
-                Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
-                output.put(BUSINESS_PROCESS, businessProcess.start());
-
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(output)
-                    .build();
+                return evaluateReady(callbackParams, businessProcess);
             }
             default:
                 return AboutToStartOrSubmitCallbackResponse.builder()
@@ -57,5 +52,14 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
                     .build();
 
         }
+    }
+
+    private CallbackResponse evaluateReady(CallbackParams callbackParams, BusinessProcess businessProcess) {
+        Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
+        output.put(BUSINESS_PROCESS, businessProcess.start());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(output)
+            .build();
     }
 }

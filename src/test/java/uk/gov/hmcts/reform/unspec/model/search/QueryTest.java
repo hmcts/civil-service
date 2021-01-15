@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.model.search;
 
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -17,16 +18,19 @@ class QueryTest {
 
     @Test
     void shouldThrowException_WhenIndexLessThan0() {
-        assertThrows(IllegalArgumentException.class, () ->
-                         new Query(QueryBuilders.matchQuery("field", "value"), List.of(), -1),
+        MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("field", "value");
+        List<String> emptyList = List.of();
+
+        assertThrows(IllegalArgumentException.class, () -> new Query(matchQuery, emptyList, -1),
                      "Start index cannot be less than 0"
         );
     }
 
     @Test
     void shouldThrowException_WhenQueryIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                         new Query(null, List.of(), 0),
+        List<String> emptyList = List.of();
+
+        assertThrows(NullPointerException.class, () -> new Query(null, emptyList, 0),
                      "QueryBuilder cannot be null in search"
         );
     }

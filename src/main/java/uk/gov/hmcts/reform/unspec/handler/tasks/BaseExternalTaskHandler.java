@@ -33,21 +33,27 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         try {
             log.info("External task '{}' started", topicName);
             handleTask(externalTask);
-            try {
-                ofNullable(getVariableMap()).ifPresentOrElse(
-                    variableMap -> externalTaskService.complete(externalTask, variableMap),
-                    () -> externalTaskService.complete(externalTask)
-                );
-                log.info("External task '{}' finished", topicName);
-            } catch (Exception e) {
-                log.error("Completing external task '{}' errored", topicName, e);
-            }
+            completeTask(externalTask, externalTaskService);
         } catch (BpmnError e) {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
             log.error("Bpmn error for external task '{}'", topicName, e);
         } catch (Exception e) {
             handleFailure(externalTask, externalTaskService, e);
             log.error("External task '{}' errored", topicName, e);
+        }
+    }
+
+    private void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        String topicName = externalTask.getTopicName();
+
+        try {
+            ofNullable(getVariableMap()).ifPresentOrElse(
+                variableMap -> externalTaskService.complete(externalTask, variableMap),
+                () -> externalTaskService.complete(externalTask)
+            );
+            log.info("External task '{}' finished", topicName);
+        } catch (Exception e) {
+            log.error("Completing external task '{}' errored", topicName, e);
         }
     }
 

@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
+class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
