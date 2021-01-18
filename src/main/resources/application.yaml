@@ -73,7 +73,7 @@ unspecified:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
   system-update:
     username: 'civil-system-update@mailnesia.com'
-    password: 'Password12'
+    password: 'Password12!'
 
 core_case_data:
   api:
