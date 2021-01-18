@@ -65,9 +65,11 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("Robotics case data for %s", reference);
 
-        assertThat(capturedEmailData.getSubject()).isEqualTo(fileName);
-        assertThat(capturedEmailData.getMessage()).isEqualTo(format("Case data for %s", reference));
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())

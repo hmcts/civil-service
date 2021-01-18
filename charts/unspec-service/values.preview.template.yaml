@@ -36,6 +36,8 @@ java:
         - docmosis-api-key
         - gov-notify-api-key
         - sendgrid-api-key
+        - robotics-notification-sender
+        - robotics-notification-recipient
         - launch-darkly-sdk-key
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api

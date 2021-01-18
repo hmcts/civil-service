@@ -42,8 +42,8 @@ public class RoboticsNotificationService {
         String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
 
         return EmailData.builder()
-            .message(String.format("Case data for %s", caseData.getLegacyCaseReference()))
-            .subject(fileName)
+            .message(String.format("Robotics case data JSON is attached for %s", caseData.getLegacyCaseReference()))
+            .subject(String.format("Robotics case data for %s", caseData.getLegacyCaseReference()))
             .to(roboticsEmailConfiguration.getRecipient())
             .attachments(of(json(roboticsJsonData, fileName)))
             .build();

@@ -156,7 +156,7 @@ docmosis:
     url: http://localhost:5433
 
 sendgrid:
-  api-key: fake-key
+  api-key: ${SENDGRID_API_KEY:false}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:fake-key}
@@ -168,6 +168,11 @@ testing:
 rd_professional:
   api:
     url: http://localhost:8765
+
+robotics:
+  notification:
+    sender: civilunspecified@gmail.com
+    recipient: civilunspecified+robotics@gmail.com
 ---
 
 spring:

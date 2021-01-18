@@ -60,4 +60,6 @@ java:
         - cmc-db-password
         - gov-notify-api-key
         - sendgrid-api-key
+        - robotics-notification-sender
+        - robotics-notification-recipient
         - launch-darkly-sdk-key

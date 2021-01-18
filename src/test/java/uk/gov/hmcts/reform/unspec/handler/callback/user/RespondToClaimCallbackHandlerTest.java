@@ -3,15 +3,22 @@ package uk.gov.hmcts.reform.unspec.handler.callback.user;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
+import uk.gov.hmcts.reform.unspec.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.unspec.event.RoboticsEvent;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -32,11 +39,14 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.APPLICANT_RESPONSE_DEADLINE;
@@ -250,14 +260,36 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
 
+        @InjectMocks
+        private RespondToClaimCallbackHandler callbackHandler;
+        @Mock
+        private ApplicationEventPublisher applicationEventPublisher;
+
         @Test
-        void shouldReturnExpectedResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
+        void shouldReturnExpectedResponse_whenRespondentResponseTypeIsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim(FULL_DEFENCE).build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) callbackHandler.handle(params);
 
-            assertThat(response).isEqualToComparingFieldByField(
+            assertSubmittedCallbackResponse(response);
+            verifyNoInteractions(applicationEventPublisher);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = RespondentResponseType.class, mode = EnumSource.Mode.EXCLUDE, names = {"FULL_DEFENCE"})
+        void shouldReturnExpectedResponse_whenRespondentResponseTypeIsNotFullDefence(RespondentResponseType type) {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim(type).build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) callbackHandler.handle(params);
+
+            assertSubmittedCallbackResponse(response);
+            verify(applicationEventPublisher).publishEvent(new RoboticsEvent(caseData));
+        }
+
+        private void assertSubmittedCallbackResponse(SubmittedCallbackResponse response) {
+            assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You've submitted your response%n## Claim number: TBC"))
                     .confirmationBody(format(

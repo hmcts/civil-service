@@ -159,8 +159,58 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQ() {
+        respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
         this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQ() {
+        applicant1DQ = Applicant1DQ.builder()
+            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                         .explainedToClient(List.of("OTHER"))
+                                                         .oneMonthStayRequested(NO)
+                                                         .reactionProtocolCompliedWith(YES)
+                                                         .build())
+            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                             .reachedAgreement(YES)
+                                                             .build())
+            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                .directionsForDisclosureProposed(NO)
+                                                                .build())
+            .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
+            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .applicant1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .applicant1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
+            .build();
         return this;
     }
 
@@ -403,33 +453,20 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondedToClaim() {
+        atStateRespondedToClaim(RespondentResponseType.FULL_DEFENCE);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondedToClaim(RespondentResponseType respondentResponseType) {
         atStateServiceConfirmed();
-        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseType = respondentResponseType;
+        if (respondentResponseType == RespondentResponseType.FULL_DEFENCE) {
+            respondent1ClaimResponseDocument = ResponseDocument.builder()
+                .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+                .build();
+            respondent1DQ();
+        }
         applicantSolicitorResponseDeadlineToRespondentSolicitor1 = APPLICANT_RESPONSE_DEADLINE;
-        respondent1ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
-            .build();
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                          .explainedToClient(List.of("CONFIRM"))
-                                                          .oneMonthStayRequested(YES)
-                                                          .reactionProtocolCompliedWith(YES)
-                                                          .build())
-            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                                                              .reachedAgreement(YES)
-                                                              .build())
-            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                                                                 .directionsForDisclosureProposed(NO)
-                                                                 .build())
-            .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
-            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
-            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .build();
         ccdState = AWAITING_CLAIMANT_INTENTION;
         return this;
     }
@@ -446,27 +483,7 @@ public class CaseDataBuilder {
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
-        applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                         .explainedToClient(List.of("OTHER"))
-                                                         .oneMonthStayRequested(NO)
-                                                         .reactionProtocolCompliedWith(YES)
-                                                         .build())
-            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                                                             .reachedAgreement(YES)
-                                                             .build())
-            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                                                                .directionsForDisclosureProposed(NO)
-                                                                .build())
-            .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
-            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
-            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
-            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant1DQ();
         return this;
     }
 
