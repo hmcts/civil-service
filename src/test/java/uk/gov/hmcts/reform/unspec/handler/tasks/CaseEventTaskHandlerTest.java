@@ -80,14 +80,14 @@ class CaseEventTaskHandlerTest {
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE)))
+        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
             .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE));
+        verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
         verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockTask);
     }

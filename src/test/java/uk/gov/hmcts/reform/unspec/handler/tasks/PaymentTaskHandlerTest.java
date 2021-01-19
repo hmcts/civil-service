@@ -78,14 +78,14 @@ class PaymentTaskHandlerTest {
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-            when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(MAKE_PBA_PAYMENT)))
+            when(coreCaseDataService.startUpdate(CASE_ID, MAKE_PBA_PAYMENT))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
-            verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(MAKE_PBA_PAYMENT));
+            verify(coreCaseDataService).startUpdate(CASE_ID, MAKE_PBA_PAYMENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockExternalTask, variables);
         }

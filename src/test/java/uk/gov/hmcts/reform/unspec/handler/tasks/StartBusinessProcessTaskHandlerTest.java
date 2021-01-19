@@ -90,14 +90,14 @@ class StartBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS));
-        verify(coreCaseDataService).submitUpdate(eq(CASE_ID), eq(content(startEventResponse, businessProcess.start())));
-        verify(externalTaskService).complete(eq(mockTask), eq(variables));
+        verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
+        verify(coreCaseDataService).submitUpdate(CASE_ID, content(startEventResponse, businessProcess.start()));
+        verify(externalTaskService).complete(mockTask, variables);
     }
 
     @Test
@@ -107,13 +107,13 @@ class StartBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS));
-        verify(externalTaskService).complete(eq(mockTask), eq(variables));
+        verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
+        verify(externalTaskService).complete(mockTask, variables);
         verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
     }
 
@@ -124,7 +124,7 @@ class StartBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
 
         handler.execute(mockTask, externalTaskService);
 

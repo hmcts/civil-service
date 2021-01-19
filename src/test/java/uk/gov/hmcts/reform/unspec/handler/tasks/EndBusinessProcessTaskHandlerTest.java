@@ -77,16 +77,16 @@ class EndBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(END_BUSINESS_PROCESS))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         CaseDataContent caseDataContentWithFinishedStatus = getCaseDataContent(caseDetails, startEventResponse);
 
         handler.execute(mockExternalTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(END_BUSINESS_PROCESS));
-        verify(coreCaseDataService).submitUpdate(eq(CASE_ID), eq(caseDataContentWithFinishedStatus));
-        verify(externalTaskService).complete(eq(mockExternalTask));
+        verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
+        verify(coreCaseDataService).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
+        verify(externalTaskService).complete(mockExternalTask);
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
