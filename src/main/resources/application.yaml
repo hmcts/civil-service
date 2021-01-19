@@ -2,12 +2,11 @@ server:
   port: 4000
 
 management:
-  health:
-    probes:
-      enabled: true
   endpoint:
     health:
       show-details: "always"
+      probes:
+        enabled: true
   endpoints:
     web:
       base-path: /
@@ -109,7 +108,9 @@ testing:
 ---
 
 spring:
-  profiles: local
+  config:
+    activate:
+      on-profile: local
 
   datasource:
     driverClassName: org.postgresql.Driver
@@ -176,7 +177,10 @@ robotics:
 ---
 
 spring:
-  profiles: integration-test
+  config:
+    activate:
+      on-profile: integration-test
+
   main:
     lazy-initialization: true
 
@@ -242,7 +246,10 @@ rd_professional:
 ---
 
 spring:
-  profiles: idam-stub
+  config:
+    activate:
+      on-profile: idam-stub
+
 idam:
   web:
     url: http://ccd-test-stubs-service:5555
