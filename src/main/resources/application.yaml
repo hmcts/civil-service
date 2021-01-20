@@ -243,6 +243,9 @@ testing:
 rd_professional:
   api:
     url: http://fake-prd-api
+
+sendgrid:
+  api-key: fake-key
 ---
 
 spring:

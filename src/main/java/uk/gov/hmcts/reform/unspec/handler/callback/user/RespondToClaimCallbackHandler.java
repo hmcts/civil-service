@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.event.RoboticsEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -34,7 +32,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -47,7 +44,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -109,9 +105,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             "<br />The claimant has until %s to proceed. We will let you know when they respond.",
             formatLocalDateTime(responseDeadline, DATE)
         );
-        if (caseData.getRespondent1ClaimResponseType() != FULL_DEFENCE) {
-            applicationEventPublisher.publishEvent(new RoboticsEvent(caseData));
-        }
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format(
                 "# You've submitted your response%n## Claim number: %s",
