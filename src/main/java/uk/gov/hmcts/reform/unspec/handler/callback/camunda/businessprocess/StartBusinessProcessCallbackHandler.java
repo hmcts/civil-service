@@ -43,9 +43,8 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
 
         switch (businessProcess.getStatusOrDefault()) {
             case READY:
-            case DISPATCHED: {
+            case DISPATCHED:
                 return evaluateReady(callbackParams, businessProcess);
-            }
             default:
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of("Concurrency Error"))

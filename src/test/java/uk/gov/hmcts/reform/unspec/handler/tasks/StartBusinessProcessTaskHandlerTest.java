@@ -128,7 +128,7 @@ class StartBusinessProcessTaskHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS));
+        verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
         verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -147,11 +147,11 @@ class StartBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
-        when(coreCaseDataService.startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startUpdate(eq(CASE_ID), eq(START_BUSINESS_PROCESS));
+        verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
         verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),

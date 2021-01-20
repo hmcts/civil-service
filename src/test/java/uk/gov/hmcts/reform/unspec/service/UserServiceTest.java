@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.unspec.service.UserService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +44,7 @@ class UserServiceTest {
     @BeforeEach
     public void setup() {
         userService = new UserService(idamClient);
-        when(idamClient.getUserInfo(eq(AUTHORISATION))).thenReturn(userInfo);
+        when(idamClient.getUserInfo(AUTHORISATION)).thenReturn(userInfo);
     }
 
     @Test

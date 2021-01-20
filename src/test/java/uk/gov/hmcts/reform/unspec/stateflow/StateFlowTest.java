@@ -19,7 +19,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -89,7 +88,7 @@ class StateFlowTest {
             StateFlow stateFlow = new StateFlow(mockedStateMachine);
 
             assertThat(stateFlow.evaluate(caseData)).isSameAs(stateFlow);
-            verify(mockedVariables).put(eq(EXTENDED_STATE_CASE_KEY), eq(caseData));
+            verify(mockedVariables).put(EXTENDED_STATE_CASE_KEY, caseData);
             verify(mockedMono).block();
         }
     }
