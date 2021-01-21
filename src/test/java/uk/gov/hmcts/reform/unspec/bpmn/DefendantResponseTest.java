@@ -32,6 +32,8 @@ class DefendantResponseTest extends BpmnBaseTest {
         = "DefendantResponseFullDefenceNotifyApplicantSolicitor1";
     private static final String FULL_DEFENCE_GENERATE_DIRECTIONS_QUESTIONNAIRE_ACTIVITY_ID
         = "DefendantResponseFullDefenceGenerateDirectionsQuestionnaire";
+    private static final String NOTIFY_RPA_ON_CASE_HANDED_OFFLINE = "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE";
+    private static final String NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID = "NotifyRoboticsOnCaseHandedOffline";
 
     public DefendantResponseTest() {
         super("defendant_response.bpmn", "DEFENDANT_RESPONSE_PROCESS_ID");
@@ -73,6 +75,15 @@ class DefendantResponseTest extends BpmnBaseTest {
             PROCESS_CASE_EVENT,
             OFFLINE_NOTIFY_APPLICANT_SOLICITOR_1,
             OFFLINE_NOTIFICATION_APPLICANT_ACTIVITY_ID
+        );
+
+        //complete the Robotics notification
+        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID
         );
 
         //end business process
