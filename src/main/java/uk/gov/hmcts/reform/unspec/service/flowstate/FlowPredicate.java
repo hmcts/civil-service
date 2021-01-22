@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.unspec.service.flowstate;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
@@ -29,17 +28,15 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimIssuedDate() != null;
 
-    public static final Predicate<CaseData> applicantConfirmService = caseData ->
-        caseData.getDeemedServiceDateToRespondentSolicitor1() != null
-            && Objects.isNull(caseData.getWithdrawClaim())
-            && Objects.isNull(caseData.getDiscontinueClaim());
-
     public static final Predicate<CaseData> respondentAcknowledgeService = caseData ->
         caseData.getRespondent1ClaimResponseIntentionType() != null
-            && caseData.getRespondent1ClaimResponseDocument() == null;
+            && caseData.getRespondent1ClaimResponseDocument() == null
+            && caseData.getCcdState() != CLOSED;
 
     public static final Predicate<CaseData> respondentRespondToClaim = caseData ->
-        caseData.getRespondent1ClaimResponseDocument() != null;
+        caseData.getRespondent1ClaimResponseDocument() != null
+            && caseData.getCcdState() != CLOSED
+            &&  caseData.getCcdState() != STAYED;
 
     public static final Predicate<CaseData> respondentAskForAnExtension = caseData ->
         caseData.getRespondentSolicitor1claimResponseExtensionProposedDeadline() != null;
@@ -52,7 +49,7 @@ public class FlowPredicate {
             && caseData.getApplicant1DefenceResponseDocument() != null;
 
     public static final Predicate<CaseData> schedulerStayClaim = caseData ->
-        caseData.getCcdState() == STAYED && caseData.getDeemedServiceDateToRespondentSolicitor1() == null;
+        caseData.getCcdState() == STAYED;
 
     public static final Predicate<CaseData> claimWithdrawn = caseData ->
         caseData.getWithdrawClaim() != null

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantConfirmService;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToRequestForExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
@@ -112,22 +111,6 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class ConfirmedServicePredicate {
-
-        @Test
-        void shouldReturnTrue_whenCaseDataAtConfirmedService() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
-            assertTrue(applicantConfirmService.test(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenCaseDataIsAtClaimIssued() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
-            assertFalse(applicantConfirmService.test(caseData));
-        }
-    }
-
-    @Nested
     class RespondentAcknowledgedServicePredicate {
 
         @Test
@@ -153,8 +136,14 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateServiceConfirmed() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+        void shouldReturnFalse_whenCaseDataAtStateClosed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDiscontinued().build();
+            assertFalse(respondentRespondToClaim.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateStayed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimStayed().build();
             assertFalse(respondentRespondToClaim.test(caseData));
         }
     }

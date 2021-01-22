@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDIN
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_CONFIRMED;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -138,25 +137,6 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnServiceConfirmed_whenCaseDataAtServiceConfirmed() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(SERVICE_CONFIRMED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(5)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName()
-                );
-        }
-
-        @Test
         void shouldReturnServiceAcknowledge_whenCaseDataAtStateServiceAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
 
@@ -167,11 +147,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(SERVICE_ACKNOWLEDGED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(5)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), SERVICE_ACKNOWLEDGED.fullName()
+                    CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName()
                 );
         }
 
@@ -186,11 +166,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(EXTENSION_REQUESTED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(6)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
+                    CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
                     EXTENSION_REQUESTED.fullName()
                 );
         }
@@ -206,11 +186,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(EXTENSION_RESPONDED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
+                    CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
                     EXTENSION_REQUESTED.fullName(), EXTENSION_RESPONDED.fullName()
                 );
         }
@@ -226,11 +206,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(RESPONDED_TO_CLAIM.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(5)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), RESPONDED_TO_CLAIM.fullName()
+                    CLAIM_ISSUED.fullName(), RESPONDED_TO_CLAIM.fullName()
                 );
         }
 
@@ -245,11 +225,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_STAYED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), RESPONDED_TO_CLAIM.fullName(),
+                    CLAIM_ISSUED.fullName(), RESPONDED_TO_CLAIM.fullName(),
                     FULL_DEFENCE.fullName(), CLAIM_STAYED.fullName()
                 );
         }
@@ -265,11 +245,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(PROCEEDS_WITH_OFFLINE_JOURNEY.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(6)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    CLAIM_ISSUED.fullName(), SERVICE_CONFIRMED.fullName(), RESPONDED_TO_CLAIM.fullName(),
+                    CLAIM_ISSUED.fullName(), RESPONDED_TO_CLAIM.fullName(),
                     PROCEEDS_WITH_OFFLINE_JOURNEY.fullName()
                 );
         }
@@ -282,7 +262,6 @@ class StateFlowEngineTest {
         @CsvSource({
             "true,EXTENSION_REQUESTED",
             "true,SERVICE_ACKNOWLEDGED",
-            "true,SERVICE_CONFIRMED",
             "true,CLAIM_ISSUED",
             "true,PAYMENT_SUCCESSFUL",
             "true,PENDING_CASE_ISSUED",
@@ -302,7 +281,7 @@ class StateFlowEngineTest {
     }
 
     @Nested
-    class EvaluateWithDrawClaim {
+    class EvaluateWithdrawClaim {
 
         @EnumSource(value = FlowState.Main.class,
             mode = EnumSource.Mode.EXCLUDE,

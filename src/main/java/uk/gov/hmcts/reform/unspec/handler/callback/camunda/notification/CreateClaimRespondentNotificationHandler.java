@@ -10,13 +10,11 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
@@ -55,9 +53,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            ofNullable(caseData.getServiceMethodToRespondentSolicitor1())
-                .map(ServiceMethod::getEmail)
-                .orElse("civilunspecified@gmail.com"), //TODO need correct email address here
+            "civilunspecified@gmail.com", //TODO need correct email address here
             notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

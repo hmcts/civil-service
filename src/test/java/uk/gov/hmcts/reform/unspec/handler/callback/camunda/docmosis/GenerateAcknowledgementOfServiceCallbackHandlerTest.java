@@ -68,7 +68,7 @@ class GenerateAcknowledgementOfServiceCallbackHandlerTest extends BaseCallbackHa
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed()
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

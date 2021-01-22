@@ -55,13 +55,6 @@ public class CaseDetailsBuilder {
         return this;
     }
 
-    public CaseDetailsBuilder atStateServiceConfirmed() {
-        CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
-        this.data = mapper.convertValue(caseData, Map.class);
-        this.state = CREATED.name();
-        return this;
-    }
-
     public CaseDetailsBuilder atStateServiceAcknowledge() {
         CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
         this.data = mapper.convertValue(caseData, Map.class);

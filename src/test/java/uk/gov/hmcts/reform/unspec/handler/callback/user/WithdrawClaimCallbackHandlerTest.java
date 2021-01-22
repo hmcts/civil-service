@@ -66,7 +66,7 @@ class WithdrawClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoErrors_whenDateInPast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
-                .disccontinueClaim(CloseClaim.builder().date(LocalDate.now().minusDays(1)).build())
+                .discontinueClaim(CloseClaim.builder().date(LocalDate.now().minusDays(1)).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 

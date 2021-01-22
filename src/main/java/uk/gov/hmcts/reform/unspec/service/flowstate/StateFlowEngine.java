@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.unspec.stateflow.StateFlow;
 import uk.gov.hmcts.reform.unspec.stateflow.StateFlowBuilder;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantConfirmService;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToRequestForExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDIN
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_CONFIRMED;
 
 @Component
 @RequiredArgsConstructor
@@ -60,15 +58,11 @@ public class StateFlowEngine {
             .state(PAYMENT_SUCCESSFUL)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(CLAIM_ISSUED)
-                .transitionTo(SERVICE_CONFIRMED).onlyIf(applicantConfirmService)
+                .transitionTo(SERVICE_ACKNOWLEDGED).onlyIf(respondentAcknowledgeService)
+                .transitionTo(RESPONDED_TO_CLAIM).onlyIf(respondentRespondToClaim)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_STAYED).onlyIf(schedulerStayClaim)
-            .state(SERVICE_CONFIRMED)
-                .transitionTo(SERVICE_ACKNOWLEDGED).onlyIf(respondentAcknowledgeService)
-                .transitionTo(RESPONDED_TO_CLAIM).onlyIf(respondentRespondToClaim)
-                .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
-                .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
             .state(SERVICE_ACKNOWLEDGED)
                 .transitionTo(EXTENSION_REQUESTED).onlyIf(respondentAskForAnExtension)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)

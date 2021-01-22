@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
-import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -16,9 +15,6 @@ import uk.gov.hmcts.reform.unspec.model.CourtLocation;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.model.ResponseDocument;
-import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.unspec.model.ServiceLocation;
-import uk.gov.hmcts.reform.unspec.model.ServiceMethod;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
@@ -54,10 +50,6 @@ import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.CLAIM_FORM;
-import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.OTHER;
-import static uk.gov.hmcts.reform.unspec.enums.ServedDocuments.PARTICULARS_OF_CLAIM;
-import static uk.gov.hmcts.reform.unspec.enums.ServiceLocationType.BUSINESS;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.enums.dq.HearingLength.ONE_DAY;
@@ -66,7 +58,6 @@ public class CaseDataBuilder {
 
     public static final String LEGACY_CASE_REFERENCE = "000LR001";
     public static final Long CASE_ID = 1594901956117591L;
-    public static final LocalDate DEEMED_SERVICE_DATE = LocalDate.now();
     public static final LocalDateTime RESPONSE_DEADLINE = now().plusDays(14).atTime(23, 59, 59);
     public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = LocalDateTime.now().plusDays(120);
     public static final LocalDate CLAIM_ISSUED_DATE = now();
@@ -92,18 +83,7 @@ public class CaseDataBuilder {
     private CaseState ccdState;
     private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     private PaymentDetails paymentDetails;
-    // Confirm Service
-    private LocalDate deemedServiceDateToRespondentSolicitor1;
     private LocalDateTime respondentSolicitor1ResponseDeadline;
-    private ServiceMethod serviceMethodToRespondentSolicitor1;
-    private ServiceLocation serviceLocationToRespondentSolicitor1;
-    private List<ServedDocuments> servedDocuments;
-    private String servedDocumentsOther;
-    private ServedDocumentFiles servedDocumentFiles;
-    private LocalDate serviceDateToRespondentSolicitor1;
-    private LocalDateTime serviceDateTimeToRespondentSolicitor1;
-    private StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
-    private String serviceNamedPersonToRespondentSolicitor1;
     //Acknowledge Service
     private ResponseIntention respondent1ClaimResponseIntentionType;
     // Request Extension
@@ -224,11 +204,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder disccontinueClaim(CloseClaim closeClaim) {
-        this.discontinueClaim = closeClaim;
-        return this;
-    }
-
     public CaseDataBuilder claimValue(ClaimValue claimValue) {
         this.claimValue = claimValue;
         return this;
@@ -236,16 +211,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimIssuedDate(LocalDate claimIssuedDate) {
         this.claimIssuedDate = claimIssuedDate;
-        return this;
-    }
-
-    public CaseDataBuilder serviceDateToRespondentSolicitor1(LocalDate serviceDateToRespondentSolicitor1) {
-        this.serviceDateToRespondentSolicitor1 = serviceDateToRespondentSolicitor1;
-        return this;
-    }
-
-    public CaseDataBuilder serviceDateTimeToRespondentSolicitor1(LocalDateTime serviceDateTimeToRespondentSolicitor1) {
-        this.serviceDateTimeToRespondentSolicitor1 = serviceDateTimeToRespondentSolicitor1;
         return this;
     }
 
@@ -259,18 +224,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder serviceMethodToRespondentSolicitor1(ServiceMethod serviceMethodToRespondentSolicitor1) {
-        this.serviceMethodToRespondentSolicitor1 = serviceMethodToRespondentSolicitor1;
-        return this;
-    }
-
     public CaseDataBuilder respondent1(Party party) {
         this.respondent1 = party;
-        return this;
-    }
-
-    public CaseDataBuilder servedDocumentsOther(String servedDocumentsOther) {
-        this.servedDocumentsOther = servedDocumentsOther;
         return this;
     }
 
@@ -298,8 +253,6 @@ public class CaseDataBuilder {
                 return atStateClaimCreated();
             case CLAIM_STAYED:
                 return atStateClaimStayed();
-            case SERVICE_CONFIRMED:
-                return atStateServiceConfirmed();
             case SERVICE_ACKNOWLEDGED:
                 return atStateServiceAcknowledge();
             case EXTENSION_REQUESTED:
@@ -332,6 +285,11 @@ public class CaseDataBuilder {
             .date(LocalDate.now())
             .reason("My reason")
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder discontinueClaim(CloseClaim closeClaim) {
+        this.discontinueClaim = closeClaim;
         return this;
     }
 
@@ -428,8 +386,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimCreated() {
         atStatePaymentSuccessful();
         claimIssuedDate = CLAIM_ISSUED_DATE;
-        confirmationOfServiceDeadline = claimIssuedDate.plusMonths(4).atTime(23, 59, 59);
         ccdState = CREATED;
+        respondentSolicitor1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
 
@@ -439,26 +397,13 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateServiceConfirmed() {
-        atStateClaimCreated();
-        deemedServiceDateToRespondentSolicitor1 = DEEMED_SERVICE_DATE;
-        respondentSolicitor1ResponseDeadline = RESPONSE_DEADLINE;
-        serviceMethodToRespondentSolicitor1 = ServiceMethodBuilder.builder().email().build();
-        serviceLocationToRespondentSolicitor1 = ServiceLocation.builder().location(BUSINESS).build();
-        serviceDateTimeToRespondentSolicitor1 = LocalDateTime.now();
-        servedDocuments = List.of(CLAIM_FORM, PARTICULARS_OF_CLAIM, OTHER);
-        servedDocumentsOther = "My other documents";
-        applicant1ServiceStatementOfTruthToRespondentSolicitor1 = StatementOfTruthBuilder.builder().build();
-        return this;
-    }
-
     public CaseDataBuilder atStateRespondedToClaim() {
         atStateRespondedToClaim(RespondentResponseType.FULL_DEFENCE);
         return this;
     }
 
     public CaseDataBuilder atStateRespondedToClaim(RespondentResponseType respondentResponseType) {
-        atStateServiceConfirmed();
+        atStateServiceAcknowledge();
         respondent1ClaimResponseType = respondentResponseType;
         if (respondentResponseType == RespondentResponseType.FULL_DEFENCE) {
             respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -488,7 +433,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateServiceAcknowledge() {
-        atStateServiceConfirmed();
+        atStateClaimCreated();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
         return this;
     }
@@ -539,20 +484,7 @@ public class CaseDataBuilder {
             .respondent1Represented(respondent1Represented)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)
-            // Confirm Service
-            .deemedServiceDateToRespondentSolicitor1(deemedServiceDateToRespondentSolicitor1)
             .respondentSolicitor1ResponseDeadline(respondentSolicitor1ResponseDeadline)
-            .serviceMethodToRespondentSolicitor1(serviceMethodToRespondentSolicitor1)
-            .serviceLocationToRespondentSolicitor1(serviceLocationToRespondentSolicitor1)
-            .servedDocuments(servedDocuments)
-            .servedDocumentsOther(servedDocumentsOther)
-            .servedDocumentFiles(servedDocumentFiles)
-            .serviceDateToRespondentSolicitor1(serviceDateToRespondentSolicitor1)
-            .serviceDateTimeToRespondentSolicitor1(serviceDateTimeToRespondentSolicitor1)
-            .applicant1ServiceStatementOfTruthToRespondentSolicitor1(
-                applicant1ServiceStatementOfTruthToRespondentSolicitor1
-            )
-            .serviceNamedPersonToRespondentSolicitor1(serviceNamedPersonToRespondentSolicitor1)
             // Acknowledge Service
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
             // Request Extension

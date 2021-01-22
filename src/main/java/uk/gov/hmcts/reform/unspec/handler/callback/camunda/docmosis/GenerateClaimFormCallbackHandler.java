@@ -51,9 +51,12 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         LocalDate claimIssuedDate = calculateIssueDate();
 
         CaseData caseData = callbackParams.getCaseData();
+
+        //TODO: CMC-1176
+        //TODO: added deadline as workaround until story is played to add new date logic. CMC-596
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .claimIssuedDate(claimIssuedDate)
-            .confirmationOfServiceDeadline(calculateConfirmationOfServiceDeadline(claimIssuedDate));
+            .respondentSolicitor1ResponseDeadline(calculateResponseDeadline(claimIssuedDate));
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseData,
@@ -71,7 +74,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         return issueDateCalculator.calculateIssueDay(LocalDateTime.now());
     }
 
-    private LocalDateTime calculateConfirmationOfServiceDeadline(LocalDate issueDate) {
-        return deadlinesCalculator.calculateConfirmationOfServiceDeadline(issueDate);
+    private LocalDateTime calculateResponseDeadline(LocalDate issueDate) {
+        return deadlinesCalculator.calculateResponseDeadline(issueDate);
     }
 }

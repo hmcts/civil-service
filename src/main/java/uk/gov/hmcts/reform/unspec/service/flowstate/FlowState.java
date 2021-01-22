@@ -27,7 +27,6 @@ public interface FlowState {
         PAYMENT_FAILED,
         CLAIM_ISSUED,
         CLAIM_STAYED,
-        SERVICE_CONFIRMED,
         SERVICE_ACKNOWLEDGED,
         EXTENSION_REQUESTED,
         EXTENSION_RESPONDED,

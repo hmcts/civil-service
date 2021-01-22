@@ -18,12 +18,6 @@ const claimValuePage = require('./pages/createClaim/claimValue.page');
 const pbaNumberPage = require('./pages/createClaim/pbaNumber.page');
 const paymentReferencePage = require('./pages/createClaim/paymentReference.page');
 
-const servedDocumentsPage = require('./pages/confirmService/servedDocuments.page');
-const uploadDocumentsPage = require('./pages/confirmService/uploadDocuments.page');
-const serviceMethodPage = require('./pages/confirmService/serviceMethod.page');
-const serviceLocationPage = require('./pages/confirmService/serviceLocation.page');
-const serviceDatePage = require('./pages/confirmService/serviceDate.page');
-
 const responseIntentionPage = require('./pages/acknowledgeSerivce/responseIntention.page');
 
 const proposeDeadline = require('./pages/requestExtension/proposeDeadline.page');
@@ -116,18 +110,6 @@ module.exports = function () {
       await event.returnToCaseDetails();
 
       caseId = (await this.grabCaseNumber()).split('-').join('').substring(1);
-    },
-
-    async confirmService() {
-      await caseViewPage.startEvent('Confirm service', caseId);
-      await servedDocumentsPage.enterServedDocuments();
-      await uploadDocumentsPage.uploadServedDocuments(TEST_FILE_PATH);
-      await serviceMethodPage.selectPostMethod();
-      await serviceLocationPage.selectUsualResidence();
-      await serviceDatePage.enterServiceDate();
-      await statementOfTruth.enterNameAndRole('service');
-      await event.submit('Confirm service', 'You\'ve confirmed service');
-      await event.returnToCaseDetails();
     },
 
     async acknowledgeService() {

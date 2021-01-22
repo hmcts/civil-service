@@ -10,20 +10,17 @@ import uk.gov.hmcts.reform.unspec.enums.ClaimType;
 import uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.unspec.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.unspec.enums.ResponseIntention;
-import uk.gov.hmcts.reform.unspec.enums.ServedDocuments;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.unspec.validation.groups.ConfirmServiceDateGroup;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.Valid;
-import javax.validation.constraints.PastOrPresent;
 
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.FINISHED;
 
@@ -64,22 +61,10 @@ public class CaseData {
     private final OrganisationPolicy respondent2OrganisationPolicy;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
-    private final ServiceMethod serviceMethodToRespondentSolicitor1;
-    private final String serviceNamedPersonToRespondentSolicitor1;
 
-    @PastOrPresent(message = "The date must not be in the future", groups = ConfirmServiceDateGroup.class)
-    private final LocalDate serviceDateToRespondentSolicitor1;
-
-    @PastOrPresent(message = "The date must not be in the future", groups = ConfirmServiceDateGroup.class)
-    private final LocalDateTime serviceDateTimeToRespondentSolicitor1;
-
-    private final LocalDate deemedServiceDateToRespondentSolicitor1;
     private final LocalDateTime respondentSolicitor1ResponseDeadline;
-    private final List<ServedDocuments> servedDocuments;
-    private final ServiceLocation serviceLocationToRespondentSolicitor1;
-    private final ServedDocumentFiles servedDocumentFiles;
-    private final String servedDocumentsOther;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ServedDocumentFiles servedDocumentFiles;
 
     private final LocalDate respondentSolicitor1claimResponseExtensionProposedDeadline;
     private final YesOrNo respondentSolicitor1claimResponseExtensionAlreadyAgreed;

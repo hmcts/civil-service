@@ -6,10 +6,6 @@ Scenario('Create claim', async (api) => {
   await api.createClaimWithRepresentedRespondent(config.solicitorUser);
 });
 
-Scenario('Confirm service', async (api) => {
-  await api.confirmService();
-});
-
 Scenario('Acknowledge service', async (api) => {
   await api.acknowledgeService();
 });

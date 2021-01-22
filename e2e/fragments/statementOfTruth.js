@@ -7,10 +7,6 @@ module.exports = {
       name: 'input[id$="applicantSolicitor1ClaimStatementOfTruth_name"',
       role: 'input[id$="applicantSolicitor1ClaimStatementOfTruth_role"',
     },
-    service: {
-      name: 'input[id$="applicant1ServiceStatementOfTruthToRespondentSolicitor1_name"',
-      role: 'input[id$="applicant1ServiceStatementOfTruthToRespondentSolicitor1_role"',
-    },
     respondent1DQ: {
       name: 'input[id$="respondent1DQStatementOfTruth_name"',
       role: 'input[id$="respondent1DQStatementOfTruth_role"',

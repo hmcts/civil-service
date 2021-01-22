@@ -77,7 +77,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
         when(issueDateCalculator.calculateIssueDay(any(LocalDateTime.class))).thenReturn(claimIssuedDate);
-        when(deadlinesCalculator.calculateConfirmationOfServiceDeadline(any(LocalDate.class))).thenReturn(deadline);
+        when(deadlinesCalculator.calculateResponseDeadline(any(LocalDate.class))).thenReturn(deadline);
     }
 
     @Nested
@@ -85,7 +85,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenCalled() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceConfirmed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -96,7 +96,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(DOCUMENT);
             assertThat(updatedData.getClaimIssuedDate()).isEqualTo(claimIssuedDate);
-            assertThat(updatedData.getConfirmationOfServiceDeadline()).isEqualTo(deadline);
+            assertThat(updatedData.getRespondentSolicitor1ResponseDeadline()).isEqualTo(deadline);
         }
     }
 }

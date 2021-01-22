@@ -14,7 +14,6 @@ const claimData = require('../fixtures/events/createClaim.js');
 const data = {
   CREATE_CLAIM: claimData.createClaim,
   CREATE_CLAIM_RESPONDENT_LIP: claimData.createClaimLitigantInPerson,
-  CONFIRM_SERVICE: require('../fixtures/events/confirmService.js'),
   ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
   REQUEST_EXTENSION: require('../fixtures/events/requestExtension.js'),
   RESPOND_EXTENSION: require('../fixtures/events/respondExtension.js'),
@@ -57,26 +56,6 @@ module.exports = {
     await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
       header: 'Your claim will now progress offline',
       body: 'You do not need to do anything'
-    });
-  },
-
-  confirmService: async () => {
-    eventName = 'CONFIRM_SERVICE';
-    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
-    assertContainsPopulatedFields(returnedCaseData);
-    caseData = returnedCaseData;
-    deleteCaseFields('servedDocumentFiles');
-
-    await validateEventPages(data.CONFIRM_SERVICE);
-
-    await assertCallbackError('ServedDocuments', data[eventName].invalid.ServedDocuments.blankOtherDocuments,
-      'CONTENT TBC: please enter a valid value for other documents');
-    await assertCallbackError('Date', data[eventName].invalid.Date.tomorrow,
-      'The date must not be in the future');
-
-    await assertSubmittedEvent('CREATED', {
-      header: 'You\'ve confirmed service',
-      body: 'Deemed date of service'
     });
   },
 

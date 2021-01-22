@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.CLAIM_ISSUED_DATE;
-import static uk.gov.hmcts.reform.unspec.sampledata.ServiceMethodBuilder.SERVICE_EMAIL;
 
 @SpringBootTest(classes = {
     CreateClaimRespondentNotificationHandler.class,
@@ -49,7 +48,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                SERVICE_EMAIL,
+                "civilunspecified@gmail.com",
                 notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
                 getExpectedMap(),
                 "create-claim-respondent-notification-000LR001"

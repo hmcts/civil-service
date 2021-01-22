@@ -208,105 +208,10 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "confirmationOfServiceDeadline",
-    "Label": "Confirmation of service deadline",
-    "FieldType": "DateTime",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "servedDocuments",
-    "Label": "Which documents did you serve?",
-    "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "ServedDocuments",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "servedDocumentsOther",
-    "Label": "List them here:",
-    "FieldType": "TextArea",
-    "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "servedDocumentFiles",
     "Label": "Upload your documents",
     "FieldType": "ServedDocumentFiles",
     "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceMethodToRespondentSolicitor1",
-    "Label": "How did you serve the documents?",
-    "FieldType": "ServiceMethod",
-    "SecurityClassification": "Public",
-    "_Definition":  "The delivery method type of service from the applicant solicitor to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceNamedPersonToRespondentSolicitor1",
-    "Label": "On whom did you serve?",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "_Definition":  "The name of the person served by the applicant solicitor to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceLocationToRespondentSolicitor1",
-    "Label": "Where did you serve the documents?",
-    "FieldType": "ServiceLocation",
-    "SecurityClassification": "Public",
-    "_Definition":  "The delivery location of service from the applicant solicitor to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceDateToRespondentSolicitor1",
-    "Label": "When did you serve the documents?",
-    "FieldType": "Date",
-    "SecurityClassification": "Public",
-    "_Definition":  "The actual date the claim was served by the applicant solicitor to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "serviceDateTimeToRespondentSolicitor1",
-    "Label": "When did you serve the documents?",
-    "FieldType": "DateTime",
-    "SecurityClassification": "Public",
-    "_Definition":  "The actual date time the claim was served by the applicant solicitor to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "applicant1ServiceStatementOfTruthToRespondentSolicitor1",
-    "Label": "Statement of truth",
-    "FieldType": "StatementOfTruth",
-    "SecurityClassification": "Public",
-    "_Definition":  "The statement of truth acknowledged by the applicant solictor of the service of the claim to the first respondent solicitor",
-    "_Category":  "CIVIL"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "deemedServiceDateToRespondentSolicitor1",
-    "Label": "Deemed date of service",
-    "FieldType": "Date",
-    "SecurityClassification": "Public",
-    "_Definition":  "The derived legal date the claim is deemed served to the first respondent solicitor. It is based on the date time when the claim was actually served",
-    "_Category":  "CIVIL"
   },
   {
     "LiveFrom": "01/01/2017",
