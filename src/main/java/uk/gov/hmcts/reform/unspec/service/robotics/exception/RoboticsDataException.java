@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.service.robotics;
+package uk.gov.hmcts.reform.unspec.service.robotics.exception;
 
 public class RoboticsDataException extends RuntimeException {
 

@@ -321,6 +321,8 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.10.2'
 
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.47'
+
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '1.4.1'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.14.0'
@@ -356,8 +358,6 @@ dependencies {
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
-  contractTestCompile group: 'com.networknt', name: 'json-schema-validator', version: '1.0.47'
-  contractTestCompile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.12.1'
   contractTestCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
   contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")

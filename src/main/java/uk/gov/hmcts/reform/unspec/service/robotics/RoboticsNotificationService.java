@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.unspec.sendgrid.EmailData;
 import uk.gov.hmcts.reform.unspec.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.unspec.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
 import javax.validation.constraints.NotNull;
