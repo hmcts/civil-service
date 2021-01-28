@@ -5,8 +5,45 @@
     "UserRole": "caseworker-caa",
     "CaseFieldID": "[CASE_REFERENCE]",
     "Label": "Case Reference",
-    "DisplayOrder": "1",
+    "DisplayOrder": 1,
     "ResultsOrdering": "1:ASC",
+    "UseCase": "orgcases"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "UserRole": "caseworker-caa",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyReference",
+    "Label": "Solicitor Reference",
+    "DisplayOrder": 2,
+    "UseCase": "orgcases"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "UserRole": "caseworker-caa",
+    "CaseFieldID": "legacyCaseReference",
+    "Label": "Case Number",
+    "DisplayOrder": 3,
+    "UseCase": "orgcases"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "UserRole": "caseworker-caa",
+    "CaseFieldID": "[LAST_MODIFIED_DATE]",
+    "Label": "Last Modified Date",
+    "DisplayOrder": 4,
+    "UseCase": "orgcases"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "UserRole": "caseworker-caa",
+    "CaseFieldID": "[STATE]",
+    "Label": "State",
+    "DisplayOrder": 5,
     "UseCase": "orgcases"
   }
 ]

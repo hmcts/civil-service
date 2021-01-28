@@ -8,7 +8,14 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "UserIDAMId": "claimantsolicitor@gmail.com",
+    "UserIDAMId": "civil.damages.claims+organisation.1.solicitor.1@gmail.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "UNSPECIFIED_CLAIMS",
+    "WorkBasketDefaultState": "CREATED"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "UserIDAMId": "civil.damages.claims+organisation.2.solicitor.1@gmail.com",
     "WorkBasketDefaultJurisdiction": "CIVIL",
     "WorkBasketDefaultCaseType": "UNSPECIFIED_CLAIMS",
     "WorkBasketDefaultState": "CREATED"

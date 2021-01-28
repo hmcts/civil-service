@@ -31,5 +31,27 @@ module.exports =  {
     }, MAX_RETRIES, RETRY_TIMEOUT_MS);
     if (incidentMessage)
       throw new Error(`Business process failed for case: ${caseId}, incident message: ${incidentMessage}`);
+  },
+  assignCaseToDefendant: async caseId => {
+    const authToken = await idamHelper.accessToken(config.defendantSolicitorUser);
+
+    await retry(() => {
+      return restHelper.request(
+        `${config.url.unspecService}/testing-support/assign-case/${caseId}`,
+        {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}` },
+        {},
+        'POST')
+        .then(response => {
+          if (response.status === 200) {
+            console.log( 'Role created successfully');
+          } else if (response.status === 409) {
+            console.log('Role already exists!');
+          } else  {
+            throw new Error(`Error occurred with status : ${response.status}`);
+          }
+        });
+    });
   }
 };

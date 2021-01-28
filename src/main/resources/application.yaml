@@ -74,6 +74,11 @@ unspecified:
     username: 'civil-system-update@mailnesia.com'
     password: 'Password12!'
 
+cross:
+  access:
+    username: 'caseworker-caa@mailnesia.com'
+    password: 'Password12!'
+
 core_case_data:
   api:
     url: http://localhost:4452
@@ -91,8 +96,8 @@ notifications:
   applicantSolicitorCaseStrikeOut: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
   respondentSolicitorCaseStrikeOut: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
   claimantSolicitorCaseWillProgressOffline: "290461ee-7b1d-404d-9b19-e46b1f6458d1"
-  applicantSolicitorEmail: claimantsolicitor@gmail.com
-  respondentSolicitorEmail: defendantsolicitor@gmail.com
+  applicantSolicitorEmail: civil.damages.claims+organisation.1.solicitor.1@gmail.com
+  respondentSolicitorEmail: civil.damages.claims+organisation.2.solicitor.1@gmail.com
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -233,8 +238,8 @@ feign:
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
-  applicantSolicitorEmail: claimantsolicitor@example.com
-  respondentSolicitorEmail: defendantsolicitor@example.com
+  applicantSolicitorEmail: civil.damages.claims+organisation.1.solicitor.1@gmail.com
+  respondentSolicitorEmail: civil.damages.claims+organisation.2.solicitor.1@gmail.com
 
 testing:
   support:

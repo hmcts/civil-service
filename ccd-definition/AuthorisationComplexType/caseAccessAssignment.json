@@ -2,56 +2,8 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "solicitorReferences",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant1",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent1",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimType",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimTypeOther",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRUD"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "personalInjuryType",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimSubmittedDateTime",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "legacyCaseReference",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyCaseAssignedRole",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
@@ -59,13 +11,31 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyReference",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant2OrganisationPolicy",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "Organisation",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationID",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationName",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
@@ -73,13 +43,39 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyCaseAssignedRole",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent2OrganisationPolicy",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyReference",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "Organisation",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationID",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationName",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   }

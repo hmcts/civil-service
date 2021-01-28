@@ -7,7 +7,7 @@ const idamUrl = config.idamStub.enabled ? config.idamStub.url : config.url.idamA
 module.exports =  {
   accessToken: async (user) => {
     return restHelper.retriedRequest(
-      `${idamUrl}/${loginEndpoint}?username=${user.email}&password=${user.password}`,
+      `${idamUrl}/${loginEndpoint}?username=${encodeURIComponent(user.email)}&password=${user.password}`,
       {'Content-Type': 'application/x-www-form-urlencoded'})
       .then(response => response.json()).then(data => data.access_token);
   },

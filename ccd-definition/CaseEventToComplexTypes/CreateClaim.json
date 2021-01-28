@@ -434,5 +434,82 @@
     "ListElementCode": "role",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationID",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationName",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyCaseAssignedRole",
+    "DefaultValue": "[APPLICANTSOLICITORONE]",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "claimType=\"IMPOSSIBLE_CLAIM_TYPE\"",
+    "RetainHiddenValue": "TRUE"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyReference",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationID",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "Organisation.OrganisationName",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyCaseAssignedRole",
+    "DefaultValue": "[RESPONDENTSOLICITORONE]",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "claimType=\"IMPOSSIBLE_CLAIM_TYPE\"",
+    "RetainHiddenValue": "TRUE"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "SolicitorCreate",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "ListElementCode": "OrgPolicyReference",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
   }
 ]

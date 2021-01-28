@@ -2,85 +2,71 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "solicitorReferences",
+    "CaseEventID": "CREATE_CLAIM",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant1",
+    "CaseEventID": "REQUEST_EXTENSION",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent1",
+    "CaseEventID": "RESPOND_EXTENSION",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimType",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimTypeOther",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRUD"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "personalInjuryType",
+    "CaseEventID": "DEFENDANT_RESPONSE",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimSubmittedDateTime",
+    "CaseEventID": "CLAIMANT_RESPONSE",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "legacyCaseReference",
+    "CaseEventID": "WITHDRAW_CLAIM",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant1OrganisationPolicy",
+    "CaseEventID": "DISCONTINUE_CLAIM",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "applicant2OrganisationPolicy",
+    "CaseEventID": "ADD_DEFENDANT_LITIGATION_FRIEND",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent1OrganisationPolicy",
+    "CaseEventID": "GENERATE_CLAIM_FORM",
     "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "respondent2OrganisationPolicy",
-    "UserRole": "caseworker-caa",
-    "CRUD": "CRU"
+    "CRUD": "R"
   }
 ]
