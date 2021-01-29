@@ -1,6 +1,6 @@
 {
-  "name": "unspec-service",
-  "version": "1.0.0",
+  "name": "civil-damages-service",
+  "version": "0.0.1",
   "description": "Civil Unspecified e2e tests",
   "scripts": {
     "lint": "eslint e2e",

@@ -5,7 +5,7 @@ properties([
   parameters([
     string(name: 'FRONTEND_URL', defaultValue: 'https://manage-case.aat.platform.hmcts.net',
       description: 'The URL you want to run the full functional tests against'),
-    string(name: 'CASE_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-aat.internal',
+    string(name: 'CASE_SERVICE_URL', defaultValue: 'http://civil-damages-service-aat.service.core-compute-aat.internal',
       description: 'The URL of case service callbacks'),
     string(name: 'IDAM_API_URL', defaultValue: 'https://idam-api.aat.platform.hmcts.net',
       description: 'The URL of idam api'),
@@ -17,7 +17,7 @@ properties([
       description: 'The URL of service auth provider'),
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
-    string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-aat.internal',
+    string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://civil-damages-service-aat.service.core-compute-aat.internal',
       description: 'The URL of unspec service'),
     string(name: 'SECURITY_RULES',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
@@ -31,7 +31,7 @@ properties([
 @Library("Infrastructure")
 
 def type = "java"
-def product = "unspec"
+def product = "civil-damages"
 def component = "service"
 
 static Map<String, Object> secret(String secretName, String envVariable) {

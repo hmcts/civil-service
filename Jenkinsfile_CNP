@@ -4,7 +4,7 @@
 import uk.gov.hmcts.contino.AppPipelineConfig
 
 def type = "java"
-def product = "unspec"
+def product = "civil-damages"
 def component = "service"
 AppPipelineConfig pipelineConf
 
@@ -115,7 +115,7 @@ withPipeline(type, product, component) {
       ./bin/import-ccd-definition.sh
     """
 
-    env.URL="https://xui-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.URL="https://xui-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   after('smoketest:preview') {
@@ -125,9 +125,9 @@ withPipeline(type, product, component) {
   before('functionalTest:preview') {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.UNSPEC_SERVICE_URL="http://unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     dir("${WORKSPACE}/bin") {
       sh """
     eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
@@ -157,7 +157,7 @@ withPipeline(type, product, component) {
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.UNSPEC_SERVICE_URL="http://unspec-service-staging.service.core-compute-aat.internal"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-staging.service.core-compute-aat.internal"
   }
 
   after('functionalTest:aat') {
