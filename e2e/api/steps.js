@@ -1,4 +1,5 @@
 const assert = require('assert').strict;
+const config = require('../config.js');
 
 const deepEqualInAnyOrder = require('deep-equal-in-any-order');
 const chai = require('chai');
@@ -10,6 +11,7 @@ const { expect } = chai;
 const {waitForFinishedBusinessProcess, assignCaseToDefendant} = require('../api/testingSupport');
 const apiRequest = require('./apiRequest.js');
 const claimData = require('../fixtures/events/createClaim.js');
+const expectedEvents =  require('../fixtures/ccd/expectedEvents.js');
 
 const data = {
   CREATE_CLAIM: claimData.createClaim,
@@ -44,6 +46,9 @@ module.exports = {
       body: 'Follow these steps to serve a claim'
     });
     await assignCaseToDefendant(caseId);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
@@ -60,6 +65,9 @@ module.exports = {
     });
 
     await assignCaseToDefendant(caseId);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
 
   acknowledgeService: async () => {
@@ -78,6 +86,9 @@ module.exports = {
       header: 'You\'ve acknowledged service',
       body: 'You need to respond before'
     });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   requestExtension: async () => {
@@ -98,6 +109,9 @@ module.exports = {
       header: 'You asked for extra time to respond',
       body: 'You asked if you can respond before 4pm on'
     });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   respondExtension: async () => {
@@ -117,6 +131,9 @@ module.exports = {
       header: 'You\'ve responded to the request for more time',
       body: 'The defendant must respond before 4pm on'
     });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   defendantResponse: async () => {
@@ -139,6 +156,10 @@ module.exports = {
       header: 'You\'ve submitted your response',
       body: 'We will let you know when they respond.'
     });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CLAIMANT_INTENTION');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CLAIMANT_INTENTION');
+
   },
 
   claimantResponse: async () => {
@@ -159,8 +180,14 @@ module.exports = {
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     });
     await waitForFinishedBusinessProcess(caseId);
+
+    //TODO: event currently puts claim into stayed state and users do no have permissions to see it.
+
+    // await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    // await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
 
+  //TODO this method is not used in api tests
   addDefendantLitigationFriend: async () => {
     eventName = 'ADD_DEFENDANT_LITIGATION_FRIEND';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
@@ -234,6 +261,11 @@ const deleteCaseFields = (...caseFields) => {
   caseFields.forEach(caseField => delete caseData[caseField]);
 };
 
+const assertCorrectEventsAreAvailableToUser = async (user, state) => {
+  const caseForDisplay = await apiRequest.fetchCaseForDisplay(user, caseId);
+  expect(caseForDisplay.triggers).to.deep.equalInAnyOrder(expectedEvents[state]);
+};
+
 function addMidEventFields(pageId, responseBody) {
   const midEventData = data[eventName].midEventData[pageId];
   const midEventField = midEventFieldForPage[pageId];
@@ -258,4 +290,3 @@ function removeUuidsFromDynamicList(data, dynamicListField) {
   // eslint-disable-next-line no-unused-vars
   return dynamicElements.map(({code, ...item}) => item);
 }
-
