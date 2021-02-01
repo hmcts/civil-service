@@ -207,11 +207,11 @@ def inStrictOrder(Task... tasks) {
 }
 
 task smoke(description: 'Runs the smoke tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, runSmokeTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies))
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, runFunctionalTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies))
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport

@@ -87,99 +87,11 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
-  after('checkout') {
-    onMaster {
-      withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
-        try {
-          sh '''
-            set -e
-
-            git remote set-url origin $(git config remote.origin.url | sed "s/github.com/${BEARER_TOKEN}@github.com/g")
-
-            git fetch origin demo:demo
-            git push --force origin HEAD:demo
-          '''
-        } catch (err) {
-          notifyBuildEvent channel: '#unspec_notification', color: 'warning', message: 'Failed to update demo branch'
-        }
-      }
-    }
-    sh """ git submodule update --init """
-  }
-
-  before('smoketest:preview') {
-    validateRpaContract()
-    sh """
-      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-      ./bin/add-roles-preview.sh
-      ./bin/import-ccd-definition.sh
-    """
-
-    env.URL="https://xui-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-  }
-
-  after('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  before('functionalTest:preview') {
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.UNSPEC_SERVICE_URL="http://civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    dir("${WORKSPACE}/bin") {
-      sh """
-    eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
-    ./import-bpmn-diagram.sh ${WORKSPACE}
-  """
-    }
-  }
-
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 
   before('smoketest:aat') {
-    validateRpaContract()
     env.URL = "https://manage-case.aat.platform.hmcts.net"
-    archiveCoreCaseDataDefinitions('staging')
-    uploadCoreCaseDataDefinitions('staging')
-    uploadBpmnDiagrams('aat')
-  }
-
-  after('smoketest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  before('functionalTest:aat') {
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.UNSPEC_SERVICE_URL="http://civil-damages-service-staging.service.core-compute-aat.internal"
-  }
-
-  after('functionalTest:aat') {
-    env.URL = "https://manage-case.aat.platform.hmcts.net"
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-    archiveCoreCaseDataDefinitions('aat')
-    uploadCoreCaseDataDefinitions('aat')
-    publishRpaContract()
-  }
-
-  before('buildinfra:demo') {
-    def subscription = 'nonprod'
-    withSubscription(subscription) {
-      withTeamSecrets(pipelineConf, 'demo') {
-        archiveCoreCaseDataDefinitions('demo')
-        uploadCoreCaseDataDefinitions('demo')
-        uploadBpmnDiagrams('demo')
-      }
-    }
-  }
-
-  after('smoketest:demo') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 }
