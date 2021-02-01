@@ -15,6 +15,7 @@ java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil-damages/service:latest'
   ingressHost: civil-damages-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: unspec
   environment:
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     IDAM_CLIENT_ID: unspec-service
