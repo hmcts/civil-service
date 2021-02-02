@@ -25,12 +25,14 @@ import java.util.Set;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
 
 @Service
 @RequiredArgsConstructor
 public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RPA_ON_CASE_HANDED_OFFLINE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
+                                                          RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE);
     public static final String TASK_ID = "NotifyRoboticsOnCaseHandedOffline";
 
     private final RoboticsNotificationService roboticsNotificationService;
