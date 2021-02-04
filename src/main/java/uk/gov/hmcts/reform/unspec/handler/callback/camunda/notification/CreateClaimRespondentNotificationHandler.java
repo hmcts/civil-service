@@ -53,7 +53,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            "civilunspecified@gmail.com", //TODO need correct email address here
+            caseData.getRespondentSolicitor1EmailAddress(),
             notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

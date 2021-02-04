@@ -40,6 +40,7 @@ public class CaseData {
     private final Party respondent1;
     private final Party respondent2;
     private final YesOrNo respondent1Represented;
+    private final String respondentSolicitor1EmailAddress;
     private final ClaimValue claimValue;
     private final Fee claimFee;
     private final String paymentReference;

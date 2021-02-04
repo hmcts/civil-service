@@ -31,12 +31,12 @@ const createClaimData = legalRepresentation => {
         primaryAddress: buildAddress('litigant friend')
       }
     },
-    ClaimantSolicitorOrganisation:{
-      applicant1OrganisationPolicy : {
-        OrgPolicyReference : 'Claimant policy reference',
-        OrgPolicyCaseAssignedRole : '[APPLICANTSOLICITORONE]',
-        Organisation : {
-          OrganisationID : '0FA7S8S'
+    ClaimantSolicitorOrganisation: {
+      applicant1OrganisationPolicy: {
+        OrgPolicyReference: 'Claimant policy reference',
+        OrgPolicyCaseAssignedRole: '[APPLICANTSOLICITORONE]',
+        Organisation: {
+          OrganisationID: '0FA7S8S'
         }
       }
     },
@@ -54,13 +54,14 @@ const createClaimData = legalRepresentation => {
       respondent1Represented: `${legalRepresentation}`
     },
     DefendantSolicitorOrganisation: {
-      respondent1OrganisationPolicy : {
-        OrgPolicyReference : 'Defendant policy reference',
-        OrgPolicyCaseAssignedRole : '[RESPONDENTSOLICITORONE]',
-        Organisation : {
-          OrganisationID : 'N5AFUXG'
-        }
-      }
+      respondent1OrganisationPolicy: {
+        OrgPolicyReference: 'Defendant policy reference',
+        OrgPolicyCaseAssignedRole: '[RESPONDENTSOLICITORONE]',
+        Organisation: {
+          OrganisationID: 'N5AFUXG'
+        },
+      },
+      respondentSolicitor1EmailAddress: 'civilunspecified@gmail.com'
     },
     ClaimType: {
       claimType: 'PERSONAL_INJURY'

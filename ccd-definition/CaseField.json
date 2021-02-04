@@ -693,6 +693,14 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1EmailAddress",
+    "Label": "Defendant solicitor's email address?",
+    "FieldType": "Email",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimProceedsInCaseman",
     "Label": "Case proceeds in Caseman",
     "FieldType": "ClaimProceedsInCaseman",

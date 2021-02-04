@@ -129,6 +129,18 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1EmailAddress",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "DefendantSolicitorOrganisation",
+    "PageDisplayOrder": 9,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "claimType",
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",

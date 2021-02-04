@@ -71,6 +71,7 @@ public class CaseDataBuilder {
     private Party applicant1;
     private Party respondent1;
     private YesOrNo respondent1Represented;
+    private String respondentSolicitor1EmailAddress;
     private ClaimValue claimValue;
     private ClaimType claimType;
     private String claimTypeOther;
@@ -360,6 +361,7 @@ public class CaseDataBuilder {
         applicant1 = PartyBuilder.builder().individual().build();
         respondent1 = PartyBuilder.builder().soleTrader().build();
         respondent1Represented = YES;
+        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.builder().build();
 
         return this;
@@ -503,6 +505,7 @@ public class CaseDataBuilder {
             .applicant1(applicant1)
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
+            .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)
             .respondentSolicitor1ResponseDeadline(respondentSolicitor1ResponseDeadline)
