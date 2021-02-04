@@ -1,0 +1,23 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "APPLICATION",
+    "ListElement": "Application",
+    "DisplayOrder": 1
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "JUDGEMENT_REQUEST",
+    "ListElement": "Judgement request",
+    "DisplayOrder": 2
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  }
+]

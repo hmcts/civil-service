@@ -3,7 +3,6 @@ const config = require('../config.js');
 const idamHelper = require('./idamHelper');
 const restHelper = require('./restHelper.js');
 const totp = require('totp-generator');
-const {waitForFinishedBusinessProcess} = require('./testingSupport');
 
 const tokens = {};
 const getCcdDataStoreBaseUrl = () => `${config.url.ccdDataStore}/caseworkers/${tokens.userId}/jurisdictions/${config.definition.jurisdiction}/case-types/${config.definition.caseType}`;
@@ -42,7 +41,6 @@ module.exports = {
   startEvent: async (eventName, caseId) => {
     let url = getCcdDataStoreBaseUrl();
     if (caseId) {
-      await waitForFinishedBusinessProcess(caseId);
       url += `/cases/${caseId}`;
     }
     url += `/event-triggers/${eventName}/token`;

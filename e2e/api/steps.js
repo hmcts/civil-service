@@ -22,6 +22,7 @@ const data = {
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
   ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
+  CASE_PROCEEDS_IN_CASEMAN: require('../fixtures/events/caseProceedsInCaseman.js'),
 };
 
 const midEventFieldForPage = {
@@ -37,6 +38,8 @@ let caseData = {};
 module.exports = {
   createClaimWithRepresentedRespondent: async (user) => {
     eventName = 'CREATE_CLAIM';
+    caseId = null;
+    caseData = {};
     await apiRequest.setupTokens(user);
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM);
@@ -44,7 +47,7 @@ module.exports = {
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
       header: 'Your claim has been issued',
       body: 'Follow these steps to serve a claim'
-    });
+    }, true);
     await assignCaseToDefendant(caseId);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
@@ -60,12 +63,11 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
     await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
-      header: 'Your claim will now progress offline',
-      body: 'You do not need to do anything'
-    });
+        header: 'Your claim will now progress offline',
+        body: 'You do not need to do anything'
+      }, true);
 
     await assignCaseToDefendant(caseId);
-
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
@@ -85,7 +87,7 @@ module.exports = {
     await assertSubmittedEvent('CREATED', {
       header: 'You\'ve acknowledged service',
       body: 'You need to respond before'
-    });
+    }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
@@ -108,7 +110,7 @@ module.exports = {
     await assertSubmittedEvent('CREATED', {
       header: 'You asked for extra time to respond',
       body: 'You asked if you can respond before 4pm on'
-    });
+    }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
@@ -130,7 +132,7 @@ module.exports = {
     await assertSubmittedEvent('CREATED', {
       header: 'You\'ve responded to the request for more time',
       body: 'The defendant must respond before 4pm on'
-    });
+    }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
@@ -155,11 +157,10 @@ module.exports = {
     await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
       header: 'You\'ve submitted your response',
       body: 'We will let you know when they respond.'
-    });
+    }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CLAIMANT_INTENTION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CLAIMANT_INTENTION');
-
   },
 
   claimantResponse: async () => {
@@ -178,7 +179,7 @@ module.exports = {
     await assertSubmittedEvent('STAYED', {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
-    });
+    }, true);
     await waitForFinishedBusinessProcess(caseId);
 
     //TODO: event currently puts claim into stayed state and users do no have permissions to see it.
@@ -195,6 +196,24 @@ module.exports = {
     caseData = returnedCaseData;
 
     await validateEventPages(data.ADD_DEFENDANT_LITIGATION_FRIEND);
+  },
+
+  caseProceedsInCaseman: async () => {
+    eventName = 'CASE_PROCEEDS_IN_CASEMAN';
+    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
+    assertContainsPopulatedFields(returnedCaseData);
+    caseData = returnedCaseData;
+
+    await validateEventPages(data.CASE_PROCEEDS_IN_CASEMAN);
+
+    await assertCallbackError('CaseProceedsInCaseman', data[eventName].invalid.CaseProceedsInCaseman,
+      'The date entered cannot be in the future');
+
+    //TODO CMC-1245 confirmation page for event
+    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+      header: '',
+      body: ''
+    }, false);
   }
 };
 
@@ -230,16 +249,18 @@ const assertCallbackError = async (pageId, eventData, expectedErrorMessage) => {
   assert.equal(responseBody.callbackErrors[0], expectedErrorMessage);
 };
 
-const assertSubmittedEvent = async (expectedState, submittedCallbackResponseContains) => {
+const assertSubmittedEvent = async (expectedState, submittedCallbackResponseContains, hasSubmittedCallback) => {
   await apiRequest.startEvent(eventName, caseId);
   const response = await apiRequest.submitEvent(eventName, caseData, caseId);
   const responseBody = await response.json();
 
   assert.equal(response.status, 201);
   assert.equal(responseBody.state, expectedState);
-  assert.equal(responseBody.callback_response_status_code, 200);
-  assert.equal(responseBody.after_submit_callback_response.confirmation_header.includes(submittedCallbackResponseContains.header), true);
-  assert.equal(responseBody.after_submit_callback_response.confirmation_body.includes(submittedCallbackResponseContains.body), true);
+  if (hasSubmittedCallback) {
+    assert.equal(responseBody.callback_response_status_code, 200);
+    assert.equal(responseBody.after_submit_callback_response.confirmation_header.includes(submittedCallbackResponseContains.header), true);
+    assert.equal(responseBody.after_submit_callback_response.confirmation_body.includes(submittedCallbackResponseContains.body), true);
+  }
 
   if (eventName === 'CREATE_CLAIM') {
     caseId = responseBody.id;
@@ -262,6 +283,7 @@ const deleteCaseFields = (...caseFields) => {
 };
 
 const assertCorrectEventsAreAvailableToUser = async (user, state) => {
+  await waitForFinishedBusinessProcess(caseId);
   const caseForDisplay = await apiRequest.fetchCaseForDisplay(user, caseId);
   expect(caseForDisplay.triggers).to.deep.equalInAnyOrder(expectedEvents[state]);
 };

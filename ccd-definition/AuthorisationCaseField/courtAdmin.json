@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "claimProceedsInCaseman",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU",
+    "Comment": "Need to up date user role"
+  }
+]

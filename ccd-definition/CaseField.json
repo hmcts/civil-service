@@ -689,5 +689,13 @@
     "Label": "Respondent 2 organisation policy",
     "FieldType": "OrganisationPolicy",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimProceedsInCaseman",
+    "Label": "Case proceeds in Caseman",
+    "FieldType": "ClaimProceedsInCaseman",
+    "SecurityClassification": "Public"
   }
 ]

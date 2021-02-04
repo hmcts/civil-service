@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
@@ -44,28 +45,29 @@ public class FlowStateAllowedEventService {
 
         CLAIM_ISSUED.fullName(),
         List.of(MOVE_TO_STAYED, ACKNOWLEDGE_SERVICE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM),
+                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN),
 
         CLAIM_STAYED.fullName(),
         List.of(WITHDRAW_CLAIM, DISCONTINUE_CLAIM),
 
         SERVICE_ACKNOWLEDGED.fullName(),
         List.of(REQUEST_EXTENSION, DEFENDANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM),
+                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN),
 
         EXTENSION_REQUESTED.fullName(),
         List.of(DEFENDANT_RESPONSE, RESPOND_EXTENSION, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM),
+                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN),
 
         EXTENSION_RESPONDED.fullName(),
-        List.of(DEFENDANT_RESPONSE, WITHDRAW_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, DISCONTINUE_CLAIM),
+        List.of(DEFENDANT_RESPONSE, WITHDRAW_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN),
 
         RESPONDED_TO_CLAIM.fullName(),
         List.of(CLAIMANT_RESPONSE, WITHDRAW_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, DISCONTINUE_CLAIM,
-                MOVE_CLAIM_TO_STRUCK_OUT),
+                MOVE_CLAIM_TO_STRUCK_OUT, CASE_PROCEEDS_IN_CASEMAN),
 
         FULL_DEFENCE.fullName(),
-        List.of(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM, DISCONTINUE_CLAIM)
+        List.of(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM, DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN)
     );
 
     public FlowState getFlowState(CaseData caseData) {
