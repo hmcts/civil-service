@@ -19,12 +19,7 @@ postgresql:
       CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
   securityContext:
-    fsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 1000
-  volumePermissions:
-    enabled: true
-
+    runAsUser: 0
   postgresqlUsername: hmcts
   postgresqlPassword: hmcts
   persistence:
