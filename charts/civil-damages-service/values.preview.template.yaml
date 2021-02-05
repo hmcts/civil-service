@@ -4,7 +4,9 @@ tags:
 postgresql:
   enabled: true
   image:
-    tag: '11.3.0'
+    registry: hmctspublic.azurecr.io
+    repository: imported/postgres
+    tag: '11.3'
   resources:
     requests:
       cpu: 25m
@@ -15,7 +17,8 @@ postgresql:
       CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-
+  securityContext:
+    runAsUser: 0
   postgresqlUsername: hmcts
   postgresqlPassword: hmcts
   persistence:
@@ -50,9 +53,9 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://camunda-${SERVICE_FQDN}/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://camunda-${SERVICE_FQDN}/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-${SERVICE_FQDN}/engine-rest/
+    LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
-    LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr

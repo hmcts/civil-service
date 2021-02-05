@@ -75,7 +75,7 @@ withPipeline(type, product, component) {
   pipelineConf = config
   disableLegacyDeployment()
   enableAksStagingDeployment()
-//  enableSlackNotifications('#unspec_notification')
+  enableSlackNotifications('#unspec_notification')
 
   onPR {
     loadVaultSecrets(secrets)
@@ -87,11 +87,73 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
+  before('smoketest:preview') {
+    validateRpaContract()
+    sh """
+      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/add-roles-preview.sh
+      ./bin/pull-latest-ccd-definition.sh
+      ./bin/pull-latest-e2e-tests.sh
+      ./bin/import-ccd-definition-preview.sh
+    """
+
+    env.URL="https://xui-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+  }
+
+  after('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
+  before('functionalTest:preview') {
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    dir("${WORKSPACE}/bin") {
+      sh """
+    eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
+    ./import-bpmn-diagram-preview.sh ${WORKSPACE}
+  """
+    }
+  }
+
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 
   before('smoketest:aat') {
-    env.URL = "https://manage-case.aat.platform.hmcts.net"
+    validateRpaContract()
+    sh """
+      ./bin/add-roles-preview.sh
+      ./bin/pull-latest-ccd-definition.sh
+      ./bin/pull-latest-e2e-tests.sh
+    """
+    env.URL="https://xui-civil-damages-service-staging.service.core-compute-preview.internal"
+    archiveCoreCaseDataDefinitions('staging')
+    uploadCoreCaseDataDefinitions('staging')
+  }
+
+  after('smoketest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
+  before('functionalTest:aat') {
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-staging.service.core-compute-preview.internal"
+    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-staging.service.core-compute-preview.internal"
+
+    dir("${WORKSPACE}/bin") {
+      sh """
+    eval \$(./variables/load-staging-environment-variables.sh)
+    ./import-bpmn-diagram-preview.sh ${WORKSPACE}
+  """
+    }
+  }
+
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 }
