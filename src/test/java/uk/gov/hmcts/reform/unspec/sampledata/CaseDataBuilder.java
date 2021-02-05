@@ -278,13 +278,26 @@ public class CaseDataBuilder {
                 return atStateClaimWithdrawn();
             case CLAIM_DISCONTINUED:
                 return atStateClaimDiscontinued();
-            case PROCEEDS_WITH_OFFLINE_JOURNEY:
-                return atStateProceedsOffline();
+            case PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM:
+                return atStateProceedsOfflineAdmissionOrCounterClaim();
+            case PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT:
+                return atStateProceedsOfflineUnrepresentedDefendant();
             case CASE_PROCEEDS_IN_CASEMAN:
                 return atStateCaseProceedsInCaseman();
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
+        atStateClaimDraft();
+        claimSubmittedDateTime = LocalDateTime.now();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = FAST_CLAIM;
+        ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
+        ccdCaseReference = CASE_ID;
+        respondent1Represented = NO;
+        return this;
     }
 
     public CaseDataBuilder atStateClaimDiscontinued() {
@@ -439,7 +452,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOffline() {
+    public CaseDataBuilder atStateProceedsOfflineAdmissionOrCounterClaim() {
         atStateRespondedToClaim();
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
         return this;

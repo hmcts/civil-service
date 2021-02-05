@@ -37,7 +37,8 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_D
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_WITH_OFFLINE_JOURNEY;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
@@ -50,7 +51,7 @@ public class StateFlowEngine {
     public StateFlow build() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
-                .transitionTo(PROCEEDS_WITH_OFFLINE_JOURNEY).onlyIf(respondent1NotRepresented)
+                .transitionTo(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented)
                 .transitionTo(PENDING_CASE_ISSUED).onlyIf(pendingCaseIssued)
             .state(PENDING_CASE_ISSUED)
                 .transitionTo(PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
@@ -86,14 +87,14 @@ public class StateFlowEngine {
                 .transitionTo(FULL_DEFENCE).onlyIf(applicantRespondToDefence)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
-                .transitionTo(PROCEEDS_WITH_OFFLINE_JOURNEY).onlyIf(claimTakenOffline)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+                .transitionTo(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM).onlyIf(claimTakenOffline)
             .state(FULL_DEFENCE)
                 .transitionTo(CLAIM_STAYED)
-            .state(CASE_PROCEEDS_IN_CASEMAN)
-                .transitionTo(PROCEEDS_WITH_OFFLINE_JOURNEY)
             .state(CLAIM_STAYED)
-            .state(PROCEEDS_WITH_OFFLINE_JOURNEY)
+            .state(CASE_PROCEEDS_IN_CASEMAN)
+            .state(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT)
+            .state(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM)
             .state(CLAIM_WITHDRAWN)
             .state(CLAIM_DISCONTINUED)
             .build();
