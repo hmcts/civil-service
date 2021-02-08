@@ -3,7 +3,6 @@ tags:
 
 postgresql:
   enabled: true
-  releaseNameOverride: ${SERVICE_NAME}-postgresql
   image:
     registry: hmctspublic.azurecr.io
     repository: imported/bitnami/postgresql
@@ -19,13 +18,6 @@ postgresql:
       CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-  securityContext:
-    enabled: true
-    runAsUser: 0
-  volumePermissions:
-    enabled: true
-    securityContext:
-      runAsUser: 0
   postgresqlUsername: hmcts
   postgresqlPassword: hmcts
   persistence:
