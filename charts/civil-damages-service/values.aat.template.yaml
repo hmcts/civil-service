@@ -6,10 +6,9 @@ postgresql:
   releaseNameOverride: ${SERVICE_NAME}-postgresql
   image:
     registry: hmctspublic.azurecr.io
-    repository: imported/postgres
-    tag: '11.3'
+    repository: imported/bitnami/postgresql
+    tag: '11.3.0'
     pullPolicy: Always
-    debug: true
   resources:
     requests:
       cpu: 25m
@@ -29,7 +28,6 @@ postgresql:
       runAsUser: 0
   postgresqlUsername: hmcts
   postgresqlPassword: hmcts
-  postgresqlDataDir: /bitnami/postgresql
   persistence:
     enabled: false
 
