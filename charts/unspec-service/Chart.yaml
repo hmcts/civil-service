@@ -2,13 +2,13 @@ apiVersion: v2
 description: A Helm chart for unspec-service App
 name: unspec-service
 home: https://github.com/hmcts/unspec-service
-version: 1.3.10
+version: 1.3.11
 maintainers:
   - name: HMCTS Unspecified team
 
 dependencies:
   - name: java
-    version: 3.2.1
+    version: 3.4.4
     repository: '@hmctspublic'
   - name: ccd
     version: 4.3.3
