@@ -8,6 +8,7 @@ postgresql:
     repository: imported/bitnami/postgresql
     tag: '11.3.0'
     pullPolicy: Always
+    debug: true
   resources:
     requests:
       cpu: 25m
