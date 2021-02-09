@@ -54,5 +54,12 @@
     "CaseEventID": "GENERATE_CLAIM_FORM",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
   }
 ]

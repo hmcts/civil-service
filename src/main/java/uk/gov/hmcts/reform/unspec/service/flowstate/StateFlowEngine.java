@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applica
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimIssued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimTakenOffline;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWithdrawn;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respond
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAskForAnExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentRespondToClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.schedulerStayClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -59,7 +61,10 @@ public class StateFlowEngine {
             .state(PAYMENT_FAILED)
                 .transitionTo(PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(PAYMENT_SUCCESSFUL)
-                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+                .transitionTo(AWAITING_CASE_NOTIFICATION).onlyIf(claimIssued)
+            .state(AWAITING_CASE_NOTIFICATION)
+                .transitionTo(CLAIM_ISSUED).onlyIf(claimNotified)
+                .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
             .state(CLAIM_ISSUED)
                 .transitionTo(SERVICE_ACKNOWLEDGED).onlyIf(respondentAcknowledgeService)
                 .transitionTo(RESPONDED_TO_CLAIM).onlyIf(respondentRespondToClaim)

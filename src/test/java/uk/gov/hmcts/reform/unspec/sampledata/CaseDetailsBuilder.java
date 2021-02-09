@@ -9,13 +9,15 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
 
 @SuppressWarnings("unchecked")
 public class CaseDetailsBuilder {
 
-    private ObjectMapper mapper = new ObjectMapper()
+    private final ObjectMapper mapper = new ObjectMapper()
         .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private String state;
@@ -42,9 +44,16 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateClaimDraft() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
         this.data = mapper.convertValue(caseData, Map.class);
-        this.state = CREATED.name();
+        this.state = PENDING_CASE_ISSUED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateAwaitingCaseNotification() {
+        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CASE_NOTIFICATION.name();
         return this;
     }
 

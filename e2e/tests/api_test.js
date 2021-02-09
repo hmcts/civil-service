@@ -6,6 +6,10 @@ Scenario('Create claim', async (api) => {
   await api.createClaimWithRepresentedRespondent(config.solicitorUser);
 });
 
+Scenario('Notify claim', async (api) => {
+  await api.notifyClaim();
+});
+
 Scenario('Acknowledge service', async (api) => {
   await api.acknowledgeService();
 });
