@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class RetryRpaNotificationTest extends BpmnBaseTest {
 
-    public static final String MESSAGE_NAME = "RETRY_RPA_NOTIFICATION";
+    public static final String MESSAGE_NAME = "RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE";
     public static final String PROCESS_ID = "RETRY_RPA_NOTIFICATION_PROCESS_ID";
 
     public static final String RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE = "RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE";

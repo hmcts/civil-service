@@ -45,7 +45,7 @@
       <bpmn:messageEventDefinition id="MessageEventDefinition_0hvzew0" messageRef="Message_1m9uzfu" />
     </bpmn:startEvent>
   </bpmn:process>
-  <bpmn:message id="Message_1m9uzfu" name="RETRY_RPA_NOTIFICATION" />
+  <bpmn:message id="Message_1m9uzfu" name="RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE" />
   <bpmn:error id="Error_00df5rf" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="RETRY_RPA_NOTIFICATION_PROCESS_ID">
