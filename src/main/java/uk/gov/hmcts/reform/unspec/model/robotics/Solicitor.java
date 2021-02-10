@@ -8,6 +8,8 @@ import lombok.Data;
 @Builder
 public class Solicitor {
 
+    @JsonProperty("ID")
+    private String id;
     @JsonProperty("organisationID")
     private String organisationId;
     private String name;
@@ -18,5 +20,7 @@ public class Solicitor {
     private String contactEmailAddress;
     private String preferredMethodOfCommunication;
     private String reference;
-    private boolean isPayee;
+    @JsonProperty("isPayee")
+    @Builder.Default
+    private boolean isPayee = true;
 }

@@ -11,10 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.unspec.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sendgrid.EmailData;
 import uk.gov.hmcts.reform.unspec.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
@@ -31,6 +34,9 @@ import static org.mockito.Mockito.verify;
         RoboticsEmailConfiguration.class,
         RoboticsNotificationService.class,
         JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class,
+        StateFlowEngine.class,
+        EventHistoryMapper.class,
         RoboticsDataMapper.class,
         RoboticsAddressMapper.class
     },

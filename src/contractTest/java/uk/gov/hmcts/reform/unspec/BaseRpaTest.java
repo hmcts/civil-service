@@ -8,8 +8,6 @@ import au.com.dius.pact.model.RequestResponsePact;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
 import java.util.Map;
 
@@ -23,8 +21,6 @@ public abstract class BaseRpaTest {
     protected static final String CONSUMER = "unspec_service";
     protected static final String PROVIDER = "rpa_api";
 
-    protected RoboticsDataMapper roboticsDataMapper = new RoboticsDataMapper(new RoboticsAddressMapper());
-
     protected PactVerificationResult getPactVerificationResult(String payload, String description) {
         Map<String, String> headers = Map.of("Content-Type", "application/json",
                                              "title", description,
@@ -34,7 +30,7 @@ public abstract class BaseRpaTest {
 
         return runPactTest(pact, pactTestRun);
     }
-    
+
     protected RequestResponsePact preparePact(String description, String body, Map<String, String> headers) {
         // @formatter:off
         return ConsumerPactBuilder

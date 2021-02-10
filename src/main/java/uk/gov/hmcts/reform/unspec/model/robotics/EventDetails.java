@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Mediation {
+public class EventDetails {
 
+    private String miscText;
 }

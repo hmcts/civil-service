@@ -36,15 +36,16 @@ public class RoboticsAddressAssert extends CustomAssert<RoboticsAddressAssert, R
 
         compare(
             "addressLine4",
-            join(", ", expected.getPostTown(), expected.getCounty()),
+            expected.getPostTown(),
             Optional.ofNullable(actual.getAddressLine4())
         );
 
         compare(
             "addressLine5",
-            expected.getCountry(),
+            join(", ", expected.getCounty(), expected.getCountry()),
             Optional.ofNullable(actual.getAddressLine5())
         );
+
         compare(
             "postcode",
             expected.getPostCode(),

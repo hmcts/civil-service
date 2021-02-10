@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 public class FlowPredicate {
 
     public static final Predicate<CaseData> pendingCaseIssued = caseData ->
-        caseData.getClaimSubmittedDateTime() != null && caseData.getRespondent1Represented() == YesOrNo.YES;
+        caseData.getLegacyCaseReference() != null && caseData.getRespondent1Represented() == YesOrNo.YES;
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getRespondent1Represented() == YesOrNo.NO;

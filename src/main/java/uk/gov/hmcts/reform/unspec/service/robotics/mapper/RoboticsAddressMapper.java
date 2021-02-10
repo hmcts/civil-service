@@ -17,8 +17,8 @@ public class RoboticsAddressMapper {
             .addressLine1(address.getAddressLine1())
             .addressLine2(address.getAddressLine2())
             .addressLine3(address.getAddressLine3())
-            .addressLine4(join(", ", address.getPostTown(), address.getCounty()))
-            .addressLine5(address.getCountry())
+            .addressLine4(address.getPostTown())
+            .addressLine5(join(", ", address.getCounty(), address.getCountry()))
             .postCode(address.getPostCode())
             .build();
     }
