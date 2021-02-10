@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.unspec.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -162,8 +163,8 @@ public class RoboticsDataMapper {
 
     private String getOrganisationID(OrganisationPolicy organisationPolicy) {
         return ofNullable(organisationPolicy)
-            .map(policy -> ofNullable(policy.getOrganisation())
-                .map(org -> org.getOrganisationID()).orElse(null))
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID)
             .orElse(null);
     }
 }
