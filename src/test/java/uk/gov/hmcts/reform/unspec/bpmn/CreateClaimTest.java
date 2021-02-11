@@ -18,6 +18,11 @@ class CreateClaimTest extends BpmnBaseTest {
 
     public static final String MESSAGE_NAME = "CREATE_CLAIM";
     public static final String PROCESS_ID = "CREATE_CLAIM_PROCESS_ID";
+
+    public static final String NOTIFY_RESPONDENT_SOLICITOR_1_CLAIM_ISSUE
+        = "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE";
+    private static final String NOTIFY_RESPONDENT_SOLICITOR_1_CLAIM_ISSUE_ACTIVITY_ID
+        = "CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1";
     public static final String NOTIFY_RESPONDENT_SOLICITOR_1_FAILED_PAYMENT
         = "NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT";
     private static final String NOTIFY_RESPONDENT_SOLICITOR_1_FAILED_PAYMENT_ACTIVITY_ID
@@ -77,6 +82,12 @@ class CreateClaimTest extends BpmnBaseTest {
             PROCESS_CASE_EVENT,
             GENERATE_CLAIM_FORM,
             CLAIM_FORM_ACTIVITY_ID
+        );
+
+        //complete the notification
+        ExternalTask notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT, NOTIFY_RESPONDENT_SOLICITOR_1_CLAIM_ISSUE,
+                                   NOTIFY_RESPONDENT_SOLICITOR_1_CLAIM_ISSUE_ACTIVITY_ID
         );
 
         //end business process
