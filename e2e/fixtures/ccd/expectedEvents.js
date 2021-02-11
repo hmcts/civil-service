@@ -1,11 +1,6 @@
 const events =  require('./events.js');
 
 module.exports = {
-  AWAITING_CASE_NOTIFICATION: [
-    events.NOTIFY_DEFENDANT_OF_CLAIM,
-    events.ADD_DEFENDANT_LITIGATION_FRIEND,
-    events.CASE_PROCEEDS_IN_CASEMAN
-  ],
   CREATED: [
     events.REQUEST_EXTENSION,
     events.RESPOND_EXTENSION,

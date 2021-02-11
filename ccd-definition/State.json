@@ -10,17 +10,17 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "AWAITING_CASE_NOTIFICATION",
-    "Name": "Awaiting case notification",
-    "Description": "Awaiting case notification",
+    "ID": "CREATED",
+    "Name": "Claim created",
+    "Description": "Case is created",
     "DisplayOrder": 2
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "CREATED",
-    "Name": "Claim created",
-    "Description": "Case is created",
+    "ID": "STAYED",
+    "Name": "Stayed",
+    "Description": "Case is in stayed state",
     "DisplayOrder": 3
   },
   {
@@ -46,13 +46,5 @@
     "Name": "Proceeds with offline journey",
     "Description": "Case is to be handled offline",
     "DisplayOrder": 6
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "STAYED",
-    "Name": "Stayed",
-    "Description": "Case is in stayed state",
-    "DisplayOrder": 7
   }
 ]

@@ -285,12 +285,5 @@
     "CaseFieldID": "respondentSolicitor1EmailAddress",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRUD"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimNotificationDate",
-    "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU"
   }
 ]

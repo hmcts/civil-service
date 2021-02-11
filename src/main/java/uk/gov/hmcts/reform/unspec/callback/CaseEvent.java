@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.unspec.callback.UserType.USER;
 @RequiredArgsConstructor
 public enum CaseEvent {
     CREATE_CLAIM(USER),
-    NOTIFY_DEFENDANT_OF_CLAIM(USER),
     REQUEST_EXTENSION(USER),
     RESPOND_EXTENSION(USER),
     MOVE_TO_STAYED(USER),

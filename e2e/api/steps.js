@@ -50,8 +50,8 @@ module.exports = {
     }, true);
     await assignCaseToDefendant(caseId);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
@@ -70,20 +70,6 @@ module.exports = {
     await assignCaseToDefendant(caseId);
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-  },
-
-  notifyClaim: async() => {
-    eventName = 'NOTIFY_DEFENDANT_OF_CLAIM';
-    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
-    assertContainsPopulatedFields(returnedCaseData);
-
-    await assertSubmittedEvent('CREATED', {
-      header: 'Notification of claim sent',
-      body: 'What happens next'
-    });
-
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
   },
 
   acknowledgeService: async () => {

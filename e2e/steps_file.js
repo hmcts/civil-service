@@ -116,13 +116,6 @@ module.exports = function () {
       caseId = (await this.grabCaseNumber()).split('-').join('').substring(1);
     },
 
-    async notifyClaim() {
-      await caseViewPage.startEvent('Notify claim', caseId);
-      await this.clickContinue();
-      await event.submit('Submit', 'Notification of claim sent');
-      await event.returnToCaseDetails();
-    },
-
     async acknowledgeService() {
       await caseViewPage.startEvent('Acknowledge service', caseId);
       await respondentDetails.verifyDetails();

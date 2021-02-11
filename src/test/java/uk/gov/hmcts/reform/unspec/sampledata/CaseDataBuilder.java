@@ -42,7 +42,6 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
@@ -88,7 +87,6 @@ public class CaseDataBuilder {
     private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     private PaymentDetails paymentDetails;
     private LocalDateTime respondentSolicitor1ResponseDeadline;
-    private LocalDate claimNotificationDate;
     //Acknowledge Service
     private ResponseIntention respondent1ClaimResponseIntentionType;
     // Request Extension
@@ -262,8 +260,6 @@ public class CaseDataBuilder {
                 return atStatePaymentSuccessful();
             case PAYMENT_FAILED:
                 return atStatePaymentFailed();
-            case AWAITING_CASE_NOTIFICATION:
-                return atStateAwaitingCaseNotification();
             case CLAIM_ISSUED:
                 return atStateClaimCreated();
             case CLAIM_STAYED:
@@ -413,16 +409,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAwaitingCaseNotification() {
-        atStatePaymentSuccessful();
-        ccdState = AWAITING_CASE_NOTIFICATION;
-        claimIssuedDate = CLAIM_ISSUED_DATE;
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimCreated() {
-        atStateAwaitingCaseNotification();
-        claimNotificationDate = LocalDate.now();
+        atStatePaymentSuccessful();
+        claimIssuedDate = CLAIM_ISSUED_DATE;
         ccdState = CREATED;
         respondentSolicitor1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
@@ -435,7 +424,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateCaseProceedsInCaseman() {
-        atStateAwaitingCaseNotification();
+        atStateClaimCreated();
         claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
             .date(LocalDate.now())
             .reason(ReasonForProceedingOnPaper.APPLICATION)
@@ -532,7 +521,6 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)
             .respondentSolicitor1ResponseDeadline(respondentSolicitor1ResponseDeadline)
-            .claimNotificationDate(claimNotificationDate)
             // Acknowledge Service
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
             // Request Extension

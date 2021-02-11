@@ -21,11 +21,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
@@ -44,9 +42,6 @@ public class FlowStateAllowedEventService {
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.of(
         DRAFT.fullName(),
         List.of(CREATE_CLAIM, WITHDRAW_CLAIM, DISCONTINUE_CLAIM),
-
-        AWAITING_CASE_NOTIFICATION.fullName(),
-        List.of(NOTIFY_DEFENDANT_OF_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, CASE_PROCEEDS_IN_CASEMAN),
 
         CLAIM_ISSUED.fullName(),
         List.of(MOVE_TO_STAYED, ACKNOWLEDGE_SERVICE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
