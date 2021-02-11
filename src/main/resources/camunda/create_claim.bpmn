@@ -73,7 +73,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PENDING_CASE_ISSUED"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0m985z3" name="Respondent 1 not represented" sourceRef="Gateway_16n995u" targetRef="CreateClaimProceedsOfflineNotifyApplicantSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT" || flowState == "MAIN.PROCEEDS_WITH_OFFLINE_JOURNEY"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="CreateClaimProceedsOfflineNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -124,6 +124,15 @@
   <bpmn:error id="Error_1237qii" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CREATE_CLAIM_PROCESS_ID">
+      <bpmndi:BPMNEdge id="Flow_1442e6s_di" bpmnElement="Flow_1442e6s">
+        <di:waypoint x="920" y="480" />
+        <di:waypoint x="1050" y="480" />
+        <di:waypoint x="1050" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sddkki_di" bpmnElement="Flow_1sddkki">
+        <di:waypoint x="690" y="480" />
+        <di:waypoint x="820" y="480" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0sd5lah_di" bpmnElement="Flow_0sd5lah">
         <di:waypoint x="330" y="250" />
         <di:waypoint x="375" y="250" />
@@ -155,10 +164,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="632" y="116" width="52" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1sddkki_di" bpmnElement="Flow_1sddkki">
-        <di:waypoint x="690" y="480" />
-        <di:waypoint x="820" y="480" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0m985z3_di" bpmnElement="Flow_0m985z3">
         <di:waypoint x="400" y="275" />
@@ -195,11 +200,6 @@
         <di:waypoint x="1100" y="250" />
         <di:waypoint x="1132" y="250" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1442e6s_di" bpmnElement="Flow_1442e6s">
-        <di:waypoint x="920" y="480" />
-        <di:waypoint x="1050" y="480" />
-        <di:waypoint x="1050" y="290" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0bn79uc_di" bpmnElement="CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1">
         <dc:Bounds x="840" y="130" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -230,14 +230,14 @@
       <bpmndi:BPMNShape id="Gateway_16n995u_di" bpmnElement="Gateway_16n995u" isMarkerVisible="true">
         <dc:Bounds x="375" y="225" width="50" height="50" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18sx1ge_di" bpmnElement="CreateClaimProceedsOfflineNotifyApplicantSolicitor1">
+        <dc:Bounds x="590" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0y089q8_di" bpmnElement="Activity_0y089q8">
         <dc:Bounds x="230" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1mtqud7_di" bpmnElement="Event_1mtqud7">
         <dc:Bounds x="262" y="122" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_18sx1ge_di" bpmnElement="CreateClaimProceedsOfflineNotifyApplicantSolicitor1">
-        <dc:Bounds x="590" y="440" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0rv0g4m_di" bpmnElement="NotifyRoboticsOnCaseHandedOffline">
         <dc:Bounds x="820" y="440" width="100" height="80" />
