@@ -122,8 +122,8 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        void shouldReturnFalse_whenCaseDataAtDraftState() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
             assertFalse(claimIssued.test(caseData));
         }
     }

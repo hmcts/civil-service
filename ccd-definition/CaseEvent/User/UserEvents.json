@@ -98,7 +98,7 @@
     "Name": "Acknowledge service",
     "Description": "Defendant solicitor is acknowledging service",
     "DisplayOrder": 6,
-    "PreConditionState(s)": "PENDING_CASE_ISSUED;CREATED",
+    "PreConditionState(s)": "CREATED",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",

@@ -50,8 +50,8 @@ module.exports = {
     }, true);
     await assignCaseToDefendant(caseId);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {

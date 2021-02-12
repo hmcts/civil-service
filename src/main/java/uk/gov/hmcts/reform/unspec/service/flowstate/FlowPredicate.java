@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
@@ -27,10 +26,7 @@ public class FlowPredicate {
         caseData.getPaymentDetails() != null && caseData.getPaymentDetails().getStatus() == SUCCESS;
 
     public static final Predicate<CaseData> claimIssued = caseData ->
-        caseData.getClaimIssuedDate() != null && caseData.getCcdState() == AWAITING_CASE_NOTIFICATION;
-
-    public static final Predicate<CaseData> claimIssued2 = caseData ->
-        caseData.getClaimIssuedDate() != null && caseData.getCcdState() != AWAITING_CASE_NOTIFICATION;
+        caseData.getClaimIssuedDate() != null;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
         caseData.getClaimNotificationDate() != null;
