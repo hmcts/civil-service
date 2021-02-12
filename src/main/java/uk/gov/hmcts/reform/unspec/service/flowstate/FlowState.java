@@ -25,6 +25,7 @@ public interface FlowState {
         PENDING_CASE_ISSUED,
         PAYMENT_SUCCESSFUL,
         PAYMENT_FAILED,
+        AWAITING_CASE_NOTIFICATION,
         CLAIM_ISSUED,
         CLAIM_STAYED,
         SERVICE_ACKNOWLEDGED,

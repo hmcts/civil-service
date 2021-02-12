@@ -1,0 +1,13 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM",
+    "CaseFieldID": "notifyClaimLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "AccessGrantedWarning",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

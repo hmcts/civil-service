@@ -72,6 +72,20 @@ module.exports = {
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
 
+  notifyClaim: async() => {
+    eventName = 'NOTIFY_DEFENDANT_OF_CLAIM';
+    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
+    assertContainsPopulatedFields(returnedCaseData);
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'Notification of claim sent',
+      body: 'What happens next'
+    });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+  },
+
   acknowledgeService: async () => {
     eventName = 'ACKNOWLEDGE_SERVICE';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);

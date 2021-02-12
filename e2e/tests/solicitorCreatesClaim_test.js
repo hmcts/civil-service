@@ -19,6 +19,12 @@ Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.see(`Case #${caseId()} has been created.`);
 });
 
+// Disabled as old code will not feature notify claim. Will enable in separate PR after code is merged
+// Scenario('Solicitor notifies defendant solicitor of claim', async (I) => {
+//   await I.notifyClaim();
+//   await I.see(caseEventMessage('Notify claim'));
+// });
+
 Scenario('Solicitor acknowledges service', async (I) => {
   await I.acknowledgeService();
   await I.see(caseEventMessage('Acknowledge service'));
