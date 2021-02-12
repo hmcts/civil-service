@@ -5,8 +5,6 @@ import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddress;
 
 import java.util.Optional;
 
-import static java.lang.String.join;
-
 public class RoboticsAddressAssert extends CustomAssert<RoboticsAddressAssert, RoboticsAddress> {
 
     public RoboticsAddressAssert(RoboticsAddress actual) {
@@ -18,31 +16,31 @@ public class RoboticsAddressAssert extends CustomAssert<RoboticsAddressAssert, R
 
         compare(
             "addressLine1",
-            expected.getAddressLine1(),
+            expected.firstNonNull(),
             Optional.ofNullable(actual.getAddressLine1())
         );
 
         compare(
             "addressLine2",
-            expected.getAddressLine2(),
+            expected.secondNonNull(),
             Optional.ofNullable(actual.getAddressLine2())
         );
 
         compare(
             "addressLine3",
-            expected.getAddressLine3(),
+            expected.thirdNonNull(),
             Optional.ofNullable(actual.getAddressLine3())
         );
 
         compare(
             "addressLine4",
-            expected.getPostTown(),
+            expected.fourthNonNull(),
             Optional.ofNullable(actual.getAddressLine4())
         );
 
         compare(
             "addressLine5",
-            join(", ", expected.getCounty(), expected.getCountry()),
+            expected.fifthNonNull(),
             Optional.ofNullable(actual.getAddressLine5())
         );
 
