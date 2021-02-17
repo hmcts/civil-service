@@ -65,7 +65,9 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-e2e.zip
+      ./bin/pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
       ./bin/import-ccd-definition.sh
+      ./bin/import-bpmn-diagram.sh .
     """
 
     env.URL="https://xui-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
@@ -81,13 +83,6 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.UNSPEC_SERVICE_URL="http://civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    dir("${WORKSPACE}/bin") {
-      sh """
-        eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
-        ./pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
-        ./import-bpmn-diagram.sh ${WORKSPACE}
-      """
-    }
   }
 
   after('functionalTest:preview') {
@@ -101,7 +96,9 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-e2e.zip
+      ./bin/pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
       ./bin/import-ccd-definition.sh
+      ./bin/import-bpmn-diagram.sh .
     """
     env.URL="https://xui-civil-damages-service-staging.service.core-compute-preview.internal"
   }
@@ -116,14 +113,6 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-damages-service-staging.service.core-compute-preview.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.UNSPEC_SERVICE_URL="http://civil-damages-service-staging.service.core-compute-preview.internal"
-
-    dir("${WORKSPACE}/bin") {
-      sh """
-        eval \$(./variables/load-staging-environment-variables.sh)
-        ./pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
-        ./import-bpmn-diagram.sh ${WORKSPACE}
-      """
-    }
   }
 
   after('functionalTest:aat') {
