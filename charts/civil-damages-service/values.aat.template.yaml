@@ -56,7 +56,7 @@ xui-webapp:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
-    ingressHost: xui-${SERVICE_FQDN}
+    ingressHost: civil-damages-service-xui-staging.service.core-compute-aat.internal
     environment:
       HEALTH_CCD_COMPONENT_API: http://gateway-${SERVICE_FQDN}/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -141,7 +141,7 @@ camunda-bpm:
   java:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
-    ingressHost: camunda-${SERVICE_FQDN}
+    ingressHost: civil-damages-service-camunda-staging.service.core-compute-aat.internal
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
       CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
