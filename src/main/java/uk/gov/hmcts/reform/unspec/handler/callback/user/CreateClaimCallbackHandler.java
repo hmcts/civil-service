@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
@@ -16,6 +18,8 @@ import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.CorrectEmail;
+import uk.gov.hmcts.reform.unspec.model.IdamUserDetails;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
@@ -70,6 +74,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
     private final FeesService feesService;
     private final OrganisationService organisationService;
     private final StateFlowEngine stateFlowEngine;
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -77,6 +82,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "applicant"), this::validateDateOfBirth,
             callbackKey(MID, "fee"), this::calculateFee,
+            callbackKey(MID, "idam-email"), this::getIdamEmail,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -116,6 +122,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
+            .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
+            .build();
+    }
+
     private List<String> getPbaAccounts(String authToken) {
         return organisationService.findOrganisation(authToken)
             .map(Organisation::getPaymentAccount)
@@ -124,17 +142,30 @@ public class CreateClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        CaseData updatedCaseData = caseData.toBuilder()
-            .legacyCaseReference(referenceNumberRepository.getReferenceNumber())
-            .claimSubmittedDateTime(LocalDateTime.now())
-            .allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()))
-            .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
-            .build();
+        if (applicantSolicitor1CheckEmail.isCorrect()) {
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
+        } else {
+            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
+        }
+
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        dataBuilder.claimSubmittedDateTime(LocalDateTime.now());
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+
+        //set check email field to null for GDPR
+        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(updatedCaseData))
-            .state(getState(updatedCaseData))
+            .data(caseDetailsConverter.toMap(dataBuilder.build()))
+            .state(getState(dataBuilder.build()))
             .build();
     }
 

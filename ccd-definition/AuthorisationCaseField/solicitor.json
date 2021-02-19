@@ -565,5 +565,19 @@
     "CaseFieldID": "notifyClaimLabel",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "R"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "applicantSolicitor1CheckEmail",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "applicantSolicitor1UserDetails",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRUD"
   }
 ]

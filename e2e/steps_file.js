@@ -9,6 +9,7 @@ const caseViewPage = require('./pages/caseView.page');
 const createCasePage = require('./pages/createClaim/createCase.page');
 const solicitorReferencesPage = require('./pages/createClaim/solicitorReferences.page');
 const claimantSolicitorOrganisation = require('./pages/createClaim/claimantSolicitorOrganisation.page');
+const claimantSolicitorIdamDetailsPage = require('./pages/createClaim/idamEmail.page');
 const defendantSolicitorOrganisation = require('./pages/createClaim/defendantSolicitorOrganisation.page');
 const chooseCourtPage = require('./pages/createClaim/chooseCourt.page');
 const claimantLitigationDetails = require('./pages/createClaim/claimantLitigationDetails.page');
@@ -99,6 +100,7 @@ module.exports = function () {
       await chooseCourtPage.enterCourt();
       await party.enterParty('applicant1', address);
       await claimantLitigationDetails.enterLitigantFriendWithDifferentAddressToApplicant(address, TEST_FILE_PATH);
+      await claimantSolicitorIdamDetailsPage.enterUserEmail();
       await claimantSolicitorOrganisation.enterOrganisationDetails();
       await party.enterParty('respondent1', address);
       await respondentRepresentedPage.enterRespondentRepresented();

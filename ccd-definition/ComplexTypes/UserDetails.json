@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "UserDetails",
+    "ListElementCode": "email",
+    "FieldType": "Email",
+    "ElementLabel": "What email would you like to send notifications to?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "UserDetails",
+    "ListElementCode": "id",
+    "FieldType": "Text",
+    "ElementLabel": "User ID",
+    "SecurityClassification": "Public"
+  }
+]

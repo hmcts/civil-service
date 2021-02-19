@@ -29,6 +29,10 @@ const midEventFieldForPage = {
   ClaimValue: {
     id: 'applicantSolicitor1PbaAccounts',
     dynamicList: true
+  },
+  ClaimantLitigationFriend: {
+    id: 'applicantSolicitor1CheckEmail',
+    dynamicList: false
   }
 };
 
@@ -52,6 +56,8 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    //field is deleted in about to submit callback
+    deleteCaseFields('applicantSolicitor1CheckEmail');
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
@@ -70,6 +76,8 @@ module.exports = {
     await assignCaseToDefendant(caseId);
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    //field is deleted in about to submit callback
+    deleteCaseFields('applicantSolicitor1CheckEmail');
   },
 
   notifyClaim: async() => {
@@ -238,6 +246,7 @@ const validateEventPages = async (data) => {
 };
 
 const assertValidData = async (data, pageId) => {
+  console.log(`asserting page: ${pageId} has valid data`);
   const validDataForPage = data.valid[pageId];
   caseData = {...caseData, ...validDataForPage};
 
@@ -303,6 +312,7 @@ const assertCorrectEventsAreAvailableToUser = async (user, state) => {
 };
 
 function addMidEventFields(pageId, responseBody) {
+  console.log(`Adding mid event fields for pageId: ${pageId}`);
   const midEventData = data[eventName].midEventData[pageId];
   const midEventField = midEventFieldForPage[pageId];
 
