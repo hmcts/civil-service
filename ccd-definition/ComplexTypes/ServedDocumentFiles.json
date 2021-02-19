@@ -3,16 +3,22 @@
     "ID": "ServedDocumentFiles",
     "ListElementCode": "label",
     "FieldType": "Label",
-    "ElementLabel": "Upload any documents that you have sent to the defendant.\n\nFiles must be a maximum size of 10MB and in the following format: pdf, doc,docx,jpg,jpeg, png, xls or xlsx.",
+    "ElementLabel": "Spreadsheets: .csv, .ods, .xls, .xlsx\n\nText documents: .docm, .docx, .html, .odf, .ooxml, .pdf, .rtf, .sgml, .txt, .xhtml",
     "SecurityClassification": "Public"
   },
   {
     "ID": "ServedDocumentFiles",
-    "ListElementCode": "particularsOfClaim",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "Document",
+    "ListElementCode": "particularsOfClaimDocument",
+    "FieldType": "Document",
     "ElementLabel": "Particulars of claim",
-    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "particularsOfClaimText",
+    "FieldType": "TextArea",
+    "ElementLabel": "Particulars of claim",
     "SecurityClassification": "Public"
   },
   {
@@ -21,7 +27,7 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "Document",
     "ElementLabel": "Medical reports",
-    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "HintText": "Medical reports can be uploaded in any format including image files.",
     "SecurityClassification": "Public"
   },
   {
@@ -30,7 +36,7 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "Document",
     "ElementLabel": "Schedule of loss",
-    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   },
   {
@@ -39,7 +45,7 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "Document",
     "ElementLabel": "Certificate of suitability",
-    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   },
   {
@@ -48,7 +54,7 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "Document",
     "ElementLabel": "Other documents",
-    "RegularExpression": ".jpg,.gif,.pdf,.doc,.docx,.jpeg,.png,.xls,.xlsx",
+    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   }
 ]

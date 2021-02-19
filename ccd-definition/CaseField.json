@@ -209,7 +209,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "servedDocumentFiles",
-    "Label": "Upload your documents",
+    "Label": "Upload documents in the following machine readable formats",
     "FieldType": "ServedDocumentFiles",
     "SecurityClassification": "Public"
   },

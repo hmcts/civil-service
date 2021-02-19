@@ -1,0 +1,68 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "particularsOfClaimDocument",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "particularsOfClaimText",
+    "EventElementLabel": "If you prefer you can copy and paste the details of claim here.",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "medicalReports",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Min": 1,
+    "FieldShowCondition": "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "scheduleOfLoss",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "Upload",
+    "CaseEventID": "ADD_OR_AMEND_CLAIM_DOCUMENTS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "other",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL"
+  }
+]

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.unspec.model.CorrectEmail;
 import uk.gov.hmcts.reform.unspec.model.Fee;
 import uk.gov.hmcts.reform.unspec.model.IdamUserDetails;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
@@ -169,6 +170,47 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+    }
+
+    @Nested
+    class MidEventParticularsOfClaimCallback {
+
+        private final String pageId = "particulars-of-claim";
+        private final CaseData.CaseDataBuilder caseDataBuilder =
+            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
+
+        @Test
+        void shouldReturnErrors_whenNoDocuments() {
+            CaseData caseData = caseDataBuilder.build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly("One particular of claim is required");
+        }
+
+        @Test
+        void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly("One particular of claim is required");
+        }
+
+        @Test
+        void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
     }
 
     @Nested
