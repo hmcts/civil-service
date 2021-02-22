@@ -34,6 +34,17 @@ class RoboticsAddressMapperTest {
                          "address cannot be null"
             );
         }
+
+        @Test
+        void shouldMapToRoboticsAddressWithDefaultForAddressLine2_whenAddressLine2IsNull() {
+            Address address = Address.builder()
+                .addressLine1("address line 1")
+                .postCode("SW1 1AA").build();
+
+            RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
+
+            assertThat(roboticsAddress).isEqualTo(address);
+        }
     }
 
     @Nested

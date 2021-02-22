@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddresses;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 @Component
@@ -14,7 +16,7 @@ public class RoboticsAddressMapper {
         requireNonNull(address);
         return RoboticsAddress.builder()
             .addressLine1(address.firstNonNull())
-            .addressLine2(address.secondNonNull())
+            .addressLine2(Optional.ofNullable(address.secondNonNull()).orElse("-"))
             .addressLine3(address.thirdNonNull())
             .addressLine4(address.fourthNonNull())
             .addressLine5(address.fifthNonNull())

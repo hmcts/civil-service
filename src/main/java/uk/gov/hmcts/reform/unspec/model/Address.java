@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.unspec.utils.ObjectUtils;
 
-import static java.lang.String.join;
+import static uk.gov.hmcts.reform.unspec.utils.StringUtils.joinNonNull;
 
 @Data
 @Builder
@@ -29,7 +29,7 @@ public class Address {
             addressLine2,
             addressLine3,
             postTown,
-            join(", ", county, country)
+            joinNonNull(", ", county, country)
         );
     }
 
@@ -40,7 +40,7 @@ public class Address {
             addressLine2,
             addressLine3,
             postTown,
-            join(", ", county, country)
+            joinNonNull(", ", county, country)
         );
     }
 
@@ -51,7 +51,7 @@ public class Address {
             addressLine2,
             addressLine3,
             postTown,
-            join(", ", county, country)
+            joinNonNull(", ", county, country)
         );
     }
 
@@ -62,7 +62,7 @@ public class Address {
             addressLine2,
             addressLine3,
             postTown,
-            join(", ", county, country)
+            joinNonNull(", ", county, country)
         );
     }
 
@@ -73,7 +73,7 @@ public class Address {
             addressLine2,
             addressLine3,
             postTown,
-            join(", ", county, country)
+            joinNonNull(", ", county, country)
         );
     }
 }

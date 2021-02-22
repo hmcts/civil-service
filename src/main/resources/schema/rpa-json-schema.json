@@ -580,7 +580,7 @@
         },
         "addressLine2": {
           "$id": "#/definitions/contactAddressType/properties/addressLine2",
-          "$ref": "#/definitions/addressLineOrNullType",
+          "$ref": "#/definitions/addressLineType",
           "description": ""
         },
         "addressLine3": {

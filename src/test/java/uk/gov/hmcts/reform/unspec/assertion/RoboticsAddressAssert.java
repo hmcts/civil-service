@@ -22,7 +22,7 @@ public class RoboticsAddressAssert extends CustomAssert<RoboticsAddressAssert, R
 
         compare(
             "addressLine2",
-            expected.secondNonNull(),
+            Optional.ofNullable(expected.secondNonNull()).orElse("-"),
             Optional.ofNullable(actual.getAddressLine2())
         );
 
