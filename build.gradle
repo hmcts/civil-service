@@ -341,7 +341,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.2.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.8.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.7.7'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.8.0'
 
