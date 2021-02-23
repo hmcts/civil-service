@@ -18,8 +18,6 @@ const data = {
   CREATE_CLAIM_RESPONDENT_LIP: claimData.createClaimLitigantInPerson,
   ADD_OR_AMEND_CLAIM_DOCUMENTS: require('../fixtures/events/addOrAmendClaimDocuments.js'),
   ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
-  REQUEST_EXTENSION: require('../fixtures/events/requestExtension.js'),
-  RESPOND_EXTENSION: require('../fixtures/events/respondExtension.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
   ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
@@ -133,51 +131,6 @@ module.exports = {
     await assertSubmittedEvent('CREATED', {
       header: 'You\'ve acknowledged service',
       body: 'You need to respond before'
-    }, true);
-
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-  },
-
-  requestExtension: async () => {
-    eventName = 'REQUEST_EXTENSION';
-    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
-    assertContainsPopulatedFields(returnedCaseData);
-    caseData = returnedCaseData;
-    deleteCaseFields('systemGeneratedCaseDocuments');
-
-    await validateEventPages(data.REQUEST_EXTENSION);
-
-    await assertCallbackError('ProposeDeadline', data[eventName].invalid.ProposeDeadline.past,
-      'The proposed deadline must be a date in the future');
-    await assertCallbackError('ProposeDeadline', data[eventName].invalid.ProposeDeadline.beforeCurrentDeadline,
-      'The proposed deadline must be after the current deadline');
-
-    await assertSubmittedEvent('CREATED', {
-      header: 'You asked for extra time to respond',
-      body: 'You asked if you can respond before 4pm on'
-    }, true);
-
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-  },
-
-  respondExtension: async () => {
-    eventName = 'RESPOND_EXTENSION';
-    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
-    assertContainsPopulatedFields(returnedCaseData);
-    caseData = returnedCaseData;
-
-    await validateEventPages(data.RESPOND_EXTENSION);
-
-    await assertCallbackError('Counter', data[eventName].invalid.Counter.past,
-      'The proposed deadline must be a date in the future');
-    await assertCallbackError('Counter', data[eventName].invalid.Counter.beforeCurrentDeadline,
-      'The proposed deadline must be after the current deadline');
-
-    await assertSubmittedEvent('CREATED', {
-      header: 'You\'ve responded to the request for more time',
-      body: 'The defendant must respond before 4pm on'
     }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');

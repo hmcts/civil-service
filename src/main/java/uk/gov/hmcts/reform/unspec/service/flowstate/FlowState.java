@@ -29,8 +29,6 @@ public interface FlowState {
         CLAIM_ISSUED,
         CLAIM_STAYED,
         SERVICE_ACKNOWLEDGED,
-        EXTENSION_REQUESTED,
-        EXTENSION_RESPONDED,
         RESPONDED_TO_CLAIM,
         FULL_DEFENCE,
         CLAIM_WITHDRAWN,

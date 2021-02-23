@@ -52,7 +52,7 @@ class AcknowledgeServiceApplicantNotificationHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);

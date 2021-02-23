@@ -8,8 +8,6 @@ module.exports = {
     events.ADD_OR_AMEND_CLAIM_DOCUMENTS
   ],
   CREATED: [
-    events.REQUEST_EXTENSION,
-    events.RESPOND_EXTENSION,
     events.ACKNOWLEDGE_SERVICE,
     events.ADD_DEFENDANT_LITIGATION_FRIEND,
     events.DEFENDANT_RESPONSE,

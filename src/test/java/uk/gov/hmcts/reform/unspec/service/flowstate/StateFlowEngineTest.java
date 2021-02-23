@@ -25,8 +25,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_RESPONDED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
@@ -178,46 +176,6 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnExtensionRequested_whenCaseDataAtStateExtensionRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(EXTENSION_REQUESTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    AWAITING_CASE_NOTIFICATION.fullName(), CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
-                    EXTENSION_REQUESTED.fullName()
-                );
-        }
-
-        @Test
-        void shouldReturnExtensionResponded_whenCaseDataAtStateExtensionResponded() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionResponded().build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(EXTENSION_RESPONDED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    AWAITING_CASE_NOTIFICATION.fullName(), CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
-                    EXTENSION_REQUESTED.fullName(), EXTENSION_RESPONDED.fullName()
-                );
-        }
-
-        @Test
         void shouldReturnRespondToClaim_whenCaseDataAtStateRespondedToClaim() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
 
@@ -301,20 +259,18 @@ class StateFlowEngineTest {
 
         @ParameterizedTest
         @CsvSource({
-            "true,EXTENSION_REQUESTED",
-            "true,SERVICE_ACKNOWLEDGED",
             "true,CLAIM_ISSUED",
             "true,PAYMENT_SUCCESSFUL",
             "true,PENDING_CASE_ISSUED",
             "true,DRAFT",
-            "false,EXTENSION_RESPONDED",
             "false,RESPONDED_TO_CLAIM",
             "false,FULL_DEFENCE",
-            "false,CLAIM_STAYED"
+            "false,CLAIM_STAYED",
+            "false,SERVICE_ACKNOWLEDGED",
         })
-        void shouldReturnValidResult_whenCaseDataAtStateExtensionRequested(boolean expected, FlowState.Main state) {
+        void shouldReturnValidResult_whenCaseDataAtStateClaimCreated(boolean expected, FlowState.Main state) {
             CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateClaimCreated()
                 .build();
 
             assertThat(stateFlowEngine.hasTransitionedTo(caseDetails, state)).isEqualTo(expected);

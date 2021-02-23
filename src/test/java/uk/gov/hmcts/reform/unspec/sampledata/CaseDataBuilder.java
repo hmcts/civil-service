@@ -95,15 +95,6 @@ public class CaseDataBuilder {
     private IdamUserDetails applicantSolicitor1UserDetails;
     //Acknowledge Service
     private ResponseIntention respondent1ClaimResponseIntentionType;
-    // Request Extension
-    private LocalDate respondentSolicitor1claimResponseExtensionProposedDeadline;
-    private YesOrNo respondentSolicitor1claimResponseExtensionAlreadyAgreed;
-    private String respondentSolicitor1claimResponseExtensionReason;
-    // Respond To Extension Request
-    private YesOrNo respondentSolicitor1claimResponseExtensionAccepted;
-    private YesOrNo respondentSolicitor1claimResponseExtensionCounter;
-    private LocalDate respondentSolicitor1claimResponseExtensionCounterDate;
-    private String respondentSolicitor1claimResponseExtensionRejectionReason;
     // Defendant Response
     private RespondentResponseType respondent1ClaimResponseType;
     private ResponseDocument respondent1ClaimResponseDocument;
@@ -121,33 +112,8 @@ public class CaseDataBuilder {
     private CloseClaim withdrawClaim;
     private CloseClaim discontinueClaim;
 
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionProposedDeadline(LocalDate responseDeadline) {
-        this.respondentSolicitor1claimResponseExtensionProposedDeadline = responseDeadline;
-        return this;
-    }
-
     public CaseDataBuilder respondentSolicitor1ResponseDeadline(LocalDateTime respondentSolicitor1ResponseDeadline) {
         this.respondentSolicitor1ResponseDeadline = respondentSolicitor1ResponseDeadline;
-        return this;
-    }
-
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionAccepted(YesOrNo yesOrNo) {
-        this.respondentSolicitor1claimResponseExtensionAccepted = yesOrNo;
-        return this;
-    }
-
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionCounter(YesOrNo yesOrNo) {
-        this.respondentSolicitor1claimResponseExtensionCounter = yesOrNo;
-        return this;
-    }
-
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionAlreadyAgreed(YesOrNo yesOrNo) {
-        this.respondentSolicitor1claimResponseExtensionAlreadyAgreed = yesOrNo;
-        return this;
-    }
-
-    public CaseDataBuilder respondentSolicitor1claimResponseExtensionCounterDate(LocalDate date) {
-        this.respondentSolicitor1claimResponseExtensionCounterDate = date;
         return this;
     }
 
@@ -274,10 +240,6 @@ public class CaseDataBuilder {
                 return atStateClaimStayed();
             case SERVICE_ACKNOWLEDGED:
                 return atStateServiceAcknowledge();
-            case EXTENSION_REQUESTED:
-                return atStateExtensionRequested();
-            case EXTENSION_RESPONDED:
-                return atStateExtensionResponded();
             case RESPONDED_TO_CLAIM:
                 return atStateRespondedToClaim();
             case FULL_DEFENCE:
@@ -489,23 +451,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateExtensionRequested() {
-        atStateServiceAcknowledge();
-        respondentSolicitor1claimResponseExtensionProposedDeadline = now().plusDays(21);
-        respondentSolicitor1claimResponseExtensionAlreadyAgreed = NO;
-        respondentSolicitor1claimResponseExtensionReason = "Need little more time";
-        return this;
-    }
-
-    public CaseDataBuilder atStateExtensionResponded() {
-        atStateExtensionRequested();
-        respondentSolicitor1claimResponseExtensionAccepted = NO;
-        respondentSolicitor1claimResponseExtensionCounter = YES;
-        respondentSolicitor1claimResponseExtensionCounterDate = now().plusDays(19);
-        respondentSolicitor1claimResponseExtensionRejectionReason = "This seems reasonable";
-        return this;
-    }
-
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -542,23 +487,6 @@ public class CaseDataBuilder {
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
             // Acknowledge Service
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
-            // Request Extension
-            .respondentSolicitor1claimResponseExtensionProposedDeadline(
-                respondentSolicitor1claimResponseExtensionProposedDeadline
-            )
-            .respondentSolicitor1claimResponseExtensionAlreadyAgreed(
-                respondentSolicitor1claimResponseExtensionAlreadyAgreed
-            )
-            .respondentSolicitor1claimResponseExtensionReason(respondentSolicitor1claimResponseExtensionReason)
-            // Respond To Extension Request
-            .respondentSolicitor1claimResponseExtensionAccepted(respondentSolicitor1claimResponseExtensionAccepted)
-            .respondentSolicitor1claimResponseExtensionCounter(respondentSolicitor1claimResponseExtensionCounter)
-            .respondentSolicitor1claimResponseExtensionRejectionReason(
-                respondentSolicitor1claimResponseExtensionRejectionReason
-            )
-            .respondentSolicitor1claimResponseExtensionCounterDate(
-                respondentSolicitor1claimResponseExtensionCounterDate
-            )
             // Defendant Response
             .respondent1ClaimResponseType(respondent1ClaimResponseType)
             .respondent1ClaimResponseDocument(respondent1ClaimResponseDocument)

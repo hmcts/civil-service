@@ -23,15 +23,11 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_RESPONDED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
@@ -63,19 +59,8 @@ public class FlowStateAllowedEventService {
         List.of(WITHDRAW_CLAIM, DISCONTINUE_CLAIM),
 
         SERVICE_ACKNOWLEDGED.fullName(),
-        List.of(REQUEST_EXTENSION, DEFENDANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN
-        ),
-
-        EXTENSION_REQUESTED.fullName(),
-        List.of(DEFENDANT_RESPONSE, RESPOND_EXTENSION, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN
-        ),
-
-        EXTENSION_RESPONDED.fullName(),
-        List.of(DEFENDANT_RESPONSE, WITHDRAW_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, DISCONTINUE_CLAIM,
-                CASE_PROCEEDS_IN_CASEMAN
-        ),
+        List.of(DEFENDANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN),
 
         RESPONDED_TO_CLAIM.fullName(),
         List.of(CLAIMANT_RESPONSE, WITHDRAW_CLAIM, ADD_DEFENDANT_LITIGATION_FRIEND, DISCONTINUE_CLAIM,

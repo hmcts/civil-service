@@ -5,41 +5,29 @@ module.exports = {
     description: 'Notify defendant solicitor of claim',
     order: 2
   },
-  REQUEST_EXTENSION: {
-    id: 'REQUEST_EXTENSION',
-    name: 'Request extension',
-    description: 'Defendant solicitor is submitting requesting for an extension of time',
-    order: 3
-  },
-  RESPOND_EXTENSION: {
-    id: 'RESPOND_EXTENSION',
-    name: 'Respond to extension request',
-    description: 'Respondent solicitor is responding to a request for an extension of time',
-    order: 4
-  },
   ACKNOWLEDGE_SERVICE: {
     id: 'ACKNOWLEDGE_SERVICE',
     name: 'Acknowledge service',
     description: 'Defendant solicitor is acknowledging service',
-    order: 6
+    order: 3
   },
   ADD_DEFENDANT_LITIGATION_FRIEND: {
     id: 'ADD_DEFENDANT_LITIGATION_FRIEND',
     name: 'Add litigation friend',
     description: 'Add litigation friend',
-    order: 7
+    order: 4
   },
   DEFENDANT_RESPONSE: {
     id: 'DEFENDANT_RESPONSE',
     name: 'Respond to claim',
     description: 'Defendant response to claim',
-    order: 8
+    order: 5
   },
   CLAIMANT_RESPONSE: {
     id: 'CLAIMANT_RESPONSE',
     name: 'View and respond to defence',
     description: 'View and respond to defendant',
-    order: 9
+    order: 6
   },
   WITHDRAW_CLAIM: {
     id: 'WITHDRAW_CLAIM',
@@ -51,7 +39,7 @@ module.exports = {
     id: 'ADD_OR_AMEND_CLAIM_DOCUMENTS',
     name: 'Add or amend claim documents',
     description: 'Add or amend documents attached to the claim',
-    order: 11
+    order: 10
   },
   DISCONTINUE_CLAIM: {
     id: 'DISCONTINUE_CLAIM',
@@ -63,6 +51,6 @@ module.exports = {
     description: 'Case will proceed offline in Caseman system',
     id: 'CASE_PROCEEDS_IN_CASEMAN',
     name: 'Case proceeds in Caseman',
-    order: 10
+    order: 8
   }
 };
