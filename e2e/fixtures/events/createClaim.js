@@ -91,6 +91,9 @@ const createClaimData = legalRepresentation => {
     PersonalInjuryType: {
       personalInjuryType: 'ROAD_ACCIDENT'
     },
+    Details: {
+      detailsOfClaim: 'Test details of claim'
+    },
     Upload: {
       servedDocumentFiles: {
         particularsOfClaimDocument: document('particularsOfClaim.pdf')

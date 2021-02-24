@@ -16,6 +16,7 @@ const claimantLitigationDetails = require('./pages/createClaim/claimantLitigatio
 const claimTypePage = require('./pages/createClaim/claimType.page');
 const respondentRepresentedPage = require('./pages/createClaim/isRespondentRepresented.page');
 const personalInjuryTypePage = require('./pages/createClaim/personalInjuryType.page');
+const detailsOfClaimPage = require('./pages/createClaim/detailsOfClaim.page');
 const uploadParticularsOfClaim = require('./pages/createClaim/uploadParticularsOfClaim.page');
 const claimValuePage = require('./pages/createClaim/claimValue.page');
 const pbaNumberPage = require('./pages/createClaim/pbaNumber.page');
@@ -100,6 +101,7 @@ module.exports = function () {
       await defendantSolicitorOrganisation.enterOrganisationDetails();
       await claimTypePage.selectClaimType();
       await personalInjuryTypePage.selectPersonalInjuryType();
+      await detailsOfClaimPage.enterDetailsOfClaim();
       await uploadParticularsOfClaim.upload(TEST_FILE_PATH);
       await claimValuePage.enterClaimValue();
       await pbaNumberPage.selectPbaNumber();

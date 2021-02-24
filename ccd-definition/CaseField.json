@@ -669,5 +669,21 @@
     "Label": "Notification details",
     "FieldType": "UserDetails",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "detailsOfClaimLabel",
+    "Label": "## Provide a summary of the claim\nBriefly describe the claim. Don’t include the Particulars of claim details. You can upload the Particulars on the next page.\n\nUse this space to provide additional details such as the date of the accident if making a Personal Injury claim, the date of the alleged negligence if making a clinical negligence claim, the contract start date if making a claim for breach of contract and any other supporting details.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "detailsOfClaim",
+    "Label": "Claim details",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
   }
 ]

@@ -523,5 +523,19 @@
     "CaseFieldID": "applicantSolicitor1UserDetails",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "detailsOfClaimLabel",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CR"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "detailsOfClaim",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRUD"
   }
 ]
