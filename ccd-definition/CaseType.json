@@ -2,8 +2,8 @@
   {
     "LiveFrom": "01/01/2017",
     "ID": "UNSPECIFIED_CLAIMS",
-    "Name": "Unspecified Claims",
-    "Description": "Unspecified Claims",
+    "Name": "Damages Claim",
+    "Description": "Damages Claim",
     "JurisdictionID": "CIVIL",
     "SecurityClassification": "Public"
   }
