@@ -5,7 +5,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseHistory",
     "TabLabel": "History",
-    "TabDisplayOrder": 1,
+    "TabDisplayOrder": 2,
     "CaseFieldID": "caseHistory",
     "TabFieldDisplayOrder": 1
   },
@@ -13,7 +13,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "TabID": "CaseDocuments",
     "TabLabel": "Claim documents",
-    "TabDisplayOrder": 2,
+    "TabDisplayOrder": 3,
     "CaseFieldID": "systemGeneratedCaseDocuments",
     "TabFieldDisplayOrder": 1,
     "DisplayContextParameter": "#TABLE(documentType, documentLink)"
@@ -24,7 +24,7 @@
     "Channel": "CaseWorker",
     "TabID": "Test",
     "TabLabel": "Test",
-    "TabDisplayOrder": 3,
+    "TabDisplayOrder": 4,
     "CaseFieldID": "respondent1",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder tab so that we can use label to inject respondent fields in to acknowledge service event"
@@ -35,7 +35,7 @@
     "Channel": "CaseWorker",
     "TabID": "Test",
     "TabLabel": "Test",
-    "TabDisplayOrder": 3,
+    "TabDisplayOrder": 4,
     "CaseFieldID": "courtLocation",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder so that we can use label to inject courtLocation field in to respond to claim event"
@@ -46,7 +46,7 @@
     "Channel": "CaseWorker",
     "TabID": "Test",
     "TabLabel": "Test",
-    "TabDisplayOrder": 3,
+    "TabDisplayOrder": 4,
     "CaseFieldID": "claimType",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder so that we can use claimType show hide conditions in events"

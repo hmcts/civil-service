@@ -79,7 +79,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimValue",
-    "Label": "Enter expected claim value",
+    "Label": "Expected claim value",
     "FieldType": "ClaimValue",
     "SecurityClassification": "Public"
   },
@@ -87,7 +87,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimType",
-    "Label": "What type of claim is this?",
+    "Label": "Type of claim",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "ClaimType",
     "SecurityClassification": "Public"
@@ -130,7 +130,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimFee",
-    "Label": "Pay fee using Payment by Account (PBA)",
+    "Label": "Claim fee",
     "FieldType": "Fee",
     "SecurityClassification": "Public"
   },
@@ -138,7 +138,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicantSolicitor1PbaAccounts",
-    "Label": "Select a PBA",
+    "Label": "PBA Number",
     "FieldType": "DynamicList",
     "SecurityClassification": "Public"
   },
@@ -191,7 +191,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimIssuedDate",
-    "Label": "Claim issued date",
+    "Label": "Date claim issued",
     "FieldType": "Date",
     "SecurityClassification": "Public",
     "_Definition":  "The derived legal date the claim is deemed issued. It is based on the date time when the claim was submitted digitally",
@@ -201,7 +201,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimSubmittedDateTime",
-    "Label": "Claim Submitted at",
+    "Label": "Date claim Submitted",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
@@ -217,7 +217,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondentSolicitor1ResponseDeadline",
-    "Label": "Response deadline",
+    "Label": "Respondent solicitor deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public",
     "_Definition":  "The date time by which the first respondent solicitor has to submit the response to the claim.",
@@ -642,7 +642,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimNotificationDate",
-    "Label": "Case notification date",
+    "Label": "Date claim notified",
     "FieldType": "Date",
     "SecurityClassification": "Public"
   },
@@ -682,7 +682,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "detailsOfClaim",
-    "Label": "Claim details",
+    "Label": "Description of claim",
     "FieldType": "TextArea",
     "SecurityClassification": "Public"
   }

@@ -1,0 +1,82 @@
+[
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimType",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "detailsOfClaim",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimValue",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimFee",
+    "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "applicantSolicitor1PbaAccounts",
+    "TabFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimIssuedDate",
+    "TabFieldDisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimSubmittedDateTime",
+    "TabFieldDisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "allocatedTrack",
+    "TabFieldDisplayOrder": 8
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "respondentSolicitor1ResponseDeadline",
+    "TabFieldDisplayOrder": 9
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimNotificationDate",
+    "TabFieldDisplayOrder": 10
+  }
+]
