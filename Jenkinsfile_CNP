@@ -116,6 +116,7 @@ withPipeline(type, product, component) {
     """
 
     env.URL="https://xui-unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.SERVICE_URL="http://unspec-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   after('smoketest:preview') {
@@ -143,6 +144,7 @@ withPipeline(type, product, component) {
   before('smoketest:aat') {
     validateRpaContract()
     env.URL = "https://manage-case.aat.platform.hmcts.net"
+    env.SERVICE_URL="http://unspec-service-aat.service.core-compute-aat.internal"
     archiveCoreCaseDataDefinitions('staging')
     uploadCoreCaseDataDefinitions('staging')
     uploadBpmnDiagrams('aat')
@@ -175,6 +177,12 @@ withPipeline(type, product, component) {
         archiveCoreCaseDataDefinitions('demo')
         uploadCoreCaseDataDefinitions('demo')
         uploadBpmnDiagrams('demo')
+        dir("${WORKSPACE}/bin") {
+          sh """
+            ./wait-for.sh https://manage-case.demo.platform.hmcts.net
+            ./wait-for.sh http://unspec-service-demo.service.core-compute-demo.internal
+          """
+        }
       }
     }
   }
