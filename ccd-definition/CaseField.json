@@ -27,7 +27,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "courtLocation",
-    "Label": "Choose court location",
+    "Label": "Court Code",
     "FieldType": "CourtLocation",
     "SecurityClassification": "Public"
   },
@@ -409,7 +409,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQRequestedCourt",
-    "Label": "The claimant requested court is",
+    "Label": "Court Code",
     "FieldType": "RequestedCourt",
     "SecurityClassification": "Public"
   },

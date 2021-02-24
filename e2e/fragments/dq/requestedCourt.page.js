@@ -11,7 +11,7 @@ module.exports = {
           no: 'No'
         }
       },
-      name: `#${party}DQRequestedCourt_name`,
+      responseCourtCode: `#${party}DQRequestedCourt_responseCourtCode`,
       reasonForHearingAtSpecificCourt: `#${party}DQRequestedCourt_reasonForHearingAtSpecificCourt`,
     };
   },
@@ -22,7 +22,7 @@ module.exports = {
       I.click(this.fields(party).requestHearingAtSpecificCourt.options.yes);
     });
 
-    I.fillField(this.fields(party).name, 'A court name');
+    I.fillField(this.fields(party).responseCourtCode, '343');
     I.fillField(this.fields(party).reasonForHearingAtSpecificCourt, 'A reason for the court');
     await I.clickContinue();
   },

@@ -9,6 +9,6 @@ import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 public class RequestedCourt {
 
     private final YesOrNo requestHearingAtSpecificCourt;
-    private final String name;
+    private final String responseCourtCode;
     private final String reasonForHearingAtSpecificCourt;
 }

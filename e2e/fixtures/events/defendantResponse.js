@@ -89,7 +89,7 @@ module.exports = {
     },
     RequestedCourt: {
       respondent1DQRequestedCourt: {
-        name: 'Example court',
+        responseCourtCode: '343',
         reasonForHearingAtSpecificCourt: 'No reasons',
         requestHearingAtSpecificCourt: 'Yes'
       }

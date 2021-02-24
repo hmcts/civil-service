@@ -80,7 +80,7 @@ class Respondent1DQTest {
 
     private RequestedCourt requestedCourt() {
         return RequestedCourt.builder()
-            .name("London court")
+            .responseCourtCode("343")
             .reasonForHearingAtSpecificCourt("reason for court")
             .requestHearingAtSpecificCourt(YesOrNo.YES)
             .build();

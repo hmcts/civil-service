@@ -8,7 +8,7 @@ module.exports = {
 
   async enterCourt() {
     I.waitForElement(this.fields.courtLocation);
-    I.fillField(this.fields.courtLocation, 'London High Court');
+    I.fillField(this.fields.courtLocation, '344');
     await I.clickContinue();
   }
 };
