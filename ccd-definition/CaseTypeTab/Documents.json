@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "systemGeneratedCaseDocuments",
+    "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(documentType, documentLink)"
+  }
+]
