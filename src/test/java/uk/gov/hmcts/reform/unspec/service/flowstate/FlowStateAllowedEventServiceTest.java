@@ -36,7 +36,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
@@ -64,6 +66,10 @@ class FlowStateAllowedEventServiceTest {
             return Stream.of(
                 of(CaseDataBuilder.builder().atStateClaimDraft().build(), DRAFT),
                 of(CaseDataBuilder.builder().atStateAwaitingCaseNotification().build(), AWAITING_CASE_NOTIFICATION),
+                of(
+                    CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
+                    AWAITING_CASE_DETAILS_NOTIFICATION
+                ),
                 of(CaseDataBuilder.builder().atStateClaimCreated().build(), CLAIM_ISSUED),
                 of(CaseDataBuilder.builder().atStateClaimStayed().build(), CLAIM_STAYED),
                 of(CaseDataBuilder.builder().atStateServiceAcknowledge().build(), SERVICE_ACKNOWLEDGED),
@@ -98,6 +104,17 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.getAllowedEvents(AWAITING_CASE_NOTIFICATION.fullName()))
                 .containsExactlyInAnyOrder(
                     NOTIFY_DEFENDANT_OF_CLAIM,
+                    ADD_DEFENDANT_LITIGATION_FRIEND,
+                    CASE_PROCEEDS_IN_CASEMAN,
+                    ADD_OR_AMEND_CLAIM_DOCUMENTS
+                );
+        }
+
+        @Test
+        void shouldReturnValidEvents_whenFlowStateIsAwaitingCaseDetailsNotification() {
+            assertThat(flowStateAllowedEventService.getAllowedEvents(AWAITING_CASE_DETAILS_NOTIFICATION.fullName()))
+                .containsExactlyInAnyOrder(
+                    NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                     ADD_DEFENDANT_LITIGATION_FRIEND,
                     CASE_PROCEEDS_IN_CASEMAN,
                     ADD_OR_AMEND_CLAIM_DOCUMENTS
@@ -157,6 +174,10 @@ class FlowStateAllowedEventServiceTest {
             "AWAITING_CASE_NOTIFICATION,ADD_DEFENDANT_LITIGATION_FRIEND",
             "AWAITING_CASE_NOTIFICATION,CASE_PROCEEDS_IN_CASEMAN",
             "AWAITING_CASE_NOTIFICATION,ADD_OR_AMEND_CLAIM_DOCUMENTS",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,ADD_DEFENDANT_LITIGATION_FRIEND",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,CASE_PROCEEDS_IN_CASEMAN",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,ADD_OR_AMEND_CLAIM_DOCUMENTS",
             "SERVICE_ACKNOWLEDGED,DEFENDANT_RESPONSE",
             "RESPONDED_TO_CLAIM,CLAIMANT_RESPONSE",
             "RESPONDED_TO_CLAIM,DISCONTINUE_CLAIM"
@@ -169,7 +190,8 @@ class FlowStateAllowedEventServiceTest {
         @CsvSource({
             "DRAFT,CASE_PROCEEDS_IN_CASEMAN",
             "CLAIM_STAYED,DEFENDANT_RESPONSE",
-            "AWAITING_CASE_NOTIFICATION,ACKNOWLEDGE_SERVICE",
+            "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_SERVICE",
             "FULL_DEFENCE,ACKNOWLEDGE_SERVICE"
         })
         void shouldReturnFalse_whenEventIsNotAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
@@ -203,17 +225,23 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CASE_PROCEEDS_IN_CASEMAN,
-                    new String[]{AWAITING_CASE_NOTIFICATION.fullName(), CLAIM_ISSUED.fullName(),
-                        SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
+                    new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(),
+                        FULL_DEFENCE.fullName()
                     }
                 ),
                 of(
                     ADD_DEFENDANT_LITIGATION_FRIEND,
-                    new String[]{AWAITING_CASE_NOTIFICATION.fullName(), CLAIM_ISSUED.fullName(),
-                        SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
+                    new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(),
+                        FULL_DEFENCE.fullName()
                     }
                 ),
-                of(ADD_OR_AMEND_CLAIM_DOCUMENTS, new String[]{AWAITING_CASE_NOTIFICATION.fullName()})
+                of(
+                    ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                    new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName()}
+                ),
+                of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[]{AWAITING_CASE_DETAILS_NOTIFICATION.fullName()})
             );
         }
     }
@@ -264,6 +292,31 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     false,
                     CaseDetailsBuilder.builder().atStateAwaitingCaseNotification().build(),
+                    NOTIFY_DEFENDANT_OF_CLAIM_DETAILS
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
+                    NOTIFY_DEFENDANT_OF_CLAIM_DETAILS
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
+                    ADD_DEFENDANT_LITIGATION_FRIEND
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
+                    CASE_PROCEEDS_IN_CASEMAN
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
+                    ADD_OR_AMEND_CLAIM_DOCUMENTS
+                ),
+                of(
+                    false,
+                    CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
                     ACKNOWLEDGE_SERVICE
                 )
             );

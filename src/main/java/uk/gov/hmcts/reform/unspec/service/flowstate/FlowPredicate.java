@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
@@ -28,8 +30,16 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimIssuedDate() != null;
 
+    //Temporary backwards compatibility
+    public static final Predicate<CaseData> needsToBeBackwardsCompatible = caseData ->
+        caseData.getCcdState() != AWAITING_CASE_NOTIFICATION
+            && caseData.getCcdState() != AWAITING_CASE_DETAILS_NOTIFICATION;
+
     public static final Predicate<CaseData> claimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null;
+        caseData.getClaimNotificationDate() != null && caseData.getCcdState() == AWAITING_CASE_DETAILS_NOTIFICATION;
+
+    public static final Predicate<CaseData> claimDetailsNotified = caseData ->
+        caseData.getClaimDetailsNotificationDate() != null;
 
     public static final Predicate<CaseData> respondentAcknowledgeService = caseData ->
         caseData.getRespondent1ClaimResponseIntentionType() != null
@@ -39,7 +49,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> respondentRespondToClaim = caseData ->
         caseData.getRespondent1ClaimResponseDocument() != null
             && caseData.getCcdState() != CLOSED
-            &&  caseData.getCcdState() != STAYED;
+            && caseData.getCcdState() != STAYED;
 
     public static final Predicate<CaseData> applicantRespondToDefence = caseData ->
         caseData.getApplicant1ProceedWithClaim() != null

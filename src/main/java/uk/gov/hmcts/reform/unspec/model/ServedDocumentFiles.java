@@ -26,11 +26,11 @@ public class ServedDocumentFiles {
     public List<String> getErrors() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("More than one particular of claim added");
+            errors.add("More than one Particulars of claim details added");
         }
 
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("One particular of claim is required");
+            errors.add("You must add Particulars of claim details");
         }
         return errors;
     }

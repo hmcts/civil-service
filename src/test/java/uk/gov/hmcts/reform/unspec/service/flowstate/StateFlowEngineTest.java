@@ -291,6 +291,7 @@ class StateFlowEngineTest {
                 "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
+                "AWAITING_CASE_DETAILS_NOTIFICATION",
                 "CASE_PROCEEDS_IN_CASEMAN"
             })
         @ParameterizedTest(name = "{index} => should withdraw claim after claim state {0}")
@@ -318,6 +319,7 @@ class StateFlowEngineTest {
                 "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
+                "AWAITING_CASE_DETAILS_NOTIFICATION",
                 "CASE_PROCEEDS_IN_CASEMAN"
             })
         @ParameterizedTest(name = "{index} => should discontinue claim after claim state {0}")

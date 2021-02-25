@@ -120,6 +120,13 @@ module.exports = function () {
       await event.returnToCaseDetails();
     },
 
+    async notifyClaimDetails() {
+      await caseViewPage.startEvent('Notify claim details', caseId);
+      await this.clickContinue();
+      await event.submit('Submit', 'Defendant notified');
+      await event.returnToCaseDetails();
+    },
+
     async acknowledgeService() {
       await caseViewPage.startEvent('Acknowledge service', caseId);
       await respondentDetails.verifyDetails();

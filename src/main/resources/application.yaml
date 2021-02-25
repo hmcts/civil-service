@@ -90,6 +90,7 @@ reference:
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   respondentSolicitorClaimIssueEmailTemplate: "1e55aae6-879e-4e63-93ce-cf4cf93636f2"
+  respondentSolicitorClaimDetailsEmailTemplate: "642c0bbf-044e-411e-bb90-b25b7f752c7c"
   solicitorResponseToCase: "a2b3d626-bf20-406e-ac8c-8d8a5ea43c66"
   respondentSolicitorAcknowledgeService: "6ba538b6-f3f6-4943-862d-b436c0c3d741"
   failedPayment: "51aee712-459c-4b64-ae82-4e3b81c83da0"

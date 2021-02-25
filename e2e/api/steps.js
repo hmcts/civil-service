@@ -63,7 +63,6 @@ module.exports = {
 
     //field is deleted in about to submit callback
     deleteCaseFields('applicantSolicitor1CheckEmail');
-
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
@@ -95,10 +94,10 @@ module.exports = {
     await validateEventPages(data[eventName]);
 
     await assertError('Upload', data[eventName].invalid.Upload.duplicateError,
-      'More than one particular of claim added');
+      'More than one Particulars of claim details added');
 
     await assertError('Upload', data[eventName].invalid.Upload.nullError,
-      'One particular of claim is required');
+      'You must add Particulars of claim details');
 
     await assertSubmittedEvent('AWAITING_CASE_NOTIFICATION', {
       header: 'Documents uploaded successfully',
@@ -116,6 +115,22 @@ module.exports = {
 
     await assertSubmittedEvent('CREATED', {
       header: 'Notification of claim sent',
+      body: 'What happens next'
+    });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+  },
+
+  notifyClaimDetails: async() => {
+    eventName = 'NOTIFY_DEFENDANT_OF_CLAIM_DETAILS';
+    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
+    assertContainsPopulatedFields(returnedCaseData);
+
+    await validateEventPages(data.ADD_OR_AMEND_CLAIM_DOCUMENTS);
+
+    await assertSubmittedEvent('AWAITING_CASE_DETAILS_NOTIFICATION', {
+      header: 'Defendant notified',
       body: 'What happens next'
     });
 
@@ -159,6 +174,7 @@ module.exports = {
       'The date cannot be in the past and must not be more than a year in the future');
     await assertError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
       'The date cannot be in the past and must not be more than a year in the future');
+
     await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
       header: 'You\'ve submitted your response',
       body: 'We will let you know when they respond.'
@@ -249,6 +265,7 @@ const assertValidData = async (data, pageId) => {
 const assertError = async (pageId, eventData, expectedErrorMessage, responseBodyMessage = 'Unable to proceed because there are one or more callback Errors or Warnings' ) => {
   const response = await apiRequest.validatePage(eventName, pageId, {...caseData, ...eventData}, 422);
   const responseBody = await response.json();
+
   assert.equal(response.status, 422);
   assert.equal(responseBody.message, responseBodyMessage);
   if(responseBody.callbackErrors != null){

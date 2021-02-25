@@ -33,7 +33,7 @@ class ServedDocumentFilesTest {
         void shouldReturnRequiredError_WhenBothParticularsOfClaimFieldsAreNull() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder().build();
 
-            assertThat(servedDocumentFiles.getErrors()).containsOnly("One particular of claim is required");
+            assertThat(servedDocumentFiles.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
         @Test
@@ -43,7 +43,8 @@ class ServedDocumentFilesTest {
                 .particularsOfClaimText("Some string")
                 .build();
 
-            assertThat(servedDocumentFiles.getErrors()).containsOnly("More than one particular of claim added");
+            assertThat(servedDocumentFiles.getErrors())
+                .containsOnly("More than one Particulars of claim details added");
         }
     }
 }

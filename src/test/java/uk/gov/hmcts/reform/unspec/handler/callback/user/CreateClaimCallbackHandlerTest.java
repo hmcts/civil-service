@@ -186,7 +186,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("One particular of claim is required");
+            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
         @Test
@@ -196,7 +196,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("One particular of claim is required");
+            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
         @Test

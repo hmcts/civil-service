@@ -23,7 +23,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
@@ -45,6 +47,14 @@ public class FlowStateAllowedEventService {
         AWAITING_CASE_NOTIFICATION.fullName(),
         List.of(
             NOTIFY_DEFENDANT_OF_CLAIM,
+            ADD_DEFENDANT_LITIGATION_FRIEND,
+            CASE_PROCEEDS_IN_CASEMAN,
+            ADD_OR_AMEND_CLAIM_DOCUMENTS
+        ),
+
+        AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+        List.of(
+            NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
             ADD_DEFENDANT_LITIGATION_FRIEND,
             CASE_PROCEEDS_IN_CASEMAN,
             ADD_OR_AMEND_CLAIM_DOCUMENTS

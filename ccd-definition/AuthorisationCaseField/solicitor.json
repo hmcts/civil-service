@@ -537,5 +537,12 @@
     "CaseFieldID": "detailsOfClaim",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "claimDetailsNotificationDate",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "R"
   }
 ]

@@ -57,6 +57,7 @@ public class CaseData {
     private final LocalDate claimIssuedDate;
     private LocalDateTime confirmationOfServiceDeadline;
     private final LocalDate claimNotificationDate;
+    private final LocalDate claimDetailsNotificationDate;
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
