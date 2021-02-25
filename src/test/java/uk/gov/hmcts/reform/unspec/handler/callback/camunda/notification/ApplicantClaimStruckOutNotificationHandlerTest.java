@@ -67,7 +67,6 @@ class ApplicantClaimStruckOutNotificationHandlerTest {
     private Map<String, String> getExpectedMap() {
         return Map.of(
             "claimReferenceNumber", "000LR001",
-            "claimantName", "Mr. John Rambo",
             "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
             "defendantName", "Mr. Sole Trader"
         );

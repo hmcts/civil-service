@@ -66,8 +66,7 @@ class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
 
     private Map<String, String> getExpectedMap() {
         return Map.of(
-            "claimReferenceNumber", "000LR001",
-            "applicantSolicitorName", "Applicant solicitor name (need to add solicitor name to case data?)"
+            "claimReferenceNumber", "000LR001"
         );
     }
 }

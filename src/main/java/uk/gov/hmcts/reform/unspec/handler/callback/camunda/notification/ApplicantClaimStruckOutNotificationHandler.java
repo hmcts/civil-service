@@ -64,7 +64,6 @@ public class ApplicantClaimStruckOutNotificationHandler extends CallbackHandler 
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );

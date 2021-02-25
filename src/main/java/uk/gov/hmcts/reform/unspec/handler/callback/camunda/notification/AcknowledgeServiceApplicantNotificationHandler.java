@@ -63,7 +63,6 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            SOLICITOR_REFERENCE, "claimant solicitor",
             RESPONSE_DEADLINE, caseData.getRespondentSolicitor1ResponseDeadline().toString()
         );
     }
