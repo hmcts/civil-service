@@ -113,13 +113,13 @@ module.exports = {
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('AWAITING_CASE_DETAILS_NOTIFICATION', {
       header: 'Notification of claim sent',
       body: 'What happens next'
     });
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
   },
 
   notifyClaimDetails: async() => {
@@ -129,7 +129,7 @@ module.exports = {
 
     await validateEventPages(data.ADD_OR_AMEND_CLAIM_DOCUMENTS);
 
-    await assertSubmittedEvent('AWAITING_CASE_DETAILS_NOTIFICATION', {
+    await assertSubmittedEvent('CREATED', {
       header: 'Defendant notified',
       body: 'What happens next'
     });

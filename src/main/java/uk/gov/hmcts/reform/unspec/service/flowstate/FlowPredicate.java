@@ -36,7 +36,7 @@ public class FlowPredicate {
             && caseData.getCcdState() != AWAITING_CASE_DETAILS_NOTIFICATION;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null && caseData.getCcdState() == AWAITING_CASE_DETAILS_NOTIFICATION;
+        caseData.getClaimNotificationDate() != null;
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
         caseData.getClaimDetailsNotificationDate() != null;
