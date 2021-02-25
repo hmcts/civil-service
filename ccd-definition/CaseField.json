@@ -305,7 +305,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "legacyCaseReference",
     "FieldType": "Text",
-    "Label": "CaseMan Reference number",
+    "Label": "CaseMan reference number",
     "SecurityClassification": "Public"
   },
   {
@@ -368,7 +368,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQExperts",
-    "Label": "Experts",
+    "Label": "Respondent 1 experts",
     "FieldType": "Experts",
     "SecurityClassification": "Public"
   },
@@ -376,7 +376,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQWitnesses",
-    "Label": "Witnesses",
+    "Label": "Respondent 1 witnesses",
     "FieldType": "Witnesses",
     "SecurityClassification": "Public"
   },
@@ -489,7 +489,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQExperts",
-    "Label": "Experts",
+    "Label": "Applicant 1 experts",
     "FieldType": "Experts",
     "SecurityClassification": "Public"
   },
@@ -497,7 +497,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQWitnesses",
-    "Label": "Witnesses",
+    "Label": "Applicant 1 witnesses",
     "FieldType": "Witnesses",
     "SecurityClassification": "Public"
   },

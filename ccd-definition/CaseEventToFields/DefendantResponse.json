@@ -157,6 +157,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "Experts",
+    "CaseEventFieldLabel": "Experts",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
     "ShowSummaryChangeOption": "Y"
   },
@@ -169,6 +170,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "Witnesses",
+    "CaseEventFieldLabel": "Witnesses",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\"",
     "ShowSummaryChangeOption": "Y"
   },

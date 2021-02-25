@@ -1,0 +1,100 @@
+[
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "legacyCaseReference",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "solicitorReferences",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "paymentDetails",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "applicant1",
+    "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "respondent1",
+    "TabFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "applicant1DQExperts",
+    "TabFieldDisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "respondent1DQExperts",
+    "TabFieldDisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "applicant1DQWitnesses",
+    "TabFieldDisplayOrder": 8
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "respondent1DQWitnesses",
+    "TabFieldDisplayOrder": 9
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "courtLocation",
+    "TabFieldDisplayOrder": 10
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim Details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "TabFieldDisplayOrder": 11
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim Details",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "TabFieldDisplayOrder": 12
+  }
+]

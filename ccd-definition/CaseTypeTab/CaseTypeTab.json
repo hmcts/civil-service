@@ -50,35 +50,5 @@
     "CaseFieldID": "claimType",
     "TabFieldDisplayOrder": 1,
     "Comment": "Place holder so that we can use claimType show hide conditions in events"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "Channel": "CaseWorker",
-    "TabID": "ClaimDetails",
-    "TabLabel": "Claim Details",
-    "TabDisplayOrder": 4,
-    "CaseFieldID": "legacyCaseReference",
-    "TabFieldDisplayOrder": 1
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "Channel": "CaseWorker",
-    "TabID": "ClaimDetails",
-    "TabLabel": "Claim Details",
-    "TabDisplayOrder": 4,
-    "CaseFieldID": "applicant1OrganisationPolicy",
-    "TabFieldDisplayOrder": 2
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "Channel": "CaseWorker",
-    "TabID": "ClaimDetails",
-    "TabLabel": "Claim Details",
-    "TabDisplayOrder": 4,
-    "CaseFieldID": "respondent1OrganisationPolicy",
-    "TabFieldDisplayOrder": 3
   }
 ]
