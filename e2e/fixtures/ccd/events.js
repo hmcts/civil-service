@@ -58,5 +58,11 @@ module.exports = {
     id: 'CASE_PROCEEDS_IN_CASEMAN',
     name: 'Case proceeds in Caseman',
     order: 9
+  },
+  RESUBMIT_CLAIM: {
+    id: 'RESUBMIT_CLAIM',
+    name: 'Resubmit claim',
+    description: 'Resubmits claim for unsuccessful PBA payment',
+    order: 10
   }
 };

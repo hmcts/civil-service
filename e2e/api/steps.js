@@ -16,6 +16,8 @@ const expectedEvents = require('../fixtures/ccd/expectedEvents.js');
 const data = {
   CREATE_CLAIM: claimData.createClaim,
   CREATE_CLAIM_RESPONDENT_LIP: claimData.createClaimLitigantInPerson,
+  CREATE_CLAIM_TERMINATED_PBA: claimData.createClaimWithTerminatedPBAAccount,
+  RESUBMIT_CLAIM: require('../fixtures/events/resubmitClaim.js'),
   ADD_OR_AMEND_CLAIM_DOCUMENTS: require('../fixtures/events/addOrAmendClaimDocuments.js'),
   ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
@@ -85,6 +87,37 @@ module.exports = {
     deleteCaseFields('applicantSolicitor1CheckEmail');
   },
 
+  createClaimWithFailingPBAAccount: async (user) => {
+    eventName = 'CREATE_CLAIM';
+    caseId = null;
+    caseData = {};
+    await apiRequest.setupTokens(user);
+    await apiRequest.startEvent(eventName);
+    await validateEventPages(data.CREATE_CLAIM_TERMINATED_PBA);
+
+    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
+      header: 'Your claim has been issued',
+      body: 'Follow these steps to serve a claim'
+    }, true);
+    await assignCaseToDefendant(caseId);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PENDING_CASE_ISSUED');
+  },
+
+  resubmitClaim: async (user) => {
+    eventName = 'RESUBMIT_CLAIM';
+    caseData = {};
+    await apiRequest.setupTokens(user);
+    await apiRequest.startEvent(eventName, caseId);
+    await validateEventPages(data.RESUBMIT_CLAIM);
+    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
+      header: 'Claim pending',
+      body: 'What happens next'
+    }, true);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
+  },
+    
   amendClaimDocuments: async () => {
     eventName = 'ADD_OR_AMEND_CLAIM_DOCUMENTS';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);

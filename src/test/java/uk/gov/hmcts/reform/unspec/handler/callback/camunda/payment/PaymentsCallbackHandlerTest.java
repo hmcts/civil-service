@@ -93,8 +93,18 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
+    @Test
+    void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
+        doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+        assertThat(response.getErrors()).isEmpty();
+    }
+
     @ParameterizedTest
-    @ValueSource(ints = {400, 404, 422, 504})
+    @ValueSource(ints = {404, 422, 504})
     void shouldAddError_whenOtherExceptionThrown(int status) {
         doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 

@@ -693,5 +693,13 @@
     "Label": "Case details notification date",
     "FieldType": "Date",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "pbaPaymentFailedLabel",
+    "Label": "#### Your payment did not go through. To resubmit the same claim please try again by selecting the PBA account number",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   }
 ]

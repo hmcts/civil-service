@@ -61,8 +61,13 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .paymentDetails(PaymentDetails.builder().status(SUCCESS).reference(paymentReference).build())
                 .build();
         } catch (FeignException e) {
+            log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessError(caseData, e);
+            } else if (e.status() == 400) {
+                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+                                        caseData.getCcdCaseReference(), e.contentUTF8()
+                ));
             } else {
                 errors.add(ERROR_MESSAGE);
             }
@@ -87,7 +92,8 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .build();
         } catch (JsonProcessingException jsonException) {
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
-                                    caseData.getCcdCaseReference(), e.contentUTF8()));
+                                    caseData.getCcdCaseReference(), e.contentUTF8()
+            ));
             throw e;
         }
     }

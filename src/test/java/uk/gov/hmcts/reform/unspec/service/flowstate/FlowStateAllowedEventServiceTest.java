@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
@@ -206,6 +208,7 @@ class FlowStateAllowedEventServiceTest {
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
+                of(RESUBMIT_CLAIM, new String[]{PAYMENT_FAILED.fullName()}),
                 of(MOVE_TO_STAYED, new String[]{CLAIM_ISSUED.fullName()}),
                 of(ACKNOWLEDGE_SERVICE, new String[]{CLAIM_ISSUED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{AWAITING_CASE_NOTIFICATION.fullName()}),
@@ -214,13 +217,15 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     WITHDRAW_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
-                        SERVICE_ACKNOWLEDGED.fullName(),  RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
+                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(), RESPONDED_TO_CLAIM.fullName(),
+                        FULL_DEFENCE.fullName()
                     }
                 ),
                 of(
                     DISCONTINUE_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
-                        SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
+                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
+                        RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
                     }
                 ),
                 of(

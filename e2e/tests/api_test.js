@@ -38,3 +38,9 @@ Scenario('Create claim and move it to caseman', async (api) => {
   await api.createClaimWithRepresentedRespondent(config.solicitorUser);
   await api.caseProceedsInCaseman();
 });
+
+// This will be enabled when PAY-3817 issue of two minutes is fixed
+Scenario.skip('Resubmit claim after payment failure on PBA account ', async (api) => {
+  await api.createClaimWithFailingPBAAccount(config.solicitorUser);
+  await api.resubmitClaim(config.solicitorUser);
+});
