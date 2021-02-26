@@ -384,7 +384,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQHearing",
-    "Label": "Hearing",
+    "Label": "Respondent 1 Hearing",
     "FieldType": "Hearing",
     "SecurityClassification": "Public"
   },
@@ -417,7 +417,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQHearingSupport",
-    "Label": "Hearing support requirements",
+    "Label": "Respondent 1 Hearing support requirements",
     "FieldType": "HearingSupportRequirements",
     "SecurityClassification": "Public"
   },
@@ -425,7 +425,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQFurtherInformation",
-    "Label": "Further information",
+    "Label": "Respondent 1 Further information",
     "FieldType": "FurtherInformation",
     "SecurityClassification": "Public"
   },
@@ -505,7 +505,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQHearing",
-    "Label": "Hearing",
+    "Label": "Applicant 1 Hearing",
     "FieldType": "Hearing",
     "SecurityClassification": "Public"
   },
@@ -530,7 +530,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQHearingSupport",
-    "Label": "Hearing support requirements",
+    "Label": "Applicant 1 Hearing support requirements",
     "FieldType": "HearingSupportRequirements",
     "SecurityClassification": "Public"
   },
@@ -538,7 +538,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1DQFurtherInformation",
-    "Label": "Further information",
+    "Label": "Applicant 1 Further information",
     "FieldType": "FurtherInformation",
     "SecurityClassification": "Public"
   },

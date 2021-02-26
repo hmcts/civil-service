@@ -1,0 +1,50 @@
+[
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQHearing",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQHearing",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQFurtherInformation",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQFurtherInformation",
+    "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQHearingSupport",
+    "TabFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQHearingSupport",
+    "TabFieldDisplayOrder": 6
+  }
+]

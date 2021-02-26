@@ -150,6 +150,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "Hearing",
+    "CaseEventFieldLabel": "Hearing",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND applicant1ProceedWithClaim = \"Yes\"",
     "ShowSummaryChangeOption": "Y",
     "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
@@ -187,6 +188,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "OPTIONAL",
     "PageID": "HearingSupport",
+    "CaseEventFieldLabel": "Hearing support requirements",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND applicant1ProceedWithClaim = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
@@ -199,6 +201,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "FurtherInformation",
+    "CaseEventFieldLabel": "Further information",
     "PageShowCondition": "respondent1ClaimResponseType=\"FULL_DEFENCE\" AND applicant1ProceedWithClaim = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
