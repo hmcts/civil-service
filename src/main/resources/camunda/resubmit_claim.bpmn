@@ -8,172 +8,92 @@
     <bpmn:endEvent id="Event_0r8yo0r">
       <bpmn:incoming>Flow_1hce35l</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1hce35l" sourceRef="Activity_0wretog" targetRef="Event_0r8yo0r" />
-    <bpmn:callActivity id="Activity_0wretog" name="End Business Process" calledElement="EndBusinessProcess">
+    <bpmn:sequenceFlow id="Flow_1hce35l" sourceRef="Activity_EndBusinessProcess" targetRef="Event_0r8yo0r" />
+    <bpmn:callActivity id="Activity_EndBusinessProcess" name="End Business Process" calledElement="EndBusinessProcess">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0r8knfm</bpmn:incoming>
+      <bpmn:incoming>Flow_1gb7fg7</bpmn:incoming>
       <bpmn:outgoing>Flow_1hce35l</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:serviceTask id="MakePBAPayment" name="Make PBA Payment" camunda:type="external" camunda:topic="processPayment">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">MAKE_PBA_PAYMENT</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_16mwagj</bpmn:incoming>
-      <bpmn:outgoing>Flow_0378r6q</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="CreateClaimPaymentFailedNotifyApplicantSolicitor1" name="Notify applicant solicitor 1" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_Payment_Failure</bpmn:incoming>
-      <bpmn:outgoing>Flow_NotifiedApplicantSolicitor1</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_Payment_Status">
-      <bpmn:incoming>Flow_0378r6q</bpmn:incoming>
-      <bpmn:outgoing>Flow_Payment_Failure</bpmn:outgoing>
-      <bpmn:outgoing>Flow_Payment_Successful</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_Payment_Failure" name="Payment failure" sourceRef="Gateway_Payment_Status" targetRef="CreateClaimPaymentFailedNotifyApplicantSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PAYMENT_FAILED"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0378r6q" sourceRef="MakePBAPayment" targetRef="Gateway_Payment_Status" />
-    <bpmn:serviceTask id="GenerateClaimForm" name="Generate claim form" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">GENERATE_CLAIM_FORM</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_Payment_Successful</bpmn:incoming>
-      <bpmn:outgoing>Flow_GeneratedClaimForm</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_Payment_Successful" name="Payment successful" sourceRef="Gateway_Payment_Status" targetRef="GenerateClaimForm">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PAYMENT_SUCCESSFUL"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_NotifiedApplicantSolicitor1" sourceRef="CreateClaimPaymentFailedNotifyApplicantSolicitor1" targetRef="Gateway_10sjddr" />
-    <bpmn:callActivity id="Activity_0y089q8" name="Start Business Process" calledElement="StartBusinessProcess">
+    <bpmn:callActivity id="Activity_StartBusinessProcess" name="Start Business Process" calledElement="StartBusinessProcess">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
         <camunda:out variables="all" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1if0h68</bpmn:incoming>
-      <bpmn:outgoing>Flow_16mwagj</bpmn:outgoing>
+      <bpmn:outgoing>Flow_05gyofk</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:endEvent id="Event_1mtqud7">
       <bpmn:incoming>Flow_0h072ea</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:boundaryEvent id="Event_0o3sg3o" name="Abort" attachedToRef="Activity_0y089q8">
+    <bpmn:boundaryEvent id="Event_0o3sg3o" name="Abort" attachedToRef="Activity_StartBusinessProcess">
       <bpmn:outgoing>Flow_0h072ea</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_0uj9pwb" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0h072ea" sourceRef="Event_0o3sg3o" targetRef="Event_1mtqud7" />
-    <bpmn:sequenceFlow id="Flow_1if0h68" sourceRef="Event_0t2zome" targetRef="Activity_0y089q8" />
-    <bpmn:exclusiveGateway id="Gateway_10sjddr">
-      <bpmn:incoming>Flow_GeneratedClaimForm</bpmn:incoming>
-      <bpmn:incoming>Flow_NotifiedApplicantSolicitor1</bpmn:incoming>
-      <bpmn:outgoing>Flow_0r8knfm</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_GeneratedClaimForm" sourceRef="GenerateClaimForm" targetRef="Gateway_10sjddr" />
-    <bpmn:sequenceFlow id="Flow_0r8knfm" sourceRef="Gateway_10sjddr" targetRef="Activity_0wretog" />
-    <bpmn:sequenceFlow id="Flow_16mwagj" sourceRef="Activity_0y089q8" targetRef="MakePBAPayment" />
+    <bpmn:sequenceFlow id="Flow_1if0h68" sourceRef="Event_0t2zome" targetRef="Activity_StartBusinessProcess" />
+    <bpmn:callActivity id="ResubmitClaimMakePBAPayment" name="Make PBA Payment" calledElement="MakePBAPaymentProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05gyofk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gb7fg7</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_05gyofk" sourceRef="Activity_StartBusinessProcess" targetRef="ResubmitClaimMakePBAPayment" />
+    <bpmn:sequenceFlow id="Flow_1gb7fg7" sourceRef="ResubmitClaimMakePBAPayment" targetRef="Activity_EndBusinessProcess" />
   </bpmn:process>
   <bpmn:message id="Message_0slk3de" name="RESUBMIT_CLAIM" />
   <bpmn:error id="Error_0t2ju7k" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmn:error id="Error_1237qii" name="StartBusinessAbort" errorCode="ABORT" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="RESUBMIT_CLAIM_PROCESS_ID">
-      <bpmndi:BPMNEdge id="Flow_16mwagj_di" bpmnElement="Flow_16mwagj">
-        <di:waypoint x="330" y="250" />
-        <di:waypoint x="430" y="250" />
+      <bpmndi:BPMNEdge id="Flow_1gb7fg7_di" bpmnElement="Flow_1gb7fg7">
+        <di:waypoint x="580" y="250" />
+        <di:waypoint x="720" y="250" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0r8knfm_di" bpmnElement="Flow_0r8knfm">
-        <di:waypoint x="1005" y="250" />
-        <di:waypoint x="1050" y="250" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_082v92m_di" bpmnElement="Flow_GeneratedClaimForm">
-        <di:waypoint x="880" y="180" />
-        <di:waypoint x="980" y="180" />
-        <di:waypoint x="980" y="225" />
+      <bpmndi:BPMNEdge id="Flow_05gyofk_di" bpmnElement="Flow_05gyofk">
+        <di:waypoint x="370" y="250" />
+        <di:waypoint x="480" y="250" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1if0h68_di" bpmnElement="Flow_1if0h68">
-        <di:waypoint x="188" y="250" />
-        <di:waypoint x="230" y="250" />
+        <di:waypoint x="158" y="250" />
+        <di:waypoint x="270" y="250" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0h072ea_di" bpmnElement="Flow_0h072ea">
-        <di:waypoint x="280" y="192" />
-        <di:waypoint x="280" y="158" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_03nv8cj_di" bpmnElement="Flow_NotifiedApplicantSolicitor1">
-        <di:waypoint x="880" y="320" />
-        <di:waypoint x="980" y="320" />
-        <di:waypoint x="980" y="275" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13gsvoo_di" bpmnElement="Flow_Payment_Successful">
-        <di:waypoint x="650" y="225" />
-        <di:waypoint x="650" y="180" />
-        <di:waypoint x="780" y="180" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="667" y="196" width="52" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0378r6q_di" bpmnElement="Flow_0378r6q">
-        <di:waypoint x="530" y="250" />
-        <di:waypoint x="625" y="250" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1rm2cb6_di" bpmnElement="Flow_Payment_Failure">
-        <di:waypoint x="650" y="275" />
-        <di:waypoint x="650" y="320" />
-        <di:waypoint x="780" y="320" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="661" y="293" width="77" height="14" />
-        </bpmndi:BPMNLabel>
+        <di:waypoint x="320" y="192" />
+        <di:waypoint x="320" y="148" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1hce35l_di" bpmnElement="Flow_1hce35l">
-        <di:waypoint x="1150" y="250" />
-        <di:waypoint x="1192" y="250" />
+        <di:waypoint x="820" y="250" />
+        <di:waypoint x="962" y="250" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1m02c2o_di" bpmnElement="Event_0t2zome">
-        <dc:Bounds x="152" y="232" width="36" height="36" />
+        <dc:Bounds x="122" y="232" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="158" y="275" width="24" height="14" />
+          <dc:Bounds x="128" y="275" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0r8yo0r_di" bpmnElement="Event_0r8yo0r">
-        <dc:Bounds x="1192" y="232" width="36" height="36" />
+        <dc:Bounds x="962" y="232" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1x5rl4x_di" bpmnElement="Activity_0wretog">
-        <dc:Bounds x="1050" y="210" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1x5rl4x_di" bpmnElement="Activity_EndBusinessProcess">
+        <dc:Bounds x="720" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0nw0wrg_di" bpmnElement="MakePBAPayment">
-        <dc:Bounds x="430" y="210" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_03lhz3m_di" bpmnElement="CreateClaimPaymentFailedNotifyApplicantSolicitor1">
-        <dc:Bounds x="780" y="280" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1tjkoh7_di" bpmnElement="Gateway_Payment_Status" isMarkerVisible="true">
-        <dc:Bounds x="625" y="225" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0r61zq5_di" bpmnElement="GenerateClaimForm">
-        <dc:Bounds x="780" y="140" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0y089q8_di" bpmnElement="Activity_0y089q8">
-        <dc:Bounds x="230" y="210" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0y089q8_di" bpmnElement="Activity_StartBusinessProcess">
+        <dc:Bounds x="270" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1mtqud7_di" bpmnElement="Event_1mtqud7">
-        <dc:Bounds x="262" y="122" width="36" height="36" />
+        <dc:Bounds x="302" y="112" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_10sjddr_di" bpmnElement="Gateway_10sjddr" isMarkerVisible="true">
-        <dc:Bounds x="955" y="225" width="50" height="50" />
+      <bpmndi:BPMNShape id="Activity_0y0vw7e_di" bpmnElement="ResubmitClaimMakePBAPayment">
+        <dc:Bounds x="480" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0o3sg3o_di" bpmnElement="Event_0o3sg3o">
-        <dc:Bounds x="262" y="192" width="36" height="36" />
+        <dc:Bounds x="302" y="192" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="296" y="173" width="27" height="14" />
+          <dc:Bounds x="336" y="173" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

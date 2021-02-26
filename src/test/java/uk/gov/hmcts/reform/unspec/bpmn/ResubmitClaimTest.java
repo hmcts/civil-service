@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.bpmn;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +29,11 @@ class ResubmitClaimTest extends BpmnBaseTest {
 
     public ResubmitClaimTest() {
         super("resubmit_claim.bpmn", "RESUBMIT_CLAIM_PROCESS_ID");
+    }
+
+    @BeforeEach
+    void deployPbaPayment() {
+        deployDiagram("make_pba_payment.bpmn");
     }
 
     @Test
