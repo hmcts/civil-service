@@ -64,7 +64,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim(PART_ADMISSION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(PART_ADMISSION).build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());
@@ -78,7 +78,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim(FULL_ADMISSION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_ADMISSION).build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());
@@ -92,7 +92,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim(COUNTER_CLAIM).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(COUNTER_CLAIM).build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());

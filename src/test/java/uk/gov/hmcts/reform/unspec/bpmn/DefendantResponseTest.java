@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.unspec.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 
 class DefendantResponseTest extends BpmnBaseTest {
 
@@ -93,7 +93,7 @@ class DefendantResponseTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyCompleteOnlineFullDefenceResponse() {
+    void shouldSuccessfullyCompleteOnline_whenRespondentFullDefenceResponse() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -104,7 +104,7 @@ class DefendantResponseTest extends BpmnBaseTest {
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
 
         VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, RESPONDED_TO_CLAIM.fullName());
+        variables.putValue(FLOW_STATE, RESPONDENT_FULL_DEFENCE.fullName());
 
         assertCompleteExternalTask(
             startBusiness,

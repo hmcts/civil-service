@@ -39,14 +39,14 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
 @SpringBootTest(classes = {
@@ -75,8 +75,8 @@ class FlowStateAllowedEventServiceTest {
                 of(CaseDataBuilder.builder().atStateClaimCreated().build(), CLAIM_ISSUED),
                 of(CaseDataBuilder.builder().atStateClaimStayed().build(), CLAIM_STAYED),
                 of(CaseDataBuilder.builder().atStateServiceAcknowledge().build(), SERVICE_ACKNOWLEDGED),
-                of(CaseDataBuilder.builder().atStateRespondedToClaim().build(), RESPONDED_TO_CLAIM),
-                of(CaseDataBuilder.builder().atStateFullDefence().build(), CLAIM_STAYED)
+                of(CaseDataBuilder.builder().atStateRespondentFullDefence().build(), RESPONDENT_FULL_DEFENCE),
+                of(CaseDataBuilder.builder().atStateApplicantRespondToDefence().build(), CLAIM_STAYED)
             );
         }
     }
@@ -140,16 +140,16 @@ class FlowStateAllowedEventServiceTest {
         }
 
         @Test
-        void shouldReturnValidEvents_whenFlowStateIsRespondToClaim() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDED_TO_CLAIM.fullName()))
+        void shouldReturnValidEvents_whenFlowStateIsRespondentFullDefence() {
+            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDENT_FULL_DEFENCE.fullName()))
                 .containsExactlyInAnyOrder(CLAIMANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
                                            DISCONTINUE_CLAIM, MOVE_CLAIM_TO_STRUCK_OUT, CASE_PROCEEDS_IN_CASEMAN
                 );
         }
 
         @Test
-        void shouldReturnValidEvents_whenFlowStateIsFullDefence() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(FULL_DEFENCE.fullName()))
+        void shouldReturnValidEvents_whenFlowStateIsApplicantRespondToDefence() {
+            assertThat(flowStateAllowedEventService.getAllowedEvents(APPLICANT_RESPOND_TO_DEFENCE.fullName()))
                 .containsExactlyInAnyOrder(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM, DISCONTINUE_CLAIM,
                                            CASE_PROCEEDS_IN_CASEMAN
                 );
@@ -181,8 +181,8 @@ class FlowStateAllowedEventServiceTest {
             "AWAITING_CASE_DETAILS_NOTIFICATION,CASE_PROCEEDS_IN_CASEMAN",
             "AWAITING_CASE_DETAILS_NOTIFICATION,ADD_OR_AMEND_CLAIM_DOCUMENTS",
             "SERVICE_ACKNOWLEDGED,DEFENDANT_RESPONSE",
-            "RESPONDED_TO_CLAIM,CLAIMANT_RESPONSE",
-            "RESPONDED_TO_CLAIM,DISCONTINUE_CLAIM"
+            "RESPONDENT_FULL_DEFENCE,CLAIMANT_RESPONSE",
+            "RESPONDENT_FULL_DEFENCE,DISCONTINUE_CLAIM"
         })
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
             assertTrue(flowStateAllowedEventService.isAllowedOnState(flowState.fullName(), caseEvent));
@@ -194,7 +194,7 @@ class FlowStateAllowedEventServiceTest {
             "CLAIM_STAYED,DEFENDANT_RESPONSE",
             "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
             "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_SERVICE",
-            "FULL_DEFENCE,ACKNOWLEDGE_SERVICE"
+            "APPLICANT_RESPOND_TO_DEFENCE,ACKNOWLEDGE_SERVICE"
         })
         void shouldReturnFalse_whenEventIsNotAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
             assertFalse(flowStateAllowedEventService.isAllowedOnState(flowState.fullName(), caseEvent));
@@ -212,34 +212,34 @@ class FlowStateAllowedEventServiceTest {
                 of(MOVE_TO_STAYED, new String[]{CLAIM_ISSUED.fullName()}),
                 of(ACKNOWLEDGE_SERVICE, new String[]{CLAIM_ISSUED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{AWAITING_CASE_NOTIFICATION.fullName()}),
-                of(CLAIMANT_RESPONSE, new String[]{RESPONDED_TO_CLAIM.fullName()}),
+                of(CLAIMANT_RESPONSE, new String[]{RESPONDENT_FULL_DEFENCE.fullName()}),
                 of(DEFENDANT_RESPONSE, new String[]{SERVICE_ACKNOWLEDGED.fullName()}),
                 of(
                     WITHDRAW_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
-                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(), RESPONDED_TO_CLAIM.fullName(),
-                        FULL_DEFENCE.fullName()
+                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
+                        APPLICANT_RESPOND_TO_DEFENCE.fullName()
                     }
                 ),
                 of(
                     DISCONTINUE_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
                         SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
-                        RESPONDED_TO_CLAIM.fullName(), FULL_DEFENCE.fullName()
+                        RESPONDENT_FULL_DEFENCE.fullName(), APPLICANT_RESPOND_TO_DEFENCE.fullName()
                     }
                 ),
                 of(
                     CASE_PROCEEDS_IN_CASEMAN,
                     new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(),
-                        FULL_DEFENCE.fullName()
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
+                        APPLICANT_RESPOND_TO_DEFENCE.fullName()
                     }
                 ),
                 of(
                     ADD_DEFENDANT_LITIGATION_FRIEND,
                     new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDED_TO_CLAIM.fullName(),
-                        FULL_DEFENCE.fullName()
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
+                        APPLICANT_RESPOND_TO_DEFENCE.fullName()
                     }
                 ),
                 of(

@@ -33,7 +33,7 @@ import java.util.Locale;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N181;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.unwrapElements;
 
 @Service
@@ -61,7 +61,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        DQ dq = state.equals(RESPONDED_TO_CLAIM.fullName()) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+        DQ dq = state.equals(RESPONDENT_FULL_DEFENCE.fullName()) ? caseData.getRespondent1DQ()
+            : caseData.getApplicant1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))

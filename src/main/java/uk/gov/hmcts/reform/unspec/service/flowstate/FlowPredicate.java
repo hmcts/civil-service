@@ -46,7 +46,7 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseDocument() == null
             && caseData.getCcdState() != CLOSED;
 
-    public static final Predicate<CaseData> respondentRespondToClaim = caseData ->
+    public static final Predicate<CaseData> respondentFullDefence = caseData ->
         caseData.getRespondent1ClaimResponseDocument() != null
             && caseData.getCcdState() != CLOSED
             && caseData.getCcdState() != STAYED;

@@ -244,10 +244,10 @@ public class CaseDataBuilder {
                 return atStateClaimStayed();
             case SERVICE_ACKNOWLEDGED:
                 return atStateServiceAcknowledge();
-            case RESPONDED_TO_CLAIM:
-                return atStateRespondedToClaim();
-            case FULL_DEFENCE:
-                return atStateFullDefence();
+            case RESPONDENT_FULL_DEFENCE:
+                return atStateRespondentFullDefence();
+            case APPLICANT_RESPOND_TO_DEFENCE:
+                return atStateApplicantRespondToDefence();
             case CLAIM_WITHDRAWN:
                 return atStateClaimWithdrawn();
             case CLAIM_DISCONTINUED:
@@ -421,33 +421,31 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondedToClaim() {
-        atStateRespondedToClaim(RespondentResponseType.FULL_DEFENCE);
+    public CaseDataBuilder atStateRespondentFullDefence() {
+        atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
         return this;
     }
 
-    public CaseDataBuilder atStateRespondedToClaim(RespondentResponseType respondentResponseType) {
+    public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
         atStateServiceAcknowledge();
         respondent1ClaimResponseType = respondentResponseType;
-        if (respondentResponseType == RespondentResponseType.FULL_DEFENCE) {
-            respondent1ClaimResponseDocument = ResponseDocument.builder()
-                .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
-                .build();
-            respondent1DQ();
-        }
         applicantSolicitorResponseDeadlineToRespondentSolicitor1 = APPLICANT_RESPONSE_DEADLINE;
         ccdState = AWAITING_CLAIMANT_INTENTION;
         return this;
     }
 
     public CaseDataBuilder atStateProceedsOfflineAdmissionOrCounterClaim() {
-        atStateRespondedToClaim();
+        atStateRespondentFullDefence();
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
         return this;
     }
 
-    public CaseDataBuilder atStateFullDefence() {
-        atStateRespondedToClaim();
+    public CaseDataBuilder atStateApplicantRespondToDefence() {
+        atStateRespondentFullDefence();
         applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())

@@ -155,7 +155,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
-            var params = callbackParamsOf(CaseDataBuilder.builder().atStateFullDefence().build(), ABOUT_TO_SUBMIT);
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atStateApplicantRespondToDefence().build(),
+                ABOUT_TO_SUBMIT
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -166,7 +169,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateBusinessProcess_whenNotAtFullDefenceState() {
-            var params = callbackParamsOf(CaseDataBuilder.builder().atStateRespondedToClaim().build(), ABOUT_TO_SUBMIT);
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atStateRespondentFullDefence().build(),
+                ABOUT_TO_SUBMIT
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -180,7 +186,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateFullDefence()
+                .atStateApplicantRespondToDefence()
                 .applicant1ProceedWithClaim(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -199,7 +205,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateFullDefence()
+                .atStateApplicantRespondToDefence()
                 .applicant1ProceedWithClaim(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
