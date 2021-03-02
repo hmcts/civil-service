@@ -246,6 +246,12 @@ public class CaseDataBuilder {
                 return atStateServiceAcknowledge();
             case RESPONDENT_FULL_DEFENCE:
                 return atStateRespondentFullDefence();
+            case RESPONDENT_FULL_ADMISSION:
+                return atStateRespondentFullAdmission();
+            case RESPONDENT_PART_ADMISSION:
+                return atStateRespondentPartAdmission();
+            case RESPONDENT_COUNTER_CLAIM:
+                return atStateRespondentCounterClaim();
             case APPLICANT_RESPOND_TO_DEFENCE:
                 return atStateApplicantRespondToDefence();
             case CLAIM_WITHDRAWN:
@@ -427,6 +433,21 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullAdmission() {
+        atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentPartAdmission() {
+        atStateRespondentRespondToClaim(RespondentResponseType.PART_ADMISSION);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentCounterClaim() {
+        atStateRespondentRespondToClaim(RespondentResponseType.COUNTER_CLAIM);
         return this;
     }
 

@@ -44,10 +44,10 @@
       <bpmn:outgoing>Flow_01e5t4p</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_17u38kw" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseFullDefenceNotifyApplicantSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.RESPONDED_TO_CLAIM" or flowState == "MAIN.RESPONDENT_FULL_DEFENCE"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.RESPONDENT_FULL_DEFENCE"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_01e5t4p" sourceRef="Gateway_1q9qem9" targetRef="DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState != "MAIN.RESPONDED_TO_CLAIM" and flowState != "MAIN.RESPONDENT_FULL_DEFENCE"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState != "MAIN.RESPONDENT_FULL_DEFENCE"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0qgvakl" sourceRef="DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1" targetRef="NotifyRoboticsOnCaseHandedOffline" />
     <bpmn:endEvent id="Event_15p049m">
