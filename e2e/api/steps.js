@@ -50,11 +50,11 @@ module.exports = {
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM);
 
-    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim has been issued',
-      body: 'Follow these steps to serve a claim'
-    }, true);
-    await assignCaseToDefendant(caseId);
+     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
+       header: 'Your claim has been issued',
+       body: 'You have until DATE to notify the defendant of the claim and claim details.'
+     }, true);
+     await assignCaseToDefendant(caseId);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
@@ -95,10 +95,9 @@ module.exports = {
     await apiRequest.setupTokens(user);
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM_TERMINATED_PBA);
-
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
       header: 'Your claim has been issued',
-      body: 'Follow these steps to serve a claim'
+      body: 'You have until DATE to notify the defendant of the claim and claim details.'
     }, true);
     await assignCaseToDefendant(caseId);
 
@@ -118,7 +117,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
   },
-    
+
   amendClaimDocuments: async () => {
     eventName = 'ADD_OR_AMEND_CLAIM_DOCUMENTS';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
