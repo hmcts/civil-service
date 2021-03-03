@@ -316,7 +316,7 @@
     "PageID": "PbaNumber",
     "PageDisplayOrder": 16,
     "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y",
+    "ShowSummaryChangeOption": "N",
     "FieldShowCondition": "applicantSolicitor1PbaAccountsIsEmpty = \"No\""
   },
   {
@@ -329,7 +329,7 @@
     "PageID": "PbaNumber",
     "PageDisplayOrder": 16,
     "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y",
+    "ShowSummaryChangeOption": "N",
     "FieldShowCondition": "applicantSolicitor1PbaAccountsIsEmpty = \"Yes\""
   },
   {
