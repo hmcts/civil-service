@@ -16,7 +16,7 @@ Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.createCase();
 
   caseNumber = await I.grabCaseNumber();
-  await I.see(`Case #${caseId()} has been created.`);
+  await I.see(`Case ${caseNumber} has been created.`);
 });
 
 Scenario('Solicitor notifies defendant solicitor of claim', async (I) => {
