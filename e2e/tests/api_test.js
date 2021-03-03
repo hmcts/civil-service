@@ -22,6 +22,10 @@ Scenario('Acknowledge service', async (api) => {
   await api.acknowledgeService();
 });
 
+Scenario('Inform agreed extension date', async (api) => {
+  await api.informAgreedExtensionDate();
+});
+
 Scenario('Defendant response', async (api) => {
   await api.defendantResponse();
 });

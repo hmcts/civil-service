@@ -34,6 +34,11 @@ Scenario('Solicitor acknowledges service', async (I) => {
   await I.see(caseEventMessage('Acknowledge service'));
 });
 
+Scenario('Solicitor requests deadline extension', async (I) => {
+  await I.informAgreedExtensionDate();
+  await I.see(caseEventMessage('Inform agreed extension date'));
+});
+
 Scenario('Solicitor adds defendant litigation friend', async (I) => {
   await I.addDefendantLitigationFriend();
   await I.see(caseEventMessage('Add litigation friend'));

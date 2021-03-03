@@ -24,6 +24,8 @@ const paymentReferencePage = require('./pages/createClaim/paymentReference.page'
 
 const responseIntentionPage = require('./pages/acknowledgeSerivce/responseIntention.page');
 
+const extensionDatePage = require('./pages/informAgreedExtensionDate/date.page');
+
 const responseTypePage = require('./pages/respondToClaim/responseType.page');
 const uploadResponsePage = require('./pages/respondToClaim/uploadResponseDocument.page');
 
@@ -133,6 +135,13 @@ module.exports = function () {
       await confirmDetailsPage.confirmReference();
       await responseIntentionPage.selectResponseIntention();
       await event.submit('Acknowledge service', 'You\'ve acknowledged service');
+      await event.returnToCaseDetails();
+    },
+
+    async informAgreedExtensionDate() {
+      await caseViewPage.startEvent('Inform agreed extension date', caseId);
+      await extensionDatePage.enterExtensionDate();
+      await event.submit('Submit', 'Extension deadline submitted');
       await event.returnToCaseDetails();
     },
 

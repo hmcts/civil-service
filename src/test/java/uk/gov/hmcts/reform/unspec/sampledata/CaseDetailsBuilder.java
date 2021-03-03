@@ -79,6 +79,13 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder atStateExtensionRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = CREATED.name();
+        return this;
+    }
+
     public CaseDetailsBuilder atStateRespondedToClaim() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
         this.data = mapper.convertValue(caseData, Map.class);

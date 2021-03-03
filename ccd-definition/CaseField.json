@@ -226,6 +226,15 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1AgreedDeadlineExtension",
+    "Label": "Enter the extension date that was agreed with the other party",
+    "HintText": "This date cannot be more than 28 days from the original deadline.",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "systemGeneratedCaseDocuments",
     "Label": "System generated Case Documents",
     "FieldType": "Collection",

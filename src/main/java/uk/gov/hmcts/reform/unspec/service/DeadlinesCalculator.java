@@ -13,6 +13,7 @@ import java.time.LocalTime;
 public class DeadlinesCalculator {
 
     public static final LocalTime MID_NIGHT = LocalTime.of(23, 59, 59);
+    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0);
 
     private final WorkingDayIndicator workingDayIndicator;
 

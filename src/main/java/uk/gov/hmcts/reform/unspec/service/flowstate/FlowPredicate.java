@@ -82,6 +82,9 @@ public class FlowPredicate {
         caseData.getWithdrawClaim() != null
             && caseData.getCcdState() == CLOSED;
 
+    public static final Predicate<CaseData> respondentAgreedExtension = caseData ->
+        caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null;
+
     public static final Predicate<CaseData> claimDiscontinued = caseData ->
         caseData.getDiscontinueClaim() != null
             && caseData.getCcdState() == CLOSED;

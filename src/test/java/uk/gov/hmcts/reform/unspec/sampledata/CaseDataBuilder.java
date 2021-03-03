@@ -96,6 +96,8 @@ public class CaseDataBuilder {
     private LocalDate claimDetailsNotificationDate;
     private CorrectEmail applicantSolicitor1CheckEmail;
     private IdamUserDetails applicantSolicitor1UserDetails;
+    //Deadline extension
+    private LocalDate respondentSolicitor1AgreedDeadlineExtension;
     //Acknowledge Service
     private ResponseIntention respondent1ClaimResponseIntentionType;
     // Defendant Response
@@ -119,6 +121,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor1ResponseDeadline(LocalDateTime respondentSolicitor1ResponseDeadline) {
         this.respondentSolicitor1ResponseDeadline = respondentSolicitor1ResponseDeadline;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
         return this;
     }
 
@@ -258,6 +265,8 @@ public class CaseDataBuilder {
                 return atStateAwaitingCaseDetailsNotification();
             case CLAIM_ISSUED:
                 return atStateClaimCreated();
+            case EXTENSION_REQUESTED:
+                return atStateExtensionRequested();
             case CLAIM_STAYED:
                 return atStateClaimStayed();
             case SERVICE_ACKNOWLEDGED:
@@ -430,6 +439,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateExtensionRequested() {
+        atStateServiceAcknowledge();
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimStayed() {
         atStateClaimCreated();
         ccdState = STAYED;
@@ -539,6 +554,8 @@ public class CaseDataBuilder {
             .claimDetailsNotificationDate(claimDetailsNotificationDate)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
+            //Deadline extension
+            .respondentSolicitor1AgreedDeadlineExtension(respondentSolicitor1AgreedDeadlineExtension)
             // Acknowledge Service
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
             // Defendant Response

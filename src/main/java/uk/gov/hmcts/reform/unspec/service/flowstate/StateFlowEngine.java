@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.payment
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeService;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAgreedExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullDefence;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FLOW_NAME;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
@@ -83,6 +85,15 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_STAYED).onlyIf(schedulerStayClaim)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
             .state(SERVICE_ACKNOWLEDGED)
+                .transitionTo(EXTENSION_REQUESTED).onlyIf(respondentAgreedExtension)
+                .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
+                .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
+                .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+            .state(EXTENSION_REQUESTED)
+                .transitionTo(RESPONDENT_FULL_DEFENCE).onlyIf(respondentFullDefence)
+                .transitionTo(RESPONDENT_FULL_ADMISSION).onlyIf(respondentFullAdmission)
+                .transitionTo(RESPONDENT_PART_ADMISSION).onlyIf(respondentPartAdmission)
+                .transitionTo(RESPONDENT_COUNTER_CLAIM).onlyIf(respondentCounterClaim)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)

@@ -20,6 +20,7 @@ const data = {
   RESUBMIT_CLAIM: require('../fixtures/events/resubmitClaim.js'),
   ADD_OR_AMEND_CLAIM_DOCUMENTS: require('../fixtures/events/addOrAmendClaimDocuments.js'),
   ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
+  INFORM_AGREED_EXTENSION_DATE: require('../fixtures/events/informAgreeExtensionDate.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
   ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
@@ -186,6 +187,29 @@ module.exports = {
     await assertSubmittedEvent('CREATED', {
       header: 'You\'ve acknowledged service',
       body: 'You need to respond before'
+    }, true);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+  },
+
+  informAgreedExtensionDate: async () => {
+    eventName = 'INFORM_AGREED_EXTENSION_DATE';
+    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
+    assertContainsPopulatedFields(returnedCaseData);
+    caseData = returnedCaseData;
+    deleteCaseFields('systemGeneratedCaseDocuments');
+
+    await validateEventPages(data[eventName]);
+
+    await assertError('ExtensionDate', data[eventName].invalid.ExtensionDate.past,
+      'The agreed extension date must be a date in the future');
+    await assertError('ExtensionDate', data[eventName].invalid.ExtensionDate.beforeCurrentDeadline,
+      'The agreed extension date must be after the current deadline');
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'Extension deadline submitted',
+      body: 'What happens next'
     }, true);
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');

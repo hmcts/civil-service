@@ -551,5 +551,12 @@
     "CaseFieldID": "paymentDetails",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "R"
-  }
+  },  
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1AgreedDeadlineExtension",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  } 
 ]

@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +86,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         //TODO: There will be in separate ticket for response deadline when requirement is confirmed
         CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0))
+            .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(END_OF_BUSINESS_DAY))
             .defendantResponseDate(now())
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
             .build();

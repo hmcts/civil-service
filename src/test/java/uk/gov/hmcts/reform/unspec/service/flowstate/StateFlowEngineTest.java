@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM;
@@ -198,6 +199,26 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
                     AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
                     CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName()
+                );
+        }
+
+        @Test
+        void shouldReturnExtensionRequested_whenCaseDataAtStateExtensionRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(EXTENSION_REQUESTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+                    CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(), EXTENSION_REQUESTED.fullName()
                 );
         }
 
