@@ -73,9 +73,7 @@ unspecified:
   system-update:
     username: 'civil-system-update@mailnesia.com'
     password: 'Password12!'
-
-cross:
-  access:
+  cross-access:
     username: 'caseworker-caa@mailnesia.com'
     password: 'Password12!'
 

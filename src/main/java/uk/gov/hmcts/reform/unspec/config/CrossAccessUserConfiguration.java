@@ -11,8 +11,8 @@ public class CrossAccessUserConfiguration {
     private final String userName;
     private final String password;
 
-    public CrossAccessUserConfiguration(@Value("${cross.access.username}") String userName,
-                                        @Value("${cross.access.password}") String password) {
+    public CrossAccessUserConfiguration(@Value("${unspecified.cross-access.username}") String userName,
+                                        @Value("${unspecified.cross-access.password}") String password) {
         this.userName = userName;
         this.password = password;
     }

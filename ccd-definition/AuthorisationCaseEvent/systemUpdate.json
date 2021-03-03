@@ -166,5 +166,12 @@
     "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseEventID": "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
   }
 ]

@@ -12,7 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.unspec.enums.CaseRole;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 
 @Api
 @Slf4j
@@ -27,11 +32,19 @@ import uk.gov.hmcts.reform.unspec.service.CoreCaseUserService;
 public class AssignCaseSupportController {
 
     private final CoreCaseUserService coreCaseUserService;
+    private final IdamClient idamClient;
+    private final OrganisationService organisationService;
+    private final AuthTokenGenerator authTokenGenerator;
 
     @PostMapping("/assign-case/{caseId}")
     @ApiOperation("Assign case to defendant")
     public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                            @PathVariable("caseId") String caseId) {
-        coreCaseUserService.assignCase(caseId, authorisation);
+        String userId = idamClient.getUserInfo(authorisation).getUid();
+
+        String organisationId = organisationService.findOrganisation(authorisation)
+            .map(Organisation::getOrganisationIdentifier).orElse(null);
+
+        coreCaseUserService.assignCase(caseId, userId, organisationId, CaseRole.RESPONDENTSOLICITORONE);
     }
 }

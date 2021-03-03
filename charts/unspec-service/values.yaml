@@ -56,6 +56,8 @@ java:
         - microservicekey-unspec-service
         - system-update-user-username
         - system-update-user-password
+        - cross-access-user-username
+        - cross-access-user-password
         - AppInsightsInstrumentationKey
         - docmosis-api-key
         - cmc-db-password

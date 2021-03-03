@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.sampledata;
 
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.enums.ClaimType;
@@ -113,6 +114,8 @@ public class CaseDataBuilder {
 
     private CloseClaim withdrawClaim;
     private CloseClaim discontinueClaim;
+    private OrganisationPolicy applicant1OrganisationPolicy;
+    private OrganisationPolicy respondent1OrganisationPolicy;
 
     public CaseDataBuilder respondentSolicitor1ResponseDeadline(LocalDateTime respondentSolicitor1ResponseDeadline) {
         this.respondentSolicitor1ResponseDeadline = respondentSolicitor1ResponseDeadline;
@@ -221,6 +224,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimProceedsInCaseman(ClaimProceedsInCaseman claimProceedsInCaseman) {
         this.claimProceedsInCaseman = claimProceedsInCaseman;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1OrganisationPolicy(OrganisationPolicy applicant1OrganisationPolicy) {
+        this.applicant1OrganisationPolicy = applicant1OrganisationPolicy;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1OrganisationPolicy(OrganisationPolicy respondent1OrganisationPolicy) {
+        this.respondent1OrganisationPolicy = respondent1OrganisationPolicy;
+        return this;
+    }
+
+    public CaseDataBuilder caseReference(Long ccdCaseReference) {
+        this.ccdCaseReference = ccdCaseReference;
         return this;
     }
 
@@ -486,6 +504,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicantSolicitor1UserDetails(IdamUserDetails applicantSolicitor1UserDetails) {
+        this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -539,6 +562,8 @@ public class CaseDataBuilder {
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
             .applicant1DQ(applicant1DQ)
+            .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
+            .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
             .build();
     }
 }
