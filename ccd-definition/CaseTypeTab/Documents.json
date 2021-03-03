@@ -6,6 +6,6 @@
     "TabDisplayOrder": 4,
     "CaseFieldID": "systemGeneratedCaseDocuments",
     "TabFieldDisplayOrder": 1,
-    "DisplayContextParameter": "#TABLE(documentType, documentLink)"
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink)"
   }
 ]

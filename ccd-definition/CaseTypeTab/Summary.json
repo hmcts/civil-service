@@ -78,5 +78,13 @@
     "TabDisplayOrder": 1,
     "CaseFieldID": "claimNotificationDate",
     "TabFieldDisplayOrder": 10
+  },
+  {
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "paymentDetails",
+    "TabFieldDisplayOrder": 11
   }
 ]
