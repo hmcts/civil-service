@@ -33,5 +33,19 @@
     "CaseStateID": "STAYED",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseStateID": "AWAITING_CASE_NOTIFICATION",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseStateID": "AWAITING_CASE_DETAILS_NOTIFICATION",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
   }
 ]
