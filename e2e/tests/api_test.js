@@ -38,6 +38,10 @@ Scenario('Create claim where respondent is litigant in person', async (api) => {
   await api.createClaimWithRespondentLitigantInPerson(config.solicitorUser);
 });
 
+Scenario('Create claim where respondent solicitor is not registered in my hmcts', async (api) => {
+  await api.createClaimWithRespondentSolicitorFirmNotInMyHmcts(config.solicitorUser);
+});
+
 Scenario('Create claim and move it to caseman', async (api) => {
   await api.createClaimWithRepresentedRespondent(config.solicitorUser);
   await api.caseProceedsInCaseman();

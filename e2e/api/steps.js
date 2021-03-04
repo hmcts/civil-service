@@ -19,6 +19,7 @@ const data = {
   CREATE_CLAIM_TERMINATED_PBA: claimData.createClaimWithTerminatedPBAAccount,
   RESUBMIT_CLAIM: require('../fixtures/events/resubmitClaim.js'),
   ADD_OR_AMEND_CLAIM_DOCUMENTS: require('../fixtures/events/addOrAmendClaimDocuments.js'),
+  CREATE_CLAIM_RESPONDENT_SOLICITOR_FIRM_NOT_IN_MY_HMCTS: claimData.createClaimRespondentSolFirmNotInMyHmcts,
   ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
   INFORM_AGREED_EXTENSION_DATE: require('../fixtures/events/informAgreeExtensionDate.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
@@ -69,6 +70,24 @@ module.exports = {
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
+    eventName = 'CREATE_CLAIM';
+    caseId = null;
+    caseData = {};
+    await apiRequest.setupTokens(user);
+    await apiRequest.startEvent(eventName);
+    await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
+
+    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+      header: 'Your claim will now progress offline',
+      body: 'You do not need to do anything'
+    }, true);
+
+    await assignCaseToDefendant(caseId);
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+  },
+
+  createClaimWithRespondentSolicitorFirmNotInMyHmcts: async (user) => {
     eventName = 'CREATE_CLAIM';
     caseId = null;
     caseData = {};

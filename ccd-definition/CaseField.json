@@ -78,6 +78,15 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1OrgRegistered",
+    "Label": "Is the organisation registered with MyHMCTS?",
+    "HintText": "If the organisation is not registered or if you can't find it, select 'No' to continue and enter the details manually. If you don't know if the organisation is registered, try searching by selecting 'Yes'.",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimValue",
     "Label": "Expected claim value",
     "FieldType": "ClaimValue",
@@ -637,6 +646,22 @@
     "ID": "respondentSolicitor1EmailAddress",
     "Label": "Defendant solicitor's email address?",
     "FieldType": "Email",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1OrganisationDetails",
+    "Label": " ",
+    "FieldType": "SolicitorOrganisationDetails",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1OrgLabel",
+    "Label": "Enter organisation details manually. The claim will then continue offline.",
+    "FieldType": "Label",
     "SecurityClassification": "Public"
   },
   {

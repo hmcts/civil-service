@@ -78,5 +78,53 @@
     "ListElementCode": "Organisation.OrganisationName",
     "UserRole": "caseworker-civil-solicitor",
     "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "organisationName",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "phoneNumber",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "email",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "dx",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "fax",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address",
+    "UserRole": "caseworker-civil-solicitor",
+    "CRUD": "CRU"
   }
 ]

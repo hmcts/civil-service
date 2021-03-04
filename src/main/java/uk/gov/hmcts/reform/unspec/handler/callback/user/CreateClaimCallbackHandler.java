@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
+import uk.gov.hmcts.reform.unspec.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.time.LocalDate;
@@ -47,6 +49,8 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
@@ -63,6 +67,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     public static final String LIP_CONFIRMATION_BODY = "<br />You do not need to do anything.\n\n"
         + "Your claim will be considered by the court and you will be informed of the outcome by post.";
 
+    public static final String UNREGISTERED_ORG_CONFIRMATION_BODY = "<br />\n\n### What you need to do\n\n"
+        + "\n* Serve the claim on the defendant by Date1."
+        + "\n* File the certificate of service with CCMC by Date2.";
+
     private final CaseDetailsConverter caseDetailsConverter;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
@@ -70,6 +78,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final OrganisationService organisationService;
     private final StateFlowEngine stateFlowEngine;
     private final IdamClient idamClient;
+    private final OrgPolicyValidator orgPolicyValidator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,6 +88,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             callbackKey(MID, "fee"), this::calculateFee,
             callbackKey(MID, "idam-email"), this::getIdamEmail,
             callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
+            callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy,
+            callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -98,6 +109,27 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        OrganisationPolicy applicant1OrganisationPolicy = caseData.getApplicant1OrganisationPolicy();
+        List<String> errors = orgPolicyValidator.validate(applicant1OrganisationPolicy, YES);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateRespondentSolicitorOrgPolicy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+        YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
+        List<String> errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
@@ -110,7 +142,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YesOrNo.YES : YesOrNo.NO)
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
             .paymentReference(paymentReference);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -174,17 +206,22 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String claimNumber = caseData.getLegacyCaseReference();
 
-        if (caseData.getRespondent1Represented() == YesOrNo.NO) {
+        if (caseData.getRespondent1Represented() == NO) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader("# Your claim will now progress offline")
                 .confirmationBody(LIP_CONFIRMATION_BODY)
+                .build();
+        } else if (caseData.getRespondent1OrgRegistered() == NO) {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(format("# Your claim will now progress offline: %s", claimNumber))
+                .confirmationBody(UNREGISTERED_ORG_CONFIRMATION_BODY)
                 .build();
         }
 
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-        String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
             CONFIRMATION_SUMMARY,

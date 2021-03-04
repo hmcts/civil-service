@@ -117,6 +117,7 @@ public class CaseDataBuilder {
 
     private CloseClaim withdrawClaim;
     private CloseClaim discontinueClaim;
+    private YesOrNo respondent1OrgRegistered;
     private OrganisationPolicy applicant1OrganisationPolicy;
     private OrganisationPolicy respondent1OrganisationPolicy;
 
@@ -227,6 +228,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent1Represented(YesOrNo isRepresented) {
         this.respondent1Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1OrgRegistered(YesOrNo respondent1OrgRegistered) {
+        this.respondent1OrgRegistered = respondent1OrgRegistered;
         return this;
     }
 
@@ -548,6 +554,7 @@ public class CaseDataBuilder {
             .applicant1(applicant1)
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
+            .respondent1OrgRegistered(respondent1OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)

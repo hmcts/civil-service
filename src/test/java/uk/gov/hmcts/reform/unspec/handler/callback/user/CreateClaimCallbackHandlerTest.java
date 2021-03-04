@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.unspec.service.FeesService;
 import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
+import uk.gov.hmcts.reform.unspec.validation.OrgPolicyValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -58,6 +60,7 @@ import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_J
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.UNREGISTERED_ORG_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -67,6 +70,7 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnTyp
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
+    OrgPolicyValidator.class,
     StateFlowEngine.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -328,6 +332,148 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventApplicant1OrgPolicyCallback {
+
+        private static final String PAGE_ID = "appOrgPolicy";
+
+        @Test
+        void shouldReturnError_whenOrganisationPolicyIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(null)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIdIsNull() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID(null)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldBeSuccessful_whenValid() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
+    @Nested
+    class MidEventRespondent1OrgPolicyCallback {
+
+        private static final String PAGE_ID = "repOrgPolicy";
+
+        @Test
+        void shouldReturnError_whenOrganisationPolicyIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1OrganisationPolicy(null)
+                .respondent1OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent1OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIdIsNull() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID(null)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldBeSuccessful_whenValid() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
+    @Nested
     class AboutToSubmitCallback {
 
         private CallbackParams params;
@@ -536,6 +682,27 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             REFERENCE_NUMBER
                         ))
                         .confirmationBody(body)
+                        .build());
+            }
+
+        }
+
+        @Nested
+        class Respondent1SolicitorOrgNotRegisteredInMyHmcts {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+                    .respondent1Represented(YES)
+                    .respondent1OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Your claim will now progress offline: %s", REFERENCE_NUMBER))
+                        .confirmationBody(UNREGISTERED_ORG_CONFIRMATION_BODY)
                         .build());
             }
         }

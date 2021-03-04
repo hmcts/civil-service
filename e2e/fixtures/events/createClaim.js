@@ -81,6 +81,7 @@ const createClaimData = (legalRepresentation, useValidPba) => {
       respondent1Represented: `${legalRepresentation}`
     },
     DefendantSolicitorOrganisation: {
+      respondent1OrgRegistered: 'Yes',
       respondent1OrganisationPolicy: {
         OrgPolicyReference: 'Defendant policy reference',
         OrgPolicyCaseAssignedRole: '[RESPONDENTSOLICITORONE]',
@@ -179,4 +180,20 @@ module.exports = {
   createClaimWithTerminatedPBAAccount: {
     valid: createClaimData('Yes', false)
   },
+  createClaimRespondentSolFirmNotInMyHmcts: {
+    DefendantSolicitorOrganisation: {
+      respondent1OrgRegistered: 'No'
+    },
+    UnRegisteredDefendantSolicitorOrganisation: {
+      respondentSolicitor1OrganisationDetails: {
+        organisationName: '',
+        phoneNumber: '',
+        email: '',
+        dx: '',
+        fax: '',
+        address: buildAddress('')
+      }
+    },
+    valid: createClaimData('Yes')
+  }
 };

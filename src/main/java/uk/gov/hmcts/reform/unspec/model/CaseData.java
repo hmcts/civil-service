@@ -42,6 +42,7 @@ public class CaseData {
     private final Party respondent1;
     private final Party respondent2;
     private final YesOrNo respondent1Represented;
+    private final YesOrNo respondent1OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
@@ -66,6 +67,7 @@ public class CaseData {
     private final OrganisationPolicy applicant2OrganisationPolicy;
     private final OrganisationPolicy respondent1OrganisationPolicy;
     private final OrganisationPolicy respondent2OrganisationPolicy;
+    private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
 

@@ -549,5 +549,113 @@
     "ListElementCode": "OrgPolicyReference",
     "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "organisationName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "phoneNumber",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "email",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "dx",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "fax",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.AddressLine1",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.AddressLine2",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.AddressLine3",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.PostTown",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.County",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.Country",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "respondentSolicitor1OrganisationDetails",
+    "ListElementCode": "address.PostCode",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "MANDATORY"
   }
 ]
