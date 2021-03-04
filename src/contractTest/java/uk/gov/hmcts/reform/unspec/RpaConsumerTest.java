@@ -19,9 +19,6 @@ import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.unspec.matcher.IsValidJson.validateJson;
 
 @Slf4j
@@ -64,7 +61,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(PART_ADMISSION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());
@@ -78,7 +75,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_ADMISSION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());
@@ -92,7 +89,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(COUNTER_CLAIM).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaim().build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());

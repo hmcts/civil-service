@@ -86,6 +86,11 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             "CCMCC",
             ofNullable(header.getOwningCourtName())
         );
+        compare(
+            "preferredCourtCode",
+            expected.getCourtLocation().getApplicantPreferredCourt(),
+            ofNullable(header.getPreferredCourtCode())
+        );
     }
 
     private void assertClaimDetails(CaseData expected, ClaimDetails actual) {

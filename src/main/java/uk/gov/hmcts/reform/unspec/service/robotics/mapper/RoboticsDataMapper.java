@@ -69,6 +69,7 @@ public class RoboticsDataMapper {
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
+            .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
     }
