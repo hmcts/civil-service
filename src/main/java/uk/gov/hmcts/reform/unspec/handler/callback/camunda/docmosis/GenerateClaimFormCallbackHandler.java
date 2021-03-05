@@ -52,14 +52,13 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
 
-        //TODO: CMC-1176
         //TODO: added deadline as workaround until story is played to add new date logic. CMC-596
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .claimIssuedDate(claimIssuedDate)
             .respondentSolicitor1ResponseDeadline(calculateResponseDeadline(claimIssuedDate));
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
-            caseData,
+            caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 

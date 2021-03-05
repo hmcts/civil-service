@@ -29,6 +29,7 @@ import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -85,12 +86,12 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenCalled() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(sealedClaimFormGenerator).generate(caseData, "BEARER_TOKEN");
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
