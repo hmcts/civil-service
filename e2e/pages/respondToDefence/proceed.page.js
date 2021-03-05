@@ -18,5 +18,13 @@ module.exports = {
       I.click(this.fields.proceed.options.yes);
     });
     await I.clickContinue();
+  },
+
+  async dropClaim() {
+    I.waitForElement(this.fields.proceed.id);
+    await within(this.fields.proceed.id, () => {
+      I.click(this.fields.proceed.options.no);
+    });
+    await I.clickContinue();
   }
 };

@@ -9,7 +9,7 @@ const CASE_LIST = 'exui-case-list';
 
 let caseNumber;
 
-Feature('Claim creation @claim-tests');
+Feature('Claim creation @e2e-tests');
 
 Scenario('Solicitor creates claim @create-claim', async (I) => {
   await I.login(config.solicitorUser);
@@ -30,7 +30,7 @@ Scenario('Solicitor notifies defendant solicitor of claim details', async (I) =>
 });
 
 Scenario('Solicitor acknowledges service', async (I) => {
-  await I.acknowledgeService();
+  await I.acknowledgeService('fullDefence');
   await I.see(caseEventMessage('Acknowledge service'));
 });
 
@@ -45,7 +45,7 @@ Scenario('Solicitor adds defendant litigation friend', async (I) => {
 });
 
 Scenario('Solicitor responds to claim', async (I) => {
-  await I.respondToClaim();
+  await I.respondToClaim('fullDefence');
   await I.see(caseEventMessage('Respond to claim'));
 });
 

@@ -32,6 +32,7 @@ module.exports =  {
     if (incidentMessage)
       throw new Error(`Business process failed for case: ${caseId}, incident message: ${incidentMessage}`);
   },
+
   assignCaseToDefendant: async caseId => {
     const authToken = await idamHelper.accessToken(config.defendantSolicitorUser);
 
@@ -53,5 +54,16 @@ module.exports =  {
           }
         });
     });
+  },
+
+  updateCaseData: async (caseId, caseData) => {
+    const authToken = await idamHelper.accessToken(config.solicitorUser);
+
+    await restHelper.retriedRequest(
+      `${config.url.unspecService}/testing-support/case/${caseId}`,
+      {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      }, caseData, 'PUT');
   }
 };

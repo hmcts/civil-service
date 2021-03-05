@@ -2,11 +2,19 @@ const uuid = require('uuid');
 const config = require('../config.js');
 const address = require('../fixtures/address');
 
+const getDateTimeISOString = days => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString();
+};
+
 module.exports = {
   date: (days = 0) => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    return date.toISOString().slice(0, 10);
+    return getDateTimeISOString(days).slice(0, 10);
+  },
+
+  dateTime: (days = 0) => {
+    return getDateTimeISOString(days);
   },
 
   document: filename => {

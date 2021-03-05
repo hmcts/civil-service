@@ -18,5 +18,11 @@ module.exports = {
     I.selectOption(this.fields.eventDropdown, event);
     I.click(this.goButton);
     I.waitForElement(EVENT_TRIGGER_LOCATOR);
+  },
+
+  async assertNoEventsAvailable() {
+    if (await I.hasSelector(this.fields.eventDropdown)) {
+      throw new Error('Expected to have no events available');
+    }
   }
 };

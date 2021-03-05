@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static uk.gov.hmcts.reform.unspec.callback.UserType.CAMUNDA;
+import static uk.gov.hmcts.reform.unspec.callback.UserType.TESTING_SUPPORT;
 import static uk.gov.hmcts.reform.unspec.callback.UserType.USER;
 
 @Getter
@@ -52,7 +53,9 @@ public enum CaseEvent {
     GENERATE_DIRECTIONS_QUESTIONNAIRE(CAMUNDA),
     NOTIFY_RPA_ON_CASE_HANDED_OFFLINE(CAMUNDA),
     RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE(CAMUNDA),
-    RESET_RPA_NOTIFICATION_BUSINESS_PROCESS(CAMUNDA);
+    RESET_RPA_NOTIFICATION_BUSINESS_PROCESS(CAMUNDA),
+
+    UPDATE_CASE_DATA(TESTING_SUPPORT);
 
     private final UserType userType;
 

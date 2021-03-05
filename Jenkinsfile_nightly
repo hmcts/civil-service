@@ -67,6 +67,7 @@ withNightlyPipeline(type, product, component) {
   enableFullFunctionalTest(200)
 
   after('fullFunctionalTest') {
+    sh """ ./gradlew runRpaHandOffTests """
     archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 }
