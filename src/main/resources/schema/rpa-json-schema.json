@@ -558,7 +558,7 @@
     },
     "postCodeType": {
       "$id": "#/definitions/postCodeType",
-      "type": "string",
+      "type": ["string", "null"],
       "description": ""
     },
     "contactAddressType": {
