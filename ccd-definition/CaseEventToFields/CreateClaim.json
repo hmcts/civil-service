@@ -265,7 +265,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "READONLY",
     "PageID": "Details",
-    "PageDisplayOrder": 13,
+    "PageDisplayOrder": 14,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "N"
   },
@@ -277,7 +277,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL",
     "PageID": "Details",
-    "PageDisplayOrder": 13,
+    "PageDisplayOrder": 14,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -289,7 +289,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "Upload",
-    "PageDisplayOrder": 14,
+    "PageDisplayOrder": 15,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/particulars-of-claim"
@@ -302,7 +302,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "ClaimValue",
-    "PageDisplayOrder": 15,
+    "PageDisplayOrder": 16,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "CaseEventFieldLabel": "Enter expected claim value",
@@ -316,7 +316,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "OPTIONAL",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 16,
+    "PageDisplayOrder": 17,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
     "CaseEventFieldLabel": "Pay fee using Payment by Account (PBA)",
@@ -331,7 +331,7 @@
     "PageFieldDisplayOrder": 2,
     "DisplayContext": "COMPLEX",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 16,
+    "PageDisplayOrder": 17,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -343,7 +343,7 @@
     "PageFieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 16,
+    "PageDisplayOrder": 17,
     "PageColumnNumber": 1,
     "CaseEventFieldLabel": "Select a PBA",
     "ShowSummaryChangeOption": "Y"
@@ -356,7 +356,7 @@
     "PageFieldDisplayOrder": 4,
     "DisplayContext": "READONLY",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 16,
+    "PageDisplayOrder": 17,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "N",
     "FieldShowCondition": "applicantSolicitor1PbaAccountsIsEmpty = \"No\""
@@ -369,7 +369,7 @@
     "PageFieldDisplayOrder": 5,
     "DisplayContext": "READONLY",
     "PageID": "PbaNumber",
-    "PageDisplayOrder": 16,
+    "PageDisplayOrder": 17,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "N",
     "FieldShowCondition": "applicantSolicitor1PbaAccountsIsEmpty = \"Yes\""
@@ -382,7 +382,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": "PaymentReference",
-    "PageDisplayOrder": 17,
+    "PageDisplayOrder": 18,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   },
@@ -394,7 +394,7 @@
     "PageFieldDisplayOrder": 1,
     "DisplayContext": "COMPLEX",
     "PageID": "StatementOfTruth",
-    "PageDisplayOrder": 18,
+    "PageDisplayOrder": 19,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y"
   }
