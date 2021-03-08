@@ -64,6 +64,7 @@ Scenario('Claimant does not respond to defence with defined timescale', async (I
   // Sleep waiting for Case strikeout scheduler
   await sleep(600);
   console.log('Waiting finished ' + dateTime());
+  await I.goToCase(caseId);
   await I.assertNoEventsAvailable();
 });
 

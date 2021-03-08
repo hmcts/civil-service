@@ -59,6 +59,10 @@ const welshLanguageRequirementsPage = require('./fragments/dq/language.page');
 const address = require('./fixtures/address.js');
 
 const SIGNED_IN_SELECTOR = 'exui-header';
+const JURISDICTION_LOCATOR = '#wb-jurisdiction > option';
+const TYPE_LOCATOR = '#wb-case-type > option';
+const STATE_LOCATOR = '#wb-case-state > option';
+const CASE_NUMBER_INPUT_LOCATOR = 'input[type$="number"]';
 const CASE_HEADER = 'ccd-case-header > h1';
 
 const TEST_FILE_PATH = './e2e/fixtures/examplePDF.pdf';
@@ -88,6 +92,28 @@ module.exports = function () {
       this.waitForElement(CASE_HEADER);
 
       return await this.grabTextFrom(CASE_HEADER);
+    },
+
+    async goToCase(caseId) {
+      this.click('Case list');
+
+      this.waitForElement(JURISDICTION_LOCATOR);
+      this.selectOption('jurisdiction', 'Civil');
+
+      this.waitForElement(TYPE_LOCATOR);
+      this.selectOption('case-type', 'Damages Claim');
+
+      this.waitForElement(STATE_LOCATOR);
+      this.selectOption('state', 'Any');
+
+      this.waitForElement(CASE_NUMBER_INPUT_LOCATOR);
+      this.fillField(CASE_NUMBER_INPUT_LOCATOR, caseId);
+
+      const caseLinkLocator = `a[href$="/cases/case-details/${caseId}"]`;
+      await this.retryUntilExists(() => this.click('Apply'), caseLinkLocator);
+
+      this.click(caseLinkLocator);
+      this.waitForElement(CASE_HEADER);
     },
 
     async createCase(litigantInPerson = false) {

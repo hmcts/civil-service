@@ -19,6 +19,9 @@ properties([
       description: 'The URL of ccd data store'),
     string(name: 'UNSPEC_SERVICE_URL', defaultValue: 'http://unspec-service-aat.service.core-compute-aat.internal',
       description: 'The URL of unspec service'),
+    string(name: 'WAIT_FOR_TIMEOUT_MS',
+      defaultValue: '120000',
+      description: 'Functional tests waitForTimeout value'),
     string(name: 'SECURITY_RULES',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
       description: 'The security rules to use'),
@@ -57,6 +60,7 @@ withNightlyPipeline(type, product, component) {
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
   env.CCD_DATA_STORE_URL = params.CCD_DATA_STORE_URL
   env.UNSPEC_SERVICE_URL = params.UNSPEC_SERVICE_URL
+  env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CASE_SERVICE_URL
   loadVaultSecrets(secrets)
 

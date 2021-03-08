@@ -9,7 +9,7 @@ exports.config = {
       keepCookies: true,
       show: process.env.SHOW_BROWSER_WINDOW || false,
       windowSize: '1200x900',
-      waitForTimeout: 40000,
+      waitForTimeout: process.env.WAIT_FOR_TIMEOUT_MS || 40000,
       waitForNavigation: [ "domcontentloaded", "networkidle0" ],
       chrome: {
         ignoreHTTPSErrors: true,
