@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.assertion;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.unspec.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.unspec.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.unspec.model.robotics.LitigiousParty;
@@ -51,13 +52,15 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             APPLICANT_SOLICITOR_ID,
             "applicant1" + "." + "reference",
             actual.getSolicitors().get(0),
-            expected.getSolicitorReferences().getApplicantSolicitor1Reference()
+            expected.getSolicitorReferences().getApplicantSolicitor1Reference(),
+            null
         );
         assertSolicitor(
             RESPONDENT_SOLICITOR_ID,
             "respondent1" + "." + "reference",
             actual.getSolicitors().get(1),
-            expected.getSolicitorReferences().getRespondentSolicitor1Reference()
+            expected.getSolicitorReferences().getRespondentSolicitor1Reference(),
+            expected.getRespondentSolicitor1OrganisationDetails()
         );
 
         assertNotNull(actual.getEvents());
@@ -124,7 +127,9 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         );
     }
 
-    private void assertSolicitor(String id, String fieldName, Solicitor solicitor, String reference) {
+    private void assertSolicitor(String id, String fieldName, Solicitor solicitor, String reference,
+                                 SolicitorOrganisationDetails solicitorOrganisationDetails
+    ) {
         compare(
             "id",
             solicitor.getId(),
@@ -135,6 +140,36 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             solicitor.getReference(),
             ofNullable(reference)
         );
+        ofNullable(solicitorOrganisationDetails)
+            .ifPresent(organisationDetails -> {
+                compare(
+                    "name",
+                    solicitor.getName(),
+                    ofNullable(organisationDetails.getOrganisationName())
+                );
+                compare(
+                    "contactTelephoneNumber",
+                    solicitor.getContactTelephoneNumber(),
+                    ofNullable(organisationDetails.getPhoneNumber())
+                );
+                compare(
+                    "contactFaxNumber",
+                    solicitor.getContactFaxNumber(),
+                    ofNullable(organisationDetails.getFax())
+                );
+                compare(
+                    "contactDX",
+                    solicitor.getContactDX(),
+                    ofNullable(organisationDetails.getDx())
+                );
+                compare(
+                    "contactEmailAddress",
+                    solicitor.getContactEmailAddress(),
+                    ofNullable(organisationDetails.getEmail())
+                );
+                assertThat(solicitor.getAddresses().getContactAddress())
+                    .isEqualTo(organisationDetails.getAddress());
+            });
     }
 
     private void assertParty(String fieldName,

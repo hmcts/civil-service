@@ -56,7 +56,7 @@ public class CaseData {
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     private final LocalDateTime claimSubmittedDateTime;
     private final LocalDate claimIssuedDate;
-    private LocalDateTime confirmationOfServiceDeadline;
+    private final LocalDateTime confirmationOfServiceDeadline;
     private final LocalDate claimNotificationDate;
     private final LocalDate claimDetailsNotificationDate;
     private final String legacyCaseReference;
