@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.unspec.handler.tasks;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.util.Map;
 
@@ -35,11 +38,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.unspec.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
     CaseEventTaskHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    StateFlowEngine.class
 })
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
@@ -89,7 +94,7 @@ class CaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
         verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, getVariableMap("MAIN.DRAFT"));
     }
 
     @Test
@@ -129,5 +134,11 @@ class CaseEventTaskHandlerTest {
             anyInt(),
             anyLong()
         );
+    }
+
+    private VariableMap getVariableMap(String value) {
+        VariableMap variables = Variables.createVariables();
+        variables.putValue(FLOW_STATE, value);
+        return variables;
     }
 }

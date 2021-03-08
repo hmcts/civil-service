@@ -77,7 +77,7 @@ module.exports = {
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
-    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
       header: 'Your claim will now progress offline',
       body: 'You do not need to do anything'
     }, true);
@@ -95,7 +95,7 @@ module.exports = {
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
-    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+    await assertSubmittedEvent('PENDING_CASE_ISSUED', {
       header: 'Your claim will now progress offline',
       body: 'You do not need to do anything'
     }, true);

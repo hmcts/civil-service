@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
@@ -83,17 +82,15 @@ class FlowPredicateTest {
     class Respondent1NotRepresented {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+        void shouldReturnTrue_whenRespondentNotRepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
 
             assertTrue(respondent1NotRepresented.test(caseData));
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataIsAtDraftState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
             assertFalse(respondent1NotRepresented.test(caseData));
         }
     }

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -70,9 +69,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -81,10 +78,11 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
+                .hasSize(4)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
         }
 
         @Test

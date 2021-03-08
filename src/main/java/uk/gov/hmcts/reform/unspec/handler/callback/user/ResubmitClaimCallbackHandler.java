@@ -21,6 +21,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
 
 @Slf4j
@@ -48,7 +49,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(RESUBMIT_CLAIM))
+            .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDetailsConverter.toMap(caseDataUpdated))

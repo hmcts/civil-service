@@ -6,7 +6,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.robotics.Event;
@@ -37,9 +36,7 @@ class EventHistoryMapperTest {
 
     @Test
     void shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-            .respondent1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
         Event expectedEvent = Event.builder()
             .eventSequence(1)
             .eventCode("999")

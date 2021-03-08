@@ -8,12 +8,15 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +27,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.GENERATE_CLAIM_FORM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.fromFullName;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 
 @Service
@@ -36,6 +41,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final IssueDateCalculator issueDateCalculator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final StateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -63,10 +69,20 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
 
         caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        CaseData data = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
+            .data(caseDetailsConverter.toMap(data))
+            .state(getState(data))
             .build();
+    }
+
+    private String getState(CaseData data) {
+        FlowState flowState = fromFullName(stateFlowEngine.evaluate(data).getState().getName());
+        return String.valueOf(
+            flowState == AWAITING_CASE_NOTIFICATION ? CaseState.AWAITING_CASE_NOTIFICATION :
+                CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY
+        );
     }
 
     private LocalDate calculateIssueDate() {

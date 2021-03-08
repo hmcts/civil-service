@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 
 @SpringBootTest(classes = {
@@ -42,7 +42,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(RESUBMIT_CLAIM.name());
+                .isEqualTo(CREATE_CLAIM.name());
 
             assertThat(response.getData())
                 .extracting("businessProcess")

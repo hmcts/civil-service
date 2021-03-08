@@ -55,8 +55,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.MULTI_CLAIM;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
@@ -483,89 +481,57 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String EMAIL = "example@email.com";
         private static final String DIFFERENT_EMAIL = "other_example@email.com";
 
-        @Nested
-        class Respondent1DoesNotHaveLegalRepresentation {
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
 
-            @BeforeEach
-            void setup() {
-                caseData = CaseDataBuilder.builder().atStateClaimDraft().respondent1Represented(NO).build();
-                params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                userId = UUID.randomUUID().toString();
-
-                given(idamClient.getUserDetails(any()))
-                    .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-            }
-
-            @Test
-            void shouldSetStateAsProceedsWithOfflineJourney_whenRespondentIsNotRepresented() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getState()).isEqualTo(PROCEEDS_WITH_OFFLINE_JOURNEY.toString());
-            }
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
         }
 
-        @Nested
-        class Respondent1HasLegalRepresentation {
+        @Test
+        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            @BeforeEach
-            void setup() {
-                caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-                params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                userId = UUID.randomUUID().toString();
+            assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
+            assertThat(response.getData()).containsKey("claimSubmittedDateTime");
+        }
 
-                given(idamClient.getUserDetails(any()))
-                    .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-            }
+        @Test
+        void shouldAddAllocatedTrack_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            @Test
-            void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).containsEntry("allocatedTrack", MULTI_CLAIM.name());
+        }
 
-                assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
-                assertThat(response.getData()).containsKey("claimSubmittedDateTime");
-            }
+        @Test
+        void shouldUpdateRespondentAndApplicantWithPartyNameAndPartyTypeDisplayValue_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            @Test
-            void shouldAddAllocatedTrack_whenInvoked() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            Party respondent1 = caseData.getRespondent1();
+            Party applicant1 = caseData.getApplicant1();
 
-                assertThat(response.getData()).containsEntry("allocatedTrack", MULTI_CLAIM.name());
-            }
+            assertThat(response.getData())
+                .extracting("respondent1")
+                .extracting("partyName", "partyTypeDisplayValue")
+                .containsExactly(getPartyNameBasedOnType(respondent1), respondent1.getType().getDisplayValue());
 
-            @Test
-            void shouldUpdateRespondentAndApplicantWithPartyNameAndPartyTypeDisplayValue_whenInvoked() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("applicant1")
+                .extracting("partyName", "partyTypeDisplayValue")
+                .containsExactly(getPartyNameBasedOnType(applicant1), applicant1.getType().getDisplayValue());
+        }
 
-                Party respondent1 = caseData.getRespondent1();
-                Party applicant1 = caseData.getApplicant1();
+        @Test
+        void shouldUpdateBusinessProcess_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-                assertThat(response.getData())
-                    .extracting("respondent1")
-                    .extracting("partyName", "partyTypeDisplayValue")
-                    .containsExactly(getPartyNameBasedOnType(respondent1), respondent1.getType().getDisplayValue());
-
-                assertThat(response.getData())
-                    .extracting("applicant1")
-                    .extracting("partyName", "partyTypeDisplayValue")
-                    .containsExactly(getPartyNameBasedOnType(applicant1), applicant1.getType().getDisplayValue());
-            }
-
-            @Test
-            void shouldUpdateBusinessProcess_whenInvoked() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("camundaEvent", "status")
-                    .containsOnly(CREATE_CLAIM.name(), "READY");
-            }
-
-            @Test
-            void shouldSetStateAsPendingCaseIssued_whenRespondentIsRepresented() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getState()).isEqualTo(PENDING_CASE_ISSUED.toString());
-            }
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CREATE_CLAIM.name(), "READY");
         }
 
         @Nested

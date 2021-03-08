@@ -304,12 +304,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
-        atStateClaimDraft();
-        claimSubmittedDateTime = LocalDateTime.now();
-        legacyCaseReference = LEGACY_CASE_REFERENCE;
-        allocatedTrack = FAST_CLAIM;
+        atStatePaymentSuccessful();
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
-        ccdCaseReference = CASE_ID;
+        claimIssuedDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         return this;
     }
@@ -388,6 +385,7 @@ public class CaseDataBuilder {
         applicant1 = PartyBuilder.builder().individual().build();
         respondent1 = PartyBuilder.builder().soleTrader().build();
         respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
         respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.builder().build();
         claimSubmittedDateTime = LocalDateTime.now();
