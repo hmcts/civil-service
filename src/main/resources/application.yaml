@@ -69,6 +69,7 @@ nonworking-days:
   datafile: /data/non-working_days.dat
 
 unspecified:
+  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
   system-update:
     username: 'civil-system-update@mailnesia.com'
     password: 'Password12!'

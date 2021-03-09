@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
@@ -60,13 +61,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "\n\n You have until DATE to notify the defendant of the claim and claim details.";
 
-    public static final String LIP_CONFIRMATION_BODY = "<br />You do not need to do anything.\n\n"
-        + "Your claim will be considered by the court and you will be informed of the outcome by post.";
+    public static final String LIP_CONFIRMATION_BODY = "<br />To continue your claim by post you need to:"
+        + "%n* [Download the sealed claim form](%s)"
+        + "%n* Send the claim form, <a href=\"%s\" target=\"_blank\">a response pack</a> (PDF, 266 KB) "
+        + "and any supporting documents to the defendant by %s"
+        + "%n%nOnce you have served the claim send the Certificate of Service and any supporting documents to the "
+        + "County Court Claims Centre.";
 
     public static final String UNREGISTERED_ORG_CONFIRMATION_BODY = "<br />\n\n### What you need to do\n\n"
         + "\n* Serve the claim on the defendant by Date1."
         + "\n* File the certificate of service with CCMC by Date2.";
 
+    private final ClaimIssueConfiguration claimIssueConfiguration;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
@@ -196,30 +202,28 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        if (caseData.getRespondent1Represented() == NO) {
-            return SubmittedCallbackResponse.builder()
-                .confirmationHeader("# Your claim will now progress offline")
-                .confirmationBody(LIP_CONFIRMATION_BODY)
-                .build();
-        } else if (caseData.getRespondent1OrgRegistered() == NO) {
+        if (caseData.getRespondent1OrgRegistered() == NO) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(format("# Your claim will now progress offline: %s", claimNumber))
                 .confirmationBody(UNREGISTERED_ORG_CONFIRMATION_BODY)
                 .build();
         }
 
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", claimNumber))
+            .confirmationBody(getBody(caseData.getRespondent1Represented(), caseData.getCcdCaseReference()))
+            .build();
+    }
+
+    private String getBody(YesOrNo respondentRepresented, Long caseReference) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
-        String body = format(
-            CONFIRMATION_SUMMARY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+        return format(
+            respondentRepresented == YesOrNo.NO ? LIP_CONFIRMATION_BODY : CONFIRMATION_SUMMARY,
+            format("/cases/case-details/%s#CaseDocuments", caseReference),
+            claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         );
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# Your claim has been issued%n## Claim number: %s", claimNumber))
-            .confirmationBody(body)
-            .build();
     }
 }

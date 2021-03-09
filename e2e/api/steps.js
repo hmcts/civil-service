@@ -78,8 +78,8 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim will now progress offline',
-      body: 'You do not need to do anything'
+      header: 'Your claim has been issued',
+      body: 'To continue your claim by post you need to'
     }, true);
 
     await assignCaseToDefendant(caseId);
@@ -96,8 +96,8 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim will now progress offline',
-      body: 'You do not need to do anything'
+      header: 'Your claim has been issued',
+      body: 'To continue your claim by post you need to'
     }, true);
 
     await assignCaseToDefendant(caseId);
