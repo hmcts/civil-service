@@ -59,6 +59,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_NOTIFICATION');
     let i;
     for(i=0; i<data[eventName].invalid.Court.courtLocation.applicantPreferredCourt.length; i++) {
       await assertError('Court', data[eventName].invalid.Court.courtLocation.applicantPreferredCourt[i],
@@ -85,6 +86,8 @@ module.exports = {
     await assignCaseToDefendant(caseId);
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+
   },
 
   createClaimWithRespondentSolicitorFirmNotInMyHmcts: async (user) => {
@@ -103,6 +106,7 @@ module.exports = {
     await assignCaseToDefendant(caseId);
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     //field is deleted in about to submit callback
     deleteCaseFields('applicantSolicitor1CheckEmail');
   },
@@ -158,6 +162,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_NOTIFICATION');
   },
 
   notifyClaim: async () => {
@@ -172,6 +177,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
   },
 
   notifyClaimDetails: async() => {
@@ -188,6 +194,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
   },
 
   acknowledgeService: async () => {
@@ -209,6 +216,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
   },
 
   informAgreedExtensionDate: async () => {
@@ -232,6 +240,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
   },
 
   defendantResponse: async () => {
@@ -257,6 +266,7 @@ module.exports = {
 
     await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CLAIMANT_INTENTION');
     await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CLAIMANT_INTENTION');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CLAIMANT_INTENTION');
   },
 
   claimantResponse: async () => {
@@ -282,6 +292,7 @@ module.exports = {
 
     // await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
     // await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    // await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
 
   //TODO this method is not used in api tests
@@ -294,7 +305,9 @@ module.exports = {
     await validateEventPages(data.ADD_DEFENDANT_LITIGATION_FRIEND);
   },
 
-  caseProceedsInCaseman: async () => {
+  moveCaseToCaseman: async (user) => {
+    await apiRequest.setupTokens(user);
+
     eventName = 'CASE_PROCEEDS_IN_CASEMAN';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);
@@ -310,6 +323,10 @@ module.exports = {
       header: '',
       body: ''
     }, false);
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   }
 };
 
@@ -382,9 +399,10 @@ const deleteCaseFields = (...caseFields) => {
 };
 
 const assertCorrectEventsAreAvailableToUser = async (user, state) => {
+  console.log(`Asserting user ${user.type} has correct permissions`);
   await waitForFinishedBusinessProcess(caseId);
   const caseForDisplay = await apiRequest.fetchCaseForDisplay(user, caseId);
-  expect(caseForDisplay.triggers).to.deep.equalInAnyOrder(expectedEvents[state]);
+  expect(caseForDisplay.triggers).to.deep.equalInAnyOrder(expectedEvents[user.type][state]);
 };
 
 function addMidEventFields(pageId, responseBody) {
