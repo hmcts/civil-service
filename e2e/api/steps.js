@@ -26,6 +26,7 @@ const data = {
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
   ADD_DEFENDANT_LITIGATION_FRIEND: require('../fixtures/events/addDefendantLitigationFriend.js'),
   CASE_PROCEEDS_IN_CASEMAN: require('../fixtures/events/caseProceedsInCaseman.js'),
+  AMEND_PARTY_DETAILS: require('../fixtures/events/amendPartyDetails.js'),
 };
 
 const midEventFieldForPage = {
@@ -197,7 +198,28 @@ module.exports = {
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
   },
 
-  acknowledgeService: async () => {
+  amendPartyDetails: async(user) => {
+    await apiRequest.setupTokens(user);
+
+    eventName = 'AMEND_PARTY_DETAILS';
+    let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
+    assertContainsPopulatedFields(returnedCaseData);
+
+    await validateEventPages(data[eventName]);
+
+    await assertSubmittedEvent('CREATED', {
+      header: 'You have updated a legal representative\'s email address',
+      body: ' '
+    });
+
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
+  },
+
+  acknowledgeService: async (user) => {
+    await apiRequest.setupTokens(user);
+
     eventName = 'ACKNOWLEDGE_SERVICE';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);

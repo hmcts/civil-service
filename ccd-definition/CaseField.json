@@ -735,5 +735,13 @@
     "Label": "#### Your payment did not go through. To resubmit the same claim please try again by selecting the PBA account number",
     "FieldType": "Label",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "amendPartyDetailsLabel",
+    "Label": "Update a legal representative's email address by replacing the existing email.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   }
 ]

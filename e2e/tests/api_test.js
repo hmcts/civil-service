@@ -18,8 +18,12 @@ Scenario('Notify claim details', async (api) => {
   await api.notifyClaimDetails();
 });
 
+Scenario('Amend party details', async (api) => {
+  await api.amendPartyDetails(config.adminUser);
+});
+
 Scenario('Acknowledge service', async (api) => {
-  await api.acknowledgeService();
+  await api.acknowledgeService(config.solicitorUser);
 });
 
 Scenario('Inform agreed extension date', async (api) => {

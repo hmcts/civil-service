@@ -70,5 +70,11 @@ module.exports = {
     id: 'INFORM_AGREED_EXTENSION_DATE',
     name: 'Inform agreed extension date',
     order: 13
+  },
+  AMEND_PARTY_DETAILS: {
+    description: 'Update defendant and claimant solicitor email addresses',
+    id: 'AMEND_PARTY_DETAILS',
+    name: 'Amend party details',
+    order: 14
   }
 };

@@ -1483,5 +1483,12 @@
     "CaseFieldID": "claimProceedsInCaseman",
     "UserRole": "caseworker-civil-admin",
     "CRUD": "CRU"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "CaseFieldID": "amendPartyDetailsLabel",
+    "UserRole": "caseworker-civil-admin",
+    "CRUD": "CRU"
   }
 ]

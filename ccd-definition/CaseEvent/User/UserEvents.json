@@ -236,5 +236,22 @@
     "RetriesTimeoutAboutToStartEvent": 0,
     "RetriesTimeoutURLAboutToSubmitEvent": 0,
     "RetriesTimeoutURLSubmittedEvent": 0
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "AMEND_PARTY_DETAILS",
+    "Name": "Amend party details",
+    "Description": "Update defendant and claimant solicitor email addresses",
+    "DisplayOrder": 14,
+    "PreConditionState(s)": "PENDING_CASE_ISSUED;AWAITING_CASE_NOTIFICATION;AWAITING_CASE_DETAILS_NOTIFICATION;CREATED;AWAITING_CLAIMANT_INTENTION",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutAboutToStartEvent": 0,
+    "RetriesTimeoutURLSubmittedEvent": 0
   }
 ]

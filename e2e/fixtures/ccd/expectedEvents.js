@@ -31,18 +31,24 @@ module.exports = {
   },
   admin: {
     AWAITING_CASE_NOTIFICATION: [
-      events.CASE_PROCEEDS_IN_CASEMAN
+      events.CASE_PROCEEDS_IN_CASEMAN,
+      events.AMEND_PARTY_DETAILS
     ],
     AWAITING_CASE_DETAILS_NOTIFICATION: [
-      events.CASE_PROCEEDS_IN_CASEMAN
+      events.CASE_PROCEEDS_IN_CASEMAN,
+      events.AMEND_PARTY_DETAILS
     ],
     CREATED: [
-      events.CASE_PROCEEDS_IN_CASEMAN
+      events.CASE_PROCEEDS_IN_CASEMAN,
+      events.AMEND_PARTY_DETAILS
     ],
     PROCEEDS_WITH_OFFLINE_JOURNEY: [],
     AWAITING_CLAIMANT_INTENTION: [
-      events.CASE_PROCEEDS_IN_CASEMAN
+      events.CASE_PROCEEDS_IN_CASEMAN,
+      events.AMEND_PARTY_DETAILS
     ],
-    PENDING_CASE_ISSUED: []
+    PENDING_CASE_ISSUED: [
+      events.AMEND_PARTY_DETAILS
+    ]
   }
 };

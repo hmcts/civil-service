@@ -1,0 +1,12 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "WithdrawClaim",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "applicantSolicitor1UserDetails",
+    "ListElementCode": "email",
+    "EventElementLabel": "Defendant's legal representative's details",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  }
+]
