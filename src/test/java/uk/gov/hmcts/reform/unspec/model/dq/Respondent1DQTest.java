@@ -161,7 +161,6 @@ class Respondent1DQTest {
 
     private WelshLanguageRequirements welshLanguageRequirements() {
         return WelshLanguageRequirements.builder()
-            .isPartyWelsh(YesOrNo.YES)
             .court(Language.WELSH)
             .documents(Language.WELSH)
             .evidence(Language.WELSH)

@@ -153,7 +153,7 @@ public class CaseDataBuilder {
             .respondent1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .build();
         return this;
@@ -183,7 +183,7 @@ public class CaseDataBuilder {
             .applicant1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant1DQLanguage(WelshLanguageRequirements.builder().isPartyWelsh(NO).build())
+            .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
             .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
             .build();
         return this;

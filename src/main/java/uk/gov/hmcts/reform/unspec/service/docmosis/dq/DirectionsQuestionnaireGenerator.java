@@ -176,7 +176,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         return WelshLanguageRequirements.builder()
-            .isPartyWelsh(welshLanguageRequirements.getIsPartyWelsh())
             .evidence(ofNullable(
                 welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
             .court(ofNullable(

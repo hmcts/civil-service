@@ -4,13 +4,6 @@ module.exports = {
 
   fields: function (party) {
     return {
-      isPartyWelsh: {
-        id: `#${party}DQLanguage_isPartyWelsh`,
-        options: {
-          yes: 'Yes',
-          no: 'No'
-        }
-      },
       evidence: {
         id: `#${party}DQLanguage_evidence`,
         options: {
@@ -33,10 +26,7 @@ module.exports = {
   },
 
   async enterWelshLanguageRequirements(party) {
-    I.waitForElement(this.fields(party).isPartyWelsh.id);
-    await within(this.fields(party).isPartyWelsh.id, () => {
-      I.click(this.fields(party).isPartyWelsh.options.yes);
-    });
+    I.waitForElement(this.fields(party).evidence.id);
 
     I.click(this.fields(party).evidence.options.welsh);
     I.click(this.fields(party).court.options.welsh);

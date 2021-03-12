@@ -82,7 +82,6 @@ module.exports = {
     },
     Language: {
       applicant1DQLanguage: {
-        isPartyWelsh: 'Yes',
         evidence: 'WELSH',
         court: 'WELSH',
         documents: 'WELSH'

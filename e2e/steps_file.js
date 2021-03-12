@@ -205,12 +205,12 @@ module.exports = function () {
       await disclosureOfNonElectronicDocumentsPage.enterDirectionsProposedForDisclosure(parties.RESPONDENT_SOLICITOR_1);
       await expertsPage.enterExpertInformation(parties.RESPONDENT_SOLICITOR_1);
       await witnessPage.enterWitnessInformation(parties.RESPONDENT_SOLICITOR_1);
+      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.RESPONDENT_SOLICITOR_1);
       await hearingPage.enterHearingInformation(parties.RESPONDENT_SOLICITOR_1);
       await draftDirectionsPage.enterDraftDirections(parties.RESPONDENT_SOLICITOR_1);
       await requestedCourtPage.selectSpecificCourtForHearing(parties.RESPONDENT_SOLICITOR_1);
       await hearingSupportRequirementsPage.selectRequirements(parties.RESPONDENT_SOLICITOR_1);
       await furtherInformationPage.enterFurtherInformation(parties.RESPONDENT_SOLICITOR_1);
-      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.RESPONDENT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.RESPONDENT_SOLICITOR_1 + 'DQ');
     },
 
@@ -223,11 +223,11 @@ module.exports = function () {
       await disclosureOfNonElectronicDocumentsPage.enterDirectionsProposedForDisclosure(parties.APPLICANT_SOLICITOR_1);
       await expertsPage.enterExpertInformation(parties.APPLICANT_SOLICITOR_1);
       await witnessPage.enterWitnessInformation(parties.APPLICANT_SOLICITOR_1);
+      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.APPLICANT_SOLICITOR_1);
       await hearingPage.enterHearingInformation(parties.APPLICANT_SOLICITOR_1);
       await draftDirectionsPage.enterDraftDirections(parties.APPLICANT_SOLICITOR_1);
       await hearingSupportRequirementsPage.selectRequirements(parties.APPLICANT_SOLICITOR_1);
       await furtherInformationPage.enterFurtherInformation(parties.APPLICANT_SOLICITOR_1);
-      await welshLanguageRequirementsPage.enterWelshLanguageRequirements(parties.APPLICANT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
       await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
       await this.click('Close and Return to case details');
