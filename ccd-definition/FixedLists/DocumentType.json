@@ -9,22 +9,15 @@
   {
     "LiveFrom": "01/01/2017",
     "ID": "DocumentType",
-    "ListElementCode": "CERTIFICATE_OF_SERVICE",
-    "ListElement": "Certificate of service form",
-    "DisplayOrder": 2
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "ID": "DocumentType",
     "ListElementCode": "ACKNOWLEDGEMENT_OF_SERVICE",
     "ListElement": "Acknowledgement of service form",
-    "DisplayOrder": 3
+    "DisplayOrder": 2
   },
   {
     "LiveFrom": "01/01/2017",
     "ID": "DocumentType",
     "ListElementCode": "DIRECTIONS_QUESTIONNAIRE",
     "ListElement": "Directions questionnaire form",
-    "DisplayOrder": 4
+    "DisplayOrder": 3
   }
 ]
