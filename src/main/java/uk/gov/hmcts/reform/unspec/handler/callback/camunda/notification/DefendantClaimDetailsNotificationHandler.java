@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.NotificationService;
 
@@ -33,7 +33,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,7 +67,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(updatedCaseData))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

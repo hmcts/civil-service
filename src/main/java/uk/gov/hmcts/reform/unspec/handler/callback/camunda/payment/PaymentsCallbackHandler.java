@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.service.PaymentsService;
@@ -37,7 +36,6 @@ public class PaymentsCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
 
-    private final CaseDetailsConverter caseDetailsConverter;
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
 
@@ -74,7 +72,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseData))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }

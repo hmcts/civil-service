@@ -32,9 +32,4 @@ public class CaseDetailsConverter {
     public CaseData toCaseData(Map<String, Object> caseDataMap) {
         return objectMapper.convertValue(caseDataMap, CaseData.class);
     }
-
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> toMap(CaseData caseData) {
-        return objectMapper.convertValue(caseData, Map.class);
-    }
 }

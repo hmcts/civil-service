@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -25,6 +26,8 @@ public class MoveClaimToStruckOutCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(MOVE_CLAIM_TO_STRUCK_OUT);
 
+    private final ObjectMapper objectMapper;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -47,7 +50,7 @@ public class MoveClaimToStruckOutCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(MOVE_CLAIM_TO_STRUCK_OUT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }

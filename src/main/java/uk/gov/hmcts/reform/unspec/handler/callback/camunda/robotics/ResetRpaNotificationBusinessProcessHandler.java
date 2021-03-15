@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.camunda.robotics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
@@ -28,7 +28,7 @@ public class ResetRpaNotificationBusinessProcessHandler extends CallbackHandler 
     private static final List<CaseEvent> EVENTS = List.of(RESET_RPA_NOTIFICATION_BUSINESS_PROCESS);
     public static final String TASK_ID = "ResetRpaNotificationBusinessProcess";
 
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -53,7 +53,7 @@ public class ResetRpaNotificationBusinessProcessHandler extends CallbackHandler 
             .businessProcess(BusinessProcess.ready(RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseDataUpdated))
+            .data(caseDataUpdated.toMap(objectMapper))
             .build();
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.CaseState;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
@@ -38,7 +38,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
 
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
     private final IssueDateCalculator issueDateCalculator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final StateFlowEngine stateFlowEngine;
@@ -72,7 +72,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         CaseData data = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(data))
+            .data(data.toMap(objectMapper))
             .state(getState(data))
             .build();
     }

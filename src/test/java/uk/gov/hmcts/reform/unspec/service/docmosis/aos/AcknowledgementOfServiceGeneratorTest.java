@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
+import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfServiceForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Respondent;
@@ -61,7 +61,7 @@ class AcknowledgementOfServiceGeneratorTest {
 
     @Test
     void shouldGenerateAcknowledgementOfService_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N9)))
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N9)))
             .thenReturn(new DocmosisDocument(N9.getDocumentTitle(), bytes));
 
         when(documentManagementService

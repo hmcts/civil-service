@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.validation.DeadlineExtensionValidator;
@@ -36,7 +36,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE);
 
     private final DeadlineExtensionValidator validator;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -70,7 +70,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ResponseDeadline(newDeadline);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseDataBuilder.build()))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

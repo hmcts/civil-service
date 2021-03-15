@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
-import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
+import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Applicant;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
@@ -71,7 +71,7 @@ class SealedClaimFormGeneratorTest {
     void shouldGenerateSealedClaimForm_whenValidDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
 
-        when(documentGeneratorService.generateDocmosisDocument(any(DocmosisData.class), eq(N1)))
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
 
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
