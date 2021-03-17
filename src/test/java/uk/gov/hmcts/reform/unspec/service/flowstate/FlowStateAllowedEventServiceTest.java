@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.unspec.service.flowstate;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,116 +103,155 @@ class FlowStateAllowedEventServiceTest {
         }
     }
 
+    static class GetAllowedCaseEventForFlowStateArguments implements ArgumentsProvider {
+
+        @Override
+        @SneakyThrows
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                of(
+                    DRAFT,
+                    new CaseEvent[]{
+                        CREATE_CLAIM,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM
+                    }
+                ),
+                of(
+                    PAYMENT_FAILED,
+                    new CaseEvent[]{
+                        RESUBMIT_CLAIM,
+                        AMEND_PARTY_DETAILS,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM
+                    }
+                ),
+                of(
+                    AWAITING_CASE_NOTIFICATION,
+                    new CaseEvent[]{
+                        NOTIFY_DEFENDANT_OF_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    AWAITING_CASE_DETAILS_NOTIFICATION,
+                    new CaseEvent[]{
+                        NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    CLAIM_ISSUED,
+                    new CaseEvent[]{
+                        MOVE_TO_STAYED,
+                        ACKNOWLEDGE_SERVICE,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    EXTENSION_REQUESTED,
+                    new CaseEvent[]{
+                        DEFENDANT_RESPONSE,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    CLAIM_STAYED,
+                    new CaseEvent[]{
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM
+                    }
+                ),
+                of(
+                    SERVICE_ACKNOWLEDGED,
+                    new CaseEvent[]{
+                        DEFENDANT_RESPONSE,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    RESPONDENT_FULL_DEFENCE,
+                    new CaseEvent[]{
+                        CLAIMANT_RESPONSE,
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        MOVE_CLAIM_TO_STRUCK_OUT,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    RESPONDENT_FULL_ADMISSION,
+                    new CaseEvent[]{
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    RESPONDENT_PART_ADMISSION,
+                    new CaseEvent[]{
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    RESPONDENT_COUNTER_CLAIM,
+                    new CaseEvent[]{
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    APPLICANT_RESPOND_TO_DEFENCE,
+                    new CaseEvent[]{
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                )
+            );
+        }
+    }
+
     @Nested
     class GetAllowedEventsForFlowState {
 
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsDraft() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(DRAFT.fullName()))
-                .containsExactlyInAnyOrder(CREATE_CLAIM, WITHDRAW_CLAIM, DISCONTINUE_CLAIM);
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsAwaitingCaseNotification() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(AWAITING_CASE_NOTIFICATION.fullName()))
-                .containsExactlyInAnyOrder(
-                    NOTIFY_DEFENDANT_OF_CLAIM,
-                    ADD_DEFENDANT_LITIGATION_FRIEND,
-                    CASE_PROCEEDS_IN_CASEMAN,
-                    ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                    AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsAwaitingCaseDetailsNotification() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(AWAITING_CASE_DETAILS_NOTIFICATION.fullName()))
-                .containsExactlyInAnyOrder(
-                    NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
-                    ADD_DEFENDANT_LITIGATION_FRIEND,
-                    CASE_PROCEEDS_IN_CASEMAN,
-                    ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                    AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsClaimIssued() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(CLAIM_ISSUED.fullName()))
-                .containsExactlyInAnyOrder(MOVE_TO_STAYED, ACKNOWLEDGE_SERVICE, ADD_DEFENDANT_LITIGATION_FRIEND,
-                                           WITHDRAW_CLAIM, DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN,
-                                           AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsServiceAcknowledge() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(SERVICE_ACKNOWLEDGED.fullName()))
-                .containsExactlyInAnyOrder(
-                    DEFENDANT_RESPONSE,
-                    ADD_DEFENDANT_LITIGATION_FRIEND,
-                    WITHDRAW_CLAIM,
-                    DISCONTINUE_CLAIM,
-                    CASE_PROCEEDS_IN_CASEMAN,
-                    INFORM_AGREED_EXTENSION_DATE,
-                    AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsExtensionRequested() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(EXTENSION_REQUESTED.fullName()))
-                .containsExactlyInAnyOrder(DEFENDANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND,
-                                           WITHDRAW_CLAIM, DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN,
-                                           AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsRespondentFullDefence() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDENT_FULL_DEFENCE.fullName()))
-                .containsExactlyInAnyOrder(CLAIMANT_RESPONSE, ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                                           DISCONTINUE_CLAIM, MOVE_CLAIM_TO_STRUCK_OUT, CASE_PROCEEDS_IN_CASEMAN,
-                                           AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsRespondentFulAdmission() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDENT_FULL_ADMISSION.fullName()))
-                .containsExactlyInAnyOrder(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                                           DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN, AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsRespondentPartAdmission() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDENT_PART_ADMISSION.fullName()))
-                .containsExactlyInAnyOrder(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                                           DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN, AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsRespondentCounterClaim() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(RESPONDENT_COUNTER_CLAIM.fullName()))
-                .containsExactlyInAnyOrder(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM,
-                                           DISCONTINUE_CLAIM, CASE_PROCEEDS_IN_CASEMAN, AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsApplicantRespondToDefence() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(APPLICANT_RESPOND_TO_DEFENCE.fullName()))
-                .containsExactlyInAnyOrder(ADD_DEFENDANT_LITIGATION_FRIEND, WITHDRAW_CLAIM, DISCONTINUE_CLAIM,
-                                           CASE_PROCEEDS_IN_CASEMAN, AMEND_PARTY_DETAILS
-                );
-        }
-
-        @Test
-        void shouldReturnValidEvents_whenFlowStateIsClaimStayed() {
-            assertThat(flowStateAllowedEventService.getAllowedEvents(CLAIM_STAYED.fullName()))
-                .containsExactlyInAnyOrder(WITHDRAW_CLAIM, DISCONTINUE_CLAIM);
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedCaseEventForFlowStateArguments.class)
+        void shouldReturnValidEvents_whenFlowStateIsProvided(FlowState.Main flowState, CaseEvent... caseEvents) {
+            assertThat(flowStateAllowedEventService.getAllowedEvents(flowState.fullName()))
+                .containsExactlyInAnyOrder(caseEvents);
         }
     }
 
@@ -220,31 +259,14 @@ class FlowStateAllowedEventServiceTest {
     class IsEventAllowedOnFlowState {
 
         @ParameterizedTest
-        @CsvSource({
-            "DRAFT,CREATE_CLAIM",
-            "CLAIM_ISSUED,MOVE_TO_STAYED",
-            "CLAIM_ISSUED,ACKNOWLEDGE_SERVICE",
-            "CLAIM_ISSUED,WITHDRAW_CLAIM",
-            "CLAIM_ISSUED,CASE_PROCEEDS_IN_CASEMAN",
-            "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM",
-            "AWAITING_CASE_NOTIFICATION,ADD_DEFENDANT_LITIGATION_FRIEND",
-            "AWAITING_CASE_NOTIFICATION,CASE_PROCEEDS_IN_CASEMAN",
-            "AWAITING_CASE_NOTIFICATION,ADD_OR_AMEND_CLAIM_DOCUMENTS",
-            "AWAITING_CASE_DETAILS_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
-            "AWAITING_CASE_DETAILS_NOTIFICATION,ADD_DEFENDANT_LITIGATION_FRIEND",
-            "AWAITING_CASE_DETAILS_NOTIFICATION,CASE_PROCEEDS_IN_CASEMAN",
-            "AWAITING_CASE_DETAILS_NOTIFICATION,ADD_OR_AMEND_CLAIM_DOCUMENTS",
-            "SERVICE_ACKNOWLEDGED,INFORM_AGREED_EXTENSION_DATE",
-            "SERVICE_ACKNOWLEDGED,DEFENDANT_RESPONSE",
-            "EXTENSION_REQUESTED,DEFENDANT_RESPONSE",
-            "RESPONDENT_FULL_DEFENCE,CLAIMANT_RESPONSE",
-            "RESPONDENT_FULL_DEFENCE,DISCONTINUE_CLAIM",
-            "RESPONDENT_FULL_ADMISSION,ADD_DEFENDANT_LITIGATION_FRIEND",
-            "RESPONDENT_PART_ADMISSION,ADD_DEFENDANT_LITIGATION_FRIEND",
-            "RESPONDENT_COUNTER_CLAIM,ADD_DEFENDANT_LITIGATION_FRIEND"
-        })
-        void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
-            assertTrue(flowStateAllowedEventService.isAllowedOnState(flowState.fullName(), caseEvent));
+        @ArgumentsSource(GetAllowedCaseEventForFlowStateArguments.class)
+        void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
+            Arrays.stream(caseEvents).forEach(caseEvent ->
+                                                  assertTrue(flowStateAllowedEventService.isAllowedOnState(
+                                                      flowState.fullName(),
+                                                      caseEvent
+                                                  ))
+            );
         }
 
         @ParameterizedTest
@@ -324,7 +346,8 @@ class FlowStateAllowedEventServiceTest {
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName()
-                    })
+                    }
+                )
             );
         }
     }
