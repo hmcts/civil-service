@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.unspec.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.unspec.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.CorrectEmail;
 import uk.gov.hmcts.reform.unspec.model.Fee;
@@ -65,6 +66,7 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallba
 import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.UNREGISTERED_ORG_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.launchdarkly.OnBoardingOrganisationControlService.ORG_NOT_ONBOARDED;
 import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -89,6 +91,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private OrganisationService organisationService;
 
     @MockBean
+    private OnBoardingOrganisationControlService onBoardingOrganisationControlService;
+
+    @MockBean
     private IdamClient idamClient;
 
     @Autowired
@@ -110,6 +115,42 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
         }
+    }
+
+    @Nested
+    class MidEventEligibilityCallback {
+
+        private static final String PAGE_ID = "eligibilityCheck";
+
+        @Test
+        void shouldReturnError_whenOrganisationIsNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
+                .willReturn(List.of(String.format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd")));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                .containsExactly(String.format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd"));
+        }
+
+        @Test
+        void shouldNotReturnError_whenOrganisationIsRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
+                .willReturn(List.of());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
     }
 
     @Nested

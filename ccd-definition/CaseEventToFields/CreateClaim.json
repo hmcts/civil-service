@@ -9,6 +9,7 @@
     "PageID": "Eligibility",
     "PageDisplayOrder": 1,
     "PageColumnNumber": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/eligibilityCheck",
     "ShowSummaryChangeOption": "N"
   },
   {
