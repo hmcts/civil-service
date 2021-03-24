@@ -73,6 +73,9 @@ unspecified:
   system-update:
     username: 'civil-system-update@mailnesia.com'
     password: 'Password12!'
+  prd-admin:
+    username: 'civil.damages.prd.admin@example.com'
+    password: 'Password12!'
   cross-access:
     username: 'caseworker-caa@mailnesia.com'
     password: 'Password12!'

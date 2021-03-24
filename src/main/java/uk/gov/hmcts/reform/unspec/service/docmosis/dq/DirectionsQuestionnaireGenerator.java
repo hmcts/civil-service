@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.unspec.enums.dq.Language;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Applicant;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.Experts;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.model.dq.DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.unspec.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
@@ -43,6 +46,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
+    private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
@@ -70,6 +74,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getDefendantResponseDate())
             .applicant(getApplicant(caseData))
+            .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
@@ -89,7 +94,24 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return Applicant.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant1LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
             .build();
+    }
+
+    private List<Respondent> getRespondents(CaseData caseData) {
+        Party respondent = caseData.getRespondent1();
+        return List.of(Respondent.builder()
+                           .name(respondent.getPartyName())
+                           .primaryAddress(respondent.getPrimaryAddress())
+                           .representative(representativeService.getRespondentRepresentative(caseData))
+                           .litigationFriendName(
+                               ofNullable(caseData.getRespondent1LitigationFriend())
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
     }
 
     private Experts getExperts(DQ dq) {

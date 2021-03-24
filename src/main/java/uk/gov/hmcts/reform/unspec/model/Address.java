@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.unspec.utils.ObjectUtils;
 
 import static uk.gov.hmcts.reform.unspec.utils.StringUtils.joinNonNull;
@@ -75,5 +76,18 @@ public class Address {
             postTown,
             joinNonNull(", ", county, country)
         );
+    }
+
+    @JsonIgnore
+    public static Address fromContactInformation(ContactInformation contactInformation) {
+        return Address.builder()
+            .addressLine1(contactInformation.getAddressLine1())
+            .addressLine2(contactInformation.getAddressLine2())
+            .addressLine3(contactInformation.getAddressLine3())
+            .postTown(contactInformation.getTownCity())
+            .county(contactInformation.getCounty())
+            .country(contactInformation.getCountry())
+            .postCode(contactInformation.getPostCode())
+            .build();
     }
 }

@@ -8,9 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
-import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Respondent;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 
 import java.time.LocalDate;
 
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class AcknowledgementOfServiceForm implements MappableObject {
 
     @JsonProperty("courtseal")

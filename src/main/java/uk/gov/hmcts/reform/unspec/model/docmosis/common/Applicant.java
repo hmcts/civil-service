@@ -10,4 +10,5 @@ public class Applicant {
 
     private final String name;
     private final Address primaryAddress;
+    private final String litigationFriendName;
 }

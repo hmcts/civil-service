@@ -58,6 +58,8 @@ java:
         - system-update-user-password
         - cross-access-user-username
         - cross-access-user-password
+        - prd-admin-user-username
+        - prd-admin-user-password
         - AppInsightsInstrumentationKey
         - docmosis-api-key
         - cmc-db-password

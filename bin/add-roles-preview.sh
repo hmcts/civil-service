@@ -4,6 +4,7 @@
 ./civil-unspecified-docker/bin/utils/ccd-add-role.sh "caseworker-civil"
 ./civil-unspecified-docker/bin/utils/ccd-add-role.sh "caseworker-caa"
 ./civil-unspecified-docker/bin/utils/ccd-add-role.sh "caseworker-approver"
+./civil-unspecified-docker/bin/utils/ccd-add-role.sh "prd-admin"
 
 roles=("solicitor" "systemupdate" "admin")
 for role in "${roles[@]}"

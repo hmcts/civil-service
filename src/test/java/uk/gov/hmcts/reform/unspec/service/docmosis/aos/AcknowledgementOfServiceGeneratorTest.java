@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.service.docmosis.aos;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,15 +11,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfServiceForm;
-import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Respondent;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.unspec.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 
 import static java.lang.String.format;
@@ -50,14 +54,24 @@ class AcknowledgementOfServiceGeneratorTest {
         .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
         .build();
 
+    private final Representative representative = Representative.builder().organisationName("test org").build();
+
     @MockBean
     private DocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
+    @MockBean
+    private RepresentativeService representativeService;
+
     @Autowired
     private AcknowledgementOfServiceGenerator generator;
+
+    @BeforeEach
+    void setup() {
+        when(representativeService.getRespondentRepresentative(any())).thenReturn(representative);
+    }
 
     @Test
     void shouldGenerateAcknowledgementOfService_whenValidDataIsProvided() {
@@ -79,12 +93,15 @@ class AcknowledgementOfServiceGeneratorTest {
             .respondent(Respondent.builder()
                             .name(caseData.getRespondent1().getPartyName())
                             .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                            .representative(representative)
+                            .litigationFriendName("")
                             .build())
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
+        verify(representativeService).getRespondentRepresentative(caseData);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
         verify(documentGeneratorService)
@@ -96,10 +113,13 @@ class AcknowledgementOfServiceGeneratorTest {
 
         @Test
         void whenCaseIsAtServiceAcknowledge_shouldGetAcknowledgementOfServiceFormData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build().toBuilder()
+                .respondent1LitigationFriend(LitigationFriend.builder().fullName("LF name").build())
+                .build();
 
             var templateData = generator.getTemplateData(caseData);
 
+            verify(representativeService).getRespondentRepresentative(caseData);
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 
@@ -119,6 +139,8 @@ class AcknowledgementOfServiceGeneratorTest {
                 ),
                 () -> assertEquals(templateData.getRespondent(), Respondent.builder()
                     .name(caseData.getRespondent1().getPartyName())
+                    .representative(representative)
+                    .litigationFriendName(caseData.getRespondent1LitigationFriend().getFullName())
                     .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                     .build()
                 )
