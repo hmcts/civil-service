@@ -17,17 +17,18 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
+import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {
-    MoveClaimToStruckOutCallbackHandler.class,
+    DismissClaimCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-class MoveClaimToStruckOutCallbackHandlerTest extends BaseCallbackHandlerTest {
+class DismissClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private MoveClaimToStruckOutCallbackHandler handler;
+    private DismissClaimCallbackHandler handler;
 
     @Nested
     class AboutToSubmit {
@@ -47,8 +48,9 @@ class MoveClaimToStruckOutCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("businessProcess", Map.of(
                     "status", "READY",
-                    "camundaEvent", "MOVE_CLAIM_TO_STRUCK_OUT"
-                ));
+                    "camundaEvent", "DISMISS_CLAIM"
+                ))
+                .containsEntry("claimDismissedDate", now().toString());
         }
     }
 }

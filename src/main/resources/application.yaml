@@ -92,8 +92,8 @@ notifications:
   solicitorResponseToCase: "a2b3d626-bf20-406e-ac8c-8d8a5ea43c66"
   respondentSolicitorAcknowledgeService: "6ba538b6-f3f6-4943-862d-b436c0c3d741"
   failedPayment: "51aee712-459c-4b64-ae82-4e3b81c83da0"
-  applicantSolicitorCaseStrikeOut: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
-  respondentSolicitorCaseStrikeOut: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
+  applicantSolicitorClaimDismissed: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
+  respondentSolicitorClaimDismissed: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
   claimantSolicitorCaseWillProgressOffline: "290461ee-7b1d-404d-9b19-e46b1f6458d1"
   applicantSolicitorEmail: civil.damages.claims+organisation.1.solicitor.1@gmail.com
   respondentSolicitorEmail: civil.damages.claims+organisation.2.solicitor.1@gmail.com

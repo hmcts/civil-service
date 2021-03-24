@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.event.MoveCaseToStuckOutEvent;
-import uk.gov.hmcts.reform.unspec.service.search.CaseStrikeoutSearchService;
+import uk.gov.hmcts.reform.unspec.event.DismissClaimEvent;
+import uk.gov.hmcts.reform.unspec.service.search.CaseDismissedSearchService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class ClaimStrikeoutHandlerTest {
+class ClaimDismissedHandlerTest {
 
     @Mock
     private ExternalTask mockTask;
@@ -38,13 +38,13 @@ class ClaimStrikeoutHandlerTest {
     private ExternalTaskService externalTaskService;
 
     @Mock
-    private CaseStrikeoutSearchService searchService;
+    private CaseDismissedSearchService searchService;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
-    private ClaimStrikeoutHandler caseStayedFinder;
+    private ClaimDismissedHandler handler;
 
     @BeforeEach
     void init() {
@@ -60,9 +60,9 @@ class ClaimStrikeoutHandlerTest {
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
-        caseStayedFinder.execute(mockTask, externalTaskService);
+        handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new MoveCaseToStuckOutEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
@@ -70,7 +70,7 @@ class ClaimStrikeoutHandlerTest {
     void shouldNotEmitMoveCaseToStuckOutEvent_WhenNoCasesFound() {
         when(searchService.getCases()).thenReturn(List.of());
 
-        caseStayedFinder.execute(mockTask, externalTaskService);
+        handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
     }
@@ -84,7 +84,7 @@ class ClaimStrikeoutHandlerTest {
             throw new Exception(errorMessage);
         });
 
-        caseStayedFinder.execute(mockTask, externalTaskService);
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
@@ -102,7 +102,7 @@ class ClaimStrikeoutHandlerTest {
 
         doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
 
-        caseStayedFinder.execute(mockTask, externalTaskService);
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),

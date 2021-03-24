@@ -58,9 +58,9 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "STAYED",
-    "Name": "Stayed",
-    "Description": "Case is in stayed state",
+    "ID": "CLAIM_DISMISSED",
+    "Name": "Claim dismissed",
+    "Description": "Case is dismissed",
     "DisplayOrder": 8
   }
 ]

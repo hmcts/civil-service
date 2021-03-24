@@ -16,14 +16,16 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.stateflow.StateFlow;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
@@ -161,26 +163,6 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnClaimStayed_whenCaseDataAtStateClaimStayed() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimStayed().build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_STAYED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                    CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName()
-                );
-        }
-
-        @Test
         void shouldReturnServiceAcknowledge_whenCaseDataAtStateServiceAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
 
@@ -197,6 +179,29 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
                     AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
                     CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName()
+                );
+        }
+
+        @Test
+        void shouldReturnClaimDismissed_whenCaseDataAtStateServiceAcknowledgeAndCcdStateIsDismissed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge()
+                .claimDismissedDate(LocalDate.now())
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+                    CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
+                    CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME.fullName()
                 );
         }
 
@@ -301,7 +306,27 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnClaimStayed_whenCaseDataAtStateApplicantRespondToDefence() {
+        void shouldReturnClaimDismissed_whenCaseDataAtStateClaimDismissed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(7)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
+                    CLAIM_ISSUED.fullName(), CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME.fullName()
+                );
+        }
+
+        @Test
+        void shouldReturnCaseProceedsInCaseman_whenCaseDataAtStateApplicantRespondToDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -309,7 +334,7 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
                 .isNotNull()
-                .isEqualTo(CLAIM_STAYED.fullName());
+                .isEqualTo(CASE_PROCEEDS_IN_CASEMAN.fullName());
             assertThat(stateFlow.getStateHistory())
                 .hasSize(9)
                 .extracting(State::getName)
@@ -317,7 +342,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
                     AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
                     CLAIM_ISSUED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
-                    APPLICANT_RESPOND_TO_DEFENCE.fullName(), CLAIM_STAYED.fullName()
+                    APPLICANT_RESPOND_TO_DEFENCE.fullName(), CASE_PROCEEDS_IN_CASEMAN.fullName()
                 );
         }
 
@@ -373,7 +398,6 @@ class StateFlowEngineTest {
             "true,DRAFT",
             "false,RESPONDENT_FULL_DEFENCE",
             "false,APPLICANT_RESPOND_TO_DEFENCE",
-            "false,CLAIM_STAYED",
             "false,SERVICE_ACKNOWLEDGED",
         })
         void shouldReturnValidResult_whenCaseDataAtStateClaimCreated(boolean expected, FlowState.Main state) {
@@ -400,7 +424,8 @@ class StateFlowEngineTest {
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
                 "AWAITING_CASE_DETAILS_NOTIFICATION",
-                "CASE_PROCEEDS_IN_CASEMAN"
+                "CASE_PROCEEDS_IN_CASEMAN",
+                "CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME"
             })
         @ParameterizedTest(name = "{index} => should withdraw claim after claim state {0}")
         void shouldReturnValidState_whenCaseIsWithdrawnAfter(FlowState.Main flowState) {
@@ -428,7 +453,8 @@ class StateFlowEngineTest {
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
                 "AWAITING_CASE_DETAILS_NOTIFICATION",
-                "CASE_PROCEEDS_IN_CASEMAN"
+                "CASE_PROCEEDS_IN_CASEMAN",
+                "CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME"
             })
         @ParameterizedTest(name = "{index} => should discontinue claim after claim state {0}")
         void shouldReturnValidState_whenCaseIsDiscontinuedAfter(FlowState.Main flowState) {

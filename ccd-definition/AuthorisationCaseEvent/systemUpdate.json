@@ -2,13 +2,6 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "MOVE_TO_STAYED",
-    "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
@@ -100,21 +93,21 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "MOVE_CLAIM_TO_STRUCK_OUT",
+    "CaseEventID": "DISMISS_CLAIM",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_CASE_STRIKE_OUT",
+    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_CLAIM_DISMISSED",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_CASE_STRIKE_OUT",
+    "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_CLAIM_DISMISSED",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
   },

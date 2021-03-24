@@ -12,16 +12,18 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
-public class CaseStayedSearchService extends ElasticSearchService {
+public class CaseDismissedSearchService extends ElasticSearchService {
 
-    public CaseStayedSearchService(CoreCaseDataService coreCaseDataService) {
+    public CaseDismissedSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 
+    //TODO: claimDismissedDeadline is not yet set anywhere. Date is 6 months
+    // of no activity in state view and respond to defence which is currently AWAITING_CLAIMANT_INTENTION.
     public Query query(int startIndex) {
         return new Query(
             boolQuery()
-                .must(rangeQuery("last_modified").lt("now-6M"))
+                .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
                 .must(beValidState()),
             List.of("reference"),
             startIndex
@@ -31,7 +33,6 @@ public class CaseStayedSearchService extends ElasticSearchService {
     public BoolQueryBuilder beValidState() {
         return boolQuery()
             .minimumShouldMatch(1)
-            .should(matchQuery("state", "CREATED"))
-            .should(matchQuery("state", "AWAITING_RESPONDENT_ACTION"));
+            .should(matchQuery("state", "CREATED"));
     }
 }

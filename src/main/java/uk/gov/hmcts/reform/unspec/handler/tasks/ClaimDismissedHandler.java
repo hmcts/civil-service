@@ -6,17 +6,17 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.unspec.event.MoveCaseToStayedEvent;
-import uk.gov.hmcts.reform.unspec.service.search.CaseStayedSearchService;
+import uk.gov.hmcts.reform.unspec.event.DismissClaimEvent;
+import uk.gov.hmcts.reform.unspec.service.search.CaseDismissedSearchService;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class CaseStayedHandler implements BaseExternalTaskHandler {
+public class ClaimDismissedHandler implements BaseExternalTaskHandler {
 
-    private final CaseStayedSearchService caseSearchService;
+    private final CaseDismissedSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -25,6 +25,6 @@ public class CaseStayedHandler implements BaseExternalTaskHandler {
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> applicationEventPublisher.publishEvent(
-            new MoveCaseToStayedEvent(caseDetails.getId())));
+            new DismissClaimEvent(caseDetails.getId())));
     }
 }

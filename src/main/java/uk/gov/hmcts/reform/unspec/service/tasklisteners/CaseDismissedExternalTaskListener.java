@@ -4,16 +4,16 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.unspec.handler.tasks.CaseStayedHandler;
+import uk.gov.hmcts.reform.unspec.handler.tasks.ClaimDismissedHandler;
 
 @Component
-public class CaseStayedExternalTaskListener {
+public class CaseDismissedExternalTaskListener {
 
-    private static final String TOPIC = "CASE_STAYED_FINDER";
+    private static final String TOPIC = "CASE_DISMISSED";
 
     @Autowired
-    private CaseStayedExternalTaskListener(CaseStayedHandler caseStayedFinder, ExternalTaskClient client) {
+    private CaseDismissedExternalTaskListener(ClaimDismissedHandler claimDismissedHandler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
-        subscriptionBuilder.handler(caseStayedFinder).open();
+        subscriptionBuilder.handler(claimDismissedHandler).open();
     }
 }

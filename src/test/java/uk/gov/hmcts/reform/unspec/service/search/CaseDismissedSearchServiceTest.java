@@ -10,21 +10,20 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class CaseStayedSearchServiceTest extends ElasticSearchServiceTest {
+class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new CaseStayedSearchService(coreCaseDataService);
+        searchService = new CaseDismissedSearchService(coreCaseDataService);
     }
 
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("last_modified").lt("now-6M"))
+            .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
             .must(boolQuery()
-                        .minimumShouldMatch(1)
-                        .should(matchQuery("state", "CREATED"))
-                        .should(matchQuery("state", "AWAITING_RESPONDENT_ACTION")));
+                      .minimumShouldMatch(1)
+                      .should(matchQuery("state", "CREATED")));
 
         return new Query(query, List.of("reference"), fromValue);
     }

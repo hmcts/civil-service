@@ -8,22 +8,22 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class ClaimStrikeoutTest extends BpmnBaseTest {
+class DismissClaimTest extends BpmnBaseTest {
 
-    public static final String MESSAGE_NAME = "MOVE_CLAIM_TO_STRUCK_OUT";
-    public static final String PROCESS_ID = "CLAIM_STRIKEOUT_PROCESS_ID";
+    public static final String MESSAGE_NAME = "DISMISS_CLAIM";
+    public static final String PROCESS_ID = "DISMISS_CLAIM";
 
-    public static final String NOTIFY_RESPONDENT_SOLICITOR_1 = "NOTIFY_RESPONDENT_SOLICITOR1_CASE_STRIKE_OUT";
-    public static final String RESPONDENT_SOLICITOR_1_ACTIVITY_ID = "ClaimStrikeoutNotifyRespondentSolicitor1";
-    public static final String NOTIFY_APPLICANT_SOLICITOR_1 = "NOTIFY_APPLICANT_SOLICITOR1_CASE_STRIKE_OUT";
-    public static final String APPLICANT_SOLICITOR_1_ACTIVITY_ID = "ClaimStrikeoutNotifyApplicantSolicitor1";
+    public static final String NOTIFY_RESPONDENT_SOLICITOR_1 = "NOTIFY_RESPONDENT_SOLICITOR1_CLAIM_DISMISSED";
+    public static final String RESPONDENT_SOLICITOR_1_ACTIVITY_ID = "ClaimDismissedNotifyRespondentSolicitor1";
+    public static final String NOTIFY_APPLICANT_SOLICITOR_1 = "NOTIFY_APPLICANT_SOLICITOR1_CLAIM_DISMISSED";
+    public static final String APPLICANT_SOLICITOR_1_ACTIVITY_ID = "ClaimDismissedNotifyApplicantSolicitor1";
 
-    public ClaimStrikeoutTest() {
-        super("claim_strikeout.bpmn", "CLAIM_STRIKEOUT_PROCESS_ID");
+    public DismissClaimTest() {
+        super("claim_dismissed.bpmn", "DISMISS_CLAIM");
     }
 
     @Test
-    void shouldSuccessfullyCompleteStrikeoutClaim() {
+    void shouldSuccessfullyCompleteDismissClaim() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 

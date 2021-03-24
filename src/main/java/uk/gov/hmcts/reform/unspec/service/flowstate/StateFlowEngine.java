@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.unspec.stateflow.StateFlowBuilder;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterServiceAcknowledged;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
@@ -27,14 +29,13 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respond
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentPartAdmission;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.schedulerStayClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
@@ -82,13 +83,14 @@ public class StateFlowEngine {
                 .transitionTo(RESPONDENT_COUNTER_CLAIM).onlyIf(respondentCounterClaim)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
-                .transitionTo(CLAIM_STAYED).onlyIf(schedulerStayClaim)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+                .transitionTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME).onlyIf(caseDismissed)
             .state(SERVICE_ACKNOWLEDGED)
                 .transitionTo(EXTENSION_REQUESTED).onlyIf(respondentAgreedExtension)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+                .transitionTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME).onlyIf(caseDismissedAfterServiceAcknowledged)
             .state(EXTENSION_REQUESTED)
                 .transitionTo(RESPONDENT_FULL_DEFENCE).onlyIf(respondentFullDefence)
                 .transitionTo(RESPONDENT_FULL_ADMISSION).onlyIf(respondentFullAdmission)
@@ -119,9 +121,9 @@ public class StateFlowEngine {
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
                 .transitionTo(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM).onlyIf(claimTakenOffline)
             .state(APPLICANT_RESPOND_TO_DEFENCE)
-                .transitionTo(CLAIM_STAYED)
-            .state(CLAIM_STAYED)
+                .transitionTo(CASE_PROCEEDS_IN_CASEMAN)
             .state(CASE_PROCEEDS_IN_CASEMAN)
+            .state(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME)
             .state(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT)
             .state(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM)
             .state(CLAIM_WITHDRAWN)

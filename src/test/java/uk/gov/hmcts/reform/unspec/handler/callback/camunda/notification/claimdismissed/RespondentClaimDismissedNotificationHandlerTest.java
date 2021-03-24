@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification;
+package uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.claimdismissed;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -21,14 +21,14 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
-    ApplicantClaimStruckOutNotificationHandler.class,
+    RespondentClaimDismissedNotificationHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-class ApplicantClaimStruckOutNotificationHandlerTest {
+class RespondentClaimDismissedNotificationHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
-    public static final String EMAIL = "claimantsolicitor@example.com";
+    public static final String EMAIL = "respondentsolicitor@example.com";
 
     @MockBean
     private NotificationService notificationService;
@@ -37,19 +37,19 @@ class ApplicantClaimStruckOutNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
 
     @Autowired
-    private ApplicantClaimStruckOutNotificationHandler handler;
+    private RespondentClaimDismissedNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getApplicantSolicitorCaseStrikeOut()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn(EMAIL);
+            when(notificationsProperties.getRespondentSolicitorClaimDismissed()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getRespondentSolicitorEmail()).thenReturn(EMAIL);
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
+        void shouldNotifyRespondentSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -59,7 +59,7 @@ class ApplicantClaimStruckOutNotificationHandlerTest {
                 EMAIL,
                 TEMPLATE_ID,
                 getExpectedMap(),
-                "applicant-claim-strike-out-notification-000LR001"
+                "respondent-claim-strike-out-notification-000LR001"
             );
         }
     }
@@ -67,8 +67,9 @@ class ApplicantClaimStruckOutNotificationHandlerTest {
     private Map<String, String> getExpectedMap() {
         return Map.of(
             "claimReferenceNumber", "000LR001",
-            "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-            "defendantName", "Mr. Sole Trader"
+            "claimantName", "Mr. John Rambo",
+            "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
         );
     }
+
 }

@@ -114,7 +114,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "NOTIFY_APPLICANT_SOLICITOR1_CASE_STRIKE_OUT",
+    "ID": "NOTIFY_APPLICANT_SOLICITOR1_CLAIM_DISMISSED",
     "Name": "Notify of struck out claim",
     "Description": "Notify applicant solicitor 1 of struck out claim",
     "PreConditionState(s)": "PROCEEDS_WITH_OFFLINE_JOURNEY",
@@ -128,7 +128,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "NOTIFY_RESPONDENT_SOLICITOR1_CASE_STRIKE_OUT",
+    "ID": "NOTIFY_RESPONDENT_SOLICITOR1_CLAIM_DISMISSED",
     "Name": "Notify of struck out claim",
     "Description": "Notify respondent solicitor 1 of struck out claim",
     "PreConditionState(s)": "PROCEEDS_WITH_OFFLINE_JOURNEY",

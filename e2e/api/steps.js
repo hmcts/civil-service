@@ -304,17 +304,15 @@ module.exports = {
     await assertError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
       'The date cannot be in the past and must not be more than a year in the future');
 
-    await assertSubmittedEvent('STAYED', {
+    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     }, true);
     await waitForFinishedBusinessProcess(caseId);
 
-    //TODO: event currently puts claim into stayed state and users do no have permissions to see it.
-
-    // await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    // await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    // await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
   },
 
   //TODO this method is not used in api tests

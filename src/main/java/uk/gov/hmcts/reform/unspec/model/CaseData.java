@@ -116,4 +116,8 @@ public class CaseData implements MappableObject {
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+
+    //TODO: field is currently not set anywhere
+    private final LocalDateTime claimDismissedDeadline;
+    private final LocalDate claimDismissedDate;
 }

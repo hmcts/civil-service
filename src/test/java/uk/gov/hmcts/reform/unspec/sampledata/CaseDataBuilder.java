@@ -49,11 +49,11 @@ import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLAIM_DISMISSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.STAYED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
@@ -121,6 +121,8 @@ public class CaseDataBuilder {
     private YesOrNo respondent1OrgRegistered;
     private OrganisationPolicy applicant1OrganisationPolicy;
     private OrganisationPolicy respondent1OrganisationPolicy;
+
+    private LocalDate claimDismissedDate;
 
     private SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
 
@@ -264,6 +266,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimDismissedDate(LocalDate date) {
+        this.claimDismissedDate = date;
+        return this;
+    }
+
     public CaseDataBuilder atState(FlowState.Main flowState) {
         switch (flowState) {
             case DRAFT:
@@ -282,8 +289,6 @@ public class CaseDataBuilder {
                 return atStateClaimCreated();
             case EXTENSION_REQUESTED:
                 return atStateExtensionRequested();
-            case CLAIM_STAYED:
-                return atStateClaimStayed();
             case SERVICE_ACKNOWLEDGED:
                 return atStateServiceAcknowledge();
             case RESPONDENT_FULL_DEFENCE:
@@ -306,6 +311,8 @@ public class CaseDataBuilder {
                 return atStateProceedsOfflineUnrepresentedDefendant();
             case CASE_PROCEEDS_IN_CASEMAN:
                 return atStateCaseProceedsInCaseman();
+            case CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME:
+                return atStateClaimDismissed();
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -458,12 +465,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimStayed() {
-        atStateClaimCreated();
-        ccdState = STAYED;
-        return this;
-    }
-
     public CaseDataBuilder atStateCaseProceedsInCaseman() {
         atStateAwaitingCaseNotification();
         claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
@@ -509,6 +510,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineAdmissionOrCounterClaim() {
         atStateRespondentFullDefence();
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDismissed() {
+        atStateClaimCreated();
+        ccdState = CLAIM_DISMISSED;
+        claimDismissedDate = now();
         return this;
     }
 
@@ -598,6 +606,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
+            .claimDismissedDate(claimDismissedDate)
             .build();
     }
 }

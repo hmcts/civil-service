@@ -595,8 +595,8 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "applicantSolicitorSecondResponseDeadlineToRespondentSolicitor1",
-    "Label": "Case strikeout deadline",
+    "ID": "claimDismissedDeadline",
+    "Label": "Case dismissed deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
@@ -742,6 +742,14 @@
     "ID": "amendPartyDetailsLabel",
     "Label": "Update a legal representative's email address by replacing the existing email.",
     "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimDismissedDate",
+    "Label": "Claim dismissed date",
+    "FieldType": "Date",
     "SecurityClassification": "Public"
   }
 ]

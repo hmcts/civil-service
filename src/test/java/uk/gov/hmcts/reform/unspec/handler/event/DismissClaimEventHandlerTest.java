@@ -5,28 +5,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.unspec.event.MoveCaseToStuckOutEvent;
+import uk.gov.hmcts.reform.unspec.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISMISS_CLAIM;
 
 @ExtendWith(SpringExtension.class)
-class MoveCaseToStruckOutEventHandlerTest {
+class DismissClaimEventHandlerTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
     @InjectMocks
-    private MoveCaseToStruckOutEventHandler handler;
+    private DismissClaimEventHandler handler;
 
     @Test
-    void shouldCallTriggerEventWithExpectedParams_WhenMoveToStayedEvent() {
-        MoveCaseToStuckOutEvent event = new MoveCaseToStuckOutEvent(1L);
+    void shouldCallTriggerEventWithExpectedParams_WhenDismissClaimEvent() {
+        DismissClaimEvent event = new DismissClaimEvent(1L);
 
         handler.moveCaseToStruckOut(event);
 
-        verify(coreCaseDataService).triggerEvent(event.getCaseId(), MOVE_CLAIM_TO_STRUCK_OUT);
+        verify(coreCaseDataService).triggerEvent(event.getCaseId(), DISMISS_CLAIM);
     }
 
 }

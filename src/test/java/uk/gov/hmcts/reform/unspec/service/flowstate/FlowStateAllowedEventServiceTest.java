@@ -34,9 +34,8 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISCONTINUE_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_CLAIM_TO_STRUCK_OUT;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.MOVE_TO_STAYED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
@@ -45,7 +44,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLIC
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_STAYED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
@@ -80,13 +78,11 @@ class FlowStateAllowedEventServiceTest {
                     AWAITING_CASE_DETAILS_NOTIFICATION
                 ),
                 of(CaseDataBuilder.builder().atStateClaimCreated().build(), CLAIM_ISSUED),
-                of(CaseDataBuilder.builder().atStateClaimStayed().build(), CLAIM_STAYED),
                 of(CaseDataBuilder.builder().atStateServiceAcknowledge().build(), SERVICE_ACKNOWLEDGED),
                 of(CaseDataBuilder.builder().atStateRespondentFullDefence().build(), RESPONDENT_FULL_DEFENCE),
                 of(CaseDataBuilder.builder().atStateRespondentFullAdmission().build(), RESPONDENT_FULL_ADMISSION),
                 of(CaseDataBuilder.builder().atStateRespondentPartAdmission().build(), RESPONDENT_PART_ADMISSION),
                 of(CaseDataBuilder.builder().atStateRespondentCounterClaim().build(), RESPONDENT_COUNTER_CLAIM),
-                of(CaseDataBuilder.builder().atStateApplicantRespondToDefence().build(), CLAIM_STAYED),
                 of(CaseDataBuilder.builder().atStateExtensionRequested().build(), EXTENSION_REQUESTED)
             );
         }
@@ -149,13 +145,13 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_ISSUED,
                     new CaseEvent[]{
-                        MOVE_TO_STAYED,
                         ACKNOWLEDGE_SERVICE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
-                        AMEND_PARTY_DETAILS
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM
                     }
                 ),
                 of(
@@ -166,14 +162,8 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
-                        AMEND_PARTY_DETAILS
-                    }
-                ),
-                of(
-                    CLAIM_STAYED,
-                    new CaseEvent[]{
-                        WITHDRAW_CLAIM,
-                        DISCONTINUE_CLAIM
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM
                     }
                 ),
                 of(
@@ -185,7 +175,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         INFORM_AGREED_EXTENSION_DATE,
-                        AMEND_PARTY_DETAILS
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM
                     }
                 ),
                 of(
@@ -195,7 +186,6 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
-                        MOVE_CLAIM_TO_STRUCK_OUT,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS
                     }
@@ -272,7 +262,6 @@ class FlowStateAllowedEventServiceTest {
         @ParameterizedTest
         @CsvSource({
             "DRAFT,CASE_PROCEEDS_IN_CASEMAN",
-            "CLAIM_STAYED,DEFENDANT_RESPONSE",
             "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
             "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_SERVICE",
             "APPLICANT_RESPOND_TO_DEFENCE,ACKNOWLEDGE_SERVICE",
@@ -291,14 +280,13 @@ class FlowStateAllowedEventServiceTest {
             return Stream.of(
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{PAYMENT_FAILED.fullName()}),
-                of(MOVE_TO_STAYED, new String[]{CLAIM_ISSUED.fullName()}),
                 of(ACKNOWLEDGE_SERVICE, new String[]{CLAIM_ISSUED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{AWAITING_CASE_NOTIFICATION.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{RESPONDENT_FULL_DEFENCE.fullName()}),
                 of(DEFENDANT_RESPONSE, new String[]{SERVICE_ACKNOWLEDGED.fullName(), EXTENSION_REQUESTED.fullName()}),
                 of(
                     WITHDRAW_CLAIM,
-                    new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
+                    new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(),
                         SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
@@ -307,7 +295,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     DISCONTINUE_CLAIM,
-                    new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(), CLAIM_STAYED.fullName(),
+                    new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(),
                         SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
