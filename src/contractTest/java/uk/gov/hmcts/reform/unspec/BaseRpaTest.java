@@ -18,7 +18,7 @@ public abstract class BaseRpaTest {
 
     protected static final String VERSION = "1.0.0";
     protected static final String PATH = "/fake-endpoint";
-    protected static final String CONSUMER = "unspec_service";
+    protected static final String CONSUMER = "civil";
     protected static final String PROVIDER = "rpa_api";
 
     protected PactVerificationResult getPactVerificationResult(String payload, String description) {

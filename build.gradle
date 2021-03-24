@@ -404,9 +404,13 @@ project.ext {
 pact {
   publish {
     pactDirectory = 'target/pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash()]
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
+    pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
     version = project.pactVersion
+    if(pactBrokerUrl != 'https://pact-broker.platform.hmcts.net/'){
+      excludes = ['unspec_service-Idam_api']
+    }
   }
 }
 
