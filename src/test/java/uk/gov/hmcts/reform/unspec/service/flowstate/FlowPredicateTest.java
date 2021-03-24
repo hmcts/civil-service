@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterServiceAcknowledged;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.payment
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeService;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullDefence;
@@ -147,18 +147,18 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class RespondentAcknowledgedServicePredicate {
+    class RespondentAcknowledgedClaimPredicate {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateServiceAcknowledged() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
-            assertTrue(respondentAcknowledgeService.test(caseData));
+        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            assertTrue(respondentAcknowledgeClaim.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClaimCreated() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
-            assertFalse(respondentAcknowledgeService.test(caseData));
+            assertFalse(respondentAcknowledgeClaim.test(caseData));
         }
     }
 
@@ -242,7 +242,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateServiceAcknowledged() {
+        void shouldReturnFalse_whenCaseDataatStateClaimAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             assertFalse(applicantRespondToDefence.test(caseData));
         }
@@ -333,20 +333,20 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class ClaimDismissedAfterServiceAcknowledged {
+    class ClaimDismissedAfterClaimAcknowledged {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateServiceAcknowledgeWithClaimDismissedDate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge()
+        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledgeWithClaimDismissedDate() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge()
                 .claimDismissedDate(LocalDate.now())
                 .build();
-            assertTrue(caseDismissedAfterServiceAcknowledged.test(caseData));
+            assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateServiceAcknowledge() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
-            assertFalse(caseDismissedAfterServiceAcknowledged.test(caseData));
+        void shouldReturnFalse_whenCaseDataatStateClaimAcknowledge() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
     }
 }

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfServiceForm;
+import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfClaimForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_SERVICE;
+import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N9;
 import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
@@ -40,10 +40,10 @@ import static uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils.toCaseN
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    AcknowledgementOfServiceGenerator.class,
+    AcknowledgementOfClaimGenerator.class,
     JacksonAutoConfiguration.class
 })
-class AcknowledgementOfServiceGeneratorTest {
+class AcknowledgementOfClaimGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000LR001";
@@ -51,7 +51,7 @@ class AcknowledgementOfServiceGeneratorTest {
     private static final String fileName = format(N9.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
-        .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
+        .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
         .build();
 
     private final Representative representative = Representative.builder().organisationName("test org").build();
@@ -66,7 +66,7 @@ class AcknowledgementOfServiceGeneratorTest {
     private RepresentativeService representativeService;
 
     @Autowired
-    private AcknowledgementOfServiceGenerator generator;
+    private AcknowledgementOfClaimGenerator generator;
 
     @BeforeEach
     void setup() {
@@ -74,17 +74,17 @@ class AcknowledgementOfServiceGeneratorTest {
     }
 
     @Test
-    void shouldGenerateAcknowledgementOfService_whenValidDataIsProvided() {
+    void shouldGenerateAcknowledgementOfClaim_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N9)))
             .thenReturn(new DocmosisDocument(N9.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
 
-        AcknowledgementOfServiceForm expectedDocmosisData = AcknowledgementOfServiceForm.builder()
+        AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
             .caseName("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co")
             .referenceNumber(LEGACY_CASE_REFERENCE)
             .solicitorReferences(caseData.getSolicitorReferences())
@@ -103,7 +103,7 @@ class AcknowledgementOfServiceGeneratorTest {
 
         verify(representativeService).getRespondentRepresentative(caseData);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService)
             .generateDocmosisDocument(expectedDocmosisData, N9);
     }
@@ -112,8 +112,8 @@ class AcknowledgementOfServiceGeneratorTest {
     class GetTemplateData {
 
         @Test
-        void whenCaseIsAtServiceAcknowledge_shouldGetAcknowledgementOfServiceFormData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build().toBuilder()
+        void whenCaseIsAtClaimAcknowledge_shouldGetAcknowledgementOfClaimFormData() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build().toBuilder()
                 .respondent1LitigationFriend(LitigationFriend.builder().fullName("LF name").build())
                 .build();
 
@@ -123,9 +123,9 @@ class AcknowledgementOfServiceGeneratorTest {
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 
-        private void assertThatFieldsAreCorrect(AcknowledgementOfServiceForm templateData, CaseData caseData) {
+        private void assertThatFieldsAreCorrect(AcknowledgementOfClaimForm templateData, CaseData caseData) {
             Assertions.assertAll(
-                "AcknowledgementOfService data should be as expected",
+                "AcknowledgementOfClaim data should be as expected",
                 () -> assertEquals(templateData.getCaseName(), toCaseName.apply(caseData)),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(

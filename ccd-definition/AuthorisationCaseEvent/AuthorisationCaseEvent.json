@@ -40,7 +40,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
     "AccessControl": [
       {
         "UserRoles": [

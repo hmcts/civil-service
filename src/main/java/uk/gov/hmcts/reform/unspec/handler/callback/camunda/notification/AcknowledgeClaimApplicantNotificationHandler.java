@@ -16,15 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_SERVICE_ACKNOWLEDGEMENT;
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHandler implements NotificationData {
+public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_SERVICE_ACKNOWLEDGEMENT);
-    public static final String TASK_ID = "AcknowledgeServiceNotifyApplicantSolicitor1";
-    private static final String REFERENCE_TEMPLATE = "acknowledge-service-applicant-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(
+        //TODO: CMC-1271 backwards compatibility
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_SERVICE_ACKNOWLEDGEMENT,
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT
+    );
+
+    public static final String TASK_ID = "AcknowledgeClaimNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "acknowledge-claim-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -32,7 +38,7 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForServiceAcknowledgement
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForClaimAcknowledgement
         );
     }
 
@@ -46,12 +52,12 @@ public class AcknowledgeServiceApplicantNotificationHandler extends CallbackHand
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantSolicitorForServiceAcknowledgement(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForClaimAcknowledgement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             notificationsProperties.getApplicantSolicitorEmail(),
-            notificationsProperties.getRespondentSolicitorAcknowledgeService(),
+            notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );

@@ -11,7 +11,7 @@ Scenario('Take claim offline', async (I) => {
   await I.createCase();
   await I.notifyClaim();
   await I.notifyClaimDetails();
-  await I.acknowledgeService('fullDefence');
+  await I.acknowledgeClaim('fullDefence');
   await I.caseProceedsInCaseman();
   await I.assertNoEventsAvailable();
 });
@@ -25,7 +25,7 @@ Scenario('Defendant - Defend part of Claim', async (I) => {
   await I.createCase();
   await I.notifyClaim();
   await I.notifyClaimDetails();
-  await I.acknowledgeService('partDefence');
+  await I.acknowledgeClaim('partDefence');
   await I.respondToClaim('partAdmission');
 });
 
@@ -33,7 +33,7 @@ Scenario('Defendant - Defends, Claimant decides not to proceed', async (I) => {
   await I.createCase();
   await I.notifyClaim();
   await I.notifyClaimDetails();
-  await I.acknowledgeService('fullDefence');
+  await I.acknowledgeClaim('fullDefence');
   await I.respondToClaim('fullDefence');
   await I.respondToDefenceDropClaim();
   await I.assertNoEventsAvailable();
@@ -43,7 +43,7 @@ Scenario('Defendant - Defends, Claimant decides to proceed', async (I) => {
   await I.createCase();
   await I.notifyClaim();
   await I.notifyClaimDetails();
-  await I.acknowledgeService('fullDefence');
+  await I.acknowledgeClaim('fullDefence');
   await I.respondToClaim('fullDefence');
   await I.respondToDefence();
   await I.assertNoEventsAvailable();
@@ -54,7 +54,7 @@ Scenario('Claimant does not respond to defence with defined timescale', async (I
   let caseId = getCaseId(await I.grabCaseNumber());
   await I.notifyClaim();
   await I.notifyClaimDetails();
-  await I.acknowledgeService('partDefence');
+  await I.acknowledgeClaim('partDefence');
   await I.respondToClaim('fullDefence');
 
   await waitForFinishedBusinessProcess(caseId);

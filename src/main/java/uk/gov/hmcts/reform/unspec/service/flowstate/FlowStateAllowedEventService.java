@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.AMEND_PARTY_DETAILS;
@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
@@ -39,7 +40,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPON
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_PART_ADMISSION;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +92,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_ISSUED.fullName(),
             List.of(
-                ACKNOWLEDGE_SERVICE,
+                ACKNOWLEDGE_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -116,7 +116,7 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
-            SERVICE_ACKNOWLEDGED.fullName(),
+            CLAIM_ACKNOWLEDGED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
