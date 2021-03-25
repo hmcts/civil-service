@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
@@ -146,6 +147,7 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_ISSUED,
                     new CaseEvent[]{
                         ACKNOWLEDGE_SERVICE,
+                        ACKNOWLEDGE_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,

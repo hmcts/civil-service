@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -142,6 +145,12 @@ class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetNewResponseDeadline_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = params.toBuilder()
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                             .eventId(ACKNOWLEDGE_SERVICE.toString())
+                             .build())
+                .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -153,6 +162,12 @@ class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = params.toBuilder()
+                .request(CallbackRequest.builder()
+                    .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                    .eventId(ACKNOWLEDGE_SERVICE.toString())
+                    .build())
+                .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
