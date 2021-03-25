@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.AMEND_PARTY_DETAILS;
@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
@@ -52,6 +51,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPON
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_PART_ADMISSION;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -78,7 +78,7 @@ class FlowStateAllowedEventServiceTest {
                     AWAITING_CASE_DETAILS_NOTIFICATION
                 ),
                 of(CaseDataBuilder.builder().atStateClaimCreated().build(), CLAIM_ISSUED),
-                of(CaseDataBuilder.builder().atStateClaimAcknowledge().build(), CLAIM_ACKNOWLEDGED),
+                of(CaseDataBuilder.builder().atStateServiceAcknowledge().build(), SERVICE_ACKNOWLEDGED),
                 of(CaseDataBuilder.builder().atStateRespondentFullDefence().build(), RESPONDENT_FULL_DEFENCE),
                 of(CaseDataBuilder.builder().atStateRespondentFullAdmission().build(), RESPONDENT_FULL_ADMISSION),
                 of(CaseDataBuilder.builder().atStateRespondentPartAdmission().build(), RESPONDENT_PART_ADMISSION),
@@ -145,7 +145,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_ISSUED,
                     new CaseEvent[]{
-                        ACKNOWLEDGE_CLAIM,
+                        ACKNOWLEDGE_SERVICE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
@@ -167,7 +167,7 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    CLAIM_ACKNOWLEDGED,
+                    SERVICE_ACKNOWLEDGED,
                     new CaseEvent[]{
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -263,8 +263,8 @@ class FlowStateAllowedEventServiceTest {
         @CsvSource({
             "DRAFT,CASE_PROCEEDS_IN_CASEMAN",
             "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
-            "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_CLAIM",
-            "APPLICANT_RESPOND_TO_DEFENCE,ACKNOWLEDGE_CLAIM",
+            "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_SERVICE",
+            "APPLICANT_RESPOND_TO_DEFENCE,ACKNOWLEDGE_SERVICE",
             "EXTENSION_REQUESTED, INFORM_AGREED_EXTENSION_DATE"
         })
         void shouldReturnFalse_whenEventIsNotAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
@@ -280,14 +280,14 @@ class FlowStateAllowedEventServiceTest {
             return Stream.of(
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{PAYMENT_FAILED.fullName()}),
-                of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),
+                of(ACKNOWLEDGE_SERVICE, new String[]{CLAIM_ISSUED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{AWAITING_CASE_NOTIFICATION.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{RESPONDENT_FULL_DEFENCE.fullName()}),
-                of(DEFENDANT_RESPONSE, new String[]{CLAIM_ACKNOWLEDGED.fullName(), EXTENSION_REQUESTED.fullName()}),
+                of(DEFENDANT_RESPONSE, new String[]{SERVICE_ACKNOWLEDGED.fullName(), EXTENSION_REQUESTED.fullName()}),
                 of(
                     WITHDRAW_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(),
-                        CLAIM_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
+                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
@@ -296,7 +296,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     DISCONTINUE_CLAIM,
                     new String[]{DRAFT.fullName(), CLAIM_ISSUED.fullName(),
-                        CLAIM_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
+                        SERVICE_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
@@ -305,7 +305,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CASE_PROCEEDS_IN_CASEMAN,
                     new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                        CLAIM_ISSUED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
@@ -314,7 +314,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     ADD_DEFENDANT_LITIGATION_FRIEND,
                     new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                        CLAIM_ISSUED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
+                        CLAIM_ISSUED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
@@ -325,12 +325,12 @@ class FlowStateAllowedEventServiceTest {
                     new String[]{AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName()}
                 ),
                 of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[]{AWAITING_CASE_DETAILS_NOTIFICATION.fullName()}),
-                of(INFORM_AGREED_EXTENSION_DATE, new String[]{CLAIM_ACKNOWLEDGED.fullName()}),
+                of(INFORM_AGREED_EXTENSION_DATE, new String[]{SERVICE_ACKNOWLEDGED.fullName()}),
                 of(
                     AMEND_PARTY_DETAILS,
                     new String[]{PAYMENT_FAILED.fullName(), AWAITING_CASE_NOTIFICATION.fullName(),
                         AWAITING_CASE_DETAILS_NOTIFICATION.fullName(), CLAIM_ISSUED.fullName(),
-                        EXTENSION_REQUESTED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
+                        EXTENSION_REQUESTED.fullName(), SERVICE_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
                         APPLICANT_RESPOND_TO_DEFENCE.fullName()
@@ -359,15 +359,15 @@ class FlowStateAllowedEventServiceTest {
             return Stream.of(
                 of(
                     true,
-                    CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(),
+                    CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(),
                     INFORM_AGREED_EXTENSION_DATE
                 ),
-                of(true, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), WITHDRAW_CLAIM),
-                of(true, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), DEFENDANT_RESPONSE),
-                of(true, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), DISCONTINUE_CLAIM),
-                of(true, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), CASE_PROCEEDS_IN_CASEMAN),
-                of(false, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), CREATE_CLAIM),
-                of(false, CaseDetailsBuilder.builder().atStateClaimAcknowledge().build(), CLAIMANT_RESPONSE),
+                of(true, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), WITHDRAW_CLAIM),
+                of(true, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), DEFENDANT_RESPONSE),
+                of(true, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), DISCONTINUE_CLAIM),
+                of(true, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CASE_PROCEEDS_IN_CASEMAN),
+                of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CREATE_CLAIM),
+                of(false, CaseDetailsBuilder.builder().atStateServiceAcknowledge().build(), CLAIMANT_RESPONSE),
                 of(
                     true,
                     CaseDetailsBuilder.builder().atStateAwaitingCaseNotification().build(),
@@ -416,7 +416,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     false,
                     CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
-                    ACKNOWLEDGE_CLAIM
+                    ACKNOWLEDGE_SERVICE
                 ),
                 of(false, CaseDetailsBuilder.builder().atStateProceedsOffline().build(), AMEND_PARTY_DETAILS),
                 of(true, CaseDetailsBuilder.builder().atStateClaimCreated().build(), AMEND_PARTY_DETAILS)

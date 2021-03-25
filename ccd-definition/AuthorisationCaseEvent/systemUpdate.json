@@ -11,14 +11,6 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_FOR_SERVICE_ACKNOWLEDGEMENT",
     "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU",
-    "_Comments": "//TODO: CMC-1271 backwards compatibility"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT",
-    "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
   },
   {
@@ -123,14 +115,6 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "GENERATE_ACKNOWLEDGEMENT_OF_SERVICE",
-    "UserRole": "caseworker-civil-systemupdate",
-    "CRUD": "CRU",
-    "_Comments": "//TODO: CMC-1271 backwards compatibility"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "GENERATE_ACKNOWLEDGEMENT_OF_CLAIM",
     "UserRole": "caseworker-civil-systemupdate",
     "CRUD": "CRU"
   },

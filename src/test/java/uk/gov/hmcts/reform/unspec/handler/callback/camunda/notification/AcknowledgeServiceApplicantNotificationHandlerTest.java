@@ -27,24 +27,24 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.N
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    AcknowledgeClaimApplicantNotificationHandler.class,
+    AcknowledgeServiceApplicantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class AcknowledgeServiceApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private AcknowledgeClaimApplicantNotificationHandler handler;
+    private AcknowledgeServiceApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeService()).thenReturn("template-id");
             when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn("claimantsolicitor@example.com");
             when(notificationsProperties.getRespondentSolicitorEmail()).thenReturn("defendantsolicitor@example.com");
         }
@@ -60,7 +60,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 "claimantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "acknowledge-claim-applicant-notification-000LR001"
+                "acknowledge-service-applicant-notification-000LR001"
             );
         }
 

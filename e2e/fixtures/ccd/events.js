@@ -11,10 +11,10 @@ module.exports = {
     description: 'Inform the defendant of particulars of claim',
     order: 3
   },
-  ACKNOWLEDGE_CLAIM: {
-    id: 'ACKNOWLEDGE_CLAIM',
-    name: 'Acknowledge claim',
-    description: 'Defendant solicitor is acknowledging claim',
+  ACKNOWLEDGE_SERVICE: {
+    id: 'ACKNOWLEDGE_SERVICE',
+    name: 'Acknowledge service',
+    description: 'Defendant solicitor is acknowledging service',
     order: 4
   },
   ADD_DEFENDANT_LITIGATION_FRIEND: {

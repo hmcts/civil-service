@@ -73,8 +73,8 @@ public class CaseDetailsBuilder {
         return this;
     }
 
-    public CaseDetailsBuilder atStateClaimAcknowledge() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+    public CaseDetailsBuilder atStateServiceAcknowledge() {
+        CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = CREATED.name();
         return this;

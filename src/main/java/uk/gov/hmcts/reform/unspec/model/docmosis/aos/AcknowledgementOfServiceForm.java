@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class AcknowledgementOfClaimForm implements MappableObject {
+public class AcknowledgementOfServiceForm implements MappableObject {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR

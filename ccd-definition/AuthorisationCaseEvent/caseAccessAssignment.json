@@ -9,7 +9,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },

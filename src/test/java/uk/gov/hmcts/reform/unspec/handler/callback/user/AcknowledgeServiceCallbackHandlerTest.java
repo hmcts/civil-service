@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
@@ -40,19 +40,19 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    AcknowledgeClaimCallbackHandler.class,
+    AcknowledgeServiceCallbackHandler.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
 })
-class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
+class AcknowledgeServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
 
     @Autowired
-    private AcknowledgeClaimCallbackHandler handler;
+    private AcknowledgeServiceCallbackHandler handler;
 
     @Nested
     class AboutToStartCallback {
@@ -140,7 +140,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetNewResponseDeadline_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -151,7 +151,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -159,7 +159,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(ACKNOWLEDGE_CLAIM.name());
+                .isEqualTo(ACKNOWLEDGE_SERVICE.name());
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -173,17 +173,17 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualToComparingFieldByField(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You've acknowledged claim")
+                    .confirmationHeader("# You've acknowledged service")
                     .confirmationBody(format(
                         "<br />You need to respond before 4pm on %s."
-                            + "\n\n[Download the Acknowledgement of Claim form]"
+                            + "\n\n[Download the Acknowledgement of Service form]"
                             + "(/cases/case-details/%s#CaseDocuments)",
                         formatLocalDateTime(RESPONSE_DEADLINE, DATE), caseData.getCcdCaseReference()
                     ))
