@@ -22,8 +22,8 @@ Scenario('Amend party details', async (api) => {
   await api.amendPartyDetails(config.adminUser);
 });
 
-Scenario('Acknowledge service', async (api) => {
-  await api.acknowledgeService(config.solicitorUser);
+Scenario('Acknowledge claim', async (api) => {
+  await api.acknowledgeClaim(config.solicitorUser);
 });
 
 Scenario('Inform agreed extension date', async (api) => {

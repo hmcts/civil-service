@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterServiceAcknowledged;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.payment
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeService;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAgreedExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLIC
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -49,7 +50,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPON
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_PART_ADMISSION;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.SERVICE_ACKNOWLEDGED;
 
 @Component
 @RequiredArgsConstructor
@@ -76,7 +76,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimDetailsNotified)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
             .state(CLAIM_ISSUED)
-                .transitionTo(SERVICE_ACKNOWLEDGED).onlyIf(respondentAcknowledgeService)
+                .transitionTo(CLAIM_ACKNOWLEDGED).onlyIf(respondentAcknowledgeClaim)
                 .transitionTo(RESPONDENT_FULL_DEFENCE).onlyIf(respondentFullDefence)
                 .transitionTo(RESPONDENT_FULL_ADMISSION).onlyIf(respondentFullAdmission)
                 .transitionTo(RESPONDENT_PART_ADMISSION).onlyIf(respondentPartAdmission)
@@ -85,12 +85,12 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
                 .transitionTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME).onlyIf(caseDismissed)
-            .state(SERVICE_ACKNOWLEDGED)
+            .state(CLAIM_ACKNOWLEDGED)
                 .transitionTo(EXTENSION_REQUESTED).onlyIf(respondentAgreedExtension)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
-                .transitionTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME).onlyIf(caseDismissedAfterServiceAcknowledged)
+                .transitionTo(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME).onlyIf(caseDismissedAfterClaimAcknowledged)
             .state(EXTENSION_REQUESTED)
                 .transitionTo(RESPONDENT_FULL_DEFENCE).onlyIf(respondentFullDefence)
                 .transitionTo(RESPONDENT_FULL_ADMISSION).onlyIf(respondentFullAdmission)

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfServiceForm;
+import uk.gov.hmcts.reform.unspec.model.docmosis.aos.AcknowledgementOfClaimForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
@@ -21,19 +21,19 @@ import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N9;
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgementOfServiceGenerator implements TemplateDataGenerator<AcknowledgementOfServiceForm> {
+public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<AcknowledgementOfClaimForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        AcknowledgementOfServiceForm templateData = getTemplateData(caseData);
+        AcknowledgementOfClaimForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N9);
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_SERVICE)
+            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_CLAIM)
         );
     }
 
@@ -42,8 +42,8 @@ public class AcknowledgementOfServiceGenerator implements TemplateDataGenerator<
     }
 
     @Override
-    public AcknowledgementOfServiceForm getTemplateData(CaseData caseData) {
-        return AcknowledgementOfServiceForm.builder()
+    public AcknowledgementOfClaimForm getTemplateData(CaseData caseData) {
+        return AcknowledgementOfClaimForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))

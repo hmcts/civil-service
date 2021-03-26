@@ -13,7 +13,7 @@ module.exports = {
       events.ADD_OR_AMEND_CLAIM_DOCUMENTS
     ],
     CREATED: [
-      events.ACKNOWLEDGE_SERVICE,
+      events.ACKNOWLEDGE_CLAIM,
       events.ADD_DEFENDANT_LITIGATION_FRIEND,
       events.DEFENDANT_RESPONSE,
       events.INFORM_AGREED_EXTENSION_DATE
