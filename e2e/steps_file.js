@@ -22,7 +22,7 @@ const claimValuePage = require('./pages/createClaim/claimValue.page');
 const pbaNumberPage = require('./pages/createClaim/pbaNumber.page');
 const paymentReferencePage = require('./pages/createClaim/paymentReference.page');
 
-const responseIntentionPage = require('./pages/acknowledgeService/responseIntention.page');
+const responseIntentionPage = require('./pages/acknowledgeClaim/responseIntention.page');
 
 const caseProceedsInCasemanPage = require('./pages/caseProceedsInCaseman/caseProceedsInCaseman.page');
 const takeCaseOffline = require('./pages/caseProceedsInCaseman/takeCaseOffline.page');
@@ -163,12 +163,12 @@ module.exports = function () {
       await event.returnToCaseDetails();
     },
 
-    async acknowledgeService(responseIntention) {
-      await caseViewPage.startEvent('Acknowledge service', caseId);
+    async acknowledgeClaim(responseIntention) {
+      await caseViewPage.startEvent('Acknowledge claim', caseId);
       await respondentDetails.verifyDetails();
       await confirmDetailsPage.confirmReference();
       await responseIntentionPage.selectResponseIntention(responseIntention);
-      await event.submit('Acknowledge service', 'You\'ve acknowledged service');
+      await event.submit('Acknowledge claim', 'You\'ve acknowledged claim');
       await event.returnToCaseDetails();
     },
 

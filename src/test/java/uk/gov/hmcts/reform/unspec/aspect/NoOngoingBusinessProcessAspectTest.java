@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.aspect.NoOngoingBusinessProcessAspect.ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.START_BUSINESS_PROCESS;
 
@@ -58,7 +58,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimCreated().build())
-                .request(CallbackRequest.builder().eventId(ACKNOWLEDGE_SERVICE.name()).build())
+                .request(CallbackRequest.builder().eventId(ACKNOWLEDGE_CLAIM.name()).build())
                 .build();
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
