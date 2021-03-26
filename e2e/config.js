@@ -3,7 +3,6 @@
 const defaultPassword = 'Password12!';
 
 module.exports = {
-  proxyServer: process.env.PROXY_SERVER,
   idamStub: {
     enabled: process.env.IDAM_STUB_ENABLED || false,
     url: 'http://localhost:5555'

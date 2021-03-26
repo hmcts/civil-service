@@ -12,8 +12,7 @@ exports.config = {
       waitForTimeout: process.env.WAIT_FOR_TIMEOUT_MS || 40000,
       waitForNavigation: [ "domcontentloaded", "networkidle0" ],
       chrome: {
-        ignoreHTTPSErrors: true,
-        args: process.env.PROXY_SERVER ? [`--proxy-server=${process.env.PROXY_SERVER}`,] : [],
+        ignoreHTTPSErrors: true
       },
     },
     PuppeteerHelpers: {

@@ -13,5 +13,3 @@ echo "export CAMUNDA_BASE_URL=http://camunda-api-demo.service.core-compute-demo.
 
 # definition placeholders
 echo "export CCD_DEF_CASE_SERVICE_BASE_URL=http://unspec-service-demo.service.core-compute-demo.internal"
-echo "export https_proxy=proxyout.reform.hmcts.net:8080"
-echo "export http_proxy=proxyout.reform.hmcts.net:8080"

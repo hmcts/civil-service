@@ -23,8 +23,6 @@
     "deep-equal-in-any-order": "^1.0.28",
     "eslint": "^7.3.1",
     "eslint-plugin-codeceptjs": "^1.3.0",
-    "http-proxy-agent": "^4.0.1",
-    "https-proxy-agent": "^5.0.0",
     "husky": "^4.2.5",
     "mocha-multi": "^1.1.3",
     "mochawesome": "^6.1.1",
