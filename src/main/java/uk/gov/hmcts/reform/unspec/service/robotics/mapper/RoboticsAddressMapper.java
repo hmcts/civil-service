@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.unspec.service.robotics.mapper;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddresses;
 
+import java.util.List;
 import java.util.Optional;
 
+import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.unspec.model.Address.fromContactInformation;
 
 @Component
 public class RoboticsAddressMapper {
@@ -29,5 +33,11 @@ public class RoboticsAddressMapper {
         return RoboticsAddresses.builder()
             .contactAddress(toRoboticsAddress(address))
             .build();
+    }
+
+    public RoboticsAddresses toRoboticsAddresses(List<ContactInformation> contactInformation) {
+        return isEmpty(contactInformation)
+            ? null
+            : toRoboticsAddresses(fromContactInformation(contactInformation.get(0)));
     }
 }

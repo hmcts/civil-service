@@ -3,16 +3,22 @@ package uk.gov.hmcts.reform.unspec.handler.callback.camunda.robotics;
 import com.networknt.schema.ValidationMessage;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
+import uk.gov.hmcts.reform.unspec.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.unspec.service.robotics.RoboticsNotificationService;
@@ -38,12 +44,20 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
     EventHistoryMapper.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
+    StateFlowEngine.class,
+    OrganisationService.class
 })
+@ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     RoboticsNotificationService roboticsNotificationService;
+    @MockBean
+    OrganisationApi organisationApi;
+    @MockBean
+    IdamClient idamClient;
+    @MockBean
+    PrdAdminUserConfiguration userConfig;
 
     @Nested
     class ValidJsonPayload {

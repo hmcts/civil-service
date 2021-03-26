@@ -21,6 +21,5 @@ public class Solicitor {
     private String preferredMethodOfCommunication;
     private String reference;
     @JsonProperty("isPayee")
-    @Builder.Default
-    private boolean isPayee = true;
+    private boolean isPayee;
 }

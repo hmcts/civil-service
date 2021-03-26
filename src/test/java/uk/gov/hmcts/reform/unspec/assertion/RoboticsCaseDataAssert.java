@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.unspec.assertion;
 
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.Party;
@@ -53,14 +55,16 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             "applicant1" + "." + "reference",
             actual.getSolicitors().get(0),
             expected.getSolicitorReferences().getApplicantSolicitor1Reference(),
-            null
+            null,
+            expected.getApplicant1OrganisationPolicy()
         );
         assertSolicitor(
             RESPONDENT_SOLICITOR_ID,
             "respondent1" + "." + "reference",
             actual.getSolicitors().get(1),
             expected.getSolicitorReferences().getRespondentSolicitor1Reference(),
-            expected.getRespondentSolicitor1OrganisationDetails()
+            expected.getRespondentSolicitor1OrganisationDetails(),
+            expected.getRespondent1OrganisationPolicy()
         );
 
         assertNotNull(actual.getEvents());
@@ -128,7 +132,8 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
     }
 
     private void assertSolicitor(String id, String fieldName, Solicitor solicitor, String reference,
-                                 SolicitorOrganisationDetails solicitorOrganisationDetails
+                                 SolicitorOrganisationDetails solicitorOrganisationDetails,
+                                 OrganisationPolicy organisationPolicy
     ) {
         compare(
             "id",
@@ -170,6 +175,17 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
                 assertThat(solicitor.getAddresses().getContactAddress())
                     .isEqualTo(organisationDetails.getAddress());
             });
+
+        ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID)
+            .ifPresent(organisationId ->
+                           compare(
+                               "organisationId",
+                               solicitor.getOrganisationId(),
+                               ofNullable(organisationId)
+                           )
+            );
     }
 
     private void assertParty(String fieldName,

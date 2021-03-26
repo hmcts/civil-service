@@ -324,6 +324,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
         claimIssuedDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        respondent1OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
             .organisationName("test org name")
@@ -410,6 +411,9 @@ public class CaseDataBuilder {
         respondent1 = PartyBuilder.builder().soleTrader().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
+        applicant1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY").build())
             .build();

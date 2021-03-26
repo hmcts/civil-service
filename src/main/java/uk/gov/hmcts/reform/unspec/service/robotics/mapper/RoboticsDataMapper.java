@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
@@ -15,11 +17,14 @@ import uk.gov.hmcts.reform.unspec.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.unspec.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.unspec.model.robotics.Solicitor;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.utils.PartyUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -40,6 +45,7 @@ public class RoboticsDataMapper {
 
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
+    private final OrganisationService organisationService;
 
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData) {
         requireNonNull(caseData);
@@ -98,21 +104,55 @@ public class RoboticsDataMapper {
 
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
+        Optional<String> organisationId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
+        var organisationDetails = ofNullable(
+            caseData.getRespondentSolicitor1OrganisationDetails()
+        );
+        if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
+            return solicitorBuilder.build();
+        }
         solicitorBuilder
             .id(id)
-            .organisationId(ofNullable(caseData.getRespondent1OrganisationPolicy())
-                                .map(organisationPolicy -> organisationPolicy.getOrganisation().getOrganisationID())
-                                .orElse(null)
-            )
+            .isPayee(false)
+            .organisationId(organisationId.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
             );
 
-        ofNullable(caseData.getRespondentSolicitor1OrganisationDetails())
-            .ifPresent(buildOrganisationDetails(solicitorBuilder));
+        organisationId
+            .flatMap(organisationService::findOrganisationById)
+            .ifPresent(buildOrganisation(solicitorBuilder));
+
+        organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
         return solicitorBuilder.build();
+    }
+
+    private Consumer<uk.gov.hmcts.reform.prd.model.Organisation> buildOrganisation(
+        Solicitor.SolicitorBuilder solicitorBuilder
+    ) {
+        return organisation -> {
+            List<ContactInformation> contactInformation = organisation.getContactInformation();
+            solicitorBuilder
+                .name(organisation.getName())
+                .addresses(addressMapper.toRoboticsAddresses(contactInformation))
+                .contactDX(getContactDX(contactInformation));
+        };
+    }
+
+    private String getContactDX(List<ContactInformation> contactInformation) {
+        if (isEmpty(contactInformation)) {
+            return null;
+        }
+        List<DxAddress> dxAddresses = contactInformation.get(0).getDxAddress();
+        return isEmpty(dxAddresses) ? null : dxAddresses.get(0).getDxNumber();
+    }
+
+    private Optional<String> getOrganisationId(OrganisationPolicy respondent1OrganisationPolicy) {
+        return ofNullable(respondent1OrganisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID);
     }
 
     private Consumer<SolicitorOrganisationDetails> buildOrganisationDetails(
@@ -129,17 +169,21 @@ public class RoboticsDataMapper {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
-        return Solicitor.builder()
+        Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
+        Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder()
             .id(id)
-            .organisationId(ofNullable(caseData.getApplicant1OrganisationPolicy())
-                                .map(organisationPolicy -> organisationPolicy.getOrganisation().getOrganisationID())
-                                .orElse(null)
-            )
+            .isPayee(true)
+            .organisationId(organisationId.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
-            )
-            .build();
+            );
+
+        organisationId
+            .flatMap(organisationService::findOrganisationById)
+            .ifPresent(buildOrganisation(solicitorBuilder));
+
+        return solicitorBuilder.build();
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
@@ -178,14 +222,7 @@ public class RoboticsDataMapper {
             .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
             .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
             .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
-            .solicitorOrganisationID(getOrganisationID(organisationPolicy))
+            .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
             .build();
-    }
-
-    private String getOrganisationID(OrganisationPolicy organisationPolicy) {
-        return ofNullable(organisationPolicy)
-            .map(OrganisationPolicy::getOrganisation)
-            .map(Organisation::getOrganisationID)
-            .orElse(null);
     }
 }
