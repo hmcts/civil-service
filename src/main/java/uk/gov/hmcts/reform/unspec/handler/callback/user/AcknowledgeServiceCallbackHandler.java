@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,18 +27,22 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_SERVICE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
+public class AcknowledgeServiceCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_CLAIM);
+    private static final List<CaseEvent> EVENTS = List.of(
+        ACKNOWLEDGE_CLAIM,
+        ACKNOWLEDGE_SERVICE
+    );
 
     public static final String CONFIRMATION_SUMMARY = "<br />You need to respond before 4pm on %s."
-        + "\n\n[Download the Acknowledgement of Claim form](%s)";
+        + "\n\n[Download the Acknowledgement of Service form](%s)";
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final WorkingDayIndicator workingDayIndicator;
@@ -73,9 +76,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondentSolicitor1ResponseDeadline();
         LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondentSolicitor1ResponseDeadline(newResponseDate.atTime(MID_NIGHT))
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .businessProcess(BusinessProcess.ready(caseEvent))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -93,7 +97,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         );
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# You've acknowledged claim")
+            .confirmationHeader("# You've acknowledged service")
             .confirmationBody(body)
             .build();
     }

@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.Document;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.unspec.service.docmosis.aos.AcknowledgementOfClaimGenerator;
+import uk.gov.hmcts.reform.unspec.service.docmosis.aos.AcknowledgementOfServiceGenerator;
 
 import java.time.LocalDateTime;
 
@@ -27,23 +27,23 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    GenerateAcknowledgementOfClaimCallbackHandler.class,
+    GenerateAcknowledgementOfServiceCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
+class GenerateAcknowledgementOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final CaseDocument DOCUMENT = CaseDocument.builder()
         .createdBy("John")
         .documentName("document name")
         .documentSize(0L)
-        .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
+        .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
             .documentUrl("fake-url")
@@ -53,17 +53,17 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         .build();
 
     @MockBean
-    private AcknowledgementOfClaimGenerator acknowledgementOfClaimGenerator;
+    private AcknowledgementOfServiceGenerator acknowledgementOfServiceGenerator;
 
     @Autowired
-    private GenerateAcknowledgementOfClaimCallbackHandler handler;
+    private GenerateAcknowledgementOfServiceCallbackHandler handler;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
-        when(acknowledgementOfClaimGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
+        when(acknowledgementOfServiceGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
     }
 
     @Test
@@ -75,7 +75,7 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        verify(acknowledgementOfClaimGenerator).generate(caseData, "BEARER_TOKEN");
+        verify(acknowledgementOfServiceGenerator).generate(caseData, "BEARER_TOKEN");
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 

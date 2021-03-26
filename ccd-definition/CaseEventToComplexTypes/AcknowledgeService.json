@@ -2,7 +2,7 @@
   {
     "LiveFrom": "01/01/2017",
     "ID": "SolicitorReferences",
-    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
     "CaseFieldID": "solicitorReferences",
     "ListElementCode": "respondentSolicitor1Reference",
     "FieldDisplayOrder": 1,
@@ -11,7 +11,7 @@
   {
     "LiveFrom": "01/01/2017",
     "ID": "Party",
-    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
     "CaseFieldID": "respondent1",
     "ListElementCode": "individualDateOfBirth",
     "EventElementLabel": "Defendant's date of birth",
@@ -22,7 +22,7 @@
   {
     "LiveFrom": "01/01/2017",
     "ID": "Party",
-    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
     "CaseFieldID": "respondent1",
     "ListElementCode": "soleTraderDateOfBirth",
     "EventElementLabel": "Defendant's date of birth",

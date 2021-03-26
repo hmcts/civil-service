@@ -20,7 +20,7 @@ const data = {
   RESUBMIT_CLAIM: require('../fixtures/events/resubmitClaim.js'),
   ADD_OR_AMEND_CLAIM_DOCUMENTS: require('../fixtures/events/addOrAmendClaimDocuments.js'),
   CREATE_CLAIM_RESPONDENT_SOLICITOR_FIRM_NOT_IN_MY_HMCTS: claimData.createClaimRespondentSolFirmNotInMyHmcts,
-  ACKNOWLEDGE_CLAIM: require('../fixtures/events/acknowledgeClaim.js'),
+  ACKNOWLEDGE_SERVICE: require('../fixtures/events/acknowledgeService.js'),
   INFORM_AGREED_EXTENSION_DATE: require('../fixtures/events/informAgreeExtensionDate.js'),
   DEFENDANT_RESPONSE: require('../fixtures/events/defendantResponse.js'),
   CLAIMANT_RESPONSE: require('../fixtures/events/claimantResponse.js'),
@@ -217,22 +217,22 @@ module.exports = {
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
   },
 
-  acknowledgeClaim: async (user) => {
+  acknowledgeService: async (user) => {
     await apiRequest.setupTokens(user);
 
-    eventName = 'ACKNOWLEDGE_CLAIM';
+    eventName = 'ACKNOWLEDGE_SERVICE';
     let returnedCaseData = await apiRequest.startEvent(eventName, caseId);
     assertContainsPopulatedFields(returnedCaseData);
     caseData = returnedCaseData;
     deleteCaseFields('systemGeneratedCaseDocuments');
 
-    await validateEventPages(data.ACKNOWLEDGE_CLAIM);
+    await validateEventPages(data.ACKNOWLEDGE_SERVICE);
 
     await assertError('ConfirmDetails', data[eventName].invalid.ConfirmDetails.futureDateOfBirth,
       'The date entered cannot be in the future');
 
     await assertSubmittedEvent('CREATED', {
-      header: 'You\'ve acknowledged claim',
+      header: 'You\'ve acknowledged service',
       body: 'You need to respond before'
     }, true);
 
