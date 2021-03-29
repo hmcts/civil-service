@@ -98,7 +98,7 @@ ccd:
       enabled: false
 
   global:
-    ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
+    ccdApiGatewayIngress: http://civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -115,7 +115,7 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
-      ingressHost: gateway-${SERVICE_FQDN}
+      ingressHost: civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
       keyVaults: []
   ccd-data-store-api:
@@ -145,7 +145,7 @@ ccd:
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
       keyVaults: []
-      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      ingressHost: civil-damages-service-user-profile-staging-aat.service.core-compute-aat.internal
 
   postgresql:
     persistence:
