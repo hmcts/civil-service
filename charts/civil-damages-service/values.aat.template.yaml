@@ -129,7 +129,7 @@ ccd:
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: unspec_service
       keyVaults: []
-      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      ingressHost: civil-damages-service-data-store-staging-aat.service.core-compute-aat.internal
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
@@ -138,7 +138,7 @@ ccd:
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
       keyVaults: []
-      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+      ingressHost: civil-damages-service-definition-store-staging-aat.service.core-compute-aat.internal
   ccd-user-profile-api:
     java:
       imagePullPolicy: Always
