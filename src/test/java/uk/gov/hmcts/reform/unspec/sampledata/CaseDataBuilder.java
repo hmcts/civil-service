@@ -272,6 +272,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder extensionDate(LocalDate extensionDate) {
+        this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
     public CaseDataBuilder atState(FlowState.Main flowState) {
         switch (flowState) {
             case DRAFT:

@@ -55,8 +55,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        LocalDateTime currentResponseDeadline = caseData.getRespondentSolicitor1ResponseDeadline();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validator.validateProposedDeadline(callbackParams.getRequest().getCaseDetails()))
+            .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
             .build();
     }
 

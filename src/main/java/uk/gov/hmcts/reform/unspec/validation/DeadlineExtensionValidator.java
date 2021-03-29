@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.unspec.validation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +14,6 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.END_OF_BUSI
 @Service
 @RequiredArgsConstructor
 public class DeadlineExtensionValidator {
-
-    private final ObjectMapper mapper;
 
     public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
         if (!dateToValidate.isAfter(now())) {
@@ -33,19 +29,5 @@ public class DeadlineExtensionValidator {
         }
 
         return emptyList();
-    }
-
-    public List<String> validateProposedDeadline(CaseDetails caseDetails) {
-        LocalDate deadlineExtension = mapper.convertValue(
-            caseDetails.getData().get("respondentSolicitor1AgreedDeadlineExtension"),
-            LocalDate.class
-        );
-
-        LocalDateTime responseDeadline = mapper.convertValue(
-            caseDetails.getData().get("respondentSolicitor1ResponseDeadline"),
-            LocalDateTime.class
-        );
-
-        return validateProposedDeadline(deadlineExtension, responseDeadline);
     }
 }
