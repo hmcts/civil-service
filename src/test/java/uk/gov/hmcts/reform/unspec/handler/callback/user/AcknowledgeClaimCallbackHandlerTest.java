@@ -19,13 +19,15 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static java.lang.String.format;
-import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,10 +35,9 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
-import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
-import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -49,7 +50,10 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
-    private WorkingDayIndicator workingDayIndicator;
+    private DeadlinesCalculator deadlinesCalculator;
+
+    @MockBean
+    private Time time;
 
     @Autowired
     private AcknowledgeClaimCallbackHandler handler;
@@ -132,25 +136,19 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
+        private LocalDateTime newDeadline;
+        private LocalDateTime acknowledgementDate;
 
         @BeforeEach
         void setup() {
-            when(workingDayIndicator.getNextWorkingDay(any())).thenReturn(now().plusDays(14));
+            newDeadline = LocalDateTime.now().plusDays(14);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(newDeadline);
+            acknowledgementDate = LocalDateTime.now();
+            when(time.now()).thenReturn(acknowledgementDate);
         }
 
         @Test
-        void shouldSetNewResponseDeadline_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("respondentSolicitor1ResponseDeadline")
-                .isEqualTo(now().atTime(MID_NIGHT).plusDays(14).toString());
-        }
-
-        @Test
-        void shouldUpdateBusinessProcess_whenInvoked() {
+        void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -165,6 +163,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+
+            assertThat(response.getData())
+                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
         }
     }
 
@@ -178,14 +180,14 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).isEqualToComparingFieldByField(
+            assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# You've acknowledged claim")
                     .confirmationBody(format(
-                        "<br />You need to respond before 4pm on %s."
-                            + "\n\n[Download the Acknowledgement of Claim form]"
+                        "<br />You need to respond before %s."
+                            + "%n%n[Download the Acknowledgement of Claim form]"
                             + "(/cases/case-details/%s#CaseDocuments)",
-                        formatLocalDateTime(RESPONSE_DEADLINE, DATE), caseData.getCcdCaseReference()
+                        formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference()
                     ))
                     .build());
         }

@@ -64,10 +64,10 @@ public class RoboticsDataMapper {
             .courtFee(ofNullable(caseData.getClaimFee())
                           .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
                           .orElse(null))
-            .caseIssuedDate(ofNullable(caseData.getClaimIssuedDate())
+            .caseIssuedDate(ofNullable(caseData.getIssueDate())
                                 .map(issueDate -> issueDate.format(ISO_DATE))
                                 .orElse(null))
-            .caseRequestReceivedDate(caseData.getClaimSubmittedDateTime().toLocalDate().format(ISO_DATE))
+            .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
             .build();
     }
 

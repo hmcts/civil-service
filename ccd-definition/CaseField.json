@@ -199,7 +199,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "claimIssuedDate",
+    "ID": "issueDate",
     "Label": "Date claim issued",
     "FieldType": "Date",
     "SecurityClassification": "Public",
@@ -209,7 +209,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "claimSubmittedDateTime",
+    "ID": "submittedDate",
     "Label": "Date claim Submitted",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
@@ -225,7 +225,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "respondentSolicitor1ResponseDeadline",
+    "ID": "respondent1ResponseDeadline",
     "Label": "Respondent solicitor deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public",
@@ -297,7 +297,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "applicantSolicitorResponseDeadlineToRespondentSolicitor1",
+    "ID": "applicant1ResponseDeadline",
     "Label": "Claimant response deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
@@ -603,9 +603,9 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "defendantResponseDate",
+    "ID": "respondent1ResponseDate",
     "Label": "Defendant response date",
-    "FieldType": "Date",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
   {
@@ -677,7 +677,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimNotificationDate",
     "Label": "Date claim notified",
-    "FieldType": "Date",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
   {
@@ -725,7 +725,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimDetailsNotificationDate",
     "Label": "Case details notification date",
-    "FieldType": "Date",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
   {
@@ -742,6 +742,62 @@
     "ID": "amendPartyDetailsLabel",
     "Label": "Update a legal representative's email address by replacing the existing email.",
     "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "paymentSuccessfulDate",
+    "Label": "Payment successful date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimNotificationDeadline",
+    "Label": "Claim notification deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimDetailsNotificationDeadline",
+    "Label": "Case details notification deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1TimeExtensionDate",
+    "Label": "Date respondent 1 submitted time extension",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondent1AcknowledgeNotificationDate",
+    "Label": "Date respondent 1 acknowledged notification",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicant1ResponseDate",
+    "Label": "Date applicant 1 responded to defence",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "takenOfflineDate",
+    "Label": "Date claim moved offline",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   },
   {

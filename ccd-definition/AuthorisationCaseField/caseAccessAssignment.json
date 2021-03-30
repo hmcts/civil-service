@@ -44,7 +44,7 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseFieldID": "claimSubmittedDateTime",
+    "CaseFieldID": "submittedDate",
     "UserRole": "caseworker-caa",
     "CRUD": "CRU"
   },

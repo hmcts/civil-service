@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.service.PaymentsService;
+import uk.gov.hmcts.reform.unspec.service.Time;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,6 +59,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             caseData = caseData.toBuilder()
                 .paymentDetails(PaymentDetails.builder().status(SUCCESS).reference(paymentReference).build())
+                .paymentSuccessfulDate(time.now())
                 .build();
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);

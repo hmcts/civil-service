@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsPr
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.NotificationService;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -62,12 +61,8 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
-        CaseData updatedCaseData = caseData.toBuilder()
-            .claimDetailsNotificationDate(LocalDate.now())
-            .build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -76,7 +71,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            ISSUED_ON, formatLocalDate(caseData.getClaimIssuedDate(), DATE)
+            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE)
         );
     }
 }

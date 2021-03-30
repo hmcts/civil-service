@@ -88,8 +88,8 @@ class AcknowledgementOfClaimGeneratorTest {
             .caseName("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co")
             .referenceNumber(LEGACY_CASE_REFERENCE)
             .solicitorReferences(caseData.getSolicitorReferences())
-            .claimIssuedDate(caseData.getClaimIssuedDate())
-            .responseDeadline(caseData.getRespondentSolicitor1ResponseDeadline().toLocalDate())
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
             .respondent(Respondent.builder()
                             .name(caseData.getRespondent1().getPartyName())
                             .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
@@ -132,10 +132,10 @@ class AcknowledgementOfClaimGeneratorTest {
                     templateData.getSolicitorReferences(),
                     fetchSolicitorReferences(caseData.getSolicitorReferences())
                 ),
-                () -> assertEquals(templateData.getClaimIssuedDate(), caseData.getClaimIssuedDate()),
+                () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(
                     templateData.getResponseDeadline(),
-                    caseData.getRespondentSolicitor1ResponseDeadline().toLocalDate()
+                    caseData.getRespondent1ResponseDeadline().toLocalDate()
                 ),
                 () -> assertEquals(templateData.getRespondent(), Respondent.builder()
                     .name(caseData.getRespondent1().getPartyName())

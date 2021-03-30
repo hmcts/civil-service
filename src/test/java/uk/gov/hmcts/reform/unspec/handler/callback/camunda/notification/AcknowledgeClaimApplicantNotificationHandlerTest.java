@@ -69,7 +69,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-                RESPONSE_DEADLINE, caseData.getRespondentSolicitor1ResponseDeadline().toString()
+                RESPONSE_DEADLINE, caseData.getRespondent1ResponseDeadline().toString()
             );
         }
     }

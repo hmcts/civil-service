@@ -37,12 +37,14 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.unspec.service.FeesService;
 import uk.gov.hmcts.reform.unspec.service.OrganisationService;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.OrgPolicyValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,6 +85,9 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnTyp
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000LR001";
+
+    @MockBean
+    private Time time;
 
     @MockBean
     private FeesService feesService;
@@ -531,6 +536,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String EMAIL = "example@email.com";
         private static final String DIFFERENT_EMAIL = "other_example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
@@ -540,21 +546,18 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(time.now()).willReturn(submittedDate);
         }
 
         @Test
-        void shouldAddClaimIssuedDateAndSubmittedAt_whenInvoked() {
+        void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).containsEntry("legacyCaseReference", REFERENCE_NUMBER);
-            assertThat(response.getData()).containsKey("claimSubmittedDateTime");
-        }
-
-        @Test
-        void shouldAddAllocatedTrack_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).containsEntry("allocatedTrack", MULTI_CLAIM.name());
+            assertThat(response.getData())
+                .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
+                .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
+                .containsEntry("allocatedTrack", MULTI_CLAIM.name());
         }
 
         @Test

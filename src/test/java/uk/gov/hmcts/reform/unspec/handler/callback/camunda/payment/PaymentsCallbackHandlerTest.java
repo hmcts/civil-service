@@ -21,7 +21,9 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.service.PaymentsService;
+import uk.gov.hmcts.reform.unspec.service.Time;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,9 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private PaymentsService paymentsService;
 
+    @MockBean
+    private Time time;
+
     @Autowired
     private PaymentsCallbackHandler handler;
 
@@ -63,6 +68,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
         params = callbackParamsOf(new HashMap<>(), ABOUT_TO_SUBMIT)
             .toBuilder().caseData(caseData).build();
+
+        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
     @Test
@@ -75,6 +82,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
         assertThat(response.getData()).extracting("paymentDetails").extracting("reference")
             .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+        assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
     }
 
     @ParameterizedTest

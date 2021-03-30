@@ -44,7 +44,7 @@
     "TabID": "Summary",
     "TabLabel": "Summary",
     "TabDisplayOrder": 1,
-    "CaseFieldID": "claimIssuedDate",
+    "CaseFieldID": "issueDate",
     "TabFieldDisplayOrder": 6
   },
   {
@@ -52,7 +52,7 @@
     "TabID": "Summary",
     "TabLabel": "Summary",
     "TabDisplayOrder": 1,
-    "CaseFieldID": "claimSubmittedDateTime",
+    "CaseFieldID": "submittedDate",
     "TabFieldDisplayOrder": 7
   },
   {
@@ -68,7 +68,7 @@
     "TabID": "Summary",
     "TabLabel": "Summary",
     "TabDisplayOrder": 1,
-    "CaseFieldID": "respondentSolicitor1ResponseDeadline",
+    "CaseFieldID": "respondent1ResponseDeadline",
     "TabFieldDisplayOrder": 9
   },
   {

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.unspec.enums.CaseState;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.unspec.service.IssueDateCalculator;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
@@ -39,9 +39,9 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
-    private final IssueDateCalculator issueDateCalculator;
-    private final DeadlinesCalculator deadlinesCalculator;
     private final StateFlowEngine stateFlowEngine;
+    private final DeadlinesCalculator deadlinesCalculator;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,14 +54,10 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
-        LocalDate claimIssuedDate = calculateIssueDate();
-
         CaseData caseData = callbackParams.getCaseData();
+        LocalDate issueDate = time.now().toLocalDate();
 
-        //TODO: added deadline as workaround until story is played to add new date logic. CMC-596
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .claimIssuedDate(claimIssuedDate)
-            .respondentSolicitor1ResponseDeadline(calculateResponseDeadline(claimIssuedDate));
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseDataBuilder.build(),
@@ -69,27 +65,23 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
 
         caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
-        CaseData data = caseDataBuilder.build();
+
+        CaseState state = getState(caseDataBuilder.build());
+
+        if (state.equals(CaseState.AWAITING_CASE_NOTIFICATION)) {
+            LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, issueDate);
+            caseDataBuilder.claimNotificationDeadline(deadline);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(data.toMap(objectMapper))
-            .state(getState(data))
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(String.valueOf(state))
             .build();
     }
 
-    private String getState(CaseData data) {
+    private CaseState getState(CaseData data) {
         FlowState flowState = fromFullName(stateFlowEngine.evaluate(data).getState().getName());
-        return String.valueOf(
-            flowState == AWAITING_CASE_NOTIFICATION ? CaseState.AWAITING_CASE_NOTIFICATION :
-                CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY
-        );
-    }
-
-    private LocalDate calculateIssueDate() {
-        return issueDateCalculator.calculateIssueDay(LocalDateTime.now());
-    }
-
-    private LocalDateTime calculateResponseDeadline(LocalDate issueDate) {
-        return deadlinesCalculator.calculateResponseDeadline(issueDate);
+        return flowState == AWAITING_CASE_NOTIFICATION ? CaseState.AWAITING_CASE_NOTIFICATION :
+                CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
     }
 }

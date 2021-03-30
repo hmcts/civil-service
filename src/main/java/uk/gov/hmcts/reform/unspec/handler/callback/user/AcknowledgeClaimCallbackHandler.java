@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
-import uk.gov.hmcts.reform.unspec.service.WorkingDayIndicator;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +28,8 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
-import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.MID_NIGHT;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +37,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_CLAIM);
 
-    public static final String CONFIRMATION_SUMMARY = "<br />You need to respond before 4pm on %s."
+    public static final String CONFIRMATION_SUMMARY = "<br />You need to respond before %s."
         + "\n\n[Download the Acknowledgement of Claim form](%s)";
 
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final WorkingDayIndicator workingDayIndicator;
+    private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -71,10 +71,12 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getRespondentSolicitor1ResponseDeadline();
-        LocalDate newResponseDate = workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(14).toLocalDate());
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline.toLocalDate());
+
         CaseData caseDataUpdated = caseData.toBuilder()
-            .respondentSolicitor1ResponseDeadline(newResponseDate.atTime(MID_NIGHT))
+            .respondent1AcknowledgeNotificationDate(time.now())
+            .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
             .build();
 
@@ -88,7 +90,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         String body = format(
             CONFIRMATION_SUMMARY,
-            formatLocalDateTime(caseData.getRespondentSolicitor1ResponseDeadline(), DATE),
+            formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference())
         );
 

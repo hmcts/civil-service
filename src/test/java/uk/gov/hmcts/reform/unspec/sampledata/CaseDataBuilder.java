@@ -70,6 +70,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime RESPONSE_DEADLINE = now().plusDays(14).atTime(23, 59, 59);
     public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = LocalDateTime.now().plusDays(120);
     public static final LocalDate CLAIM_ISSUED_DATE = now();
+    public static final LocalDateTime DEADLINE = LocalDate.of(2020, 1, 1).atStartOfDay();
 
     // Create Claim
     private Long ccdCaseReference;
@@ -85,17 +86,11 @@ public class CaseDataBuilder {
     private PersonalInjuryType personalInjuryType;
     private String personalInjuryTypeOther;
     private StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
-    private LocalDateTime claimSubmittedDateTime;
-    private LocalDate claimIssuedDate;
     private String legacyCaseReference;
-    private LocalDateTime confirmationOfServiceDeadline;
     private AllocatedTrack allocatedTrack;
     private CaseState ccdState;
     private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     private PaymentDetails paymentDetails;
-    private LocalDateTime respondentSolicitor1ResponseDeadline;
-    private LocalDate claimNotificationDate;
-    private LocalDate claimDetailsNotificationDate;
     private CorrectEmail applicantSolicitor1CheckEmail;
     private IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -105,8 +100,6 @@ public class CaseDataBuilder {
     // Defendant Response
     private RespondentResponseType respondent1ClaimResponseType;
     private ResponseDocument respondent1ClaimResponseDocument;
-    private LocalDateTime applicantSolicitorResponseDeadlineToRespondentSolicitor1;
-    private LocalDate defendantResponseDate;
     private Respondent1DQ respondent1DQ;
     private Applicant1DQ applicant1DQ;
     // Claimant Response
@@ -123,12 +116,29 @@ public class CaseDataBuilder {
     private OrganisationPolicy applicant1OrganisationPolicy;
     private OrganisationPolicy respondent1OrganisationPolicy;
 
+    //dates
+    private LocalDateTime submittedDate;
+    private LocalDateTime paymentSuccessfulDate;
+    private LocalDate issueDate;
+    private LocalDateTime claimNotificationDeadline;
+    private LocalDateTime claimNotificationDate;
+    private LocalDateTime claimDetailsNotificationDeadline;
+    private LocalDateTime claimDetailsNotificationDate;
+    private LocalDateTime respondent1ResponseDeadline;
+
+    private LocalDateTime claimDismissedDeadline;
+    private LocalDateTime respondent1TimeExtensionDate;
+    private LocalDateTime respondent1AcknowledgeNotificationDate;
+    private LocalDateTime respondent1ResponseDate;
+    private LocalDateTime applicant1ResponseDeadline;
+    private LocalDateTime applicant1ResponseDate;
+    private LocalDateTime takenOfflineDate;
     private LocalDate claimDismissedDate;
 
     private SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
 
-    public CaseDataBuilder respondentSolicitor1ResponseDeadline(LocalDateTime respondentSolicitor1ResponseDeadline) {
-        this.respondentSolicitor1ResponseDeadline = respondentSolicitor1ResponseDeadline;
+    public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
+        this.respondent1ResponseDeadline = deadline;
         return this;
     }
 
@@ -212,8 +222,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder claimIssuedDate(LocalDate claimIssuedDate) {
-        this.claimIssuedDate = claimIssuedDate;
+    public CaseDataBuilder issueDate(LocalDate issueDate) {
+        this.issueDate = issueDate;
         return this;
     }
 
@@ -264,6 +274,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseReference(Long ccdCaseReference) {
         this.ccdCaseReference = ccdCaseReference;
+        return this;
+    }
+
+    public CaseDataBuilder claimNotificationDeadline(LocalDateTime deadline) {
+        this.claimNotificationDeadline = deadline;
         return this;
     }
 
@@ -327,9 +342,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
         atStatePaymentSuccessful();
         ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
-        claimIssuedDate = CLAIM_ISSUED_DATE;
+        issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
+
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
             .organisationName("test org name")
@@ -424,7 +441,7 @@ public class CaseDataBuilder {
             .build();
         respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.builder().build();
-        claimSubmittedDateTime = LocalDateTime.now();
+        submittedDate = LocalDateTime.now();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("civilunspecified@gmail.com").correct(YES).build();
         return this;
     }
@@ -455,34 +472,39 @@ public class CaseDataBuilder {
             .status(SUCCESS)
             .reference("RC-1604-0739-2145-4711")
             .build();
+        paymentSuccessfulDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateAwaitingCaseNotification() {
         atStatePaymentSuccessful();
         ccdState = AWAITING_CASE_NOTIFICATION;
-        claimIssuedDate = CLAIM_ISSUED_DATE;
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateAwaitingCaseDetailsNotification() {
         atStateAwaitingCaseNotification();
-        claimNotificationDate = LocalDate.now();
+        claimNotificationDate = LocalDateTime.now();
+        claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
         return this;
     }
 
     public CaseDataBuilder atStateClaimCreated() {
         atStateAwaitingCaseDetailsNotification();
-        claimDetailsNotificationDate = LocalDate.now();
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         ccdState = CREATED;
-        respondentSolicitor1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
 
     public CaseDataBuilder atStateExtensionRequested() {
         atStateClaimAcknowledge();
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1TimeExtensionDate = LocalDateTime.now();
         return this;
     }
 
@@ -492,6 +514,7 @@ public class CaseDataBuilder {
             .date(LocalDate.now())
             .reason(ReasonForProceedingOnPaper.APPLICATION)
             .build();
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
@@ -506,24 +529,27 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullAdmission() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentPartAdmission() {
         atStateRespondentRespondToClaim(RespondentResponseType.PART_ADMISSION);
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentCounterClaim() {
         atStateRespondentRespondToClaim(RespondentResponseType.COUNTER_CLAIM);
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
         atStateClaimAcknowledge();
         respondent1ClaimResponseType = respondentResponseType;
-        applicantSolicitorResponseDeadlineToRespondentSolicitor1 = APPLICANT_RESPONSE_DEADLINE;
-        defendantResponseDate = LocalDate.now();
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
         ccdState = AWAITING_CLAIMANT_INTENTION;
         return this;
     }
@@ -548,12 +574,14 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
         applicant1DQ();
+        applicant1ResponseDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateClaimAcknowledge() {
         atStateClaimCreated();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent1AcknowledgeNotificationDate = LocalDateTime.now();
         return this;
     }
 
@@ -574,10 +602,7 @@ public class CaseDataBuilder {
     public CaseData build() {
         return CaseData.builder()
             // Create Claim
-            .claimSubmittedDateTime(claimSubmittedDateTime)
-            .claimIssuedDate(claimIssuedDate)
             .legacyCaseReference(legacyCaseReference)
-            .confirmationOfServiceDeadline(confirmationOfServiceDeadline)
             .allocatedTrack(allocatedTrack)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
@@ -593,9 +618,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)
-            .respondentSolicitor1ResponseDeadline(respondentSolicitor1ResponseDeadline)
-            .claimNotificationDate(claimNotificationDate)
-            .claimDetailsNotificationDate(claimDetailsNotificationDate)
+            .respondent1ResponseDeadline(respondent1ResponseDeadline)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
             //Deadline extension
@@ -605,10 +628,10 @@ public class CaseDataBuilder {
             // Defendant Response
             .respondent1ClaimResponseType(respondent1ClaimResponseType)
             .respondent1ClaimResponseDocument(respondent1ClaimResponseDocument)
-            .applicantSolicitorResponseDeadlineToRespondentSolicitor1(
-                applicantSolicitorResponseDeadlineToRespondentSolicitor1
+            .applicant1ResponseDeadline(
+                applicant1ResponseDeadline
             )
-            .defendantResponseDate(defendantResponseDate)
+            .respondent1ResponseDate(respondent1ResponseDate)
             // Claimant Response
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
@@ -627,6 +650,24 @@ public class CaseDataBuilder {
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
+
+            //dates
+            .submittedDate(submittedDate)
+            .issueDate(issueDate)
+            .claimNotificationDate(claimNotificationDate)
+            .claimDetailsNotificationDate(claimDetailsNotificationDate)
+            .paymentSuccessfulDate(paymentSuccessfulDate)
+            .claimNotificationDeadline(claimNotificationDeadline)
+            .claimDetailsNotificationDate(claimDetailsNotificationDate)
+            .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
+            .respondent1ResponseDeadline(respondent1ResponseDeadline)
+            .claimDismissedDeadline(claimDismissedDeadline)
+            .respondent1TimeExtensionDate(respondent1TimeExtensionDate)
+            .respondent1AcknowledgeNotificationDate(respondent1AcknowledgeNotificationDate)
+            .respondent1ResponseDeadline(respondent1ResponseDeadline)
+            .applicant1ResponseDate(applicant1ResponseDate)
+            .applicant1ResponseDeadline(applicant1ResponseDeadline)
+            .takenOfflineDate(takenOfflineDate)
             .claimDismissedDate(claimDismissedDate)
             .build();
     }
