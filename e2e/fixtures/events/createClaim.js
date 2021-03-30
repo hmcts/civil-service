@@ -89,6 +89,8 @@ const createClaimData = (legalRepresentation, useValidPba) => {
           OrganisationID: 'N5AFUXG'
         },
       },
+    },
+    DefendantSolicitorEmail: {
       respondentSolicitor1EmailAddress: 'civilunspecified@gmail.com'
     },
     ClaimType: {

@@ -172,13 +172,13 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "respondentSolicitor1EmailAddress",
-    "PageFieldDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
-    "PageID": "DefendantSolicitorOrganisation",
-    "PageDisplayOrder": 10,
+    "PageID": "DefendantSolicitorEmail",
+    "PageDisplayOrder": 11,
     "PageColumnNumber": 1,
-    "FieldShowCondition": "respondent1OrgRegistered=\"Yes\"",
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "PageShowCondition": "respondent1OrgRegistered=\"Yes\""
   },
   {
     "LiveFrom": "01/01/2017",

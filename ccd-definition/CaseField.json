@@ -644,7 +644,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondentSolicitor1EmailAddress",
-    "Label": "Defendant solicitor's email address?",
+    "Label": "Enter defendant legal representative's email address to be used for notifications",
     "FieldType": "Email",
     "SecurityClassification": "Public"
   },

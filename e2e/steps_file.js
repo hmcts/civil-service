@@ -11,6 +11,7 @@ const solicitorReferencesPage = require('./pages/createClaim/solicitorReferences
 const claimantSolicitorOrganisation = require('./pages/createClaim/claimantSolicitorOrganisation.page');
 const claimantSolicitorIdamDetailsPage = require('./pages/createClaim/idamEmail.page');
 const defendantSolicitorOrganisation = require('./pages/createClaim/defendantSolicitorOrganisation.page');
+const defendantSolicitorEmail = require('./pages/createClaim/defendantSolicitorEmail.page');
 const chooseCourtPage = require('./pages/createClaim/chooseCourt.page');
 const claimantLitigationDetails = require('./pages/createClaim/claimantLitigationDetails.page');
 const claimTypePage = require('./pages/createClaim/claimType.page');
@@ -133,6 +134,7 @@ module.exports = function () {
       } else {
         await respondentRepresentedPage.enterRespondentRepresented('yes');
         await defendantSolicitorOrganisation.enterOrganisationDetails();
+        await defendantSolicitorEmail.enterSolicitorEmail();
       }
       await claimTypePage.selectClaimType();
       await personalInjuryTypePage.selectPersonalInjuryType();
