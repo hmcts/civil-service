@@ -209,6 +209,15 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimIssuedDate",
+    "Label": "Date claim issued",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Comment": "Needs to be here temporarily for backwards compatibility"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "submittedDate",
     "Label": "Date claim Submitted",
     "FieldType": "DateTime",
@@ -217,10 +226,28 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "claimSubmittedDateTime",
+    "Label": "Date claim Submitted",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Comment": "Needs to be here temporarily for backwards compatibility"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "servedDocumentFiles",
     "Label": "Upload documents in the following machine readable formats",
     "FieldType": "ServedDocumentFiles",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "respondentSolicitor1ResponseDeadline",
+    "Label": "Respondent solicitor deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Comment": "Backwards compatibility"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -301,6 +328,15 @@
     "Label": "Claimant response deadline",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "applicantSolicitorResponseDeadlineToRespondentSolicitor1",
+    "Label": "Claimant response deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Comment": "Backwards compatibility"
   },
   {
     "LiveFrom": "01/01/2017",
@@ -607,6 +643,15 @@
     "Label": "Defendant response date",
     "FieldType": "DateTime",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "UNSPECIFIED_CLAIMS",
+    "ID": "defendantResponseDate",
+    "Label": "Defendant response date",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Comment": "Backwards compatibility"
   },
   {
     "LiveFrom": "01/01/2017",
