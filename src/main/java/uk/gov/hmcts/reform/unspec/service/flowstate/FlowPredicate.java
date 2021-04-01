@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.unspec.service.flowstate;
 
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
@@ -91,6 +92,9 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledged = caseData ->
         caseData.getClaimDismissedDate() != null && caseData.getRespondent1ClaimResponseIntentionType() != null;
+
+    public static final Predicate<CaseData> applicantOutOfTime = caseData ->
+        caseData.getTakenOfflineDate() != null && caseData.getTakenOfflineDate().isAfter(LocalDateTime.now());
 
     private FlowPredicate() {
         //Utility class

@@ -49,8 +49,7 @@ Scenario('Defendant - Defends, Claimant decides to proceed', async (I) => {
   await I.assertNoEventsAvailable();
 });
 
-//applicantSolicitorSecondResponseDeadlineToRespondentSolicitor1 field no longer exists
-Scenario.skip('Claimant does not respond to defence with defined timescale', async (I) => {
+Scenario('Claimant does not respond to defence with defined timescale', async (I) => {
   await I.createCase();
   let caseId = getCaseId(await I.grabCaseNumber());
   await I.notifyClaim();
