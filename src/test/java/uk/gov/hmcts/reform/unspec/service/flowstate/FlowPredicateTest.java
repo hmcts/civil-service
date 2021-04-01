@@ -11,6 +11,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
@@ -277,7 +278,14 @@ class FlowPredicateTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class, mode = EnumSource.Mode.EXCLUDE, names = {"CLAIM_DISCONTINUED"})
+        @EnumSource(
+            value = FlowState.Main.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {
+                "TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE",
+                "CLAIM_DISCONTINUED"
+            }
+        )
         void shouldReturnFalse_whenCaseDataIsNotAtStateClaimDiscontinued(FlowState.Main flowState) {
             CaseData caseData = CaseDataBuilder.builder().atState(flowState).build();
             assertFalse(claimDiscontinued.test(caseData));
@@ -347,6 +355,22 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataatStateClaimAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
             assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        }
+    }
+
+    @Nested
+    class ApplicantOutOfTime {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateServiceAcknowledgeWithClaimDismissedDate() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
+            assertTrue(applicantOutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateServiceAcknowledge() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            assertFalse(applicantOutOfTime.test(caseData));
         }
     }
 }
