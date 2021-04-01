@@ -183,19 +183,21 @@ module.exports = {
     valid: createClaimData('Yes', false)
   },
   createClaimRespondentSolFirmNotInMyHmcts: {
-    DefendantSolicitorOrganisation: {
-      respondent1OrgRegistered: 'No'
-    },
-    UnRegisteredDefendantSolicitorOrganisation: {
-      respondentSolicitor1OrganisationDetails: {
-        organisationName: '',
-        phoneNumber: '',
-        email: '',
-        dx: '',
-        fax: '',
-        address: buildAddress('')
-      }
-    },
-    valid: createClaimData('Yes')
+    valid: {
+      ...createClaimData('Yes', true),
+      DefendantSolicitorOrganisation: {
+        respondent1OrgRegistered: 'No'
+      },
+      UnRegisteredDefendantSolicitorOrganisation: {
+        respondentSolicitor1OrganisationDetails: {
+          organisationName: 'Test org',
+          phoneNumber: '0123456789',
+          email: 'test@example.com',
+          dx: 'test dx',
+          fax: '123123123',
+          address: buildAddress('org')
+        }
+      },
+    }
   }
 };

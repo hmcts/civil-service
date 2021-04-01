@@ -97,11 +97,11 @@ module.exports = {
     caseData = {};
     await apiRequest.setupTokens(user);
     await apiRequest.startEvent(eventName);
-    await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
+    await validateEventPages(data.CREATE_CLAIM_RESPONDENT_SOLICITOR_FIRM_NOT_IN_MY_HMCTS);
 
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim has been issued',
-      body: 'To continue your claim by post you need to'
+      header: 'Your claim will now progress offline',
+      body: 'What you need to do'
     }, true);
 
     await assignCaseToDefendant(caseId);
