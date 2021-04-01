@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.stateflow.StateFlow;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
@@ -185,9 +186,9 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnClaimDismissed_whenCaseDataatStateClaimAcknowledgeAndCcdStateIsDismissed() {
+        void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge()
-                .claimDismissedDate(LocalDate.now())
+                .claimDismissedDate(LocalDateTime.now())
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -410,6 +411,25 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnClaimDismissedPastNotificationDeadline_whenPastClaimNotificationDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(5)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    AWAITING_CASE_NOTIFICATION.fullName(),  CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName()
+                );
+        }
+
+        @Test
         void shouldReturnCaseDismissed_whenCaseDataIsPastClaimDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
@@ -471,6 +491,7 @@ class StateFlowEngineTest {
                 "AWAITING_CASE_DETAILS_NOTIFICATION",
                 "CASE_PROCEEDS_IN_CASEMAN",
                 "CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME",
+                "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
                 "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE"
             })
         @ParameterizedTest(name = "{index} => should withdraw claim after claim state {0}")
@@ -501,6 +522,7 @@ class StateFlowEngineTest {
                 "AWAITING_CASE_DETAILS_NOTIFICATION",
                 "CASE_PROCEEDS_IN_CASEMAN",
                 "CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME",
+                "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
                 "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE"
             })
         @ParameterizedTest(name = "{index} => should discontinue claim after claim state {0}")

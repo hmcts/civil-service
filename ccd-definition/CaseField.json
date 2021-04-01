@@ -805,7 +805,7 @@
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "claimDismissedDate",
     "Label": "Claim dismissed date",
-    "FieldType": "Date",
+    "FieldType": "DateTime",
     "SecurityClassification": "Public"
   }
 ]

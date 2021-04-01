@@ -139,7 +139,7 @@
     "Name": "Move claim to dismissed",
     "Description": "Moves a claim to dismissed",
     "DisplayOrder": 8,
-    "PreConditionState(s)": "CREATED;AWAITING_CASE_DETAILS_NOTIFICATION",
+    "PreConditionState(s)": "CREATED;AWAITING_CASE_NOTIFICATION;AWAITING_CASE_DETAILS_NOTIFICATION",
     "PostConditionState": "CLAIM_DISMISSED",
     "SecurityClassification": "Public",
     "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",

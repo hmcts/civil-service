@@ -132,7 +132,7 @@ public class CaseDataBuilder {
     private LocalDateTime applicant1ResponseDeadline;
     private LocalDateTime applicant1ResponseDate;
     private LocalDateTime takenOfflineDate;
-    private LocalDate claimDismissedDate;
+    private LocalDateTime claimDismissedDate;
 
     private SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
 
@@ -281,7 +281,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder claimDismissedDate(LocalDate date) {
+    public CaseDataBuilder claimDismissedDate(LocalDateTime date) {
         this.claimDismissedDate = date;
         return this;
     }
@@ -337,16 +337,26 @@ public class CaseDataBuilder {
                 return atStateClaimDismissedPastClaimDetailsNotificationDeadline();
             case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                 return atStateTakenOfflinePastApplicantResponseDeadline();
+            case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
+                return atStateClaimDismissedPastClaimNotificationDeadline();
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
+    }
+
+    public CaseDataBuilder atStateClaimDismissedPastClaimNotificationDeadline() {
+        atStateAwaitingCaseNotification();
+        ccdState = CLAIM_DISMISSED;
+        claimNotificationDeadline = LocalDateTime.now().minusDays(1);
+        claimDismissedDate = LocalDateTime.now();
+        return this;
     }
 
     public CaseDataBuilder atStateClaimDismissedPastClaimDetailsNotificationDeadline() {
         atStateAwaitingCaseDetailsNotification();
         claimDetailsNotificationDeadline = LocalDateTime.now().minusDays(5);
         ccdState = CLAIM_DISMISSED;
-        claimDismissedDate = LocalDate.now();
+        claimDismissedDate = LocalDateTime.now();
         return this;
     }
 
@@ -579,7 +589,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDismissed() {
         atStateClaimCreated();
         ccdState = CLAIM_DISMISSED;
-        claimDismissedDate = now();
+        claimDismissedDate = LocalDateTime.now();
         return this;
     }
 
