@@ -10,11 +10,19 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.unspec.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.unspec.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sendgrid.EmailData;
 import uk.gov.hmcts.reform.unspec.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.unspec.service.OrganisationService;
+import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper;
 
@@ -31,8 +39,12 @@ import static org.mockito.Mockito.verify;
         RoboticsEmailConfiguration.class,
         RoboticsNotificationService.class,
         JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class,
+        StateFlowEngine.class,
+        EventHistoryMapper.class,
         RoboticsDataMapper.class,
-        RoboticsAddressMapper.class
+        RoboticsAddressMapper.class,
+        OrganisationService.class
     },
     properties = {
         "sendgrid.api-key:some-key",
@@ -52,6 +64,14 @@ class RoboticsNotificationServiceTest {
 
     @MockBean
     SendGridClient sendGridClient;
+    @MockBean
+    OrganisationApi organisationApi;
+    @MockBean
+    AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    IdamClient idamClient;
+    @MockBean
+    PrdAdminUserConfiguration userConfig;
 
     @Test
     @SneakyThrows

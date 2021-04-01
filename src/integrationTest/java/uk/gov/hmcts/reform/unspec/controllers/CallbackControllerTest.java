@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 
 public class CallbackControllerTest extends BaseIntegrationTest {
 
@@ -16,8 +16,8 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnNotFoundWhenCallbackHandlerIsNotImplemented() {
         CallbackRequest callbackRequest = CallbackRequest.builder()
-            .eventId(REQUEST_EXTENSION.name())
-            .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
+            .eventId(CREATE_CLAIM.name())
+            .caseDetails(CaseDetailsBuilder.builder().atStateClaimCreated().build())
             .build();
 
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, "invalid-callback-type")

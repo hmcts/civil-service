@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -21,13 +23,18 @@ import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
@@ -48,6 +55,9 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
     StateFlowEngine.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private Time time;
 
     @Autowired
     private RespondToDefenceCallbackHandler handler;
@@ -152,25 +162,40 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
+        private final LocalDateTime localDateTime = now();
+
+        @BeforeEach
+        void setup() {
+            when(time.now()).thenReturn(localDateTime);
+        }
 
         @Test
         void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
-            var params = callbackParamsOf(CaseDataBuilder.builder().atStateFullDefence().build(), ABOUT_TO_SUBMIT);
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atStateApplicantRespondToDefence().build(),
+                ABOUT_TO_SUBMIT
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("businessProcess").extracting("status").isEqualTo(READY.name());
-            assertThat(response.getData()).extracting("businessProcess").extracting("camundaEvent")
-                .isEqualTo(CLAIMANT_RESPONSE.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
         @Test
         void shouldNotUpdateBusinessProcess_whenNotAtFullDefenceState() {
-            var params = callbackParamsOf(CaseDataBuilder.builder().atStateRespondedToClaim().build(), ABOUT_TO_SUBMIT);
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atStateRespondentFullDefence().build(),
+                ABOUT_TO_SUBMIT
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).doesNotContainKey("businessProcess");
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
     }
 
@@ -180,14 +205,14 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateFullDefence()
+                .atStateApplicantRespondToDefence()
                 .applicant1ProceedWithClaim(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).isEqualToComparingFieldByField(
+            assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You've decided to proceed with the claim%n## Claim number: 000LR001"))
                     .confirmationBody(format(
@@ -199,14 +224,14 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateFullDefence()
+                .atStateApplicantRespondToDefence()
                 .applicant1ProceedWithClaim(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).isEqualToComparingFieldByField(
+            assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000LR001"))

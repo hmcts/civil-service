@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonSchemaValidationServiceTest {
 
-    JsonSchemaValidationService validationService = new JsonSchemaValidationService("/sample-json-schema.json");
+    JsonSchemaValidationService validationService = new JsonSchemaValidationService("sample-json-schema.json");
 
     @Nested
     class IsValid {
@@ -98,7 +98,7 @@ class JsonSchemaValidationServiceTest {
         @Test
         void shouldReturnDefaultSchemaFile_whenInvoked() {
             assertThat(validationService.getJsonSchemaFile())
-                .isEqualTo("/sample-json-schema.json");
+                .isEqualTo("sample-json-schema.json");
         }
 
         @Test

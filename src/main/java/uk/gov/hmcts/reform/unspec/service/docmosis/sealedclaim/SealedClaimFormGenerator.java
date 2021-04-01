@@ -4,17 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Applicant;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Representative;
-import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.unspec.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.unspec.model.documents.DocumentType;
 import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.unspec.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.unspec.utils.DocmosisTemplateDataUtils;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N1;
 
 @Service
@@ -35,7 +38,6 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         + "which occurred on 1st July 2017 as a result of the negligence of the first defendant.";
 
     private static final Representative TEMP_REPRESENTATIVE = Representative.builder()
-        .contactName("MiguelSpooner")
         .dxAddress("DX 751Newport")
         .organisationName("DBE Law")
         .phoneNumber("0800 206 1592")
@@ -50,6 +52,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimForm templateData = getTemplateData(caseData);
@@ -67,7 +70,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     @Override
     public SealedClaimForm getTemplateData(CaseData caseData) {
-        Optional<SolicitorReferences> solicitorReferences = Optional.ofNullable(caseData.getSolicitorReferences());
+        Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         return SealedClaimForm.builder()
             .applicants(getApplicants(caseData))
             .respondents(getRespondents(caseData))
@@ -77,8 +80,8 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
             .applicantRepresentative(TEMP_REPRESENTATIVE)
             .referenceNumber(caseData.getLegacyCaseReference())
-            .issueDate(caseData.getClaimIssuedDate())
-            .submittedOn(caseData.getClaimSubmittedDateTime().toLocalDate())
+            .issueDate(caseData.getIssueDate())
+            .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicantExternalReference(solicitorReferences
                                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                                            .orElse(""))
@@ -94,7 +97,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         return List.of(Respondent.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
-                           .representative(TEMP_REPRESENTATIVE)
+                           .representative(representativeService.getRespondentRepresentative(caseData))
                            .build());
     }
 
@@ -103,6 +106,10 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         return List.of(Applicant.builder()
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
+                           .litigationFriendName(
+                               ofNullable(caseData.getApplicant1LitigationFriend())
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
                            .build());
     }
 }

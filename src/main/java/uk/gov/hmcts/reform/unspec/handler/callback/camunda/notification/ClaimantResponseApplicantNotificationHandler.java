@@ -63,8 +63,7 @@ public class ClaimantResponseApplicantNotificationHandler extends CallbackHandle
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            SOLICITOR_REFERENCE, "claimant solicitor"
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 }

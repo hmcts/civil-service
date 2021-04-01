@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.aspect.NoOngoingBusinessProcessAspect.ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.START_BUSINESS_PROCESS;
 
 @ExtendWith(SpringExtension.class)
@@ -57,8 +57,8 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateExtensionRequested().build())
-                .request(CallbackRequest.builder().eventId(RESPOND_EXTENSION.name()).build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimCreated().build())
+                .request(CallbackRequest.builder().eventId(ACKNOWLEDGE_CLAIM.name()).build())
                 .build();
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
@@ -119,8 +119,7 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(SUBMITTED, CaseDataBuilder.builder()
-                    .atStateClaimCreated()
+                .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimCreated()
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
@@ -146,9 +145,7 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder()
-                    .atStateExtensionRequested()
-                    .build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimCreated().build())
                 .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
                 .build();
 

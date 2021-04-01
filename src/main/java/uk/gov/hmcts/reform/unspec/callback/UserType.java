@@ -2,5 +2,6 @@ package uk.gov.hmcts.reform.unspec.callback;
 
 public enum UserType {
     USER,
-    CAMUNDA
+    CAMUNDA,
+    TESTING_SUPPORT
 }

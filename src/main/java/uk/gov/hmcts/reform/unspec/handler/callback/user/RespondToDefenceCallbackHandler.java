@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -10,11 +11,11 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
@@ -41,7 +42,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
     private final StateFlowEngine stateFlowEngine;
     private final UnavailableDateValidator unavailableDateValidator;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -71,13 +73,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (fromFullName(stateFlowEngine.evaluate(caseData).getState().getName()) == FlowState.Main.CLAIM_STAYED) {
-            caseData = caseData.toBuilder().businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE)).build();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        if (getFlowState(caseData) == FlowState.Main.CASE_PROCEEDS_IN_CASEMAN) {
+            builder.businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE)).build();
         }
 
+        builder.applicant1ResponseDate(time.now());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseData))
+            .data(builder.build().toMap(objectMapper))
             .build();
+    }
+
+    private FlowState getFlowState(CaseData caseData) {
+        return fromFullName(stateFlowEngine.evaluate(caseData).getState().getName());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

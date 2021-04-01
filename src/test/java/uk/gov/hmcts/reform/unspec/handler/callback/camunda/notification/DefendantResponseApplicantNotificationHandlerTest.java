@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.SOLICITOR_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -48,7 +47,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
@@ -56,7 +55,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             verify(notificationService).sendMail(
                 "claimantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "claimant solicitor"),
+                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE),
                 "defendant-response-applicant-notification-000LR001"
             );
         }

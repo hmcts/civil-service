@@ -8,23 +8,27 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
-import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
+import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Applicant;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.unspec.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.unspec.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.unspec.model.dq.FurtherInformation;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
-public class DirectionsQuestionnaireForm implements DocmosisData {
+@ToString
+public class DirectionsQuestionnaireForm implements MappableObject {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
@@ -35,6 +39,7 @@ public class DirectionsQuestionnaireForm implements DocmosisData {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate submittedOn;
     private final Applicant applicant;
+    private final List<Respondent> respondents;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;

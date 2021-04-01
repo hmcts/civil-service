@@ -3,10 +3,13 @@ package uk.gov.hmcts.reform.unspec.service.robotics.mapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.unspec.model.Address;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.unspec.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.unspec.sampledata.AddressBuilder;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.unspec.assertion.CustomAssertions.assertThat;
@@ -34,6 +37,17 @@ class RoboticsAddressMapperTest {
                          "address cannot be null"
             );
         }
+
+        @Test
+        void shouldMapToRoboticsAddressWithDefaultForAddressLine2_whenAddressLine2IsNull() {
+            Address address = Address.builder()
+                .addressLine1("address line 1")
+                .postCode("SW1 1AA").build();
+
+            RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
+
+            assertThat(roboticsAddress).isEqualTo(address);
+        }
     }
 
     @Nested
@@ -52,9 +66,41 @@ class RoboticsAddressMapperTest {
         @Test
         void shouldThrowNullPointerException_whenAddressIsNullForToRoboticsAddresses() {
             assertThrows(NullPointerException.class, () ->
-                             mapper.toRoboticsAddresses(null),
+                             mapper.toRoboticsAddresses((Address) null),
                          "address cannot be null"
             );
+        }
+
+        @Test
+        void shouldMapToRoboticsAddresses_whenContactInformationIsProvided() {
+            List<ContactInformation> contactInformationList = List.of(ContactInformation.builder()
+                                                                          .addressLine1("line 1")
+                                                                          .addressLine2("line 2")
+                                                                          .postCode("AB1 2XY")
+                                                                          .county("My county")
+                                                                          .build());
+
+            RoboticsAddresses roboticsAddresses = mapper.toRoboticsAddresses(contactInformationList);
+
+            Assertions.assertThat(roboticsAddresses).isNotNull();
+            assertThat(contactInformationList)
+                .isEqualTo(roboticsAddresses.getContactAddress());
+        }
+
+        @Test
+        void shouldMapToNull_whenContactInformationIsEmpty() {
+            List<ContactInformation> contactInformationList = List.of();
+
+            RoboticsAddresses roboticsAddresses = mapper.toRoboticsAddresses(contactInformationList);
+
+            Assertions.assertThat(roboticsAddresses).isNull();
+        }
+
+        @Test
+        void shouldMapToNull_whenContactInformationIsNull() {
+            RoboticsAddresses roboticsAddresses = mapper.toRoboticsAddresses((List<ContactInformation>) null);
+
+            Assertions.assertThat(roboticsAddresses).isNull();
         }
     }
 }

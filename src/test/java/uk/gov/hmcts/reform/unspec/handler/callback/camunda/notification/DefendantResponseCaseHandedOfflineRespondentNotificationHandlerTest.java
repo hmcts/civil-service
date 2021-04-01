@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.SOLICITOR_REFERENCE;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -56,7 +55,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             verify(notificationService).sendMail(
                 "defendantsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE, SOLICITOR_REFERENCE, "defendant solicitor"),
+                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE),
                 "defendant-response-case-handed-offline-respondent-notification-000LR001"
             );
         }

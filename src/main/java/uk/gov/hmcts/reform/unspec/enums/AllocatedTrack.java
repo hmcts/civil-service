@@ -25,6 +25,13 @@ public enum AllocatedTrack {
         }
     }
 
+    public static int getDaysToAddToDeadline(AllocatedTrack track) {
+        if (track == SMALL_CLAIM) {
+            return 14;
+        }
+        return 28;
+    }
+
     private static boolean isValueSmallerThan(BigDecimal value, int comparisionValue) {
         return value.compareTo(BigDecimal.valueOf(comparisionValue)) < 0;
     }

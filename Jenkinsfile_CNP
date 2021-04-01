@@ -71,6 +71,7 @@ withPipeline(type, product, component) {
     """
 
     env.URL="https://xui-civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   after('smoketest:preview') {
@@ -101,6 +102,7 @@ withPipeline(type, product, component) {
       ./bin/import-bpmn-diagram.sh .
     """
     env.URL="https://civil-damages-service-xui-staging.aat.platform.hmcts.net"
+    env.UNSPEC_SERVICE_URL="http://civil-damages-service-staging.service.core-compute-aat.internal"
   }
 
   after('smoketest:aat') {

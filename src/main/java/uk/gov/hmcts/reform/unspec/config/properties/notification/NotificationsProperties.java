@@ -16,10 +16,13 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimIssueEmailTemplate;
 
     @NotEmpty
+    private String respondentSolicitorClaimDetailsEmailTemplate;
+
+    @NotEmpty
     private String solicitorResponseToCase;
 
     @NotEmpty
-    private String respondentSolicitorAcknowledgeService;
+    private String respondentSolicitorAcknowledgeClaim;
 
     @NotEmpty
     private String failedPayment;
@@ -31,10 +34,10 @@ public class NotificationsProperties {
     private String respondentSolicitorEmail;
 
     @NotEmpty
-    private String applicantSolicitorCaseStrikeOut;
+    private String applicantSolicitorClaimDismissed;
 
     @NotEmpty
-    private String respondentSolicitorCaseStrikeOut;
+    private String respondentSolicitorClaimDismissed;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;

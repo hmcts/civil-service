@@ -14,5 +14,5 @@ public class RoboticsCaseData implements ToJsonString {
     private List<Solicitor> solicitors;
     private String particularsOfClaim;
     private ClaimDetails claimDetails;
-    private Mediation mediation;
+    private EventHistory events;
 }

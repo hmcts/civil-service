@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -25,7 +26,8 @@ import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.CLAIM_ISSUED
 @SpringBootTest(classes = {
     CreateClaimRespondentNotificationHandler.class,
     NotificationsProperties.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
 })
 class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
@@ -42,7 +44,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
@@ -58,7 +60,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
         private Map<String, String> getExpectedMap() {
             return Map.of(
                 "claimReferenceNumber", "000LR001",
-                "defendantSolicitorName", "Placeholder name",
                 "claimantName", "Mr. John Rambo",
                 "defendantName", "Mr. Sole Trader",
                 "issuedOn", formatLocalDate(CLAIM_ISSUED_DATE, DATE)

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,12 +10,14 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
@@ -24,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
@@ -43,7 +45,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
+    private final Time time;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -83,33 +87,37 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
-        //TODO: There will be in separate ticket for response deadline when requirement is confirmed
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .applicantSolicitorResponseDeadlineToRespondentSolicitor1(now().atTime(16, 0))
-            .defendantResponseDate(now())
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDate = time.now();
+        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+
+        CaseData updatedData = caseData.toBuilder()
+            .respondent1ResponseDate(responseDate)
+            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseData))
+            .data(updatedData.toMap(objectMapper))
             .build();
+    }
+
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
+        return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getApplicantSolicitorResponseDeadlineToRespondentSolicitor1();
-
-        String claimNumber = "TBC";
+        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+        String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
             "<br />The claimant has until %s to proceed. We will let you know when they respond.",
             formatLocalDateTime(responseDeadline, DATE)
         );
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format(
-                "# You've submitted your response%n## Claim number: %s",
-                claimNumber
-            ))
+            .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
     }

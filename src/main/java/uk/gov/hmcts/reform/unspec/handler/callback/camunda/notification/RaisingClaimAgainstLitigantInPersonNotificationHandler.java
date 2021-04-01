@@ -64,8 +64,7 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_SOLICITOR_NAME, "Applicant solicitor name (need to add solicitor name to case data?)"
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 }
