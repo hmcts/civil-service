@@ -9,13 +9,17 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
 
 @SuppressWarnings("unchecked")
 public class CaseDetailsBuilder {
 
-    private ObjectMapper mapper = new ObjectMapper()
+    private final ObjectMapper mapper = new ObjectMapper()
         .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private String state;
@@ -42,9 +46,23 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateClaimDraft() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
         this.data = mapper.convertValue(caseData, Map.class);
-        this.state = CREATED.name();
+        this.state = PENDING_CASE_ISSUED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateAwaitingCaseNotification() {
+        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CASE_NOTIFICATION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateAwaitingCaseDetailsNotification() {
+        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CASE_DETAILS_NOTIFICATION.name();
         return this;
     }
 
@@ -55,24 +73,10 @@ public class CaseDetailsBuilder {
         return this;
     }
 
-    public CaseDetailsBuilder atStateServiceAcknowledge() {
-        CaseData caseData = CaseDataBuilder.builder().atStateServiceAcknowledge().build();
+    public CaseDetailsBuilder atStateClaimAcknowledge() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = CREATED.name();
-        return this;
-    }
-
-    public CaseDetailsBuilder atStateRespondedToClaim() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondedToClaim().build();
-        this.data = mapper.convertValue(caseData, Map.class);
-        this.state = AWAITING_CLAIMANT_INTENTION.name();
-        return this;
-    }
-
-    public CaseDetailsBuilder atStateFullDefence() {
-        CaseData caseData = CaseDataBuilder.builder().atStateFullDefence().build();
-        this.data = mapper.convertValue(caseData, Map.class);
-        this.state = AWAITING_CLAIMANT_INTENTION.name();
         return this;
     }
 
@@ -80,6 +84,27 @@ public class CaseDetailsBuilder {
         CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = CREATED.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateRespondedToClaim() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CLAIMANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateFullDefence() {
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_CLAIMANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateProceedsOffline() {
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PROCEEDS_WITH_OFFLINE_JOURNEY.name();
         return this;
     }
 

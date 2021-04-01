@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CaseRole {
+    CREATOR,
     APPLICANTSOLICITORONE,
     APPLICANTSOLICITORTWO,
     RESPONDENTSOLICITORONE,

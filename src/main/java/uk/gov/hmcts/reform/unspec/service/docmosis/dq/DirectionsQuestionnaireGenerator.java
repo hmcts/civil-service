@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.unspec.enums.dq.Language;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.LitigationFriend;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.common.Applicant;
+import uk.gov.hmcts.reform.unspec.model.docmosis.common.Respondent;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.unspec.model.docmosis.dq.Experts;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.PDF;
 import uk.gov.hmcts.reform.unspec.model.dq.DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.unspec.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.unspec.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.unspec.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.unspec.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
@@ -33,7 +36,7 @@ import java.util.Locale;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.unspec.service.docmosis.DocmosisTemplates.N181;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDED_TO_CLAIM;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.unwrapElements;
 
 @Service
@@ -43,6 +46,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
+    private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
@@ -61,14 +65,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        DQ dq = state.equals(RESPONDED_TO_CLAIM.fullName()) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+        DQ dq = state.equals(RESPONDENT_FULL_DEFENCE.fullName()) ? caseData.getRespondent1DQ()
+            : caseData.getApplicant1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
-            .submittedOn(caseData.getDefendantResponseDate())
+            .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(getApplicant(caseData))
+            .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
@@ -88,7 +94,24 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return Applicant.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant1LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
             .build();
+    }
+
+    private List<Respondent> getRespondents(CaseData caseData) {
+        Party respondent = caseData.getRespondent1();
+        return List.of(Respondent.builder()
+                           .name(respondent.getPartyName())
+                           .primaryAddress(respondent.getPrimaryAddress())
+                           .representative(representativeService.getRespondentRepresentative(caseData))
+                           .litigationFriendName(
+                               ofNullable(caseData.getRespondent1LitigationFriend())
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
     }
 
     private Experts getExperts(DQ dq) {
@@ -175,7 +198,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         return WelshLanguageRequirements.builder()
-            .isPartyWelsh(welshLanguageRequirements.getIsPartyWelsh())
             .evidence(ofNullable(
                 welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
             .court(ofNullable(

@@ -24,19 +24,22 @@ public class FeatureToggleService {
     }
 
     public boolean isFeatureEnabled(String feature) {
-        return internalClient.boolVariation(feature, createLDUser(), false);
+        return internalClient.boolVariation(feature, createLDUser().build(), false);
     }
 
     public boolean isFeatureEnabled(String feature, LDUser user) {
         return internalClient.boolVariation(feature, user, false);
     }
 
-    public LDUser createLDUser() {
-        LDUser.Builder builder = new LDUser.Builder("civil-unspec-service")
+    public boolean isOrganisationOnboarded(String orgId) {
+        LDUser ldUser = createLDUser().custom("orgId", orgId).build();
+        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
+    }
+
+    public LDUser.Builder createLDUser() {
+        return new LDUser.Builder("civil-unspec-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
             .custom("environment", environment);
-
-        return builder.build();
     }
 
     private void close() {

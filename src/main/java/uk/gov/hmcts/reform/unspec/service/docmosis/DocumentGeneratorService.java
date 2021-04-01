@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.unspec.config.DocmosisConfiguration;
-import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisData;
+import uk.gov.hmcts.reform.unspec.model.common.MappableObject;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.unspec.model.docmosis.DocmosisRequest;
 
@@ -27,7 +27,7 @@ public class DocumentGeneratorService {
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;
 
-    public DocmosisDocument generateDocmosisDocument(DocmosisData templateData, DocmosisTemplates template) {
+    public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template) {
         return generateDocmosisDocument(templateData.toMap(mapper), template);
     }
 

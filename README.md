@@ -74,32 +74,40 @@ To access XUI visit url (make sure that it starts with `https`, otherwise IDAM w
 To access Camunda visit url (login and password are both `admin`):
 - `https://camunda-civil-damages-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
-## Pact or contract testing
+## Contract testing
 
-### Run and generate pact
+### Generate contracts
 
-You can run contract or pact tests as follows:
+You can generate contracts as follows:
 
 ```
 ./gradlew contract
 ```
-### Run pact broker local docker
-You can then publish your pact tests locally by first running the pact docker-compose:
 
-```
-docker-compose -f docker-pactbroker-compose.yml up -d
-```
-### Publish pact to broker
-and then using it to publish your tests:
+### Publish contracts
 
-```
-./gradlew pactPublish
-```
-if you want to publish the pact to hmcts pact broker, please set this env variable accordingly before running the publish command.
+If you want to publish the contracts to hmcts pact broker, please set this env variable accordingly before running the publish command.
 ```
 export PACT_BROKER_FULL_URL=http://pact-broker.platform.hmcts.net/
+```
+and if you want to publish the RPA contract to the PactFlow pact broker, please set this env variable accordingly before running the publish command.
+By setting your env variable to this, the IDAM contract will be ignored and only the RPA contract will be published to PactFlow.
+```
+export PACT_BROKER_FULL_URL=https://civil-damages-claims.pactflow.io/
+```
+Before running, you should set the API token to connect to the pactflow portal as follows:
+
+```bash
+export PACT_BROKER_TOKEN=<api token here>
+```
+The API Token can be obtained on [Confluence](https://tools.hmcts.net/confluence/display/CU/Pactflow).
+
+To publish your contracts:
+```
 ./gradlew pactPublish
 ```
+
+* If connecting to Pactflow, please disable the HMCTS VPN.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

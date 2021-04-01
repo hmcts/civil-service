@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.unspec.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -32,7 +30,6 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +81,7 @@ class CoreCaseDataServiceTest {
     @Nested
     class TriggerEvent {
 
-        private static final String EVENT_ID = "MOVE_TO_STAYED";
+        private static final String EVENT_ID = "DISMISS_CLAIM";
         private static final String JURISDICTION = "CIVIL";
         private static final String EVENT_TOKEN = "eventToken";
         private static final String CASE_ID = "1";
@@ -141,18 +138,6 @@ class CoreCaseDataServiceTest {
                 .eventId(EVENT_ID)
                 .token(EVENT_TOKEN)
                 .caseDetails(caseDetails)
-                .build();
-        }
-
-        private CaseDataContent buildCaseDataContent() {
-            Map<String, Object> data = objectMapper.convertValue(caseData, new TypeReference<>() {
-            });
-
-            return CaseDataContent.builder()
-                .eventToken(EVENT_TOKEN)
-                .event(Event.builder().id(EVENT_ID).build())
-                .data(data)
-                .ignoreWarning(true)
                 .build();
         }
     }

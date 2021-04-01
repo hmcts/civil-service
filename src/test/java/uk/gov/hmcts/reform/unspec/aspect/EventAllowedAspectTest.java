@@ -13,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.unspec.aspect.EventAllowedAspect;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
@@ -29,8 +28,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.REQUEST_EXTENSION;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESPOND_EXTENSION;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -57,7 +56,7 @@ class EventAllowedAspectTest {
         when(proceedingJoinPoint.proceed()).thenReturn(response);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(callbackType, CaseDetailsBuilder.builder().atStateExtensionRequested().build())
+            .of(callbackType, CaseDetailsBuilder.builder().atStateAwaitingCaseNotification().build())
             .build();
         Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);
 
@@ -76,8 +75,8 @@ class EventAllowedAspectTest {
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .type(ABOUT_TO_START)
             .request(CallbackRequest.builder()
-                         .eventId(REQUEST_EXTENSION.name())
-                         .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
+                         .eventId(DEFENDANT_RESPONSE.name())
+                         .caseDetails(CaseDetailsBuilder.builder().atStateClaimDraft().build())
                          .build())
             .build();
         Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);
@@ -95,8 +94,8 @@ class EventAllowedAspectTest {
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .type(ABOUT_TO_START)
             .request(CallbackRequest.builder()
-                         .eventId(RESPOND_EXTENSION.name())
-                         .caseDetails(CaseDetailsBuilder.builder().atStateExtensionRequested().build())
+                         .eventId(CLAIMANT_RESPONSE.name())
+                         .caseDetails(CaseDetailsBuilder.builder().atStateRespondedToClaim().build())
                          .build())
             .build();
         Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);

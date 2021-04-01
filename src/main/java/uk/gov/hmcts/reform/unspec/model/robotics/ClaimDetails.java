@@ -10,8 +10,10 @@ import java.math.BigDecimal;
 @Builder
 public class ClaimDetails {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private String caseRequestReceivedDate;
+    private String caseIssuedDate;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private BigDecimal amountClaimed;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private BigDecimal courtFee;
 }

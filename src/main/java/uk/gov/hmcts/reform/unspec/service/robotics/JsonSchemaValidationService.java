@@ -9,14 +9,8 @@ import com.networknt.schema.ValidationMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.unspec.service.robotics.exception.JsonSchemaValidationException;
+import uk.gov.hmcts.reform.unspec.utils.ResourceReader;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -28,7 +22,7 @@ public class JsonSchemaValidationService {
     private String jsonSchemaFile;
 
     public JsonSchemaValidationService() {
-        this.jsonSchemaFile = "/schema/rpa-json-schema.json";
+        this.jsonSchemaFile = "schema/rpa-json-schema.json";
     }
 
     public JsonSchemaValidationService(String jsonSchemaFile) {
@@ -68,13 +62,9 @@ public class JsonSchemaValidationService {
 
     private String readJsonSchema(String input) {
         try {
-            URL resource = getClass().getResource(input);
-            URI url = resource.toURI();
-            return Files.readString(Paths.get(url));
-        } catch (NoSuchFileException | NullPointerException e) {
+            return ResourceReader.readString(input);
+        } catch (NullPointerException | IllegalArgumentException e) {
             throw new JsonSchemaValidationException(format("no file found with the link '%s'", input), e);
-        } catch (IOException | URISyntaxException e) {
-            throw new JsonSchemaValidationException(format("failed to read from file '%s'", input), e);
         }
     }
 

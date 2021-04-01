@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
-import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.service.PaymentsService;
+import uk.gov.hmcts.reform.unspec.service.Time;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +37,9 @@ public class PaymentsCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
 
-    private final CaseDetailsConverter caseDetailsConverter;
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,17 +59,23 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             caseData = caseData.toBuilder()
                 .paymentDetails(PaymentDetails.builder().status(SUCCESS).reference(paymentReference).build())
+                .paymentSuccessfulDate(time.now())
                 .build();
         } catch (FeignException e) {
+            log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessError(caseData, e);
+            } else if (e.status() == 400) {
+                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+                                        caseData.getCcdCaseReference(), e.contentUTF8()
+                ));
             } else {
                 errors.add(ERROR_MESSAGE);
             }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDetailsConverter.toMap(caseData))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -87,7 +93,8 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .build();
         } catch (JsonProcessingException jsonException) {
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
-                                    caseData.getCcdCaseReference(), e.contentUTF8()));
+                                    caseData.getCcdCaseReference(), e.contentUTF8()
+            ));
             throw e;
         }
     }

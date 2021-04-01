@@ -28,7 +28,7 @@ public class PaymentsService {
             .amount(claimFee.getCalculatedAmount())
             .caseReference(caseData.getLegacyCaseReference())
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-            .customerReference("Test Customer Reference")
+            .customerReference(caseData.getPaymentReference())
             .description("Claim issue payment")
             .organisationName("Test Organisation Name")
             .service(paymentsConfiguration.getService())

@@ -73,7 +73,7 @@ class PaymentsServiceTest {
             .amount(FEE_DATA.toFeeDto().getCalculatedAmount())
             .caseReference("000LR001")
             .ccdCaseNumber("12345")
-            .customerReference("Test Customer Reference")
+            .customerReference(caseData.getPaymentReference())
             .description("Claim issue payment")
             .organisationName("Test Organisation Name")
             .service(SERVICE)
