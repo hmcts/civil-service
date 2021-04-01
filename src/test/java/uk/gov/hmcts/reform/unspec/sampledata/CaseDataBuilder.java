@@ -125,7 +125,6 @@ public class CaseDataBuilder {
     private LocalDateTime claimDetailsNotificationDeadline;
     private LocalDateTime claimDetailsNotificationDate;
     private LocalDateTime respondent1ResponseDeadline;
-
     private LocalDateTime claimDismissedDeadline;
     private LocalDateTime respondent1TimeExtensionDate;
     private LocalDateTime respondent1AcknowledgeNotificationDate;
@@ -334,11 +333,21 @@ public class CaseDataBuilder {
                 return atStateCaseProceedsInCaseman();
             case CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME:
                 return atStateClaimDismissed();
+            case CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE:
+                return atStateClaimDismissedPastClaimDetailsNotificationDeadline();
             case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                 return atStateTakenOfflinePastApplicantResponseDeadline();
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
+    }
+
+    public CaseDataBuilder atStateClaimDismissedPastClaimDetailsNotificationDeadline() {
+        atStateAwaitingCaseDetailsNotification();
+        claimDetailsNotificationDeadline = LocalDateTime.now().minusDays(5);
+        ccdState = CLAIM_DISMISSED;
+        claimDismissedDate = LocalDate.now();
+        return this;
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
@@ -475,6 +484,7 @@ public class CaseDataBuilder {
             .reference("RC-1604-0739-2145-4711")
             .build();
         paymentSuccessfulDate = LocalDateTime.now();
+        claimDetailsNotificationDeadline = LocalDateTime.now().plusDays(1);
         return this;
     }
 
@@ -526,24 +536,28 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentFullAdmission() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentPartAdmission() {
         atStateRespondentRespondToClaim(RespondentResponseType.PART_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateRespondentCounterClaim() {
         atStateRespondentRespondToClaim(RespondentResponseType.COUNTER_CLAIM);
         takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
 
@@ -668,6 +682,7 @@ public class CaseDataBuilder {
             .respondent1TimeExtensionDate(respondent1TimeExtensionDate)
             .respondent1AcknowledgeNotificationDate(respondent1AcknowledgeNotificationDate)
             .respondent1ResponseDate(respondent1ResponseDate)
+            .respondent1ResponseDeadline(respondent1ResponseDeadline)
             .applicant1ResponseDate(applicant1ResponseDate)
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .takenOfflineDate(takenOfflineDate)
