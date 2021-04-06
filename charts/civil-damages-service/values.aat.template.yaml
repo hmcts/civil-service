@@ -35,6 +35,10 @@ java:
         - microservicekey-unspec-service
         - system-update-user-username
         - system-update-user-password
+        - cross-access-user-username
+        - cross-access-user-password
+        - prd-admin-user-username
+        - prd-admin-user-password
         - AppInsightsInstrumentationKey
         - docmosis-api-key
         - gov-notify-api-key
