@@ -2,35 +2,35 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "CREATED",
+    "CaseStateID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "AWAITING_CLAIMANT_INTENTION",
+    "CaseStateID": "AWAITING_APPLICANT_INTENTION",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "CLOSED",
+    "CaseStateID": "CASE_DISMISSED",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "PROCEEDS_WITH_OFFLINE_JOURNEY",
+    "CaseStateID": "PROCEEDS_IN_HERITAGE_SYSTEM",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "AWAITING_CASE_NOTIFICATION",
+    "CaseStateID": "CASE_ISSUED",
     "UserRole": "caseworker-caa",
     "CRUD": "CRUD"
   },

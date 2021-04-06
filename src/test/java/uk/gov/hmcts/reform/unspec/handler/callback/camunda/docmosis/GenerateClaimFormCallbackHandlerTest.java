@@ -35,8 +35,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.model.documents.DocumentType.SEALED_CLAIM;
 
@@ -92,7 +92,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void shouldGenerateDocumentAndSetStateAsAwaitingCaseNotification_whenRespondentIsRepresented() {
+        void shouldGenerateDocumentAndSetStateAsCaseIssued_whenRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -106,11 +106,11 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(DOCUMENT);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
             assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
-            assertThat(response.getState()).isEqualTo(AWAITING_CASE_NOTIFICATION.toString());
+            assertThat(response.getState()).isEqualTo(CASE_ISSUED.toString());
         }
 
         @Test
-        void shouldGenerateDocumentAndSetStateAsProceedsWithOfflineJourney_whenRespondentIsNotRepresented() {
+        void shouldGenerateDocumentAndSetStateAsProceedsInHeritageSystem_whenRespondentIsNotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -121,11 +121,11 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(DOCUMENT);
-            assertThat(response.getState()).isEqualTo(PROCEEDS_WITH_OFFLINE_JOURNEY.toString());
+            assertThat(response.getState()).isEqualTo(PROCEEDS_IN_HERITAGE_SYSTEM.toString());
         }
 
         @Test
-        void shouldGenerateDocumentAndSetStateAsProceedsWithOfflineJourney_whenRespondentSolicitorUnregistered() {
+        void shouldGenerateDocumentAndSetStateAsProceedsInHeritageSystem_whenRespondentSolicitorUnregistered() {
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification()
                 .respondent1OrgRegistered(NO)
                 .build();
@@ -138,7 +138,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(DOCUMENT);
-            assertThat(response.getState()).isEqualTo(PROCEEDS_WITH_OFFLINE_JOURNEY.toString());
+            assertThat(response.getState()).isEqualTo(PROCEEDS_IN_HERITAGE_SYSTEM.toString());
         }
     }
 }

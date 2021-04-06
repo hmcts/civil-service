@@ -12,8 +12,8 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CASE_ISSUED;
 
 @Service
 public class CaseDismissedSearchService extends ElasticSearchService {
@@ -31,10 +31,10 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                             .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                            .must(beState(AWAITING_CASE_NOTIFICATION)))
+                            .must(beState(CASE_ISSUED)))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
-                            .must(beState(CREATED))),
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
         );

@@ -9,35 +9,35 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "CREATED",
+    "CaseStateID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
     "UserRoles": ["caseworker-civil-solicitor","caseworker-civil-admin"],
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "AWAITING_CLAIMANT_INTENTION",
+    "CaseStateID": "AWAITING_APPLICANT_INTENTION",
     "UserRoles": ["caseworker-civil-solicitor","caseworker-civil-admin"],
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "CLOSED",
+    "CaseStateID": "CASE_DISMISSED",
     "UserRoles": ["caseworker-civil-solicitor","caseworker-civil-admin"],
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "PROCEEDS_WITH_OFFLINE_JOURNEY",
+    "CaseStateID": "PROCEEDS_IN_HERITAGE_SYSTEM",
     "UserRoles": ["caseworker-civil-solicitor","caseworker-civil-admin"],
     "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "CaseStateID": "AWAITING_CASE_NOTIFICATION",
+    "CaseStateID": "CASE_ISSUED",
     "UserRoles": ["caseworker-civil-solicitor","caseworker-civil-admin"],
     "CRUD": "CRUD"
   },

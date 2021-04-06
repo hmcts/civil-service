@@ -3,64 +3,56 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "PENDING_CASE_ISSUED",
-    "Name": "Pending claim issued",
-    "Description": "Pending claim issued",
+    "Name": "Claim Issue Pending",
+    "Description": "Holding state whilst payment is taken",
     "DisplayOrder": 1
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "AWAITING_CASE_NOTIFICATION",
-    "Name": "Awaiting case notification",
-    "Description": "Awaiting case notification",
+    "ID": "CASE_ISSUED",
+    "Name": "Awaiting Claim Notification",
+    "Description": "Claim is created",
     "DisplayOrder": 2
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "AWAITING_CASE_DETAILS_NOTIFICATION",
-    "Name": "Awaiting claim details notification",
-    "Description": "Awaiting claim details notification",
+    "Name": "Awaiting Claim Details Notification",
+    "Description": "Awaiting Claim Details Notification",
     "DisplayOrder": 3
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "CREATED",
-    "Name": "Claim created",
-    "Description": "Case is created",
+    "ID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "Name": "Awaiting Defendant Response",
+    "Description": "Awaiting Defendant Response",
     "DisplayOrder": 4
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "AWAITING_CLAIMANT_INTENTION",
-    "Name": "Awaiting claimant intention",
-    "Description": "Awaiting claimant intention",
+    "ID": "AWAITING_APPLICANT_INTENTION",
+    "Name": "Claimant Intent Pending",
+    "Description": "Claimant Intent Pending",
     "DisplayOrder": 5
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "CLOSED",
-    "Name": "Closed",
-    "Description": "Case is closed",
+    "ID": "CASE_DISMISSED",
+    "Name": "Claim Dismissed",
+    "Description": "Claim has been dismissed",
     "DisplayOrder": 6
   },
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "PROCEEDS_WITH_OFFLINE_JOURNEY",
-    "Name": "Proceeds with offline journey",
-    "Description": "Case is to be handled offline",
+    "ID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "Name": "Case Proceeds Offline",
+    "Description": "Claim is not able to be progressed online in CCD and will be taken offline",
     "DisplayOrder": 7
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "CaseTypeID": "UNSPECIFIED_CLAIMS",
-    "ID": "CLAIM_DISMISSED",
-    "Name": "Claim dismissed",
-    "Description": "Case is dismissed",
-    "DisplayOrder": 8
   }
 ]

@@ -58,9 +58,9 @@ module.exports = {
      }, true);
      await assignCaseToDefendant(caseId);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CASE_ISSUED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CASE_ISSUED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CASE_ISSUED');
     let i;
     for(i=0; i<data[eventName].invalid.Court.courtLocation.applicantPreferredCourt.length; i++) {
       await assertError('Court', data[eventName].invalid.Court.courtLocation.applicantPreferredCourt[i],
@@ -85,9 +85,9 @@ module.exports = {
     }, true);
 
     await assignCaseToDefendant(caseId);
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
 
   },
 
@@ -105,9 +105,9 @@ module.exports = {
     }, true);
 
     await assignCaseToDefendant(caseId);
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
     //field is deleted in about to submit callback
     deleteCaseFields('applicantSolicitor1CheckEmail');
   },
@@ -139,7 +139,7 @@ module.exports = {
       body: 'What happens next'
     }, true);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CASE_ISSUED');
   },
 
   amendClaimDocuments: async () => {
@@ -156,14 +156,14 @@ module.exports = {
     await assertError('Upload', data[eventName].invalid.Upload.nullError,
       'You must add Particulars of claim details');
 
-    await assertSubmittedEvent('AWAITING_CASE_NOTIFICATION', {
+    await assertSubmittedEvent('CASE_ISSUED', {
       header: 'Documents uploaded successfully',
       body: '<br />'
     }, true);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CASE_NOTIFICATION');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CASE_NOTIFICATION');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_NOTIFICATION');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CASE_ISSUED');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CASE_ISSUED');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CASE_ISSUED');
   },
 
   notifyClaim: async () => {
@@ -188,14 +188,14 @@ module.exports = {
 
     await validateEventPages(data.ADD_OR_AMEND_CLAIM_DOCUMENTS);
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('AWAITING_RESPONDENT_ACKNOWLEDGEMENT', {
       header: 'Defendant notified',
       body: 'What happens next'
     });
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
   },
 
   amendPartyDetails: async(user) => {
@@ -207,14 +207,14 @@ module.exports = {
 
     await validateEventPages(data[eventName]);
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('AWAITING_RESPONDENT_ACKNOWLEDGEMENT', {
       header: 'You have updated a legal representative\'s email address',
       body: ' '
     });
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
   },
 
   acknowledgeClaim: async (user) => {
@@ -231,14 +231,14 @@ module.exports = {
     await assertError('ConfirmDetails', data[eventName].invalid.ConfirmDetails.futureDateOfBirth,
       'The date entered cannot be in the future');
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('AWAITING_RESPONDENT_ACKNOWLEDGEMENT', {
       header: 'You\'ve acknowledged claim',
       body: 'You need to respond before'
     }, true);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
   },
 
   informAgreedExtensionDate: async () => {
@@ -255,14 +255,14 @@ module.exports = {
     await assertError('ExtensionDate', data[eventName].invalid.ExtensionDate.beforeCurrentDeadline,
       'The agreed extension date must be after the current deadline');
 
-    await assertSubmittedEvent('CREATED', {
+    await assertSubmittedEvent('AWAITING_RESPONDENT_ACKNOWLEDGEMENT', {
       header: 'Extension deadline submitted',
       body: 'What happens next'
     }, true);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'CREATED');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'CREATED');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT');
   },
 
   defendantResponse: async () => {
@@ -281,14 +281,14 @@ module.exports = {
     await assertError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
       'The date cannot be in the past and must not be more than a year in the future');
 
-    await assertSubmittedEvent('AWAITING_CLAIMANT_INTENTION', {
+    await assertSubmittedEvent('AWAITING_APPLICANT_INTENTION', {
       header: 'You\'ve submitted your response',
       body: 'We will let you know when they respond.'
     }, true);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_CLAIMANT_INTENTION');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_CLAIMANT_INTENTION');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CLAIMANT_INTENTION');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'AWAITING_APPLICANT_INTENTION');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'AWAITING_APPLICANT_INTENTION');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_APPLICANT_INTENTION');
   },
 
   claimantResponse: async () => {
@@ -304,15 +304,15 @@ module.exports = {
     await assertError('Hearing', data[eventName].invalid.Hearing.moreThanYear,
       'The date cannot be in the past and must not be more than a year in the future');
 
-    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+    await assertSubmittedEvent('PROCEEDS_IN_HERITAGE_SYSTEM', {
       header: 'You\'ve decided to proceed with the claim',
       body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
     }, true);
     await waitForFinishedBusinessProcess(caseId);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
   },
 
   //TODO this method is not used in api tests
@@ -339,14 +339,14 @@ module.exports = {
       'The date entered cannot be in the future');
 
     //TODO CMC-1245 confirmation page for event
-    await assertSubmittedEvent('PROCEEDS_WITH_OFFLINE_JOURNEY', {
+    await assertSubmittedEvent('PROCEEDS_IN_HERITAGE_SYSTEM', {
       header: '',
       body: ''
     }, false);
 
-    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
-    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_WITH_OFFLINE_JOURNEY');
+    await assertCorrectEventsAreAvailableToUser(config.solicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.defendantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
   }
 };
 

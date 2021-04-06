@@ -2,7 +2,7 @@ const events = require('./events.js');
 
 module.exports = {
   solicitor: {
-    AWAITING_CASE_NOTIFICATION: [
+    CASE_ISSUED: [
       events.NOTIFY_DEFENDANT_OF_CLAIM,
       events.ADD_DEFENDANT_LITIGATION_FRIEND,
       events.ADD_OR_AMEND_CLAIM_DOCUMENTS
@@ -12,14 +12,14 @@ module.exports = {
       events.ADD_DEFENDANT_LITIGATION_FRIEND,
       events.ADD_OR_AMEND_CLAIM_DOCUMENTS
     ],
-    CREATED: [
+    AWAITING_RESPONDENT_ACKNOWLEDGEMENT: [
       events.ACKNOWLEDGE_CLAIM,
       events.ADD_DEFENDANT_LITIGATION_FRIEND,
       events.DEFENDANT_RESPONSE,
       events.INFORM_AGREED_EXTENSION_DATE
     ],
-    PROCEEDS_WITH_OFFLINE_JOURNEY: [],
-    AWAITING_CLAIMANT_INTENTION: [
+    PROCEEDS_IN_HERITAGE_SYSTEM: [],
+    AWAITING_APPLICANT_INTENTION: [
       events.ADD_DEFENDANT_LITIGATION_FRIEND,
       events.CLAIMANT_RESPONSE,
     ],
@@ -30,7 +30,7 @@ module.exports = {
     ]
   },
   admin: {
-    AWAITING_CASE_NOTIFICATION: [
+    CASE_ISSUED: [
       events.CASE_PROCEEDS_IN_CASEMAN,
       events.AMEND_PARTY_DETAILS
     ],
@@ -38,12 +38,12 @@ module.exports = {
       events.CASE_PROCEEDS_IN_CASEMAN,
       events.AMEND_PARTY_DETAILS
     ],
-    CREATED: [
+    AWAITING_RESPONDENT_ACKNOWLEDGEMENT: [
       events.CASE_PROCEEDS_IN_CASEMAN,
       events.AMEND_PARTY_DETAILS
     ],
-    PROCEEDS_WITH_OFFLINE_JOURNEY: [],
-    AWAITING_CLAIMANT_INTENTION: [
+    PROCEEDS_IN_HERITAGE_SYSTEM: [],
+    AWAITING_APPLICANT_INTENTION: [
       events.CASE_PROCEEDS_IN_CASEMAN,
       events.AMEND_PARTY_DETAILS
     ],

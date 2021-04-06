@@ -47,14 +47,13 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CASE_NOTIFICATION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_CLAIMANT_INTENTION;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLAIM_DISMISSED;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CLOSED;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.unspec.enums.PersonalInjuryType.ROAD_ACCIDENT;
@@ -346,7 +345,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimDismissedPastClaimNotificationDeadline() {
         atStateAwaitingCaseNotification();
-        ccdState = CLAIM_DISMISSED;
+        ccdState = CASE_DISMISSED;
         claimNotificationDeadline = LocalDateTime.now().minusDays(1);
         claimDismissedDate = LocalDateTime.now();
         return this;
@@ -355,14 +354,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDismissedPastClaimDetailsNotificationDeadline() {
         atStateAwaitingCaseDetailsNotification();
         claimDetailsNotificationDeadline = LocalDateTime.now().minusDays(5);
-        ccdState = CLAIM_DISMISSED;
+        ccdState = CASE_DISMISSED;
         claimDismissedDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
         atStatePaymentSuccessful();
-        ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         takenOfflineDate = LocalDateTime.now();
@@ -385,7 +384,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder discontinueClaim() {
-        this.ccdState = CLOSED;
+        this.ccdState = CASE_DISMISSED;
         this.discontinueClaim = CloseClaim.builder()
             .date(LocalDate.now())
             .reason("My reason")
@@ -400,7 +399,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder discontinueClaimFrom(FlowState.Main flowState) {
         atState(flowState);
-        this.ccdState = CLOSED;
+        this.ccdState = CASE_DISMISSED;
         this.discontinueClaim = CloseClaim.builder()
             .date(LocalDate.now())
             .reason("My reason")
@@ -419,7 +418,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withdrawClaim() {
-        this.ccdState = CLOSED;
+        this.ccdState = CASE_DISMISSED;
         this.withdrawClaim = CloseClaim.builder()
             .date(LocalDate.now())
             .reason("My reason")
@@ -429,7 +428,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withdrawClaimFrom(FlowState.Main flowState) {
         atState(flowState);
-        this.ccdState = CLOSED;
+        this.ccdState = CASE_DISMISSED;
         this.withdrawClaim = CloseClaim.builder()
             .date(LocalDate.now())
             .reason("My reason")
@@ -500,7 +499,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateAwaitingCaseNotification() {
         atStatePaymentSuccessful();
-        ccdState = AWAITING_CASE_NOTIFICATION;
+        ccdState = CASE_ISSUED;
         issueDate = CLAIM_ISSUED_DATE;
         claimNotificationDeadline = LocalDateTime.now();
         return this;
@@ -518,7 +517,7 @@ public class CaseDataBuilder {
         atStateAwaitingCaseDetailsNotification();
         claimDetailsNotificationDate = LocalDateTime.now();
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
-        ccdState = CREATED;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
@@ -576,19 +575,19 @@ public class CaseDataBuilder {
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = LocalDateTime.now();
-        ccdState = AWAITING_CLAIMANT_INTENTION;
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 
     public CaseDataBuilder atStateProceedsOfflineAdmissionOrCounterClaim() {
         atStateRespondentFullDefence();
-        ccdState = PROCEEDS_WITH_OFFLINE_JOURNEY;
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
 
     public CaseDataBuilder atStateClaimDismissed() {
         atStateClaimCreated();
-        ccdState = CLAIM_DISMISSED;
+        ccdState = CASE_DISMISSED;
         claimDismissedDate = LocalDateTime.now();
         return this;
     }

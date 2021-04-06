@@ -45,7 +45,7 @@ module.exports = {
     id: 'ADD_OR_AMEND_CLAIM_DOCUMENTS',
     name: 'Add or amend claim documents',
     description: 'Add or amend documents attached to the claim',
-    order: 11
+    order: 10
   },
   DISCONTINUE_CLAIM: {
     id: 'DISCONTINUE_CLAIM',
@@ -69,12 +69,12 @@ module.exports = {
     description: 'Enter an extension date that has already been agreed with other parties',
     id: 'INFORM_AGREED_EXTENSION_DATE',
     name: 'Inform agreed extension date',
-    order: 13
+    order: 12
   },
   AMEND_PARTY_DETAILS: {
     description: 'Update defendant and claimant solicitor email addresses',
     id: 'AMEND_PARTY_DETAILS',
     name: 'Amend party details',
-    order: 14
+    order: 13
   }
 };
