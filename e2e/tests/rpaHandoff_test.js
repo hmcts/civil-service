@@ -9,9 +9,13 @@ Feature('RPA handoff points tests @rpa-handoff-tests');
 Scenario('Take claim offline', async (I) => {
   await I.login(config.solicitorUser);
   await I.createCase();
+  let caseId = getCaseId(await I.grabCaseNumber());
   await I.notifyClaim();
   await I.notifyClaimDetails();
   await I.acknowledgeClaim('fullDefence');
+
+  await I.login(config.adminUser);
+  await I.goToCase(caseId);
   await I.caseProceedsInCaseman();
   await I.assertNoEventsAvailable();
 });
