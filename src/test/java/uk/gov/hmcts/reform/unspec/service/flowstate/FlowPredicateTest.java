@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.payment
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
@@ -98,6 +99,23 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
             assertFalse(respondent1NotRepresented.test(caseData));
+        }
+    }
+
+    @Nested
+    class Respondent1NotRegistered {
+
+        @Test
+        void shouldReturnTrue_whenRespondentNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant().build();
+
+            assertTrue(respondent1OrgNotRegistered.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+            assertFalse(respondent1OrgNotRegistered.test(caseData));
         }
     }
 
@@ -245,7 +263,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataatStateClaimAcknowledged() {
+        void shouldReturnFalse_whenCaseDataAtStateClaimAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             assertFalse(applicantRespondToDefence.test(caseData));
         }
@@ -354,7 +372,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataatStateClaimAcknowledge() {
+        void shouldReturnFalse_whenCaseDataAtStateClaimAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
             assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }

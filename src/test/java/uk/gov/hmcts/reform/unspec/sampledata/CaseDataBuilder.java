@@ -328,6 +328,8 @@ public class CaseDataBuilder {
                 return atStateProceedsOfflineAdmissionOrCounterClaim();
             case PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT:
                 return atStateProceedsOfflineUnrepresentedDefendant();
+            case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                return atStateProceedsOfflineUnregisteredDefendant();
             case CASE_PROCEEDS_IN_CASEMAN:
                 return atStateCaseProceedsInCaseman();
             case CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME:
@@ -375,6 +377,15 @@ public class CaseDataBuilder {
             .phoneNumber("0123456789")
             .address(AddressBuilder.builder().build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant() {
+        atStatePaymentSuccessful();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
         return this;
     }
 

@@ -4,6 +4,9 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -13,7 +16,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITI
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT;
 
 class CreateClaimTest extends BpmnBaseTest {
 
@@ -147,8 +149,10 @@ class CreateClaimTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    @Test
-    void shouldSuccessfullyCompleteCreateClaim_whenClaimTakenOffline() {
+    @ParameterizedTest
+    @EnumSource(value = FlowState.Main.class,
+        names = {"PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT"})
+    void shouldSuccessfullyCompleteCreateClaim_whenClaimTakenOffline(FlowState.Main flowState) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -183,7 +187,7 @@ class CreateClaimTest extends BpmnBaseTest {
         );
 
         //complete the document generation
-        variables.putValue(FLOW_STATE, PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+        variables.putValue(FLOW_STATE, flowState.fullName());
 
         ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(

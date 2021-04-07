@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_COUNTER_CLAIM;
@@ -88,6 +89,24 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
                     PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+        }
+
+        @Test
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(4)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName());
         }
 
         @Test
@@ -486,6 +505,7 @@ class StateFlowEngineTest {
                 "PAYMENT_SUCCESSFUL",
                 "CLAIM_DISCONTINUED",
                 "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
+                "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
                 "AWAITING_CASE_DETAILS_NOTIFICATION",
@@ -517,6 +537,7 @@ class StateFlowEngineTest {
                 "PAYMENT_SUCCESSFUL",
                 "CLAIM_WITHDRAWN",
                 "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
+                "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM",
                 "AWAITING_CASE_NOTIFICATION",
                 "AWAITING_CASE_DETAILS_NOTIFICATION",

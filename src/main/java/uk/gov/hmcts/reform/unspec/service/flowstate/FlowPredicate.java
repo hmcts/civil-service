@@ -22,8 +22,10 @@ public class FlowPredicate {
         caseData.getLegacyCaseReference() != null;
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
-        caseData.getIssueDate() != null
-            && (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO);
+        caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
+
+    public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
+        caseData.getIssueDate() != null && caseData.getRespondent1OrgRegistered() == NO;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         caseData.getPaymentDetails() != null && caseData.getPaymentDetails().getStatus() == FAILED;
