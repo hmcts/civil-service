@@ -4,12 +4,12 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.4.2'
-  id 'org.owasp.dependencycheck' version '6.1.2'
+  id 'org.owasp.dependencycheck' version '6.1.5'
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'org.sonarqube' version '3.1.1'
-  id 'au.com.dius.pact' version '4.2.2'
-  id "io.freefair.lombok" version "5.3.0"
-  id "org.flywaydb.flyway" version "7.7.1"
+  id 'au.com.dius.pact' version '4.2.3'
+  id "io.freefair.lombok" version "5.3.3.3"
+  id "org.flywaydb.flyway" version "7.7.2"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -292,7 +292,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.7'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.8.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -300,11 +300,11 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.4'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.5'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.0'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.50'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.51'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '1.4.1'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
