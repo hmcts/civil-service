@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.unspec.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.model.robotics.Event;
 import uk.gov.hmcts.reform.unspec.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.unspec.model.robotics.EventHistory;
@@ -26,6 +25,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -281,7 +281,6 @@ class EventHistoryMapperTest {
     @Test
     void shouldPrepareExpectedEvents_whenClaimWithFullDefenceNotProceeds() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateExtensionRequested()
             .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
             .build();
         Event expectedDefenceFiled = Event.builder()
@@ -297,14 +296,11 @@ class EventHistoryMapperTest {
             .litigiousPartyID("002")
             .eventDetailsText(format(
                 "preferredCourtCode: %s; stayClaim: %s",
-                ofNullable(caseData.getRespondent1DQ())
-                    .map(Respondent1DQ::getRespondent1DQRequestedCourt)
+                ofNullable(caseData.getRespondent1DQ().getRequestedCourt())
                     .map(RequestedCourt::getResponseCourtCode)
-                    .orElse("None"),
-                ofNullable(caseData.getRespondent1DQ())
-                    .map(Respondent1DQ::getRespondent1DQFileDirectionsQuestionnaire)
-                    .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
-                    .orElse(NO)
+                    .orElse(null),
+                caseData.getRespondent1DQ().getFileDirectionQuestionnaire()
+                    .getOneMonthStayRequested() == YES
             ))
             .build();
         List<Event> expectedMiscellaneousEvents = List.of(
@@ -335,18 +331,6 @@ class EventHistoryMapperTest {
                               .build())
             .build();
 
-        Event expectedConsentExtensionFilingDefence = Event.builder()
-            .eventSequence(3)
-            .eventCode("45")
-            .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
-            .litigiousPartyID("002")
-            .eventDetails(EventDetails.builder()
-                              .agreedExtensionDate(caseData
-                                                       .getRespondentSolicitor1AgreedDeadlineExtension()
-                                                       .format(ISO_DATE))
-                              .build())
-            .build();
-
         var eventHistory = mapper.buildEvents(caseData);
 
         assertThat(eventHistory).isNotNull();
@@ -358,14 +342,112 @@ class EventHistoryMapperTest {
             .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
         assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
             .containsExactly(expectedAcknowledgementOfServiceReceived);
-        assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
-            .containsExactly(expectedConsentExtensionFilingDefence);
 
         assertEmptyEvents(
             eventHistory,
             "receiptOfAdmission",
             "receiptOfPartAdmission",
-            "replyToDefence"
+            "replyToDefence",
+            "consentExtensionFilingDefence"
+        );
+    }
+
+    @Test
+    void shouldPrepareExpectedEvents_whenClaimWithFullDefenceProceeds() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+            .build();
+        Event expectedDefenceFiled = Event.builder()
+            .eventSequence(4)
+            .eventCode("50")
+            .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
+            .litigiousPartyID("002")
+            .build();
+        Event expectedDirectionsQuestionnaireRespondent = Event.builder()
+            .eventSequence(5)
+            .eventCode("197")
+            .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
+            .litigiousPartyID("002")
+            .eventDetailsText(format(
+                "preferredCourtCode: %s; stayClaim: %s",
+                ofNullable(caseData.getRespondent1DQ().getRequestedCourt())
+                    .map(RequestedCourt::getResponseCourtCode)
+                    .orElse(null),
+                ofNullable(caseData.getRespondent1DQ().getFileDirectionQuestionnaire())
+                    .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
+                    .orElse(NO) == YES
+            ))
+            .build();
+        Event expectedReplyToDefence = Event.builder()
+            .eventSequence(6)
+            .eventCode("66")
+            .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
+            .litigiousPartyID("001")
+            .build();
+        Event expectedDirectionsQuestionnaireApplicant = Event.builder()
+            .eventSequence(7)
+            .eventCode("197")
+            .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
+            .litigiousPartyID("001")
+            .eventDetailsText(format(
+                "preferredCourtCode: %s; stayClaim: %s",
+                ofNullable(caseData.getApplicant1DQ().getRequestedCourt())
+                    .map(RequestedCourt::getResponseCourtCode)
+                    .orElse(null),
+                ofNullable(caseData.getApplicant1DQ().getFileDirectionQuestionnaire())
+                    .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
+                    .orElse(NO) == YES
+            ))
+            .build();
+        List<Event> expectedMiscellaneousEvents = List.of(
+            Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant")
+                                  .build())
+                .build(),
+            Event.builder()
+                .eventSequence(8)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Applicant proceeds")
+                                  .build())
+                .build()
+        );
+        Event expectedAcknowledgementOfServiceReceived = Event.builder()
+            .eventSequence(2)
+            .eventCode("38")
+            .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
+            .litigiousPartyID("002")
+            .eventDetails(EventDetails.builder()
+                              .responseIntention("contest jurisdiction")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory).extracting("replyToDefence").asList()
+            .containsExactly(expectedReplyToDefence);
+        assertThat(eventHistory).extracting("defenceFiled").asList()
+            .containsExactly(expectedDefenceFiled);
+        assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+            .containsExactlyInAnyOrder(
+                expectedDirectionsQuestionnaireRespondent,
+                expectedDirectionsQuestionnaireApplicant);
+        assertThat(eventHistory).extracting("miscellaneous").asList()
+            .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+        assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
+            .containsExactly(expectedAcknowledgementOfServiceReceived);
+
+        assertEmptyEvents(
+            eventHistory,
+            "receiptOfAdmission",
+            "receiptOfPartAdmission",
+            "consentExtensionFilingDefence"
         );
     }
 
@@ -376,7 +458,8 @@ class EventHistoryMapperTest {
         "RESPONDENT_COUNTER_CLAIM",
         "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
         "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
-        "FULL_DEFENCE_NOT_PROCEED"
+        "FULL_DEFENCE_NOT_PROCEED",
+        "FULL_DEFENCE_PROCEED"
     })
     void shouldBuildEmptyEventHistory_whenNoMappingsDefinedForStateFlow(FlowState.Main flowStateMain) {
         CaseData caseData = CaseDataBuilder.builder().atState(flowStateMain).build();

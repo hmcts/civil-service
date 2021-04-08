@@ -187,4 +187,24 @@ class RpaConsumerTest extends BaseRpaTest {
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
+
+    @Nested
+    class FullDefenceProceed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceProceeds() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with full defence confirms to proceeds";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
 }
