@@ -31,6 +31,6 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
     private QueryBuilder beValidState() {
         return boolQuery()
             .minimumShouldMatch(1)
-            .should(matchQuery("state", "AWAITING_CLAIMANT_INTENTION"));
+            .should(matchQuery("state", "AWAITING_APPLICANT_INTENTION"));
     }
 }

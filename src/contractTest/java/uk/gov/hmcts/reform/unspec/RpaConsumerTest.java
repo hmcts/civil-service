@@ -103,6 +103,26 @@ class RpaConsumerTest extends BaseRpaTest {
     }
 
     @Nested
+    class UnregisteredDefendant {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim against unrepresented defendant";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
+
+    @Nested
     class AdmissionsOrCounterClaim {
 
         @Test

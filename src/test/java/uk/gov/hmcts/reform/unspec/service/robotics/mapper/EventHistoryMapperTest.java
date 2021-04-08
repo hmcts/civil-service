@@ -67,6 +67,38 @@ class EventHistoryMapperTest {
     }
 
     @Test
+    void shouldPrepareMiscellaneousEvent_whenClaimWithUnregisteredDefendant() {
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant().build();
+        Event expectedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
+            .eventDetails(EventDetails.builder()
+                              .miscText("RPA Reason: Unregistered defendant solicitor firm.")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(expectedEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
+    @Test
     void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmission() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
         Event expectedReceiptOfAdmission = Event.builder()
@@ -272,7 +304,8 @@ class EventHistoryMapperTest {
         "RESPONDENT_FULL_ADMISSION",
         "RESPONDENT_PART_ADMISSION",
         "RESPONDENT_COUNTER_CLAIM",
-        "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT"
+        "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
+        "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT"
     })
     void shouldBuildEmptyEventHistory_whenNoMappingsDefinedForStateFlow(FlowState.Main flowStateMain) {
         CaseData caseData = CaseDataBuilder.builder().atState(flowStateMain).build();

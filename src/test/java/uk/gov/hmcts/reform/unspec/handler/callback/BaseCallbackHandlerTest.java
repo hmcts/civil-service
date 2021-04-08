@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.unspec.service.UserService;
 import java.util.HashMap;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.unspec.enums.CaseState.CREATED;
+import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 
 public abstract class BaseCallbackHandlerTest {
 
@@ -30,11 +30,25 @@ public abstract class BaseCallbackHandlerTest {
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type) {
-        return callbackParamsOf(data, CREATED, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(
+            data,
+            AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+            type,
+            null,
+            null,
+            Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN")
+        );
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, String pageId) {
-        return callbackParamsOf(data, CREATED, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(
+            data,
+            AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+            type,
+            null,
+            pageId,
+            Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN")
+        );
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type) {

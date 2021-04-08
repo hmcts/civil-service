@@ -23,7 +23,7 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
             .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
             .must(boolQuery()
                       .minimumShouldMatch(1)
-                      .should(matchQuery("state", "AWAITING_CLAIMANT_INTENTION")));
+                      .should(matchQuery("state", "AWAITING_APPLICANT_INTENTION")));
 
         return new Query(query, List.of("reference"), fromValue);
     }
