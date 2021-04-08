@@ -318,8 +318,10 @@ public class CaseDataBuilder {
                 return atStateRespondentPartAdmission();
             case RESPONDENT_COUNTER_CLAIM:
                 return atStateRespondentCounterClaim();
-            case APPLICANT_RESPOND_TO_DEFENCE:
-                return atStateApplicantRespondToDefence();
+            case FULL_DEFENCE_PROCEED:
+                return atStateApplicantRespondToDefenceAndProceed();
+            case FULL_DEFENCE_NOT_PROCEED:
+                return atStateApplicantRespondToDefenceAndNotProceed();
             case CLAIM_WITHDRAWN:
                 return atStateClaimWithdrawn();
             case CLAIM_DISCONTINUED:
@@ -603,13 +605,20 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateApplicantRespondToDefence() {
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
         atStateRespondentFullDefence();
         applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
         applicant1DQ();
+        applicant1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
+        atStateRespondentFullDefence();
+        applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
         return this;
     }

@@ -129,7 +129,10 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build()
+                .toBuilder()
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                 .build();

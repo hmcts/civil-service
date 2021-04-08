@@ -11,7 +11,6 @@ module.exports = {
   async confirmReference() {
     I.waitForElement(this.fields.solicitorReferences.id);
     I.fillField(this.fields.solicitorReferences.id, 'Defendant Reference ++');
-
     await I.clickContinue();
   }
 };

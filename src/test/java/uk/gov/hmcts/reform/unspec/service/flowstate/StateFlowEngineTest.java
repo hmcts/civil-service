@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
@@ -35,7 +34,6 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENS
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
@@ -88,7 +86,8 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+                    PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+                );
         }
 
         @Test
@@ -347,37 +346,20 @@ class StateFlowEngineTest {
                 );
         }
 
-        @Test
-        void shouldReturnCaseProceedsInCaseman_whenCaseDataAtStateApplicantRespondToDefence() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            mode = EnumSource.Mode.INCLUDE,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"}
+        )
+        void shouldReturnFullDefenceProceed_whenCaseDataAtStateApplicantRespondToDefence(FlowState.Main flowState) {
+            CaseData caseData = CaseDataBuilder.builder().atState(flowState).build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
                 .isNotNull()
-                .isEqualTo(CASE_PROCEEDS_IN_CASEMAN.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
-                    AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
-                    CLAIM_ISSUED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
-                    APPLICANT_RESPOND_TO_DEFENCE.fullName(), CASE_PROCEEDS_IN_CASEMAN.fullName()
-                );
-        }
-
-        @Test
-        void shouldReturnProceedsWithOfflineJourney_whenCcdStateIsProceedsWithOfflineJourney() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM.fullName());
+                .isEqualTo(flowState.fullName());
             assertThat(stateFlow.getStateHistory())
                 .hasSize(8)
                 .extracting(State::getName)
@@ -385,7 +367,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), PENDING_CASE_ISSUED.fullName(), PAYMENT_SUCCESSFUL.fullName(),
                     AWAITING_CASE_NOTIFICATION.fullName(), AWAITING_CASE_DETAILS_NOTIFICATION.fullName(),
                     CLAIM_ISSUED.fullName(), RESPONDENT_FULL_DEFENCE.fullName(),
-                    PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM.fullName()
+                    flowState.fullName()
                 );
         }
 
@@ -481,7 +463,8 @@ class StateFlowEngineTest {
             "true,PENDING_CASE_ISSUED",
             "true,DRAFT",
             "false,RESPONDENT_FULL_DEFENCE",
-            "false,APPLICANT_RESPOND_TO_DEFENCE",
+            "false,FULL_DEFENCE_PROCEED",
+            "false,FULL_DEFENCE_NOT_PROCEED",
             "false,CLAIM_ACKNOWLEDGED",
         })
         void shouldReturnValidResult_whenCaseDataAtStateClaimCreated(boolean expected, FlowState.Main state) {
