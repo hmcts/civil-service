@@ -43,7 +43,7 @@
     "ID": "Upload",
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "scheduleOfLoss",
+    "ListElementCode": "scheduleOfLoss.document",
     "FieldDisplayOrder": 5,
     "DisplayContext": "OPTIONAL"
   },
@@ -52,7 +52,7 @@
     "ID": "Upload",
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "certificateOfSuitability",
+    "ListElementCode": "certificateOfSuitability.document",
     "FieldDisplayOrder": 6,
     "DisplayContext": "OPTIONAL"
   },
@@ -60,7 +60,7 @@
     "LiveFrom": "01/01/2017",
     "ID": "Upload",
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
-    "CaseFieldID": "servedDocumentFiles",
+    "CaseFieldID": "servedDocumentFiles.document",
     "ListElementCode": "other",
     "FieldDisplayOrder": 7,
     "DisplayContext": "OPTIONAL"

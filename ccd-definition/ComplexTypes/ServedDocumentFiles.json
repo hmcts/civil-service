@@ -34,27 +34,24 @@
     "ID": "ServedDocumentFiles",
     "ListElementCode": "scheduleOfLoss",
     "FieldType": "Collection",
-    "FieldTypeParameter": "Document",
+    "FieldTypeParameter": "DocumentWithRegex",
     "ElementLabel": "Schedule of loss",
-    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   },
   {
     "ID": "ServedDocumentFiles",
     "ListElementCode": "certificateOfSuitability",
     "FieldType": "Collection",
-    "FieldTypeParameter": "Document",
+    "FieldTypeParameter": "DocumentWithRegex",
     "ElementLabel": "Certificate of suitability",
-    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   },
   {
     "ID": "ServedDocumentFiles",
     "ListElementCode": "other",
     "FieldType": "Collection",
-    "FieldTypeParameter": "Document",
+    "FieldTypeParameter": "DocumentWithRegex",
     "ElementLabel": "Other documents",
-    "RegularExpression": ".csv,.ods,.xls,.xlsx,.docm,.docx,.html,.odf,.ooxml,.pdf,.rtf,.sgml,.txt,.xhtml",
     "SecurityClassification": "Public"
   }
 ]

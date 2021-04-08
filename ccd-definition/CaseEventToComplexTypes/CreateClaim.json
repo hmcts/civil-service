@@ -414,7 +414,7 @@
     "ID": "Upload",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "scheduleOfLoss",
+    "ListElementCode": "scheduleOfLoss.document",
     "FieldDisplayOrder": 5,
     "DisplayContext": "OPTIONAL"
   },
@@ -423,7 +423,7 @@
     "ID": "Upload",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "certificateOfSuitability",
+    "ListElementCode": "certificateOfSuitability.document",
     "FieldDisplayOrder": 6,
     "DisplayContext": "OPTIONAL"
   },
@@ -432,7 +432,7 @@
     "ID": "Upload",
     "CaseEventID": "CREATE_CLAIM",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "other",
+    "ListElementCode": "other.document",
     "FieldDisplayOrder": 7,
     "DisplayContext": "OPTIONAL"
   },
