@@ -81,7 +81,7 @@
       <bpmn:outgoing>Flow_FULL_DEFENCE_PROCEED</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_NOT_PROCEED" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="NotifyRoboticsOnCaseHandedOffline">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_NOT_PROCEED"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_NOT_PROCEED" || flowState != "MAIN.APPLICANT_RESPOND_TO_DEFENCE"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_PROCEED" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ClaimantResponseGenerateDirectionsQuestionnaire">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_PROCEED" || flowState == "MAIN.APPLICANT_RESPOND_TO_DEFENCE"}</bpmn:conditionExpression>
