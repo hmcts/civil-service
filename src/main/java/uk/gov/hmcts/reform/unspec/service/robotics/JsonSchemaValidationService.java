@@ -36,6 +36,7 @@ public class JsonSchemaValidationService {
     public boolean isValid(String body, String jsonSchemaFileName) {
         Set<ValidationMessage> errors = validate(body, jsonSchemaFileName);
         if (!errors.isEmpty()) {
+            log.error("Schema validation errors count: {}", errors.size());
             log.error("Schema validation errors: {}", errors);
             return false;
         }

@@ -45,7 +45,7 @@ public class FlowPredicate {
         caseData.getClaimDetailsNotificationDate() != null;
 
     public static final Predicate<CaseData> respondentAcknowledgeClaim = caseData ->
-        caseData.getRespondent1ClaimResponseIntentionType() != null
+        caseData.getRespondent1AcknowledgeNotificationDate() != null
             && caseData.getRespondent1ClaimResponseType() == null
             && caseData.getRespondent1ClaimResponseDocument() == null
             && caseData.getCcdState() != CASE_DISMISSED;
@@ -66,10 +66,15 @@ public class FlowPredicate {
         caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM
             && caseData.getCcdState() != CASE_DISMISSED;
 
-    public static final Predicate<CaseData> applicantRespondToDefence = caseData ->
+    public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         caseData.getApplicant1ProceedWithClaim() != null
-            && caseData.getApplicant1DefenceResponseDocument() != null
-            && caseData.getCcdState() != PROCEEDS_IN_HERITAGE_SYSTEM;
+            && caseData.getApplicant1ProceedWithClaim() == YES
+            && caseData.getTakenOfflineDate() == null;
+
+    public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
+        caseData.getApplicant1ProceedWithClaim() != null
+            && caseData.getApplicant1ProceedWithClaim() == NO
+            && caseData.getTakenOfflineDate() == null;
 
     public static final Predicate<CaseData> claimWithdrawn = caseData ->
         caseData.getWithdrawClaim() != null

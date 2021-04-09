@@ -95,7 +95,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateFullDefence() {
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_APPLICANT_INTENTION.name();
         return this;
