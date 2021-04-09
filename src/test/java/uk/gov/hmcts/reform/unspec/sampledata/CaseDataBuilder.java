@@ -140,6 +140,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1AcknowledgeNotificationDate(LocalDateTime dateTime) {
+        this.respondent1AcknowledgeNotificationDate = dateTime;
+        return this;
+    }
+
     public CaseDataBuilder respondentSolicitor1AgreedDeadlineExtension(LocalDate extensionDate) {
         this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
         return this;
@@ -212,6 +217,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1ProceedWithClaim(YesOrNo yesOrNo) {
         this.applicant1ProceedWithClaim = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseIntentionType(ResponseIntention responseIntention) {
+        this.respondent1ClaimResponseIntentionType = respondent1ClaimResponseIntentionType;
         return this;
     }
 

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.dq.DQ;
-import uk.gov.hmcts.reform.unspec.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.unspec.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.unspec.model.robotics.Event;
 import uk.gov.hmcts.reform.unspec.model.robotics.EventDetails;
@@ -19,7 +18,6 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.unspec.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
@@ -100,9 +98,8 @@ public class EventHistoryMapper {
             ofNullable(dq.getRequestedCourt())
                 .map(RequestedCourt::getResponseCourtCode)
                 .orElse(null),
-            ofNullable(dq.getFileDirectionQuestionnaire())
-                .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
-                .orElse(NO) == YES
+            dq.getFileDirectionQuestionnaire()
+                .getOneMonthStayRequested() == YES
         );
     }
 
@@ -178,9 +175,10 @@ public class EventHistoryMapper {
                         .eventCode("38")
                         .dateReceived(dateAcknowledge.format(ISO_DATE))
                         .litigiousPartyID("002")
-                        .eventDetails(EventDetails.builder()
-                                          .responseIntention("contest jurisdiction")
-                                          .build())
+                        .eventDetailsText(format(
+                            "responseIntention: %s",
+                            caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                        ))
                         .build()
                 ));
     }
@@ -249,11 +247,9 @@ public class EventHistoryMapper {
                     .eventCode("45")
                     .dateReceived(dateReceived.format(ISO_DATE))
                     .litigiousPartyID("002")
-                    .eventDetails(EventDetails.builder()
-                                      .agreedExtensionDate(caseData
-                                                               .getRespondentSolicitor1AgreedDeadlineExtension()
-                                                               .format(ISO_DATE))
-                                      .build())
+                    .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                        .getRespondentSolicitor1AgreedDeadlineExtension()
+                        .format(ISO_DATE)))
                     .build()
             )
         );

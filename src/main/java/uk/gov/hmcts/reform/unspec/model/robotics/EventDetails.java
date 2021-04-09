@@ -10,6 +10,4 @@ import lombok.Data;
 public class EventDetails {
 
     private String miscText;
-    private String responseIntention;
-    private String agreedExtensionDate;
 }

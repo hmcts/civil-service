@@ -724,7 +724,8 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetailsText",
-            "type": ["null", "string"]
+            "type": ["null", "string"],
+            "maxLength": 250
           }
         },
         "additionalProperties": false
@@ -768,15 +769,13 @@
           },
           "eventDetails": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails",
-            "type": "object",
-            "required": [
-              "responseIntention"
-            ],
+            "type": ["object", "null"],
             "properties": {
-              "responseIntention": {
-                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/responseIntention",
+              "miscText": {
+                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",
-                "description": ""
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
               }
             },
             "additionalProperties": false
@@ -784,6 +783,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetailsText",
             "type": [ "null", "string"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -828,15 +828,13 @@
           },
           "eventDetails": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails",
-            "type": "object",
-            "required": [
-              "agreedExtensionDate"
-            ],
+            "type": ["object", "null"],
             "properties": {
-              "agreedExtensionDate": {
-                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/agreedExtensionDate",
+              "miscText": {
+                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",
-                "description": ""
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
               }
             },
             "additionalProperties": false
@@ -844,6 +842,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -898,6 +897,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -952,6 +952,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -1006,6 +1007,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -1060,6 +1062,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -1114,6 +1117,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
@@ -1167,6 +1171,7 @@
           "eventDetailsText": {
             "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventCode",
             "type": ["string", "null"],
+            "maxLength": 250,
             "description": ""
           }
         },
