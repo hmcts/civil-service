@@ -144,7 +144,7 @@ module.exports = function () {
       await pbaNumberPage.selectPbaNumber();
       await paymentReferencePage.updatePaymentReference();
       await statementOfTruth.enterNameAndRole('claim');
-      let expectedMessage = litigantInPerson ? 'Your claim will now progress offline' : 'Your claim has been issued';
+      let expectedMessage = litigantInPerson ? 'Your claim will now progress offline' : 'Your claim has been received\nClaim number: ';
       await event.submit('Issue claim', expectedMessage);
 
       await event.returnToCaseDetails();
@@ -231,7 +231,7 @@ module.exports = function () {
       await hearingSupportRequirementsPage.selectRequirements(parties.APPLICANT_SOLICITOR_1);
       await furtherInformationPage.enterFurtherInformation(parties.APPLICANT_SOLICITOR_1);
       await statementOfTruth.enterNameAndRole(parties.APPLICANT_SOLICITOR_1 + 'DQ');
-      await event.submit('Submit your response', 'You\'ve decided to proceed with the claim');
+      await event.submit('Submit your response', 'You\'ve chosen to proceed with the claim\nClaim number: ');
       await this.click('Close and Return to case details');
     },
 

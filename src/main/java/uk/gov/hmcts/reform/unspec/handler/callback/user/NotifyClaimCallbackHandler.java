@@ -33,8 +33,8 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_DEFENDANT_OF_CLAIM);
-    public static final String CONFIRMATION_SUMMARY = "<br />What happens next\n\n"
-        + "The defendant legal representative's organisation has been notified and granted access to this claim.\n\n"
+    public static final String CONFIRMATION_SUMMARY = "<br />The defendant legal representative's organisation has "
+        + "been notified and granted access to this claim.\n\n"
         + "You must notify the defendant with the claim details by %s";
 
     private final ObjectMapper objectMapper;
@@ -88,7 +88,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         String body = format(CONFIRMATION_SUMMARY, formattedDeadline);
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# Notification of claim sent")
+            .confirmationHeader(String.format(
+                "# Notification of claim sent%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            ))
             .confirmationBody(body)
             .build();
     }

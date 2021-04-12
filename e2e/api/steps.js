@@ -53,8 +53,8 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM);
 
      await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-       header: 'Your claim has been issued',
-       body: 'You have until DATE to notify the defendant of the claim and claim details.'
+       header: 'Your claim has been received',
+       body: 'Your claim will not be issued until payment is confirmed.'
      }, true);
      await assignCaseToDefendant(caseId);
 
@@ -80,8 +80,8 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_LIP);
 
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim has been issued',
-      body: 'To continue your claim by post you need to'
+      header: 'Your claim has been received and will progress offline',
+      body: 'Your claim will not be issued until payment is confirmed. Once payment is confirmed you will receive an email. The claim will then progress offline.'
     }, true);
 
     await assignCaseToDefendant(caseId);
@@ -100,8 +100,8 @@ module.exports = {
     await validateEventPages(data.CREATE_CLAIM_RESPONDENT_SOLICITOR_FIRM_NOT_IN_MY_HMCTS);
 
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim will now progress offline',
-      body: 'What you need to do'
+      header: 'Your claim has been received and will progress offline',
+      body: 'Your claim will not be issued until payment is confirmed. Once payment is confirmed you will receive an email. The claim will then progress offline.'
     }, true);
 
     await assignCaseToDefendant(caseId);
@@ -120,7 +120,7 @@ module.exports = {
     await apiRequest.startEvent(eventName);
     await validateEventPages(data.CREATE_CLAIM_TERMINATED_PBA);
     await assertSubmittedEvent('PENDING_CASE_ISSUED', {
-      header: 'Your claim has been issued',
+      header: 'Your claim has been received',
       body: 'You have until DATE to notify the defendant of the claim and claim details.'
     }, true);
     await assignCaseToDefendant(caseId);
@@ -305,8 +305,8 @@ module.exports = {
       'The date cannot be in the past and must not be more than a year in the future');
 
     await assertSubmittedEvent('PROCEEDS_IN_HERITAGE_SYSTEM', {
-      header: 'You\'ve decided to proceed with the claim',
-      body: 'We\'ll review the case. We\'ll contact you to tell you what to do next.'
+      header: 'You\'ve chosen to proceed with the claim',
+      body: '>We\'ll review the case and contact you to tell you what to do next.'
     }, true);
     await waitForFinishedBusinessProcess(caseId);
 

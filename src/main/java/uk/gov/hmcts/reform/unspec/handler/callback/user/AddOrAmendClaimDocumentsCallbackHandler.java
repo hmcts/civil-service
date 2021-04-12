@@ -40,7 +40,10 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# Documents uploaded successfully")
+            .confirmationHeader(String.format(
+                "# Documents uploaded successfully%n## Claim number: %s",
+                callbackParams.getCaseData().getLegacyCaseReference()
+            ))
             .confirmationBody("<br />")
             .build();
     }

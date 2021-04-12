@@ -4,17 +4,8 @@
     "ID": "Upload",
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
-    "ListElementCode": "label",
-    "FieldDisplayOrder": 1,
-    "DisplayContext": "READONLY"
-  },
-  {
-    "LiveFrom": "01/01/2017",
-    "ID": "Upload",
-    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
-    "CaseFieldID": "servedDocumentFiles",
     "ListElementCode": "particularsOfClaimDocument",
-    "FieldDisplayOrder": 2,
+    "FieldDisplayOrder": 1,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -24,7 +15,7 @@
     "CaseFieldID": "servedDocumentFiles",
     "ListElementCode": "particularsOfClaimText",
     "EventElementLabel": "If you prefer you can copy and paste the details of claim here.",
-    "FieldDisplayOrder": 3,
+    "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -33,7 +24,7 @@
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
     "ListElementCode": "medicalReports",
-    "FieldDisplayOrder": 4,
+    "FieldDisplayOrder": 3,
     "DisplayContext": "OPTIONAL",
     "Min": 1,
     "FieldShowCondition": "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\""
@@ -44,7 +35,7 @@
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
     "ListElementCode": "scheduleOfLoss.document",
-    "FieldDisplayOrder": 5,
+    "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -53,7 +44,7 @@
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles",
     "ListElementCode": "certificateOfSuitability.document",
-    "FieldDisplayOrder": 6,
+    "FieldDisplayOrder": 5,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -62,7 +53,7 @@
     "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
     "CaseFieldID": "servedDocumentFiles.document",
     "ListElementCode": "other",
-    "FieldDisplayOrder": 7,
+    "FieldDisplayOrder": 6,
     "DisplayContext": "OPTIONAL"
   }
 ]

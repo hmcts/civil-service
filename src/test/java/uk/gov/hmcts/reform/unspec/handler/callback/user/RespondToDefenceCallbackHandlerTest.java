@@ -203,9 +203,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've decided to proceed with the claim%n## Claim number: 000LR001"))
+                    .confirmationHeader(format("# You've chosen to proceed with the claim%n## Claim number: 000LR001"))
                     .confirmationBody(format(
-                        "<br />We'll review the case. We'll contact you to tell you what to do next.%n%n"
+                        "<br />We'll review the case and contact you to tell you what to do next.%n%n"
                             + "[Download directions questionnaire](http://www.google.com)"))
                     .build());
         }
@@ -222,13 +222,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
+                    .confirmationHeader(format("# You've chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000LR001"))
-                    .confirmationBody(format("<br />If you do want to proceed you need to do it within: %n%n"
-                                                 + "- 14 days if the claim is allocated to a small claims track%n"
-                                                 + "- 28 days if the claim is allocated to a fast or multi track%n%n"
-                                                 + "The case will be stayed if you do not proceed within the allowed"
-                                                 + " timescale."))
+                    .confirmationBody("<br />")
                     .build());
         }
     }

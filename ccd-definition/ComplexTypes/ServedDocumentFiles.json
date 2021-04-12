@@ -1,13 +1,6 @@
 [
   {
     "ID": "ServedDocumentFiles",
-    "ListElementCode": "label",
-    "FieldType": "Label",
-    "ElementLabel": "Spreadsheets: .csv, .ods, .xls, .xlsx\n\nText documents: .docm, .docx, .html, .odf, .ooxml, .pdf, .rtf, .sgml, .txt, .xhtml",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "ServedDocumentFiles",
     "ListElementCode": "particularsOfClaimDocument",
     "FieldType": "Document",
     "ElementLabel": "Particulars of claim",

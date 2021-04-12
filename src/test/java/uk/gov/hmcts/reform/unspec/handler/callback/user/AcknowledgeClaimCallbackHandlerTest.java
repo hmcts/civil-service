@@ -182,7 +182,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You've acknowledged claim")
+                    .confirmationHeader(format("# You've acknowledged claim%n## Claim number: 000LR001"))
                     .confirmationBody(format(
                         "<br />You need to respond before %s."
                             + "%n%n[Download the Acknowledgement of Claim form]"

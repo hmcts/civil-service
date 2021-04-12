@@ -125,8 +125,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class SubmittedCallback {
 
-            private static final String CONFIRMATION_SUMMARY = "<br />What happens next\n\n"
-                + "The defendant legal representative's organisation has been notified of the claim details.\n\n"
+            private static final String CONFIRMATION_SUMMARY = "<br />The defendant legal representative's organisation"
+                + " has been notified of the claim details.\n\n"
                 + "They must respond by %s. Your account will be updated and you will be sent an email.";
 
             @Test
@@ -140,7 +140,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader("# Defendant notified")
+                        .confirmationHeader(format("# Defendant notified%n## Claim number: 000LR001"))
                         .confirmationBody(confirmationBody)
                         .build());
             }
