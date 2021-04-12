@@ -481,7 +481,7 @@
       "$id": "#/definitions/courtCodeType",
       "type": ["string", "null"],
       "pattern": "^\\d{3}$",
-      "description": "The HMCTS 3 digit court code."
+      "description": "The HMCTS 3 digit court location code."
     },
     "contactDXType": {
       "$id": "#/definitions/contactDXType",

@@ -9,6 +9,22 @@
   },
   {
     "ID": "StatementOfTruth",
+    "ListElementCode": "label2",
+    "FieldType": "Label",
+    "ElementLabel": "Label",
+    "SecurityClassification": "Public",
+    "Comment": "This label should be set in caseEventToComplexTypes"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "ListElementCode": "label3",
+    "FieldType": "Label",
+    "ElementLabel": "Label",
+    "SecurityClassification": "Public",
+    "Comment": "This label should be set in caseEventToComplexTypes"
+  },
+  {
+    "ID": "StatementOfTruth",
     "ListElementCode": "name",
     "FieldType": "Text",
     "ElementLabel": "Name",

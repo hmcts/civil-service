@@ -27,7 +27,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "courtLocation",
-    "Label": "Court Code",
+    "Label": "Court location code",
     "FieldType": "CourtLocation",
     "SecurityClassification": "Public"
   },
@@ -45,7 +45,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1LitigationFriendRequired",
-    "Label": "Is the claimant a child?",
+    "Label": "Is the claimant a child i.e. under the age of 18?",
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public"
   },
@@ -53,7 +53,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "applicant1LitigationFriend",
-    "Label": "Claimant litigation details",
+    "Label": "Claimant litigation friend details",
     "FieldType": "LitigationFriend",
     "SecurityClassification": "Public"
   },
@@ -427,7 +427,7 @@
     "LiveFrom": "01/01/2017",
     "CaseTypeID": "UNSPECIFIED_CLAIMS",
     "ID": "respondent1DQRequestedCourt",
-    "Label": "Court Code",
+    "Label": "Court location code",
     "FieldType": "RequestedCourt",
     "SecurityClassification": "Public"
   },
