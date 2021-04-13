@@ -481,7 +481,7 @@
       "$id": "#/definitions/courtCodeType",
       "type": ["string", "null"],
       "pattern": "^\\d{3}$",
-      "description": "The HMCTS 3 digit court code."
+      "description": "The HMCTS 3 digit court location code."
     },
     "contactDXType": {
       "$id": "#/definitions/contactDXType",
@@ -639,7 +639,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -661,6 +662,10 @@
           "eventDetails": {
             "$id": "#/definitions/nullEventType/items/properties/eventDetails",
             "type": "null"
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/nullEventType/items/properties/eventDetailsText",
+            "type": "null"
           }
         },
         "additionalProperties": false
@@ -679,7 +684,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -715,6 +721,11 @@
               }
             },
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetailsText",
+            "type": ["null", "string"],
+            "maxLength": 250
           }
         },
         "additionalProperties": false
@@ -732,7 +743,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -757,18 +769,22 @@
           },
           "eventDetails": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails",
-            "type": "object",
-            "required": [
-              "responseIntention"
-            ],
+            "type": ["object", "null"],
             "properties": {
-              "responseIntention": {
-                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/responseIntention",
+              "miscText": {
+                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",
-                "description": ""
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
               }
             },
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetailsText",
+            "type": [ "null", "string"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -786,7 +802,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -811,18 +828,22 @@
           },
           "eventDetails": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails",
-            "type": "object",
-            "required": [
-              "agreedExtensionDate"
-            ],
+            "type": ["object", "null"],
             "properties": {
-              "agreedExtensionDate": {
-                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/agreedExtensionDate",
+              "miscText": {
+                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",
-                "description": ""
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
               }
             },
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -840,7 +861,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -871,6 +893,12 @@
             ],
             "required": [],
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -888,7 +916,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -919,6 +948,12 @@
             ],
             "required": [],
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -936,7 +971,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -967,6 +1003,12 @@
             ],
             "required": [],
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -984,7 +1026,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -1015,6 +1058,12 @@
             ],
             "required": [],
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -1032,7 +1081,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -1063,6 +1113,12 @@
             ],
             "required": [],
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false
@@ -1080,7 +1136,8 @@
           "eventCode",
           "dateReceived",
           "litigiousPartyID",
-          "eventDetails"
+          "eventDetails",
+          "eventDetailsText"
         ],
         "properties": {
           "eventSequence": {
@@ -1109,32 +1166,13 @@
               "object",
               "null"
             ],
-            "required": [
-              "stayClaim",
-              "preferredCourtCode",
-              "preferredCourtName"
-            ],
-            "properties": {
-              "stayClaim": {
-                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/stayClaim",
-                "type": "string",
-                "description": ""
-              },
-              "preferredCourtCode": {
-                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtCode",
-                "$ref": "#/definitions/courtCodeType",
-                "description": ""
-              },
-              "preferredCourtName": {
-                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtName",
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": ""
-              }
-            },
             "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventCode",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
           }
         },
         "additionalProperties": false

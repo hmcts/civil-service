@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.unspec.service.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,9 +112,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
 
-        private static final String CONFIRMATION_BODY = "<br />What happens next\n\n"
-            + "The defendant legal representative's organisation has been notified and granted access to this "
-            + "claim.\n\n"
+        private static final String CONFIRMATION_BODY = "<br />The defendant legal representative's organisation has "
+            + "been notified and granted access to this claim.\n\n"
             + "You must notify the defendant with the claim details by %s";
 
         @Test
@@ -127,7 +127,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Notification of claim sent")
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000LR001"))
                     .confirmationBody(confirmationBody)
                     .build());
         }

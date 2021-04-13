@@ -103,6 +103,26 @@ class RpaConsumerTest extends BaseRpaTest {
     }
 
     @Nested
+    class UnregisteredDefendant {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim against unrepresented defendant";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
+
+    @Nested
     class AdmissionsOrCounterClaim {
 
         @Test
@@ -142,6 +162,46 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for defendant responded with counter claim";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
+
+    @Nested
+    class FullDefenceNotProceed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceNotProceeds() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with full defence not proceeds";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
+
+    @Nested
+    class FullDefenceProceed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceProceeds() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with full defence confirms to proceeds";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);

@@ -41,13 +41,14 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
@@ -130,7 +131,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                        AMEND_PARTY_DETAILS
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM
                     }
                 ),
                 of(
@@ -140,7 +142,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                        AMEND_PARTY_DETAILS
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM
                     }
                 ),
                 of(
@@ -223,7 +226,17 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    APPLICANT_RESPOND_TO_DEFENCE,
+                    FULL_DEFENCE_PROCEED,
+                    new CaseEvent[]{
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    FULL_DEFENCE_NOT_PROCEED,
                     new CaseEvent[]{
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -266,7 +279,7 @@ class FlowStateAllowedEventServiceTest {
             "DRAFT,CASE_PROCEEDS_IN_CASEMAN",
             "AWAITING_CASE_NOTIFICATION,NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
             "AWAITING_CASE_DETAILS_NOTIFICATION,ACKNOWLEDGE_CLAIM",
-            "APPLICANT_RESPOND_TO_DEFENCE,ACKNOWLEDGE_CLAIM",
+            "FULL_DEFENCE_PROCEED,ACKNOWLEDGE_CLAIM",
             "EXTENSION_REQUESTED, INFORM_AGREED_EXTENSION_DATE"
         })
         void shouldReturnFalse_whenEventIsNotAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
@@ -292,7 +305,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
-                        APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
+                        FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        EXTENSION_REQUESTED.fullName()
                     }
                 ),
                 of(
@@ -301,7 +315,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_ACKNOWLEDGED.fullName(), PAYMENT_FAILED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
-                        APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
+                        FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        EXTENSION_REQUESTED.fullName()
                     }
                 ),
                 of(
@@ -310,7 +325,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_ISSUED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
-                        APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
+                        FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        EXTENSION_REQUESTED.fullName()
                     }
                 ),
                 of(
@@ -319,7 +335,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_ISSUED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
-                        APPLICANT_RESPOND_TO_DEFENCE.fullName(), EXTENSION_REQUESTED.fullName()
+                        FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        EXTENSION_REQUESTED.fullName()
                     }
                 ),
                 of(
@@ -335,7 +352,7 @@ class FlowStateAllowedEventServiceTest {
                         EXTENSION_REQUESTED.fullName(), CLAIM_ACKNOWLEDGED.fullName(),
                         RESPONDENT_FULL_DEFENCE.fullName(), RESPONDENT_FULL_ADMISSION.fullName(),
                         RESPONDENT_PART_ADMISSION.fullName(), RESPONDENT_COUNTER_CLAIM.fullName(),
-                        APPLICANT_RESPOND_TO_DEFENCE.fullName()
+                        FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName()
                     }
                 )
             );

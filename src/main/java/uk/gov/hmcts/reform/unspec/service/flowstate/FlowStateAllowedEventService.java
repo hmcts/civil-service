@@ -29,13 +29,14 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_FULL_ADMISSION;
@@ -75,7 +76,8 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                DISMISS_CLAIM
             )
         ),
 
@@ -86,7 +88,8 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                DISMISS_CLAIM
             )
         ),
 
@@ -177,7 +180,18 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
-            APPLICANT_RESPOND_TO_DEFENCE.fullName(),
+            FULL_DEFENCE_PROCEED.fullName(),
+            List.of(
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN,
+                AMEND_PARTY_DETAILS
+            )
+        ),
+
+        entry(
+            FULL_DEFENCE_NOT_PROCEED.fullName(),
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,

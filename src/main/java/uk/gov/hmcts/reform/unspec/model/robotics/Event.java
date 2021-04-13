@@ -12,4 +12,5 @@ public class Event {
     private String dateReceived;
     private String litigiousPartyID;
     private EventDetails eventDetails;
+    private String eventDetailsText;
 }

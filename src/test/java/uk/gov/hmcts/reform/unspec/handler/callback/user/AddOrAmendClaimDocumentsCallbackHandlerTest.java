@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
@@ -78,7 +79,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader("# Documents uploaded successfully")
+                        .confirmationHeader(format("# Documents uploaded successfully%n## Claim number: 000LR001"))
                         .confirmationBody("<br />")
                         .build());
             }

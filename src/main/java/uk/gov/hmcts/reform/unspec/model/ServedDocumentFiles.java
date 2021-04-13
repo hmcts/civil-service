@@ -15,12 +15,12 @@ import static java.util.Optional.ofNullable;
 @Builder
 public class ServedDocumentFiles {
 
-    private List<Element<Document>> other;
+    private List<Element<DocumentWithRegex>> other;
     private List<Element<Document>> medicalReports;
-    private List<Element<Document>> scheduleOfLoss;
+    private List<Element<DocumentWithRegex>> scheduleOfLoss;
     private Document particularsOfClaimDocument;
     private String particularsOfClaimText;
-    private List<Element<Document>> certificateOfSuitability;
+    private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
     @JsonIgnore
     public List<String> getErrors() {

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.unspec.stateflow.StateFlowBuilder;
 import uk.gov.hmcts.reform.unspec.stateflow.model.State;
 
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantRespondToDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
@@ -20,31 +19,40 @@ import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimIs
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimTakenOffline;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWithdrawn;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.failToNotifyClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefenceNotProceed;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAgreedExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullDefence;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentPartAdmission;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.APPLICANT_RESPOND_TO_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.AWAITING_CASE_NOTIFICATION;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_WITHDRAWN;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.EXTENSION_REQUESTED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FLOW_NAME;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.RESPONDENT_COUNTER_CLAIM;
@@ -71,12 +79,16 @@ public class StateFlowEngine {
             .state(PAYMENT_SUCCESSFUL)
                 .transitionTo(AWAITING_CASE_NOTIFICATION).onlyIf(claimIssued)
                 .transitionTo(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered)
             .state(AWAITING_CASE_NOTIFICATION)
                 .transitionTo(AWAITING_CASE_DETAILS_NOTIFICATION).onlyIf(claimNotified)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(failToNotifyClaim)
             .state(AWAITING_CASE_DETAILS_NOTIFICATION)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimDetailsNotified)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
+                    .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(CLAIM_ISSUED)
                 .transitionTo(CLAIM_ACKNOWLEDGED).onlyIf(respondentAcknowledgeClaim)
                 .transitionTo(RESPONDENT_FULL_DEFENCE).onlyIf(respondentFullDefence)
@@ -102,11 +114,11 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
             .state(RESPONDENT_FULL_DEFENCE)
-                .transitionTo(APPLICANT_RESPOND_TO_DEFENCE).onlyIf(applicantRespondToDefence)
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(fullDefenceProceed)
+                .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
-                .transitionTo(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM).onlyIf(claimTakenOffline)
                 .transitionTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE).onlyIf(applicantOutOfTime)
             .state(RESPONDENT_FULL_ADMISSION)
                 .transitionTo(CLAIM_DISCONTINUED).onlyIf(claimDiscontinued)
@@ -123,15 +135,18 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_WITHDRAWN).onlyIf(claimWithdrawn)
                 .transitionTo(CASE_PROCEEDS_IN_CASEMAN).onlyIf(caseProceedsInCaseman)
                 .transitionTo(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM).onlyIf(claimTakenOffline)
-            .state(APPLICANT_RESPOND_TO_DEFENCE)
-                .transitionTo(CASE_PROCEEDS_IN_CASEMAN)
+            .state(FULL_DEFENCE_PROCEED)
+            .state(FULL_DEFENCE_NOT_PROCEED)
             .state(CASE_PROCEEDS_IN_CASEMAN)
             .state(CLAIM_DISMISSED_DEFENDANT_OUT_OF_TIME)
             .state(PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT)
+            .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
             .state(PROCEEDS_OFFLINE_ADMIT_OR_COUNTER_CLAIM)
             .state(CLAIM_WITHDRAWN)
             .state(CLAIM_DISCONTINUED)
+            .state(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
+            .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
             .build();
     }
 

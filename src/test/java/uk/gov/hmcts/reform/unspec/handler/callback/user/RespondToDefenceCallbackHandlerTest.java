@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -24,7 +26,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.Time;
-import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
@@ -42,7 +44,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -51,8 +52,7 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
-    CaseDetailsConverter.class,
-    StateFlowEngine.class
+    CaseDetailsConverter.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -169,10 +169,13 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(localDateTime);
         }
 
-        @Test
-        void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
             var params = callbackParamsOf(
-                CaseDataBuilder.builder().atStateApplicantRespondToDefence().build(),
+                CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
 
@@ -184,19 +187,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
-
-        @Test
-        void shouldNotUpdateBusinessProcess_whenNotAtFullDefenceState() {
-            var params = callbackParamsOf(
-                CaseDataBuilder.builder().atStateRespondentFullDefence().build(),
-                ABOUT_TO_SUBMIT
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).doesNotContainKey("businessProcess");
-            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
-        }
     }
 
     @Nested
@@ -205,8 +195,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefence()
-                .applicant1ProceedWithClaim(YES)
+                .atStateApplicantRespondToDefenceAndProceed()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -214,9 +203,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've decided to proceed with the claim%n## Claim number: 000LR001"))
+                    .confirmationHeader(format("# You've chosen to proceed with the claim%n## Claim number: 000LR001"))
                     .confirmationBody(format(
-                        "<br />We'll review the case. We'll contact you to tell you what to do next.%n%n"
+                        "<br />We'll review the case and contact you to tell you what to do next.%n%n"
                             + "[Download directions questionnaire](http://www.google.com)"))
                     .build());
         }
@@ -224,7 +213,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefence()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .applicant1ProceedWithClaim(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -233,13 +222,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
+                    .confirmationHeader(format("# You've chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000LR001"))
-                    .confirmationBody(format("<br />If you do want to proceed you need to do it within: %n%n"
-                                                 + "- 14 days if the claim is allocated to a small claims track%n"
-                                                 + "- 28 days if the claim is allocated to a fast or multi track%n%n"
-                                                 + "The case will be stayed if you do not proceed within the allowed"
-                                                 + " timescale."))
+                    .confirmationBody("<br />")
                     .build());
         }
     }

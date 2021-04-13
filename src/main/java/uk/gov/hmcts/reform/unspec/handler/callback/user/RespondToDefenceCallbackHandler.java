@@ -16,8 +16,6 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.service.Time;
-import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
 import java.util.Collections;
@@ -33,14 +31,12 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.fromFullName;
 
 @Service
 @RequiredArgsConstructor
 public class RespondToDefenceCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
-    private final StateFlowEngine stateFlowEngine;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -55,7 +51,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(ABOUT_TO_SUBMIT), this::handleNotifications,
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -71,22 +67,15 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse handleNotifications(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-        if (getFlowState(caseData) == FlowState.Main.CASE_PROCEEDS_IN_CASEMAN) {
-            builder.businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE)).build();
-        }
-
-        builder.applicant1ResponseDate(time.now());
+        CaseData.CaseDataBuilder builder = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
+            .applicant1ResponseDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
-    }
-
-    private FlowState getFlowState(CaseData caseData) {
-        return fromFullName(stateFlowEngine.evaluate(caseData).getState().getName());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -94,32 +83,31 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
         YesOrNo proceeding = caseData.getApplicant1ProceedWithClaim();
 
         String claimNumber = caseData.getLegacyCaseReference();
-        String dqLink = "http://www.google.com";
-
-        String body = getBody(proceeding);
         String title = getTitle(proceeding);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format(title, claimNumber))
-            .confirmationBody(format(body, dqLink))
+            .confirmationBody(getBody(proceeding))
             .build();
     }
 
     private String getTitle(YesOrNo proceeding) {
         if (proceeding == YES) {
-            return "# You've decided to proceed with the claim%n## Claim number: %s";
+            return "# You've chosen to proceed with the claim%n## Claim number: %s";
         }
-        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
+        return "# You've chosen not to proceed with the claim%n## Claim number: %s";
     }
 
     private String getBody(YesOrNo proceeding) {
+        String dqLink = "http://www.google.com";
+
         if (proceeding == YES) {
-            return "<br />We'll review the case. We'll contact you to tell you what to do next.%n%n"
-                + "[Download directions questionnaire](%s)";
+            return format(
+                "<br />We'll review the case and contact you to tell you what to do next.%n%n"
+                    + "[Download directions questionnaire](%s)",
+                dqLink
+            );
         }
-        return "<br />If you do want to proceed you need to do it within: %n%n"
-            + "- 14 days if the claim is allocated to a small claims track%n"
-            + "- 28 days if the claim is allocated to a fast or multi track%n%n"
-            + "The case will be stayed if you do not proceed within the allowed timescale.";
+        return "<br />";
     }
 }

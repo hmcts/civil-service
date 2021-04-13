@@ -65,7 +65,6 @@ import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
-import static uk.gov.hmcts.reform.unspec.handler.callback.user.CreateClaimCallbackHandler.UNREGISTERED_ORG_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.launchdarkly.OnBoardingOrganisationControlService.ORG_NOT_ONBOARDED;
@@ -85,6 +84,15 @@ import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnTyp
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000LR001";
+
+    public static final String LIP_CONFIRMATION_SCREEN = "<br />Your claim will not be issued"
+        + " until payment is confirmed."
+        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
+        + "\n\n To continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
+        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
+        + "the defendant within 4 months. "
+        + "\n\nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
+        + " Court Claims Centre.";
 
     @MockBean
     private Time time;
@@ -132,14 +140,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().build();
 
             given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
-                .willReturn(List.of(String.format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd")));
+                .willReturn(List.of(format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd")));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors())
-                .containsExactly(String.format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd"));
+                .containsExactly(format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd"));
         }
 
         @Test
@@ -682,7 +690,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format(
-                            "# Your claim has been issued%n## Claim number: %s",
+                            "# Your claim has been received and will progress offline%n## Claim number: %s",
                             REFERENCE_NUMBER
                         ))
                         .confirmationBody(body)
@@ -707,7 +715,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format(
-                            "# Your claim has been issued%n## Claim number: %s",
+                            "# Your claim has been received%n## Claim number: %s",
                             REFERENCE_NUMBER
                         ))
                         .confirmationBody(body)
@@ -729,8 +737,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim will now progress offline: %s", REFERENCE_NUMBER))
-                        .confirmationBody(UNREGISTERED_ORG_CONFIRMATION_BODY)
+                        .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
+                                                       + "Claim number: %s", REFERENCE_NUMBER))
+                        .confirmationBody(format(
+                            LIP_CONFIRMATION_SCREEN,
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink))
                         .build());
             }
         }

@@ -85,7 +85,7 @@ class AcknowledgementOfClaimGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
 
         AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
-            .caseName("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co")
+            .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
             .referenceNumber(LEGACY_CASE_REFERENCE)
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())

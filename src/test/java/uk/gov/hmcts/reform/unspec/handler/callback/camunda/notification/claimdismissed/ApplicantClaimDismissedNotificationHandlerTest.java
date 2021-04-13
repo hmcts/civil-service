@@ -51,7 +51,7 @@ class ApplicantClaimDismissedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefence().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);

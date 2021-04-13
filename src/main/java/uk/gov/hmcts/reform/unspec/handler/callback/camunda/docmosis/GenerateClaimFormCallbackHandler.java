@@ -68,7 +68,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
         CaseState state = getState(caseDataBuilder.build());
 
-        if (state.equals(CaseState.AWAITING_CASE_NOTIFICATION)) {
+        if (state.equals(CaseState.CASE_ISSUED)) {
             LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, issueDate);
             caseDataBuilder.claimNotificationDeadline(deadline);
         }
@@ -81,7 +81,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private CaseState getState(CaseData data) {
         FlowState flowState = fromFullName(stateFlowEngine.evaluate(data).getState().getName());
-        return flowState == AWAITING_CASE_NOTIFICATION ? CaseState.AWAITING_CASE_NOTIFICATION :
-                CaseState.PROCEEDS_WITH_OFFLINE_JOURNEY;
+        return flowState == AWAITING_CASE_NOTIFICATION ? CaseState.CASE_ISSUED :
+                CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     }
 }
