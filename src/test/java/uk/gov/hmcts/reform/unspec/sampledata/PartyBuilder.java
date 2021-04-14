@@ -56,7 +56,7 @@ public class PartyBuilder {
         soleTraderDateOfBirth = DATE_OF_BIRTH;
         soleTraderTradingAs = "Sole Trader co";
         partyName = soleTraderTitle + " " + soleTraderFirstName + " " + soleTraderLastName;
-        primaryAddress = AddressBuilder.builder().build();
+        primaryAddress = AddressBuilder.defaults().build();
         return this;
     }
 
@@ -64,7 +64,15 @@ public class PartyBuilder {
         type = COMPANY;
         companyName = "Company ltd";
         partyName = companyName;
-        primaryAddress = AddressBuilder.builder().build();
+        primaryAddress = AddressBuilder.defaults().build();
+        return this;
+    }
+
+    public PartyBuilder companyWithMinimalData() {
+        type = COMPANY;
+        companyName = "C";
+        partyName = companyName;
+        primaryAddress = AddressBuilder.minimal().build();
         return this;
     }
 
@@ -72,7 +80,7 @@ public class PartyBuilder {
         type = ORGANISATION;
         organisationName = "The Organisation";
         partyName = organisationName;
-        primaryAddress = AddressBuilder.builder().build();
+        primaryAddress = AddressBuilder.defaults().build();
         return this;
     }
 
@@ -83,7 +91,7 @@ public class PartyBuilder {
         individualLastName = "Rambo";
         individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;
-        primaryAddress = AddressBuilder.builder().build();
+        primaryAddress = AddressBuilder.defaults().build();
         return this;
     }
 

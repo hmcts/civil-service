@@ -4,13 +4,19 @@ import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 
 public class StatementOfTruthBuilder {
 
-    public static StatementOfTruth.StatementOfTruthBuilder builder() {
+    public static StatementOfTruth.StatementOfTruthBuilder defaults() {
         return StatementOfTruth.builder()
             .name("Signer Name")
             .role("Signer Role");
     }
 
+    public static StatementOfTruth.StatementOfTruthBuilder minimal() {
+        return StatementOfTruth.builder()
+            .name("a")
+            .role("b");
+    }
+
     public StatementOfTruth build() {
-        return builder().build();
+        return defaults().build();
     }
 }

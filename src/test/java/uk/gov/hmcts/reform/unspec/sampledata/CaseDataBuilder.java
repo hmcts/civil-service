@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.math.BigDecimal.TEN;
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -79,6 +80,7 @@ public class CaseDataBuilder {
     private SolicitorReferences solicitorReferences;
     private CourtLocation courtLocation;
     private Party applicant1;
+    private YesOrNo applicant1LitigationFriendRequired;
     private Party respondent1;
     private YesOrNo respondent1Represented;
     private String respondentSolicitor1EmailAddress;
@@ -90,6 +92,7 @@ public class CaseDataBuilder {
     private DynamicList applicantSolicitor1PbaAccounts;
     private Fee claimFee;
     private StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
+    private String paymentReference;
     private String legacyCaseReference;
     private AllocatedTrack allocatedTrack;
     private CaseState ccdState;
@@ -392,8 +395,125 @@ public class CaseDataBuilder {
             .fax("123123123")
             .dx("test org dx")
             .phoneNumber("0123456789")
-            .address(AddressBuilder.builder().build())
+            .address(AddressBuilder.defaults().build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendantWithMinimalData() {
+        atStatePaymentSuccessfulWithMinimalData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = NO;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDraftWithMinimalData() {
+        courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("121")
+            .build();
+        applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
+        applicant1LitigationFriendRequired = NO;
+        applicantSolicitor1CheckEmail = CorrectEmail.builder()
+            .email("civilunspecified@gmail.com")
+            .correct(YES)
+            .build();
+        applicant1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .build();
+        respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
+        respondent1Represented = NO;
+        claimType = ClaimType.CLINICAL_NEGLIGENCE;
+        claimValue = ClaimValue.builder()
+            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
+            .build();
+        claimFee = Fee.builder()
+            .calculatedAmountInPence(TEN)
+            .code("fee code")
+            .version("version 1")
+            .build();
+        paymentReference = "some reference";
+        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal().build();
+        submittedDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStatePendingCaseIssuedWithMinimalData() {
+        atStateClaimDraftWithMinimalData();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = FAST_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        return this;
+    }
+
+    public CaseDataBuilder atStatePaymentSuccessfulWithMinimalData() {
+        atStatePendingCaseIssuedWithMinimalData();
+        paymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentSuccessfulDate = LocalDateTime.now();
+        claimDetailsNotificationDeadline = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingCaseNotificationWithMinimalData() {
+        atStatePaymentSuccessfulWithMinimalData();
+        ccdState = CASE_ISSUED;
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingCaseDetailsNotificationWithMinimalData() {
+        atStateAwaitingCaseNotificationWithMinimalData();
+        claimNotificationDate = LocalDateTime.now();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimCreatedWithMinimalData() {
+        atStateAwaitingCaseDetailsNotificationWithMinimalData();
+
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimWithMinimalData(
+        RespondentResponseType respondentResponseType
+    ) {
+        atStateServiceAcknowledgeWithMinimalData();
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateServiceAcknowledgeWithMinimalData() {
+        atStateClaimCreatedWithMinimalData();
+        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
         return this;
     }
 
@@ -496,7 +616,7 @@ public class CaseDataBuilder {
             .organisation(Organisation.builder().organisationID("QWERTY").build())
             .build();
         respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.builder().build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         submittedDate = LocalDateTime.now();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("civilunspecified@gmail.com").correct(YES).build();
         return this;
@@ -694,6 +814,8 @@ public class CaseDataBuilder {
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .paymentDetails(paymentDetails)
+            .claimFee(claimFee)
+            .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
             //Deadline extension
