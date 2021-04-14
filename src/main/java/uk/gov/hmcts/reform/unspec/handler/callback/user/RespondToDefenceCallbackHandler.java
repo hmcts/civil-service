@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,7 @@ import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceCallbackHandler extends CallbackHandler {
+public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
     private final UnavailableDateValidator unavailableDateValidator;
@@ -51,6 +52,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
+            callbackKey(MID, "experts"), this::validateApplicantDqExperts,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );

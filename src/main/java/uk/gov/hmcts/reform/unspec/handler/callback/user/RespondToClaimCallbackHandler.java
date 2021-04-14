@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +40,7 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimCallbackHandler extends CallbackHandler {
+public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
@@ -60,6 +61,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
+            callbackKey(MID, "experts"), this::validateRespondentDqExperts,
             callbackKey(MID, "upload"), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
