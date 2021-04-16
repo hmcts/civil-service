@@ -37,6 +37,9 @@ import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.unspec.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.CONTEST_JURISDICTION;
+import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.unspec.matcher.IsValidJson.validateJson;
 
 @Slf4j
@@ -153,6 +156,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmission()
                 .legacyCaseReference("000LR004")
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -170,6 +174,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
                 .legacyCaseReference("000LR005")
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -229,6 +234,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentCounterClaim()
                 .legacyCaseReference("000LR008")
+                .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -246,6 +252,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(COUNTER_CLAIM)
                 .legacyCaseReference("000LR009")
+                .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -267,6 +274,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                 .legacyCaseReference("000LR010")
+                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -288,6 +296,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .legacyCaseReference("000LR011")
+                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 

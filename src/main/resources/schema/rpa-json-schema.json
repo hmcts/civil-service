@@ -769,8 +769,16 @@
           },
           "eventDetails": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails",
-            "type": ["object", "null"],
+            "type": "object",
+            "required": [
+              "responseIntention"
+            ],
             "properties": {
+              "responseIntention": {
+                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/responseIntention",
+                "type": "string",
+                "description": ""
+              },
               "miscText": {
                 "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",

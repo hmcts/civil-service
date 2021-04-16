@@ -10,4 +10,5 @@ import lombok.Data;
 public class EventDetails {
 
     private String miscText;
+    private String responseIntention;
 }
