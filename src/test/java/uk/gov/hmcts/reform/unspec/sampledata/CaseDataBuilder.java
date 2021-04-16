@@ -229,7 +229,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent1ClaimResponseIntentionType(ResponseIntention responseIntention) {
-        this.respondent1ClaimResponseIntentionType = respondent1ClaimResponseIntentionType;
+        this.respondent1ClaimResponseIntentionType = responseIntention;
         return this;
     }
 

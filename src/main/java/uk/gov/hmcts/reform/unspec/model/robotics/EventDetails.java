@@ -11,4 +11,8 @@ public class EventDetails {
 
     private String miscText;
     private String responseIntention;
+    private String agreedExtensionDate;
+    private Boolean stayClaim;
+    private String preferredCourtCode;
+    private String preferredCourtName;
 }

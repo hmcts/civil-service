@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
-import uk.gov.hmcts.reform.unspec.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.unspec.model.robotics.Event;
 import uk.gov.hmcts.reform.unspec.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.unspec.model.robotics.EventHistory;
@@ -22,11 +21,9 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
-import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.unspec.enums.ResponseIntention.PART_DEFENCE;
-import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -135,9 +132,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -170,6 +167,10 @@ class EventHistoryMapperTest {
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
                 .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
@@ -214,9 +215,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -272,9 +273,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -307,6 +308,10 @@ class EventHistoryMapperTest {
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
                 .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
@@ -352,9 +357,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -410,9 +415,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -444,6 +449,10 @@ class EventHistoryMapperTest {
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
                 .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
@@ -489,9 +498,9 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -546,32 +555,33 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("002")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    ofNullable(caseData.getRespondent1DQ().getRequestedCourt())
-                        .map(RequestedCourt::getResponseCourtCode)
-                        .orElse(null),
-                    caseData.getRespondent1DQ().getFileDirectionQuestionnaire()
-                        .getOneMonthStayRequested() == YES
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getRespondent1DQ(),
+                    mapper.getPreferredCourtCode(caseData.getRespondent1DQ())
                 ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                  .preferredCourtName("")
+                                  .build())
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("RPA Reason: Claimant intends not to proceed")
+                    .eventDetailsText("RPA Reason: Claimant intends not to proceed.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claimant intends not to proceed")
+                                      .miscText("RPA Reason: Claimant intends not to proceed.")
                                       .build())
                     .build()
             );
@@ -594,6 +604,10 @@ class EventHistoryMapperTest {
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
                 .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
@@ -638,32 +652,33 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("002")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    ofNullable(caseData.getRespondent1DQ().getRequestedCourt())
-                        .map(RequestedCourt::getResponseCourtCode)
-                        .orElse(null),
-                    caseData.getRespondent1DQ().getFileDirectionQuestionnaire()
-                        .getOneMonthStayRequested() == YES
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getRespondent1DQ(),
+                    mapper.getPreferredCourtCode(caseData.getRespondent1DQ())
                 ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                  .preferredCourtName("")
+                                  .build())
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("RPA Reason: Claimant intends not to proceed")
+                    .eventDetailsText("RPA Reason: Claimant intends not to proceed.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claimant intends not to proceed")
+                                      .miscText("RPA Reason: Claimant intends not to proceed.")
                                       .build())
                     .build()
             );
@@ -709,16 +724,15 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("002")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    caseData
-                        .getRespondent1DQ()
-                        .getRespondent1DQRequestedCourt()
-                        .getResponseCourtCode(),
-                    caseData.getRespondent1DQ()
-                        .getRespondent1DQFileDirectionsQuestionnaire()
-                        .getOneMonthStayRequested() == YES ? true : false
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getRespondent1DQ(),
+                    mapper.getPreferredCourtCode(caseData.getRespondent1DQ())
                 ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                  .preferredCourtName("")
+                                  .build())
                 .build();
             Event expectedReplyToDefence = Event.builder()
                 .eventSequence(6)
@@ -731,13 +745,14 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("001")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    ofNullable(caseData.getApplicant1DQ().getRequestedCourt())
-                        .map(RequestedCourt::getResponseCourtCode)
-                        .orElse(null),
-                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
-                        .getOneMonthStayRequested() == YES
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
+                                  .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                  .preferredCourtName("")
+                                  .build())
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getApplicant1DQ(),
+                    caseData.getCourtLocation().getApplicantPreferredCourt()
                 ))
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -745,18 +760,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(8)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("RPA Reason: Applicant proceeds")
+                    .eventDetailsText("RPA Reason: Applicant proceeds.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Applicant proceeds")
+                                      .miscText("RPA Reason: Applicant proceeds.")
                                       .build())
                     .build()
             );
@@ -779,6 +794,10 @@ class EventHistoryMapperTest {
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate().format(ISO_DATE))
                 .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
@@ -826,16 +845,15 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("002")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    caseData
-                        .getRespondent1DQ()
-                        .getRespondent1DQRequestedCourt()
-                        .getResponseCourtCode(),
-                    caseData.getRespondent1DQ()
-                        .getRespondent1DQFileDirectionsQuestionnaire()
-                        .getOneMonthStayRequested() == YES ? true : false
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getRespondent1DQ(),
+                    mapper.getPreferredCourtCode(caseData.getRespondent1DQ())
                 ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                  .preferredCourtName("")
+                                  .build())
                 .build();
             Event expectedReplyToDefence = Event.builder()
                 .eventSequence(6)
@@ -848,13 +866,14 @@ class EventHistoryMapperTest {
                 .eventCode("197")
                 .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID("001")
-                .eventDetailsText(format(
-                    "preferredCourtCode: %s; stayClaim: %s",
-                    ofNullable(caseData.getApplicant1DQ().getRequestedCourt())
-                        .map(RequestedCourt::getResponseCourtCode)
-                        .orElse(null),
-                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
-                        .getOneMonthStayRequested() == YES
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
+                                  .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                  .preferredCourtName("")
+                                  .build())
+                .eventDetailsText(mapper.prepareEventDetailsText(
+                    caseData.getApplicant1DQ(),
+                    caseData.getCourtLocation().getApplicantPreferredCourt()
                 ))
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -862,18 +881,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("Claimant has notified defendant")
+                    .eventDetailsText("Claimant has notified defendant.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claimant has notified defendant")
+                                      .miscText("Claimant has notified defendant.")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(8)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
-                    .eventDetailsText("RPA Reason: Applicant proceeds")
+                    .eventDetailsText("RPA Reason: Applicant proceeds.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Applicant proceeds")
+                                      .miscText("RPA Reason: Applicant proceeds.")
                                       .build())
                     .build()
             );

@@ -480,7 +480,7 @@
     "courtCodeType": {
       "$id": "#/definitions/courtCodeType",
       "type": ["string", "null"],
-      "pattern": "^\\d{3}$",
+      "pattern": "^(?:\\d{3}|)$",
       "description": "The HMCTS 3 digit court location code."
     },
     "contactDXType": {
@@ -836,8 +836,16 @@
           },
           "eventDetails": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails",
-            "type": ["object", "null"],
+            "type": "object",
+            "required": [
+              "agreedExtensionDate"
+            ],
             "properties": {
+              "agreedExtensionDate": {
+                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/agreedExtensionDate",
+                "type": "string",
+                "description": ""
+              },
               "miscText": {
                 "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/miscText",
                 "type": "string",
@@ -1174,10 +1182,35 @@
               "object",
               "null"
             ],
+            "required": [
+              "stayClaim",
+              "preferredCourtCode",
+              "preferredCourtName"
+            ],
+            "properties": {
+              "stayClaim": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/stayClaim",
+                "type": "boolean",
+                "description": ""
+              },
+              "preferredCourtCode": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtCode",
+                "$ref": "#/definitions/courtCodeType",
+                "description": ""
+              },
+              "preferredCourtName": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtName",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": ""
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
-            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventCode",
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
