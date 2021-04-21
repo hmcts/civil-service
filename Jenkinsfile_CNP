@@ -64,7 +64,6 @@ withPipeline(type, product, component) {
       eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-ccd-definition.zip
-      ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-e2e.zip
       ./bin/pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
       ./bin/import-ccd-definition.sh
       ./bin/import-bpmn-diagram.sh .
@@ -96,7 +95,6 @@ withPipeline(type, product, component) {
       eval \$(./bin/variables/load-staging-environment-variables.sh)
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-ccd-definition.zip
-      ./bin/pull-latest-release-asset.sh civil-damages-ccd-definition civil-damages-e2e.zip
       ./bin/pull-latest-release-asset.sh civil-damages-camunda-bpmn-definition civil-damages-camunda-bpmn-definition.zip
       ./bin/import-ccd-definition.sh
       ./bin/import-bpmn-diagram.sh .

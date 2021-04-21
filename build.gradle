@@ -159,6 +159,10 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
 }
 
+task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
+  commandLine './bin/pull-latest-release-asset.sh', 'civil-damages-ccd-definition', 'civil-damages-e2e.zip'
+}
+
 task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
   commandLine '/usr/bin/yarn', '--mutex', 'network', '--frozen-lockfile', '--silent', 'install'
 }
@@ -192,11 +196,11 @@ def inStrictOrder(Task... tasks) {
 }
 
 task smoke(description: 'Runs the smoke tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, runSmokeTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSmokeTests))
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, runFunctionalTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runFunctionalTests))
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
