@@ -396,13 +396,11 @@ pact {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
     if(pactBrokerUrl == 'https://civil-damages-claims.pactflow.io/') {
+      excludes = ['unspec_service-Idam_api']
       pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
     }
     tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
     version = project.pactVersion
-    if(pactBrokerUrl != 'https://pact-broker.platform.hmcts.net/'){
-      excludes = ['unspec_service-Idam_api']
-    }
   }
 }
 
