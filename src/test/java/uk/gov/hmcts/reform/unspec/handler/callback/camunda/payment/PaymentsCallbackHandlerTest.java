@@ -5,6 +5,7 @@ import feign.FeignException;
 import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.unspec.service.PaymentsService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -36,6 +36,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.unspec.enums.PaymentStatus.SUCCESS;
 
 @SpringBootTest(classes = {
     PaymentsCallbackHandler.class,
@@ -66,72 +69,151 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     public void setup() {
         caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
-        params = callbackParamsOf(new HashMap<>(), ABOUT_TO_SUBMIT)
-            .toBuilder().caseData(caseData).build();
 
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
-    @Test
-    void shouldMakePbaPayment_whenInvoked() {
-        when(paymentsService.createCreditAccountPayment(any(), any()))
-            .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+    @Nested
+    class NewCode {
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        @BeforeEach
+        void setup() {
+            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
-        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-        assertThat(response.getData()).extracting("paymentDetails").extracting("reference")
-            .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
-        assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
+        }
+
+        @Test
+        void shouldMakePbaPayment_whenInvoked() {
+            when(paymentsService.createCreditAccountPayment(any(), any()))
+                .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("reference", "status", "customerReference")
+                .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), "12345");
+            assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {403})
+        void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails").extracting("reference").isNull();
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("errorMessage", "errorCode", "status", "customerReference")
+                .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), "12345");
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
+            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {404, 422, 504})
+        void shouldAddError_whenOtherExceptionThrown(int status) {
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("paymentReference").isEqualTo("12345");
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("paymentErrorMessage", "paymentErrorCode")
+                .containsExactly(null, null);
+            assertThat(response.getErrors()).containsOnly("Technical error occurred");
+        }
+
+        @Test
+        void shouldThrowException_whenForbiddenExceptionThrownContainsInvalidResponse() {
+            doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
+                .when(paymentsService).createCreditAccountPayment(any(), any());
+
+            assertThrows(FeignException.class, () -> handler.handle(params));
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+        }
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {403})
-    void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
-        doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
+    @Nested
+    class OldCode {
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        @BeforeEach
+        void setup() {
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        }
 
-        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-        assertThat(response.getData()).extracting("paymentDetails").extracting("reference").isNull();
-        assertThat(response.getData()).extracting("paymentDetails").extracting("errorMessage")
-            .isEqualTo(PAYMENT_ERROR_MESSAGE);
-        assertThat(response.getData()).extracting("paymentDetails").extracting("errorCode")
-            .isEqualTo(PAYMENT_ERROR_CODE);
-        assertThat(response.getErrors()).isEmpty();
-    }
+        @Test
+        void shouldMakePbaPayment_whenInvoked() {
+            when(paymentsService.createCreditAccountPayment(any(), any()))
+                .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
-    @Test
-    void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
-        doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("paymentDetails")
+                .extracting("reference", "status", "customerReference")
+                .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), null);
+            assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
+        }
 
-        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-        assertThat(response.getErrors()).isEmpty();
-    }
+        @ParameterizedTest
+        @ValueSource(ints = {403})
+        void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
-    @ParameterizedTest
-    @ValueSource(ints = {404, 422, 504})
-    void shouldAddError_whenOtherExceptionThrown(int status) {
-        doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("paymentDetails").extracting("reference").isNull();
+            assertThat(response.getData()).extracting("paymentDetails")
+                .extracting("errorMessage", "errorCode", "status", "customerReference")
+                .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), null);
+            assertThat(response.getErrors()).isEmpty();
+        }
 
-        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-        assertThat(response.getData()).extracting("paymentReference").isNull();
-        assertThat(response.getData()).extracting("paymentErrorMessage").isNull();
-        assertThat(response.getData()).extracting("paymentErrorCode").isNull();
-        assertThat(response.getErrors()).containsOnly("Technical error occurred");
-    }
+        @Test
+        void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
+            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
 
-    @Test
-    void shouldThrowException_whenForbiddenExceptionThrownContainsInvalidResponse() {
-        doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
-            .when(paymentsService).createCreditAccountPayment(any(), any());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThrows(FeignException.class, () -> handler.handle(params));
-        verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {404, 422, 504})
+        void shouldAddError_whenOtherExceptionThrown(int status) {
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+            assertThat(response.getData()).extracting("paymentReference").isEqualTo("12345");
+            assertThat(response.getData()).extracting("paymentDetails").isNull();
+            assertThat(response.getErrors()).containsOnly("Technical error occurred");
+        }
+
+        @Test
+        void shouldThrowException_whenForbiddenExceptionThrownContainsInvalidResponse() {
+            doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
+                .when(paymentsService).createCreditAccountPayment(any(), any());
+
+            assertThrows(FeignException.class, () -> handler.handle(params));
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
+        }
     }
 
     @SneakyThrows

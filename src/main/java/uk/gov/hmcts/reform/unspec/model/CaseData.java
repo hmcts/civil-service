@@ -58,6 +58,7 @@ public class CaseData implements MappableObject {
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
+    private final PaymentDetails claimIssuedPaymentDetails;
 
     private final OrganisationPolicy applicant1OrganisationPolicy;
     private final OrganisationPolicy applicant2OrganisationPolicy;

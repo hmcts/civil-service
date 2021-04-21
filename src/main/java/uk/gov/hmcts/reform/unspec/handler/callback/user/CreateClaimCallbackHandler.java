@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.CorrectEmail;
 import uk.gov.hmcts.reform.unspec.model.IdamUserDetails;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.PaymentDetails;
 import uk.gov.hmcts.reform.unspec.model.SolicitorReferences;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.repositories.ReferenceNumberRepository;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValida
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
@@ -87,18 +90,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck,
-            callbackKey(MID, "applicant"), this::validateDateOfBirth,
-            callbackKey(MID, "fee"), this::calculateFee,
-            callbackKey(MID, "idam-email"), this::getIdamEmail,
-            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
-            callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy,
-            callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        HashMap<String, Callback> callbackMap = new HashMap<>();
+        callbackMap.put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse);
+        callbackMap.put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck);
+        callbackMap.put(callbackKey(MID, "applicant"), this::validateDateOfBirth);
+        callbackMap.put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible);
+        callbackMap.put(callbackKey(V_1, MID, "fee"), this::calculateFee);
+        callbackMap.put(callbackKey(MID, "idam-email"), this::getIdamEmail);
+        callbackMap.put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim);
+        callbackMap.put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy);
+        callbackMap.put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy);
+        callbackMap.put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim);
+        callbackMap.put(callbackKey(SUBMITTED), this::buildConfirmation);
+
+        return callbackMap;
     }
 
     @Override
@@ -144,7 +149,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse calculateFee(CallbackParams callbackParams) {
+    private CallbackResponse calculateFeeBackwardsCompatible(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
         String paymentReference = ofNullable(caseData.getPaymentReference())
@@ -158,6 +163,28 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
             .paymentReference(paymentReference);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse calculateFee(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
+        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
+        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
+        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

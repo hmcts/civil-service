@@ -97,7 +97,7 @@ public class CaseDataBuilder {
     private AllocatedTrack allocatedTrack;
     private CaseState ccdState;
     private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
-    private PaymentDetails paymentDetails;
+    private PaymentDetails claimIssuedPaymentDetails;
     private CorrectEmail applicantSolicitor1CheckEmail;
     private IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -465,7 +465,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStatePaymentSuccessfulWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
-        paymentDetails = PaymentDetails.builder()
+        claimIssuedPaymentDetails = PaymentDetails.builder()
             .status(SUCCESS)
             .reference("RC-1604-0739-2145-4711")
             .build();
@@ -628,13 +628,15 @@ public class CaseDataBuilder {
         allocatedTrack = FAST_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        paymentReference = "12345";
         return this;
     }
 
     public CaseDataBuilder atStatePaymentFailed() {
         atStatePendingCaseIssued();
 
-        paymentDetails = PaymentDetails.builder()
+        claimIssuedPaymentDetails = PaymentDetails.builder()
             .status(FAILED)
             .errorMessage("Your account is deleted")
             .errorCode("CA-E0004")
@@ -644,7 +646,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStatePaymentSuccessful() {
         atStatePendingCaseIssued();
-        paymentDetails = PaymentDetails.builder()
+        claimIssuedPaymentDetails = PaymentDetails.builder()
             .status(SUCCESS)
             .reference("RC-1604-0739-2145-4711")
             .build();
@@ -813,7 +815,7 @@ public class CaseDataBuilder {
             .respondent1OrgRegistered(respondent1OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
-            .paymentDetails(paymentDetails)
+            .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)

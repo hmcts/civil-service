@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.unspec.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -28,7 +28,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {JacksonAutoConfiguration.class})
+@ContextConfiguration(classes = {
+    PaymentsService.class,
+    JacksonAutoConfiguration.class
+})
 class PaymentsServiceTest {
 
     private static final String SERVICE = "service";
@@ -39,17 +42,18 @@ class PaymentsServiceTest {
         .name("test org")
         .contactInformation(List.of(ContactInformation.builder().build()))
         .build();
+    private static final String CUSTOMER_REFERENCE = "12345";
 
-    @Mock
+    @MockBean
     private PaymentsClient paymentsClient;
 
-    @Mock
+    @MockBean
     private PaymentsConfiguration paymentsConfiguration;
 
-    @Mock
+    @MockBean
     private OrganisationService organisationService;
 
-    @InjectMocks
+    @Autowired
     private PaymentsService paymentsService;
 
     @BeforeEach
@@ -62,29 +66,34 @@ class PaymentsServiceTest {
 
     @Test
     void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
         CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("OrgId").build())
-                                              .build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
-        var expectedCreditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-            .accountNumber("PBA0077597")
-            .amount(caseData.getClaimFee().toFeeDto().getCalculatedAmount())
-            .caseReference("000LR001")
-            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-            .customerReference(caseData.getPaymentReference())
-            .description("Claim issue payment")
-            .organisationName(ORGANISATION.getName())
-            .service(SERVICE)
-            .siteId(SITE_ID)
-            .fees(new FeeDto[]{caseData.getClaimFee().toFeeDto()})
-            .build();
+
+        var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
 
         PaymentDto paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
 
         verify(organisationService).findOrganisationById("OrgId");
         verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
         assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);
+    }
+
+    private CreditAccountPaymentRequest getExpectedCreditAccountPaymentRequest(CaseData caseData) {
+        return CreditAccountPaymentRequest.builder()
+            .accountNumber("PBA0077597")
+            .amount(caseData.getClaimFee().toFeeDto().getCalculatedAmount())
+            .caseReference("000LR001")
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .customerReference(CUSTOMER_REFERENCE)
+            .description("Claim issue payment")
+            .organisationName(ORGANISATION.getName())
+            .service(SERVICE)
+            .siteId(SITE_ID)
+            .fees(new FeeDto[]{caseData.getClaimFee().toFeeDto()})
+            .build();
     }
 }

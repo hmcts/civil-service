@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 
 @SpringBootTest(classes = {
@@ -55,7 +56,7 @@ class CallbackHandlerFactoryTest {
                 @Override
                 protected Map<String, Callback> callbacks() {
                     return ImmutableMap.of(
-                        ABOUT_TO_SUBMIT.getValue(), this::createCitizenClaim
+                        callbackKey(V_1, ABOUT_TO_SUBMIT), this::createCitizenClaim
                     );
                 }
 
@@ -77,7 +78,7 @@ class CallbackHandlerFactoryTest {
                 @Override
                 protected Map<String, Callback> callbacks() {
                     return ImmutableMap.of(
-                        ABOUT_TO_SUBMIT.getValue(), this::sendSealedClaim
+                        callbackKey(V_1, ABOUT_TO_SUBMIT), this::sendSealedClaim
                     );
                 }
 
@@ -96,6 +97,28 @@ class CallbackHandlerFactoryTest {
                 }
             };
         }
+
+        @Bean
+        public CallbackHandler defendantResponseHandlerWithoutCallbackVersion() {
+
+            return new CallbackHandler() {
+                @Override
+                protected Map<String, Callback> callbacks() {
+                    return ImmutableMap.of(
+                        callbackKey(ABOUT_TO_SUBMIT), this::doMethod
+                    );
+                }
+
+                private CallbackResponse doMethod(CallbackParams callbackParams) {
+                    return EVENT_HANDLED_RESPONSE;
+                }
+
+                @Override
+                public List<CaseEvent> handledEvents() {
+                    return Collections.singletonList(DEFENDANT_RESPONSE);
+                }
+            };
+        }
     }
 
     @Autowired
@@ -109,13 +132,33 @@ class CallbackHandlerFactoryTest {
             .build();
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
+            .type(ABOUT_TO_SUBMIT)
+            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .version(V_1)
+            .build();
+
+        assertThatThrownBy(() -> callbackHandlerFactory.dispatch(params))
+            .isInstanceOf(CallbackException.class)
+            .hasMessage("Could not handle callback for event nope");
+    }
+
+    @Test
+    void shouldThrowCallbackException_whenUnknownVersion() {
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(CREATE_CLAIM.name())
+            .build();
+        CallbackParams params = CallbackParams.builder()
+            .request(callbackRequest)
+            .type(ABOUT_TO_SUBMIT)
             .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .version(V_2)
             .build();
 
         assertThatThrownBy(() -> callbackHandlerFactory.dispatch(params))
             .isInstanceOf(CallbackException.class)
-            .hasMessage("Could not handle callback for event nope");
+            .hasMessage(
+                "Callback for event CREATE_CLAIM, version V_2, type ABOUT_TO_SUBMIT and page id null not implemented");
     }
 
     @Test
@@ -212,6 +255,43 @@ class CallbackHandlerFactoryTest {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CREATE_CLAIM.name())
+            .build();
+
+        CallbackParams params = CallbackParams.builder()
+            .request(callbackRequest)
+            .type(ABOUT_TO_SUBMIT)
+            .version(V_1)
+            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
+
+        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
+
+        assertEquals(EVENT_HANDLED_RESPONSE, callbackResponse);
+    }
+
+    @Test
+    void shouldProcessEvent_whenNoVersion() {
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(DEFENDANT_RESPONSE.name())
+            .build();
+
+        CallbackParams params = CallbackParams.builder()
+            .request(callbackRequest)
+            .type(ABOUT_TO_SUBMIT)
+            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
+
+        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
+
+        assertEquals(EVENT_HANDLED_RESPONSE, callbackResponse);
+    }
+
+    @Test
+    void shouldDefaultToMethod_whenVersionSpecifiedInCallbackButNotInHandler() {
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(DEFENDANT_RESPONSE.name())
             .build();
 
         CallbackParams params = CallbackParams.builder()
