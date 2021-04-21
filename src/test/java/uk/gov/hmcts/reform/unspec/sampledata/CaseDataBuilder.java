@@ -422,7 +422,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimDraftWithMinimalData() {
         courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("121")
+            .applicantPreferredCourt("127")
             .build();
         applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;
@@ -590,7 +590,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1Reference("6789")
             .build();
         courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("121")
+            .applicantPreferredCourt("127")
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
