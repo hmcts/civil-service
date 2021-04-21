@@ -17,6 +17,7 @@ public class ServedDocumentFiles {
 
     private List<Element<DocumentWithRegex>> other;
     private List<Element<Document>> medicalReports;
+    private List<Element<DocumentWithRegex>> medicalReport;
     private List<Element<DocumentWithRegex>> scheduleOfLoss;
     private Document particularsOfClaimDocument;
     private String particularsOfClaimText;
