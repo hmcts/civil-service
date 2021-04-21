@@ -154,7 +154,7 @@ task integration(type: Test) {
 task contract(type: Test) {
   useJUnitPlatform()
   description = "Runs pact contract tests"
-  group = "Verification"
+  group = "Delivery pipeline"
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
 }
@@ -374,6 +374,17 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+
+}
+
+runAndPublishConsumerPactTests.dependsOn contract
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
@@ -382,7 +393,9 @@ pact {
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
+    if(pactBrokerUrl == 'https://civil-damages-claims.pactflow.io/') {
+      pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
+    }
     tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
     version = project.pactVersion
     if(pactBrokerUrl != 'https://pact-broker.platform.hmcts.net/'){
