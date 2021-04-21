@@ -7,9 +7,9 @@ plugins {
   id 'org.owasp.dependencycheck' version '6.1.5'
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'org.sonarqube' version '3.1.1'
-  id 'au.com.dius.pact' version '4.2.3'
+  id 'au.com.dius.pact' version '4.2.4'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "7.7.3"
+  id "org.flywaydb.flyway" version "7.8.1"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -268,8 +268,10 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.18.1'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.18.1'
+
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.19.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
+
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
@@ -311,12 +313,12 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.0'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.51'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.52'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '1.4.1'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.15.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.14.0'
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.2'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.3'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
