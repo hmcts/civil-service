@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.unspec.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.unspec.service.OrganisationService;
 import uk.gov.hmcts.reform.unspec.utils.PartyUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -96,10 +97,12 @@ public class RoboticsDataMapper {
     }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
-        return List.of(
-            buildApplicantSolicitor(caseData, APPLICANT_SOLICITOR_ID),
-            buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID)
-        );
+        List<Solicitor> solicitorsList = new ArrayList<>();
+        solicitorsList.add(buildApplicantSolicitor(caseData, APPLICANT_SOLICITOR_ID));
+        ofNullable(buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID))
+            .ifPresent(solicitorsList::add);
+
+        return solicitorsList;
     }
 
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
@@ -109,7 +112,7 @@ public class RoboticsDataMapper {
             caseData.getRespondentSolicitor1OrganisationDetails()
         );
         if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
-            return solicitorBuilder.build();
+            return null;
         }
         solicitorBuilder
             .id(id)

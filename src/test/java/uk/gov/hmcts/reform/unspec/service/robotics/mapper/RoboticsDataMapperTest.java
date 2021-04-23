@@ -128,6 +128,23 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant()
+            .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
+        var applicantSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY");
+        assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(applicantSolicitor.getAddresses().getContactAddress());
+    }
+
+    @Test
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
         assertThrows(NullPointerException.class, () ->
                          mapper.toRoboticsCaseData(null),

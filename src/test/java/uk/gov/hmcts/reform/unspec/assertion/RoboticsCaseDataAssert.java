@@ -58,14 +58,16 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             null,
             expected.getApplicant1OrganisationPolicy()
         );
-        assertSolicitor(
-            RESPONDENT_SOLICITOR_ID,
-            "respondent1" + "." + "reference",
-            actual.getSolicitors().get(1),
-            expected.getSolicitorReferences().getRespondentSolicitor1Reference(),
-            expected.getRespondentSolicitor1OrganisationDetails(),
-            expected.getRespondent1OrganisationPolicy()
-        );
+        if (actual.getSolicitors().size() == 2) {
+            assertSolicitor(
+                RESPONDENT_SOLICITOR_ID,
+                "respondent1" + "." + "reference",
+                actual.getSolicitors().get(1),
+                expected.getSolicitorReferences().getRespondentSolicitor1Reference(),
+                expected.getRespondentSolicitor1OrganisationDetails(),
+                expected.getRespondent1OrganisationPolicy()
+            );
+        }
 
         assertNotNull(actual.getEvents());
 

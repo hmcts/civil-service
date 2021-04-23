@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-damages-service App
 name: civil-damages-service
 home: https://github.com/hmcts/civil-damages-service
-version: 0.0.5
+version: 0.0.6
 maintainers:
   - name: HMCTS Unspecified team
 
@@ -11,7 +11,7 @@ dependencies:
     version: 3.4.5
     repository: '@hmctspublic'
   - name: ccd
-    version: 4.3.3
+    version: 5.0.2
     repository: '@hmctspublic'
     tags:
       - unspec-ccd-stack
