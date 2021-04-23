@@ -37,7 +37,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_CLAIM);
 
-    public static final String CONFIRMATION_SUMMARY = "<br />You need to respond before %s."
+    public static final String CONFIRMATION_SUMMARY = "<br />You need to respond to the claim before %s."
         + "\n\n[Download the Acknowledgement of Claim form](%s)";
 
     private final DateOfBirthValidator dateOfBirthValidator;
@@ -96,7 +96,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
-                "# You've acknowledged claim%n## Claim number: %s",
+                "# You have acknowledged the claim%n## Claim number: %s",
                 caseData.getLegacyCaseReference()
             ))
             .confirmationBody(body)
