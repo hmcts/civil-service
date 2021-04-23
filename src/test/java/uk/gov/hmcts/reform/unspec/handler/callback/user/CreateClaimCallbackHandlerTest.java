@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.unspec.model.Fee;
 import uk.gov.hmcts.reform.unspec.model.IdamUserDetails;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicList;
 import uk.gov.hmcts.reform.unspec.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
@@ -354,7 +355,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class FeatureToggleDisabled {
+        class OldCode {
 
             @Test
             void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
@@ -609,7 +610,22 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+    }
 
+    @Nested
+    class StatementOfTruth {
+
+        @Test
+        void shouldSetStatementOfTruthToNull_whenPopulated() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("applicantSolicitor1ClaimStatementOfTruth")
+                .isNull();
+        }
     }
 
     @Nested
@@ -819,7 +835,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(format(
                             LIP_CONFIRMATION_SCREEN,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                            responsePackLink))
+                            responsePackLink
+                        ))
                         .build());
             }
         }

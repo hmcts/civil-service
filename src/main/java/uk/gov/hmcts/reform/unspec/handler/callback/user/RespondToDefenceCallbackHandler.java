@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
@@ -53,6 +54,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateApplicantDqExperts,
+            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -66,6 +68,15 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder().applicant1DQStatementOfTruth(null).build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().applicant1DQ(dq).build().toMap(objectMapper))
             .build();
     }
 

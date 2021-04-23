@@ -220,6 +220,22 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class StatementOfTruth {
+
+        @Test
+        void shouldSetStatementOfTruthToNull_whenPopulated() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("applicant1DQStatementOfTruth")
+                .isNull();
+        }
+    }
+
+    @Nested
     class AboutToSubmitCallback {
         private final LocalDateTime localDateTime = now();
 

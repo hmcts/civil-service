@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -36,7 +37,6 @@ import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValida
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,20 +90,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     @Override
     protected Map<String, Callback> callbacks() {
-        HashMap<String, Callback> callbackMap = new HashMap<>();
-        callbackMap.put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse);
-        callbackMap.put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck);
-        callbackMap.put(callbackKey(MID, "applicant"), this::validateDateOfBirth);
-        callbackMap.put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible);
-        callbackMap.put(callbackKey(V_1, MID, "fee"), this::calculateFee);
-        callbackMap.put(callbackKey(MID, "idam-email"), this::getIdamEmail);
-        callbackMap.put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim);
-        callbackMap.put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy);
-        callbackMap.put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy);
-        callbackMap.put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim);
-        callbackMap.put(callbackKey(SUBMITTED), this::buildConfirmation);
-
-        return callbackMap;
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
+            .put(callbackKey(MID, "applicant"), this::validateDateOfBirth)
+            .put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible)
+            .put(callbackKey(V_1, MID, "fee"), this::calculateFee)
+            .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
+            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
+            .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
+            .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     @Override
@@ -207,6 +207,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return organisationService.findOrganisation(authToken)
             .map(Organisation::getPaymentAccount)
             .orElse(emptyList());
+    }
+
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().applicantSolicitor1ClaimStatementOfTruth(null).build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
