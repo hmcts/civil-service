@@ -17,4 +17,14 @@ public interface ParticularsOfClaimValidator {
             .errors(servedDocumentFiles.getErrors())
             .build();
     }
+
+    default CallbackResponse validateParticularsOfClaimAddOrAmendDocuments(CallbackParams callbackParams) {
+        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
+            .orElse(ServedDocumentFiles.builder().build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(servedDocumentFiles.getErrorsAddOrAmendDocuments())
+            .build();
+    }
+
 }

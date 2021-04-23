@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.unspec.model.documents.Document;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
 import static java.lang.String.format;
@@ -37,23 +38,23 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
 
         @Test
-        void shouldReturnErrors_whenNoDocuments() {
+        void shouldNotReturnErrors_whenNoDocuments() {
             CaseData caseData = caseDataBuilder.build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
-        void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
+        void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmpty() {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -66,6 +67,19 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .particularsOfClaimDocument(Document.builder()
+                                                                        .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly("More than one Particulars of claim details added");
         }
 
         @Nested

@@ -29,9 +29,17 @@ public class ServedDocumentFiles {
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
             errors.add("More than one Particulars of claim details added");
         }
-
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
             errors.add("You must add Particulars of claim details");
+        }
+        return errors;
+    }
+
+    @JsonIgnore
+    public List<String> getErrorsAddOrAmendDocuments() {
+        List<String> errors = new ArrayList<>();
+        if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
+            errors.add("More than one Particulars of claim details added");
         }
         return errors;
     }

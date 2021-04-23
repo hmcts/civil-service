@@ -18,6 +18,7 @@ class ServedDocumentFilesTest {
                 .build();
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
         }
 
         @Test
@@ -27,6 +28,7 @@ class ServedDocumentFilesTest {
                 .build();
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
         }
 
         @Test
@@ -44,6 +46,8 @@ class ServedDocumentFilesTest {
                 .build();
 
             assertThat(servedDocumentFiles.getErrors())
+                .containsOnly("More than one Particulars of claim details added");
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments())
                 .containsOnly("More than one Particulars of claim details added");
         }
     }
