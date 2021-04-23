@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
@@ -63,6 +64,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateRespondentDqExperts,
             callbackKey(MID, "upload"), this::emptyCallbackResponse,
+            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -101,6 +103,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder().respondent1DQStatementOfTruth(null).build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().respondent1DQ(dq).build().toMap(objectMapper))
             .build();
     }
 

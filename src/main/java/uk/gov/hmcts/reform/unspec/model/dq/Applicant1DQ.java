@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.unspec.model.documents.Document;
 
 @Setter
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Applicant1DQ implements DQ {
 
     private final FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
