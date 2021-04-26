@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.unspec.testingsupport;
+package uk.gov.hmcts.reform.unspec.controllers.testingsupport;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
