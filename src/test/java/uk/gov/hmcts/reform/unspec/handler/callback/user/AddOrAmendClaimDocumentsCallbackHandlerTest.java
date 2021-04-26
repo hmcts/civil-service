@@ -82,6 +82,19 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(response.getErrors()).containsOnly("More than one Particulars of claim details added");
         }
 
+        @Test
+        void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmitted() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string").build())
+                                                                        .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            System.out.println(response.getErrors());
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
         @Nested
         class SubmittedCallback {
 

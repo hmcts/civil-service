@@ -17,8 +17,10 @@ class ServedDocumentFilesTest {
                 .particularsOfClaimDocument(Document.builder().build())
                 .build();
 
-            assertThat(servedDocumentFiles.getErrors()).isEmpty();
-            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("CREATE_CLAIM")).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("NOTIFY_DEFENDANT_OF_CLAIM_DETAILS")).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("ADD_OR_AMEND_CLAIM_DOCUMENTS")).isEmpty();
+
         }
 
         @Test
@@ -27,15 +29,19 @@ class ServedDocumentFilesTest {
                 .particularsOfClaimText("Some string")
                 .build();
 
-            assertThat(servedDocumentFiles.getErrors()).isEmpty();
-            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("CREATE_CLAIM")).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("NOTIFY_DEFENDANT_OF_CLAIM_DETAILS")).isEmpty();
+            assertThat(servedDocumentFiles.getErrors("ADD_OR_AMEND_CLAIM_DOCUMENTS")).isEmpty();
         }
 
         @Test
         void shouldReturnRequiredError_WhenBothParticularsOfClaimFieldsAreNull() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder().build();
 
-            assertThat(servedDocumentFiles.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(servedDocumentFiles.getErrors("CREATE_CLAIM"))
+                .containsOnly("You must add Particulars of claim details");
+            assertThat(servedDocumentFiles.getErrors("NOTIFY_DEFENDANT_OF_CLAIM_DETAILS"))
+                .containsOnly("You must add Particulars of claim details");
         }
 
         @Test
@@ -45,9 +51,11 @@ class ServedDocumentFilesTest {
                 .particularsOfClaimText("Some string")
                 .build();
 
-            assertThat(servedDocumentFiles.getErrors())
+            assertThat(servedDocumentFiles.getErrors("CREATE_CLAIM"))
                 .containsOnly("More than one Particulars of claim details added");
-            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments())
+            assertThat(servedDocumentFiles.getErrors("NOTIFY_DEFENDANT_OF_CLAIM_DETAILS"))
+                .containsOnly("More than one Particulars of claim details added");
+            assertThat(servedDocumentFiles.getErrors("ADD_OR_AMEND_CLAIM_DOCUMENTS"))
                 .containsOnly("More than one Particulars of claim details added");
         }
     }

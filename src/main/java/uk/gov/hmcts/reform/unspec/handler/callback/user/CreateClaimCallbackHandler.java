@@ -97,7 +97,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible)
             .put(callbackKey(V_1, MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
-            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
+            .put(callbackKey(MID, "particulars-of-claim"), callbackParams -> validateParticularsOfClaim(callbackParams,
+                                                                                                        "CREATE_CLAIM"))
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)

@@ -24,13 +24,15 @@ public class ServedDocumentFiles {
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
     @JsonIgnore
-    public List<String> getErrors() {
+    public List<String> getErrors(String eventName) {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
             errors.add("More than one Particulars of claim details added");
         }
-        if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("You must add Particulars of claim details");
+        if (!eventName.equals("ADD_OR_AMEND_CLAIM_DOCUMENTS")) {
+            if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
+                errors.add("You must add Particulars of claim details");
+            }
         }
         return errors;
     }
