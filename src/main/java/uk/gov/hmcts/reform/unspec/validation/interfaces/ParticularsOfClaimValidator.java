@@ -9,21 +9,23 @@ import static java.util.Optional.ofNullable;
 
 public interface ParticularsOfClaimValidator {
 
-    default CallbackResponse validateParticularsOfClaim(CallbackParams callbackParams, String eventName) {
-        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
-            .orElse(ServedDocumentFiles.builder().build());
+    private ServedDocumentFiles buildServedDocumentFiles(CallbackParams callbackParams) {
+
+        return ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
+           .orElse(ServedDocumentFiles.builder().build());
+    }
+
+    default CallbackResponse validateParticularsOfClaim(CallbackParams callbackParams) {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(servedDocumentFiles.getErrors(eventName))
-                .build();
+            .errors(buildServedDocumentFiles(callbackParams).getErrors())
+            .build();
     }
 
     default CallbackResponse validateParticularsOfClaimAddOrAmendDocuments(CallbackParams callbackParams) {
-        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
-            .orElse(ServedDocumentFiles.builder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(servedDocumentFiles.getErrorsAddOrAmendDocuments())
+            .errors(buildServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocuments())
             .build();
     }
 }
