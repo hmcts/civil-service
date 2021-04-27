@@ -90,7 +90,6 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            System.out.println(response.getErrors());
 
             assertThat(response.getErrors()).isEmpty();
         }
