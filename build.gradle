@@ -160,7 +160,7 @@ task contract(type: Test) {
 }
 
 task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine './bin/pull-latest-release-asset.sh', 'civil-damages-ccd-definition', 'civil-damages-e2e.zip'
+  commandLine './bin/pull-latest-release-asset.sh', 'civil-ccd-definition', 'civil-e2e.zip'
 }
 
 task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
@@ -207,8 +207,8 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 
 sonarqube {
   properties {
-    property "sonar.projectName", "UNSPEC :: civil-damages-service"
-    property "sonar.projectKey", "civil-damages-service"
+    property "sonar.projectName", "CIVIL :: service"
+    property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -397,7 +397,7 @@ pact {
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if(pactBrokerUrl == 'https://civil-damages-claims.pactflow.io/') {
+    if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
       excludes = ['unspec_service-Idam_api']
       pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
     }

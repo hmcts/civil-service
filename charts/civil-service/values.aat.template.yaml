@@ -54,9 +54,9 @@ java:
     CMC_DB_PASSWORD: hmcts
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
-    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://civil-damages-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://civil-damages-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://civil-damages-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
     LAUNCH_DARKLY_ENV: service-staging
@@ -67,7 +67,7 @@ idam-pr:
   enabled: true
   redirect_uris:
     XUI:
-      - https://civil-damages-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
+      - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true
@@ -75,13 +75,13 @@ xui-webapp:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:prod-816d45c5
-    ingressHost: civil-damages-service-xui-staging.aat.platform.hmcts.net
+    ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
     environment:
-      HEALTH_CCD_COMPONENT_API: http://civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal/health
-      HEALTH_CCD_DATA_API: http://civil-damages-service-data-store-staging-aat.service.core-compute-aat.internal/health
+      HEALTH_CCD_COMPONENT_API: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal/health
+      HEALTH_CCD_DATA_API: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-aat.service.core-compute-aat.internal/health
-      SERVICES_CCD_COMPONENT_API: http://civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal
-      SERVICES_CCD_DATA_STORE_API: http://civil-damages-service-data-store-staging-aat.service.core-compute-aat.internal
+      SERVICES_CCD_COMPONENT_API: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal
+      SERVICES_CCD_DATA_STORE_API: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-aat.service.core-compute-aat.internal
       JURISDICTIONS: DIVORCE,PROBATE,FR,PUBLICLAW,IA,SSCS,EMPLOYMENT,CIVIL,UNSPECIFIED_CLAIMS
       SERVICES_IDAM_ISS_URL: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
@@ -102,10 +102,10 @@ ccd:
       enabled: false
 
   global:
-    ccdApiGatewayIngress: http://civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal
-    ccdDataStoreUrl: http://civil-damages-service-data-store-staging-aat.service.core-compute-aat.internal
-    ccdDefinitionStoreUrl: http://civil-damages-service-definition-store-staging-aat.service.core-compute-aat.internal
-    ccdUserProfileUrl: http://civil-damages-service-user-profile-staging-aat.service.core-compute-aat.internal
+    ccdApiGatewayIngress: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal
+    ccdDataStoreUrl: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
+    ccdDefinitionStoreUrl: http://civil-service-definition-store-staging-aat.service.core-compute-aat.internal
+    ccdUserProfileUrl: http://civil-service-user-profile-staging-aat.service.core-compute-aat.internal
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -119,7 +119,7 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
-      ingressHost: civil-damages-service-gateway-staging-aat.service.core-compute-aat.internal
+      ingressHost: civil-service-gateway-staging-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
       keyVaults: []
   ccd-data-store-api:
@@ -133,7 +133,7 @@ ccd:
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: unspec_service
       keyVaults: []
-      ingressHost: civil-damages-service-data-store-staging-aat.service.core-compute-aat.internal
+      ingressHost: civil-service-data-store-staging-aat.service.core-compute-aat.internal
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
@@ -142,14 +142,14 @@ ccd:
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
       keyVaults: []
-      ingressHost: civil-damages-service-definition-store-staging-aat.service.core-compute-aat.internal
+      ingressHost: civil-service-definition-store-staging-aat.service.core-compute-aat.internal
   ccd-user-profile-api:
     java:
       imagePullPolicy: Always
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
       keyVaults: []
-      ingressHost: civil-damages-service-user-profile-staging-aat.service.core-compute-aat.internal
+      ingressHost: civil-service-user-profile-staging-aat.service.core-compute-aat.internal
 
   postgresql:
     persistence:
@@ -160,7 +160,7 @@ camunda-bpm:
   java:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
-    ingressHost: civil-damages-service-camunda-staging-aat.service.core-compute-aat.internal
+    ingressHost: civil-service-camunda-staging-aat.service.core-compute-aat.internal
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
       CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
