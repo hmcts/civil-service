@@ -59,14 +59,14 @@ class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
                 EMAIL,
                 TEMPLATE_ID,
                 getExpectedMap(),
-                "applicant-create-case-handed-offline-notification-000LR001"
+                "applicant-create-case-handed-offline-notification-000DC001"
             );
         }
     }
 
     private Map<String, String> getExpectedMap() {
         return Map.of(
-            "claimReferenceNumber", "000LR001"
+            "claimReferenceNumber", "000DC001"
         );
     }
 }

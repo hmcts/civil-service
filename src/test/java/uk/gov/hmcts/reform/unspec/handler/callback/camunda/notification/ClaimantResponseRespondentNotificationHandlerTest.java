@@ -56,7 +56,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
                 notificationsProperties.getRespondentSolicitorEmail(),
                 "template-id",
                 Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE),
-                "claimant-response-respondent-notification-000LR001"
+                "claimant-response-respondent-notification-000DC001"
             );
         }
     }
