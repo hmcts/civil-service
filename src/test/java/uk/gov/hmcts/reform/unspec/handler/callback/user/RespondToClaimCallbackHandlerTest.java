@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.dq.Expert;
 import uk.gov.hmcts.reform.unspec.model.dq.Experts;
@@ -282,18 +283,29 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class StatementOfTruth {
+    class MidStatementOfTruth {
 
         @Test
         void shouldSetStatementOfTruthToNull_whenPopulated() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .respondent1DQ()
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("respondent1DQStatementOfTruth")
+                .extracting("uiStatementOfTruth")
                 .isNull();
+
+            assertThat(response.getData())
+                .extracting("respondent1DQStatementOfTruth")
+                .extracting("name", "role")
+                .containsExactly(name, role);
         }
     }
 

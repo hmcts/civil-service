@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
@@ -73,10 +74,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder().applicant1DQStatementOfTruth(null).build();
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
+            .applicant1DQStatementOfTruth(statementOfTruth)
+            .build();
+
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(null)
+            .applicant1DQ(dq)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().applicant1DQ(dq).build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

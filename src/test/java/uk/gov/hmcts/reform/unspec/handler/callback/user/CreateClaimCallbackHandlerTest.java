@@ -613,18 +613,28 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class StatementOfTruth {
+    class MidStatementOfTruth {
 
         @Test
         void shouldSetStatementOfTruthToNull_whenPopulated() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("applicantSolicitor1ClaimStatementOfTruth")
+                .extracting("uiStatementOfTruth")
                 .isNull();
+
+            assertThat(response.getData())
+                .extracting("applicantSolicitor1ClaimStatementOfTruth")
+                .extracting("name", "role")
+                .containsExactly(name, role);
         }
     }
 

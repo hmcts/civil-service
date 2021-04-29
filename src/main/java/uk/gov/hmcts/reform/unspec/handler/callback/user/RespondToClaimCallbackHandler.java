@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
+import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
@@ -108,10 +109,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder().respondent1DQStatementOfTruth(null).build();
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQStatementOfTruth(statementOfTruth)
+            .build();
+
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(null)
+            .respondent1DQ(dq)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().respondent1DQ(dq).build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
