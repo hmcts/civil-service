@@ -86,7 +86,7 @@ class PaymentsServiceTest {
         return CreditAccountPaymentRequest.builder()
             .accountNumber("PBA0077597")
             .amount(caseData.getClaimFee().toFeeDto().getCalculatedAmount())
-            .caseReference("000LR001")
+            .caseReference("000DC001")
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())
             .customerReference(CUSTOMER_REFERENCE)
             .description("Claim issue payment")

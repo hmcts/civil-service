@@ -54,13 +54,13 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 "civilunspecified@gmail.com",
                 notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
                 getExpectedMap(),
-                "claim-details-respondent-notification-000LR001"
+                "claim-details-respondent-notification-000DC001"
             );
         }
 
         private Map<String, String> getExpectedMap() {
             return Map.of(
-                "claimReferenceNumber", "000LR001",
+                "claimReferenceNumber", "000DC001",
                 "defendantName", "Mr. Sole Trader",
                 "issuedOn", formatLocalDate(CLAIM_ISSUED_DATE, DATE)
             );

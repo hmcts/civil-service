@@ -11,6 +11,6 @@ public class MockDatabaseConfiguration {
 
     @Bean
     public ReferenceNumberRepository referenceNumberRepository() {
-        return () -> "000LR001";
+        return () -> "000DC001";
     }
 }

@@ -56,7 +56,7 @@ class FailedPaymentApplicantNotificationHandlerTest extends BaseCallbackHandlerT
                 "claimantsolicitor@example.com",
                 "template-id",
                 Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE),
-                "failed-payment-applicant-notification-000LR001"
+                "failed-payment-applicant-notification-000DC001"
             );
         }
     }

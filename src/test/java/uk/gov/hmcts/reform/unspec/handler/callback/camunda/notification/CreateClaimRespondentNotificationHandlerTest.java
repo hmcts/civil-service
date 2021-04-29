@@ -53,13 +53,13 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
                 "civilunspecified@gmail.com",
                 notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
                 getExpectedMap(),
-                "create-claim-respondent-notification-000LR001"
+                "create-claim-respondent-notification-000DC001"
             );
         }
 
         private Map<String, String> getExpectedMap() {
             return Map.of(
-                "claimReferenceNumber", "000LR001",
+                "claimReferenceNumber", "000DC001",
                 "claimantName", "Mr. John Rambo",
                 "defendantName", "Mr. Sole Trader",
                 "issuedOn", formatLocalDate(CLAIM_ISSUED_DATE, DATE)

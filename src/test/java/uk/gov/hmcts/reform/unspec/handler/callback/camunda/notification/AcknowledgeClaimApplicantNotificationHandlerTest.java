@@ -60,7 +60,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 "claimantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "acknowledge-claim-applicant-notification-000LR001"
+                "acknowledge-claim-applicant-notification-000DC001"
             );
         }
 

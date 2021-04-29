@@ -127,7 +127,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000LR001"))
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
                     .confirmationBody(confirmationBody)
                     .build());
         }

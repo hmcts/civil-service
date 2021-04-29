@@ -96,7 +96,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT)
-                .legacyCaseReference("000LR001")
+                .legacyCaseReference("000DC001")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -117,7 +117,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
-                .legacyCaseReference("000LR002")
+                .legacyCaseReference("000DC002")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -134,7 +134,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendantWithMinimalData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantWithMinimalData()
-                .legacyCaseReference("000LR003")
+                .legacyCaseReference("000DC003")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -155,7 +155,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmission()
-                .legacyCaseReference("000LR004")
+                .legacyCaseReference("000DC004")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -173,7 +173,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmissionWithMinimalData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
-                .legacyCaseReference("000LR005")
+                .legacyCaseReference("000DC005")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -195,7 +195,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullAdmission()
-                .legacyCaseReference("000LR006")
+                .legacyCaseReference("000DC006")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -212,7 +212,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmissionWithMinimalData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(FULL_ADMISSION)
-                .legacyCaseReference("000LR007")
+                .legacyCaseReference("000DC007")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -233,7 +233,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentCounterClaim()
-                .legacyCaseReference("000LR008")
+                .legacyCaseReference("000DC008")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -251,7 +251,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaimWithMinimalData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(COUNTER_CLAIM)
-                .legacyCaseReference("000LR009")
+                .legacyCaseReference("000DC009")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -273,7 +273,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceNotProceeds() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
-                .legacyCaseReference("000LR010")
+                .legacyCaseReference("000DC010")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -295,7 +295,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceProceeds() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .legacyCaseReference("000LR011")
+                .legacyCaseReference("000DC011")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
