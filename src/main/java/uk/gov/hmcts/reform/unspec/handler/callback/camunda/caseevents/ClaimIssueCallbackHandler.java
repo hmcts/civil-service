@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
 
 @Service
 @RequiredArgsConstructor
 public class ClaimIssueCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIM_ISSUE);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCESS_CLAIM_ISSUE);
 
     @Override
     protected Map<String, Callback> callbacks() {
