@@ -134,7 +134,7 @@ public class IdamConsumerTest {
 
         return new PactDslJsonBody()
             .stringType("id", "123")
-            .stringType("email", "unspec-solicitor@fake.hmcts.net")
+            .stringType("email", "civil-solicitor@fake.hmcts.net")
             .stringType("forename", "John")
             .stringType("surname", "Smith")
             .stringType("roles", array.toString());

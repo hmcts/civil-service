@@ -1,5 +1,5 @@
 tags:
-  unspec-ccd-stack: false
+  civil-ccd-stack: false
 postgresql:
   enabled: false
 idam-pr:
@@ -15,7 +15,7 @@ java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil/service:latest'
   ingressHost: civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-  aadIdentityName: unspec
+  aadIdentityName: civil
   environment:
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     IDAM_CLIENT_ID: civil-service
@@ -49,10 +49,10 @@ java:
     SOME_ENV_VARIABLE: true
 
   keyVaults:
-    unspec:
-      resourceGroup: unspec
+    civil:
+      resourceGroup: civil
       secrets:
-        - unspec-idam-client-secret
+        - civil-idam-client-secret
         - microservicekey-civil-service
         - system-update-user-username
         - system-update-user-password

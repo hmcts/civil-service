@@ -14,7 +14,7 @@ properties([
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
     string(name: 'CIVIL_SERVICE_URL', defaultValue: 'http://civil-service-aat.service.core-compute-aat.internal',
-      description: 'The URL of unspec service'),
+      description: 'The URL of civil service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -42,7 +42,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 }
 
 def secrets = [
-  'unspec-${env}': [
+  'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET')
   ]
 ]

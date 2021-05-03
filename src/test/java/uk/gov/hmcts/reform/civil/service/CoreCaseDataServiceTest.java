@@ -50,7 +50,7 @@ class CoreCaseDataServiceTest {
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
-    private static final String CASE_TYPE = "UNSPECIFIED_CLAIMS";
+    private static final String CASE_TYPE = "CIVIL";
 
     @MockBean
     private SystemUpdateUserConfiguration userConfig;

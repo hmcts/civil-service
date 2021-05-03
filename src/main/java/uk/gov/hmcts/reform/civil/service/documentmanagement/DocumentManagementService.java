@@ -35,7 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @RequiredArgsConstructor
 public class DocumentManagementService {
 
-    public static final String UNSPEC = "Unspec";
+    public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
     private final DocumentUploadClientApi documentUploadClientApi;
@@ -77,7 +77,7 @@ public class DocumentManagementService {
                 .documentType(pdf.getDocumentType())
                 .createdDatetime(LocalDateTime.now())
                 .documentSize(document.size)
-                .createdBy(UNSPEC)
+                .createdBy(CREATED_BY)
                 .build();
         } catch (Exception ex) {
             log.error("Failed uploading file {}", originalFileName, ex);

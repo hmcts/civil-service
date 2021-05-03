@@ -3,7 +3,7 @@ spring:
     propertiesvolume:
       enabled: true
       prefixed: false
-      paths: /mnt/secrets/unspec
+      paths: /mnt/secrets/civil
       aliases:
         microservicekey-civil-service: idam.s2s-auth.totp_secret
         system-update-user-password: unspecified.system-update.password
@@ -15,7 +15,7 @@ spring:
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         cmc-db-password: CMC_DB_PASSWORD
         docmosis-api-key: docmosis.tornado.key
-        unspec-idam-client-secret: idam.client.secret
+        civil-idam-client-secret: idam.client.secret
         gov-notify-api-key: GOV_NOTIFY_API_KEY
         sendgrid-api-key: SENDGRID_API_KEY
         robotics-notification-sender: robotics.notification.sender

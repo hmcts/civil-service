@@ -52,7 +52,7 @@ fees:
 payments:
   api:
     site_id: AAA7
-    service: UNSPEC
+    service: CIVIL
 
 idam:
   s2s-auth:
@@ -152,7 +152,7 @@ idam:
     url: http://localhost:4502
     totp_secret: AABBCCDDEEFFGGHH
   client:
-    id: unspec
+    id: civil
     redirect_uri: https://localhost:9000/oauth2/callback
     secret: OOOOOOOOOOOOOOOO
 

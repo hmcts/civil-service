@@ -30,7 +30,7 @@ public class CaseDocumentBuilder {
             .documentSize(56975)
             .createdDatetime(of(2020, 7, 16, 14, 5, 15, 550439))
             .documentType(documentType)
-            .createdBy("Unspec")
+            .createdBy("Civil")
             .documentName(documentName)
             .build();
     }
