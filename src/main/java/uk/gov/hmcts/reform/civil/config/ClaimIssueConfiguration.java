@@ -10,7 +10,7 @@ public class ClaimIssueConfiguration {
 
     private final String responsePackLink;
 
-    public ClaimIssueConfiguration(@Value("${unspecified.response-pack-url}") String responsePackLink) {
+    public ClaimIssueConfiguration(@Value("${civil.response-pack-url}") String responsePackLink) {
         this.responsePackLink = responsePackLink;
     }
 }

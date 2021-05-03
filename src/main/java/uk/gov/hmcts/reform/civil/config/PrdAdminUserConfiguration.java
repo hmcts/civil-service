@@ -11,8 +11,8 @@ public class PrdAdminUserConfiguration {
     private final String username;
     private final String password;
 
-    public PrdAdminUserConfiguration(@Value("${unspecified.prd-admin.username}") String username,
-                                     @Value("${unspecified.prd-admin.password}") String password) {
+    public PrdAdminUserConfiguration(@Value("${civil.prd-admin.username}") String username,
+                                     @Value("${civil.prd-admin.password}") String password) {
         this.username = username;
         this.password = password;
     }

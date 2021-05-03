@@ -35,7 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @RequiredArgsConstructor
 public class DocumentManagementService {
 
-    public static final String CREATED_BY = "Civil";
+    public static final String CREATED_BY = "Unspec"; //TODO: CMC-1545
     protected static final String FILES_NAME = "files";
 
     private final DocumentUploadClientApi documentUploadClientApi;

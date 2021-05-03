@@ -113,7 +113,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private CreateClaimCallbackHandler handler;
 
-    @Value("${unspecified.response-pack-url}")
+    @Value("${civil.response-pack-url}")
     private String responsePackLink;
 
     @Nested

@@ -11,8 +11,8 @@ public class SystemUpdateUserConfiguration {
     private final String userName;
     private final String password;
 
-    public SystemUpdateUserConfiguration(@Value("${unspecified.system-update.username}") String userName,
-        @Value("${unspecified.system-update.password}") String password) {
+    public SystemUpdateUserConfiguration(@Value("${civil.system-update.username}") String userName,
+        @Value("${civil.system-update.password}") String password) {
         this.userName = userName;
         this.password = password;
     }
