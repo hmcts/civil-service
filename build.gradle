@@ -173,7 +173,7 @@ task checkDependenciesIntegrity(type: Exec, description: 'Checks integrity of Ya
 
 task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
   commandLine './bin/wait-for.sh', System.env.URL
-  commandLine './bin/wait-for.sh', System.env.UNSPEC_SERVICE_URL
+  commandLine './bin/wait-for.sh', System.env.CIVIL_SERVICE_URL
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
@@ -362,11 +362,11 @@ dependencies {
 
 }
 
-mainClassName = 'uk.gov.hmcts.reform.unspec.Application'
+mainClassName = 'uk.gov.hmcts.reform.civil.Application'
 
 bootJar {
   getArchiveFileName().set(provider {
-    'unspec-service.jar'
+    'civil-service.jar'
   })
 
   manifest {
@@ -398,7 +398,7 @@ pact {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
     if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
-      excludes = ['unspec_service-Idam_api']
+      excludes = ['civil_service-Idam_api']
       pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
     }
     tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']

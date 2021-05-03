@@ -3,19 +3,19 @@ spring:
     propertiesvolume:
       enabled: true
       prefixed: false
-      paths: /mnt/secrets/unspec
+      paths: /mnt/secrets/civil
       aliases:
-        microservicekey-unspec-service: idam.s2s-auth.totp_secret
-        system-update-user-password: unspecified.system-update.password
-        system-update-user-username: unspecified.system-update.username
-        cross-access-user-password: unspecified.cross-access.password
-        cross-access-user-username: unspecified.cross-access.username
-        prd-admin-user-password: unspecified.prd-admin.password
-        prd-admin-user-username: unspecified.prd-admin.username
+        microservicekey-civil-service: idam.s2s-auth.totp_secret
+        system-update-user-password: civil.system-update.password
+        system-update-user-username: civil.system-update.username
+        cross-access-user-password: civil.cross-access.password
+        cross-access-user-username: civil.cross-access.username
+        prd-admin-user-password: civil.prd-admin.password
+        prd-admin-user-username: civil.prd-admin.username
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         cmc-db-password: CMC_DB_PASSWORD
         docmosis-api-key: docmosis.tornado.key
-        unspec-idam-client-secret: idam.client.secret
+        civil-idam-client-secret: idam.client.secret
         gov-notify-api-key: GOV_NOTIFY_API_KEY
         sendgrid-api-key: SENDGRID_API_KEY
         robotics-notification-sender: robotics.notification.sender
