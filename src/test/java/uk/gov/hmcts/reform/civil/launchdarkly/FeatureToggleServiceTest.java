@@ -21,7 +21,7 @@ class FeatureToggleServiceTest {
 
     private static final String FAKE_FEATURE = "fake-feature";
     private static final String ENVIRONMENT = "fake-env";
-    private static final LDUser LD_USER = new LDUser.Builder("civil-unspec-service")
+    private static final LDUser LD_USER = new LDUser.Builder("civil-service")
         .custom("timestamp", String.valueOf(System.currentTimeMillis()))
         .custom("environment", ENVIRONMENT).build();
 

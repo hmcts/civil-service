@@ -41,7 +41,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/unspec-service` directory)
+Run the distribution (created in `build/install/civil-service` directory)
 by executing the following command:
 
 ```bash

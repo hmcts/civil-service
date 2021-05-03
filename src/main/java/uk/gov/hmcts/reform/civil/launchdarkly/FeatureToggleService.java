@@ -37,7 +37,7 @@ public class FeatureToggleService {
     }
 
     public LDUser.Builder createLDUser() {
-        return new LDUser.Builder("civil-unspec-service")
+        return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
             .custom("environment", environment);
     }

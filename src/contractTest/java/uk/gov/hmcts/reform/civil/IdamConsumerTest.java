@@ -33,7 +33,7 @@ public class IdamConsumerTest {
     private static final String IDAM_DETAILS_URL = "/details";
     private static final String IDAM_OPENID_TOKEN_URL = "/o/token";
 
-    @Pact(provider = "Idam_api", consumer = "unspec_service")
+    @Pact(provider = "Idam_api", consumer = "civil_service")
     public RequestResponsePact executeGetUserDetailsAndGet200(PactDslWithProvider builder) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
@@ -84,7 +84,7 @@ public class IdamConsumerTest {
         assertThat(rolesArr.get(0).toString()).isNotBlank();
     }
 
-    @Pact(provider = "Idam_api", consumer = "unspec_service")
+    @Pact(provider = "Idam_api", consumer = "civil_service")
     public RequestResponsePact executeGetIdamAccessTokenAndGet200(PactDslWithProvider builder) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
@@ -152,7 +152,7 @@ public class IdamConsumerTest {
 
     private static String createRequestBody() {
         return "{\"grant_type\": \"password\","
-            + " \"client_id\": \"unspec_service\","
+            + " \"client_id\": \"civil_service\","
             + " \"client_secret\": \"some_client_secret\","
             + " \"redirect_uri\": \"/oauth2redirect\","
             + " \"scope\": \"openid roles profile\","

@@ -15,7 +15,7 @@ management:
 
 spring:
   application:
-    name: unspec-service
+    name: civil-service
   cache:
     cache-names: userInfoCache
     caffeine:
@@ -56,7 +56,7 @@ payments:
 
 idam:
   s2s-auth:
-    microservice: unspec_service
+    microservice: civil_service
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"

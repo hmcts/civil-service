@@ -5,7 +5,7 @@ spring:
       prefixed: false
       paths: /mnt/secrets/unspec
       aliases:
-        microservicekey-unspec-service: idam.s2s-auth.totp_secret
+        microservicekey-civil-service: idam.s2s-auth.totp_secret
         system-update-user-password: unspecified.system-update.password
         system-update-user-username: unspecified.system-update.username
         cross-access-user-password: unspecified.cross-access.password

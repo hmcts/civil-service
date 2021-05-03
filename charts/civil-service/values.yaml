@@ -18,7 +18,7 @@ java:
   aadIdentityName: unspec
   environment:
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
-    IDAM_CLIENT_ID: unspec-service
+    IDAM_CLIENT_ID: civil-service
     IDAM_CLIENT_REDIRECT_URI: https://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/oauth2/callback
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_WEB_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
@@ -53,7 +53,7 @@ java:
       resourceGroup: unspec
       secrets:
         - unspec-idam-client-secret
-        - microservicekey-unspec-service
+        - microservicekey-civil-service
         - system-update-user-username
         - system-update-user-password
         - cross-access-user-username
