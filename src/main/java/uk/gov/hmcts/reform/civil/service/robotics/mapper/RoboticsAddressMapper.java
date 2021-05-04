@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
 import java.util.List;
 import java.util.Optional;

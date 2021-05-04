@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.launchdarkly;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.ArrayList;
 import java.util.List;

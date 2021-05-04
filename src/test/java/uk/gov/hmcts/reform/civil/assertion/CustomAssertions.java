@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.assertion;
 
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
 import java.math.BigDecimal;
 import java.util.List;

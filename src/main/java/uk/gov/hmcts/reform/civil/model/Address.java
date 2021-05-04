@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 

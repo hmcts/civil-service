@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
+import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
 import java.util.List;
 
