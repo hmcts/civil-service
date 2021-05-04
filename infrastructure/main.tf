@@ -26,6 +26,10 @@ locals {
   vaultName = "${var.product}-${var.env}"
 }
 
+data "azurerm_key_vault" "civil_key_vault" {
+  name = local.vaultName
+  resource_group_name = "${var.product}-${var.component}-${var.env}"
+}
 
 resource "azurerm_application_insights" "appinsights" {
   name                = "${var.product}-${var.component}-${var.env}"
@@ -48,3 +52,8 @@ data "azurerm_key_vault_secret" "send_grid_api_key" {
   name         = "hmcts-damages-api-key"
 }
 
+resource "azurerm_key_vault_secret" "sendgrid_api_key" {
+  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+  name         = "sendgrid-api-key"
+  value        = data.azurerm_key_vault_secret.send_grid_api_key.value
+}
