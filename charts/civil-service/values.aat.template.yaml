@@ -28,11 +28,11 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   keyVaults:
-    civil:
+    unspec:
       resourceGroup: civil
       secrets:
         - civil-idam-client-secret
-        - microservicekey-civil-service
+        - microservicekey-unspec-service
         - system-update-user-username
         - system-update-user-password
         - cross-access-user-username

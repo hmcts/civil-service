@@ -31,7 +31,7 @@ java:
       resourceGroup: civil
       secrets:
         - civil-idam-client-secret
-        - microservicekey-civil-service
+        - microservicekey-unspec-service
         - system-update-user-username
         - system-update-user-password
         - cross-access-user-username
