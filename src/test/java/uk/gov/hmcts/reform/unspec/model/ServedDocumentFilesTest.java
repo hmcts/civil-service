@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.unspec.model.documents.Document;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 
 class ServedDocumentFilesTest {
 
@@ -14,7 +15,7 @@ class ServedDocumentFilesTest {
         @Test
         void shouldReturnEmptyList_WhenOnlyDocument() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocument(Document.builder().build())
+                .particularsOfClaimDocumentNew(wrapElements(Document.builder().build()))
                 .build();
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
@@ -39,12 +40,13 @@ class ServedDocumentFilesTest {
         @Test
         void shouldReturnMoreThanOneError_WhenBothParticularsOfClaimFieldsAreNotNull() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocument(Document.builder().build())
+                .particularsOfClaimDocumentNew(wrapElements(Document.builder().build()))
                 .particularsOfClaimText("Some string")
                 .build();
 
             assertThat(servedDocumentFiles.getErrors())
-                .containsOnly("More than one Particulars of claim details added");
+                .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "
+                                  + "of claim text in the field provided. You cannot do both.");
         }
     }
 }

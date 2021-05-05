@@ -16,6 +16,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 
 @Service
@@ -28,7 +29,8 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
+            callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim,
+            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimBackwardsCompatible,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
