@@ -57,7 +57,7 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimCreated().build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimDetailsNotified().build())
                 .request(CallbackRequest.builder().eventId(ACKNOWLEDGE_CLAIM.name()).build())
                 .build();
 
@@ -77,7 +77,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, CaseDataBuilder.builder()
-                    .atStateClaimCreated()
+                    .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
@@ -98,7 +98,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, CaseDataBuilder.builder()
-                    .atStateClaimCreated()
+                    .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
@@ -119,7 +119,7 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimCreated()
+                .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
@@ -145,7 +145,7 @@ class NoOngoingBusinessProcessAspectTest {
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimCreated().build())
+                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimDetailsNotified().build())
                 .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
                 .build();
 
@@ -165,7 +165,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, CaseDataBuilder.builder()
-                    .atStateClaimCreated()
+                    .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build())
                 .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())

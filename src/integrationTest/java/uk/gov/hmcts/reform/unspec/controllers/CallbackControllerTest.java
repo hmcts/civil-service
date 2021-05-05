@@ -17,7 +17,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     public void shouldReturnNotFoundWhenCallbackHandlerIsNotImplemented() {
         CallbackRequest callbackRequest = CallbackRequest.builder()
             .eventId(CREATE_CLAIM.name())
-            .caseDetails(CaseDetailsBuilder.builder().atStateClaimCreated().build())
+            .caseDetails(CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build())
             .build();
 
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, "invalid-callback-type")

@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.unspec.service.flowstate;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
@@ -12,44 +10,60 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseProceedsInCaseman;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDetailsNotified;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDiscontinued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimTakenOffline;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimWithdrawn;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.failToNotifyClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.claimSubmitted;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.counterClaimAfterAcknowledge;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.counterClaimAfterNotifyDetails;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullAdmission;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullAdmissionAfterAcknowledge;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullAdmissionAfterNotifyDetails;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefence;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefenceAfterAcknowledge;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefenceAfterNotifyDetails;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.notificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.partAdmission;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.partAdmissionAfterAcknowledge;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.partAdmissionAfterNotifyDetails;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.paymentSuccessful;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingCaseIssued;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentAcknowledgeClaim;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentCounterClaim;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullAdmission;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentFullDefence;
-import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.respondentPartAdmission;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaff;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 
 class FlowPredicateTest {
 
     @Nested
-    class ClaimIssuedPredicate {
+    class ClaimSubmittedPredicate {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
-            assertTrue(pendingCaseIssued.test(caseData));
+        void shouldReturnTrue_whenCaseDataAtPendingClaimIssuedState() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            assertTrue(claimSubmitted.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtDraftState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            assertFalse(pendingCaseIssued.test(caseData));
+            assertFalse(claimSubmitted.test(caseData));
         }
     }
 
@@ -58,7 +72,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             assertTrue(claimNotified.test(caseData));
         }
 
@@ -74,14 +88,30 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             assertTrue(claimDetailsNotified.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             assertFalse(claimDetailsNotified.test(caseData));
+        }
+    }
+
+    @Nested
+    class ClaimDetailsNotifiedTimeExtensionPredicate {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtIssuedState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
+            assertTrue(claimDetailsNotifiedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseDetailsNotification() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            assertFalse(claimDetailsNotifiedTimeExtension.test(caseData));
         }
     }
 
@@ -90,14 +120,13 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
-
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
             assertTrue(respondent1NotRepresented.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             assertFalse(respondent1NotRepresented.test(caseData));
         }
     }
@@ -107,14 +136,13 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant().build();
-
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRegisteredDefendant().build();
             assertTrue(respondent1OrgNotRegistered.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             assertFalse(respondent1OrgNotRegistered.test(caseData));
         }
     }
@@ -130,7 +158,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtDraftState() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             assertFalse(paymentFailed.test(caseData));
         }
     }
@@ -146,17 +174,33 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtDraftState() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             assertFalse(paymentSuccessful.test(caseData));
         }
     }
 
     @Nested
-    class CcdStateClaimIssuedPredicate {
+    class PendingClaimIssuedPredicate {
 
         @Test
-        void shouldReturnTrue_whenCaseDataIsAtAwaitingCaseNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+        void shouldReturnTrue_whenCaseDataIsAtPendingClaimIssuedState() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            assertTrue(pendingClaimIssued.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtDraftState() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+            assertFalse(pendingClaimIssued.test(caseData));
+        }
+    }
+
+    @Nested
+    class ClaimIssuedPredicate {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataIsAtClaimIssuedState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             assertTrue(claimIssued.test(caseData));
         }
 
@@ -168,18 +212,34 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class RespondentAcknowledgedClaimPredicate {
+    class NotificationAcknowledgedPredicate {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
-            assertTrue(respondentAcknowledgeClaim.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            assertTrue(notificationAcknowledged.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClaimCreated() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
-            assertFalse(respondentAcknowledgeClaim.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            assertFalse(notificationAcknowledged.test(caseData));
+        }
+    }
+
+    @Nested
+    class NotificationAcknowledgedTimeExtensionPredicate {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
+            assertTrue(notificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimCreated() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            assertFalse(notificationAcknowledgedTimeExtension.test(caseData));
         }
     }
 
@@ -189,19 +249,31 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateFullDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-            assertTrue(respondentFullDefence.test(caseData));
+            assertTrue(fullDefence.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyDetails() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyDetails().build();
+            assertTrue(fullDefenceAfterNotifyDetails.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            assertTrue(fullDefenceAfterAcknowledge.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClosed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDiscontinued().build();
-            assertFalse(respondentFullDefence.test(caseData));
+            assertFalse(fullDefence.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
-            CaseData caseData = CaseDataBuilder.builder().atStateCaseProceedsInCaseman().build();
-            assertFalse(respondentFullDefence.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+            assertFalse(fullDefence.test(caseData));
         }
     }
 
@@ -211,13 +283,25 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
-            assertTrue(respondentFullAdmission.test(caseData));
+            assertTrue(fullAdmission.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullAdmissionAfterNotifyDetails() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionAfterNotifyDetails().build();
+            assertTrue(fullAdmissionAfterNotifyDetails.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullAdmissionAfterAcknowledge() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
+            assertTrue(fullAdmissionAfterAcknowledge.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
-            CaseData caseData = CaseDataBuilder.builder().atStateCaseProceedsInCaseman().build();
-            assertFalse(respondentFullAdmission.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+            assertFalse(fullAdmission.test(caseData));
         }
     }
 
@@ -227,13 +311,25 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStatePartAdmission() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
-            assertTrue(respondentPartAdmission.test(caseData));
+            assertTrue(partAdmission.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStatePartAdmissionAfterNotifyDetails() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionAfterNotifyDetails().build();
+            assertTrue(partAdmissionAfterNotifyDetails.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStatePartAdmissionAfterAcknowledge() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
+            assertTrue(partAdmissionAfterAcknowledge.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
-            CaseData caseData = CaseDataBuilder.builder().atStateCaseProceedsInCaseman().build();
-            assertFalse(respondentPartAdmission.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+            assertFalse(partAdmission.test(caseData));
         }
     }
 
@@ -243,13 +339,25 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStatePartAdmission() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaim().build();
-            assertTrue(respondentCounterClaim.test(caseData));
+            assertTrue(counterClaim.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStatePartAdmissionAfterNotifyDetails() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
+            assertTrue(counterClaimAfterNotifyDetails.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStatePartAdmissionAfterAcknowledge() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaim().build();
+            assertTrue(counterClaimAfterAcknowledge.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
-            CaseData caseData = CaseDataBuilder.builder().atStateCaseProceedsInCaseman().build();
-            assertFalse(respondentCounterClaim.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+            assertFalse(counterClaim.test(caseData));
         }
     }
 
@@ -270,77 +378,58 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class WithdrawnClaimPredicate {
-
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class)
-        void shouldReturnTrue_whenCaseDataAtStateClaimWithdrawn(FlowState.Main flowState) {
-            CaseData caseData = CaseDataBuilder.builder().withdrawClaimFrom(flowState).build();
-            assertTrue(claimWithdrawn.test(caseData));
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class, mode = EnumSource.Mode.EXCLUDE, names = {"CLAIM_WITHDRAWN"})
-        void shouldReturnFalse_whenCaseDataIsNotAtStateClaimWithdrawn(FlowState.Main flowState) {
-            CaseData caseData = CaseDataBuilder.builder().atState(flowState).build();
-            assertFalse(claimWithdrawn.test(caseData));
-        }
-    }
-
-    @Nested
-    class DiscontinuedClaimPredicate {
-
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class)
-        void shouldReturnTrue_whenCaseDataAtStateClaimDiscontinued(FlowState.Main flowState) {
-            CaseData caseData = CaseDataBuilder.builder().discontinueClaimFrom(flowState).build();
-            assertTrue(claimDiscontinued.test(caseData));
-        }
-
-        @ParameterizedTest
-        @EnumSource(
-            value = FlowState.Main.class,
-            mode = EnumSource.Mode.EXCLUDE,
-            names = {
-                "TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE",
-                "CLAIM_DISCONTINUED"
-            }
-        )
-        void shouldReturnFalse_whenCaseDataIsNotAtStateClaimDiscontinued(FlowState.Main flowState) {
-            CaseData caseData = CaseDataBuilder.builder().atState(flowState).build();
-            assertFalse(claimDiscontinued.test(caseData));
-        }
-    }
-
-    @Nested
-    class ClaimTakenOffline {
+    class ClaimTakenOfflineByStaff {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateProceedsOffline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
-            assertTrue(claimTakenOffline.test(caseData));
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+
+            assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimNotified().build();
+            assertTrue(takenOfflineByStaffAfterClaimNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimDetailsNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified().build();
+            assertTrue(takenOfflineByStaffAfterClaimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimDetailsNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
+                .build();
+            assertTrue(takenOfflineByStaffAfterClaimDetailsNotifiedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterNotificationAcknowledged()
+                .build();
+            assertTrue(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterNotificationAcknowledgedExtnesion() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension().build();
+            assertTrue(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterDefendantResponse() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterDefendantResponse().build();
+            assertTrue(takenOfflineByStaff.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataNotAtStateProceedsOffline() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            assertFalse(claimTakenOffline.test(caseData));
-        }
-    }
-
-    @Nested
-    class ClaimProceedsInCaseman {
-
-        @Test
-        void shouldReturnTrue_whenCaseDataAtStateCaseProceedsInCaseman() {
-            CaseData caseData = CaseDataBuilder.builder().atStateCaseProceedsInCaseman().build();
-            assertTrue(caseProceedsInCaseman.test(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenCaseDataNotAtStateProceedsOffline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            assertFalse(caseProceedsInCaseman.test(caseData));
+            assertFalse(takenOfflineByStaff.test(caseData));
         }
     }
 
@@ -348,32 +437,46 @@ class FlowPredicateTest {
     class ClaimDismissed {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimDismissed() {
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
-            assertTrue(caseDismissed.test(caseData));
+            assertTrue(caseDismissedAfterDetailNotified.test(caseData));
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            assertFalse(caseDismissed.test(caseData));
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .claimDismissedDate(LocalDateTime.now())
+                .build();
+            assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
         }
-    }
-
-    @Nested
-    class ClaimDismissedAfterClaimAcknowledged {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledgeWithClaimDismissedDate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge()
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
+                .claimDismissedDate(LocalDateTime.now())
+                .build();
+            assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .claimDismissedDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
         void shouldReturnFalse_whenCaseDataAtStateClaimAcknowledge() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
     }
@@ -400,13 +503,13 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataClaimDismissedPastClaimNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline().build();
-            assertTrue(failToNotifyClaim.test(caseData));
+            assertTrue(pastClaimNotificationDeadline.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateAwaitingCaseNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
-            assertFalse(failToNotifyClaim.test(caseData));
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            assertFalse(pastClaimNotificationDeadline.test(caseData));
         }
     }
 
@@ -423,7 +526,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             assertFalse(pastClaimDetailsNotificationDeadline.test(caseData));
         }
     }

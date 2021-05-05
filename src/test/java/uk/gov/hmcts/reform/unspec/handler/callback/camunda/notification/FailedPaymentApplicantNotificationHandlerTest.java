@@ -47,7 +47,7 @@ class FailedPaymentApplicantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldNotifyClaimantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);

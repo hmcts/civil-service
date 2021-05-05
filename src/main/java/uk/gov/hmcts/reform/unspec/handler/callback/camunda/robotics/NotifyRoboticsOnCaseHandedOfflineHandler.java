@@ -68,7 +68,6 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
             Set<ValidationMessage> errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             if (errors.isEmpty()) {
                 roboticsNotificationService.notifyRobotics(caseData);
-                caseData = caseData.toBuilder().takenOfflineDate(time.now()).build();
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),
@@ -78,8 +77,6 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

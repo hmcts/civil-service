@@ -60,7 +60,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder().takenOfflineDate(time.now()).build();
+        CaseData caseData = callbackParams.getCaseData().toBuilder().takenOfflineByStaffDate(time.now()).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

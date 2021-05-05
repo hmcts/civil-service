@@ -106,7 +106,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldUpdateBusinessProcess_whenInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -131,7 +131,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 

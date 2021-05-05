@@ -118,7 +118,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateNotificationAcknowledgedTimeExtension()
                 .atStateRespondentFullAdmission()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
@@ -258,7 +258,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateNotificationAcknowledgedTimeExtension()
                 .atStateRespondentPartAdmission()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
@@ -400,7 +400,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentCounterClaimWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateNotificationAcknowledgedTimeExtension()
                 .atStateRespondentCounterClaim()
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
@@ -541,7 +541,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithFullDefenceNotProceedsWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateNotificationAcknowledgedTimeExtension()
                 .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                 .build();
             Event expectedDefenceFiled = Event.builder()
@@ -710,7 +710,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithFullDefenceProceedsWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateExtensionRequested()
+                .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .build();
             Event expectedDefenceFiled = Event.builder()
@@ -810,10 +810,11 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedReplyToDefence);
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .containsExactlyInAnyOrder(
-                    expectedDirectionsQuestionnaireRespondent,
-                    expectedDirectionsQuestionnaireApplicant);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
+                .asList().containsExactlyInAnyOrder(
+                expectedDirectionsQuestionnaireRespondent,
+                expectedDirectionsQuestionnaireApplicant
+            );
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -904,10 +905,11 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedReplyToDefence);
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .containsExactlyInAnyOrder(
-                    expectedDirectionsQuestionnaireRespondent,
-                    expectedDirectionsQuestionnaireApplicant);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
+                .asList().containsExactlyInAnyOrder(
+                expectedDirectionsQuestionnaireRespondent,
+                expectedDirectionsQuestionnaireApplicant
+            );
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
@@ -923,11 +925,11 @@ class EventHistoryMapperTest {
 
     @ParameterizedTest
     @EnumSource(value = FlowState.Main.class, mode = EnumSource.Mode.EXCLUDE, names = {
-        "RESPONDENT_FULL_ADMISSION",
-        "RESPONDENT_PART_ADMISSION",
-        "RESPONDENT_COUNTER_CLAIM",
-        "PROCEEDS_OFFLINE_UNREPRESENTED_DEFENDANT",
-        "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+        "FULL_ADMISSION",
+        "PART_ADMISSION",
+        "COUNTER_CLAIM",
+        "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
+        "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT",
         "FULL_DEFENCE_NOT_PROCEED",
         "FULL_DEFENCE_PROCEED"
     })

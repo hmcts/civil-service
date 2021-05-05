@@ -67,7 +67,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcessAndAddNotificationDeadline_when14DaysIsBeforeThe4MonthDeadline() {
             LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .claimNotificationDeadline(claimNotificationDeadline)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
@@ -86,7 +86,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsAfterThe4MonthDeadline() {
             LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .claimNotificationDeadline(claimNotificationDeadline)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
@@ -98,7 +98,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsSameDayAs4MonthDeadline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .claimNotificationDeadline(deadline)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
@@ -118,7 +118,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
