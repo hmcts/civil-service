@@ -59,7 +59,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim pending")
-            .confirmationBody("Once your payment is confirmed your claim will be processed ready to be issued. "
+            .confirmationBody("<br />Once your payment is confirmed your claim will be processed ready to be issued. "
                                   + "Wait for us to contact you.")
             .build();
     }
