@@ -427,7 +427,7 @@ public class CaseDataBuilder {
         applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;
         applicantSolicitor1CheckEmail = CorrectEmail.builder()
-            .email("civilunspecified@gmail.com")
+            .email("hmcts.civil@gmail.com")
             .correct(YES)
             .build();
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
