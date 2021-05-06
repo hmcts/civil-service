@@ -448,7 +448,7 @@ public class CaseDataBuilder {
             .version("version 1")
             .build();
         paymentReference = "some reference";
-        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
+        respondentSolicitor1EmailAddress = "hmcts.civil@gmail.com";
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal().build();
         submittedDate = LocalDateTime.now();
         return this;
@@ -615,10 +615,10 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY").build())
             .build();
-        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
+        respondentSolicitor1EmailAddress = "hmcts.civil@gmail.com";
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         submittedDate = LocalDateTime.now();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("civilunspecified@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
         return this;
     }
 
