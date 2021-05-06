@@ -159,7 +159,6 @@ public class StateFlowEngine {
             .state(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
             .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
             .state(FULL_ADMISSION)
             .state(PART_ADMISSION)
             .state(COUNTER_CLAIM)

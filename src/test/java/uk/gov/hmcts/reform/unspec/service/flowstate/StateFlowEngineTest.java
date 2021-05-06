@@ -645,28 +645,6 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflinePastClaimDismissDeadline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed()
-                .takenOfflineByStaffDate(LocalDateTime.now())
-                .build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(),
-                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName(),
-                    TAKEN_OFFLINE_BY_STAFF.fullName()
-                );
-        }
-
-        @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflinePastClaimNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline()
                 .takenOfflineByStaffDate(LocalDateTime.now())
