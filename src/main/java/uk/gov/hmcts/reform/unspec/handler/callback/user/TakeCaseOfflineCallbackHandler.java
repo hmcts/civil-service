@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.Time;
 
@@ -32,7 +33,7 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::setTakenOfflineDate
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit
         );
     }
 
@@ -41,9 +42,10 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse setTakenOfflineDate(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .takenOfflineDate(time.now())
+            .businessProcess(BusinessProcess.ready(TAKE_CASE_OFFLINE))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
