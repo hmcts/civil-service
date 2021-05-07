@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 
 import java.util.List;
@@ -86,5 +87,16 @@ public abstract class CallbackHandler {
      */
     protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    /**
+     * Returns empty submitted callback response. Used by events that set business process to ready, but doesn't have
+     * any submitted callback logic (making callback is still required to trigger EventEmitterAspect)
+     *
+     * @param callbackParams This parameter is required as this is passed as reference for execute method in CallBack
+     * @return empty submitted callback response
+     */
+    protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
+        return SubmittedCallbackResponse.builder().build();
     }
 }
