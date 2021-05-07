@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
+import uk.gov.hmcts.reform.unspec.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DeadlineExtensionValidator;
 
@@ -41,6 +43,8 @@ import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.END_OF_BUSI
 
 @SpringBootTest(classes = {
     InformAgreedExtensionDateCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     DeadlineExtensionValidator.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
@@ -50,6 +54,9 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Autowired
     private InformAgreedExtensionDateCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
@@ -144,7 +151,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class SubmittedCallback {
 
-        private static final String BODY = "<br />What happens next.%n%n You must respond to the claimant by %s";
+        private static final String BODY = "<br />What happens next%n%n You must respond to the claimant by %s";
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
@@ -159,7 +166,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response).isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Extension deadline submitted")
-                    .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT)))
+                    .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

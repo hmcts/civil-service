@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValidator;
 
@@ -38,9 +39,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS);
     private static final String CONFIRMATION_SUMMARY = "<br />The defendant legal representative's organisation has"
-        + " been notified of the claim details.\n\n"
+        + " been notified of the claim details.%n%n"
         + "They must respond by %s. Your account will be updated and you will be sent an email.";
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -82,7 +84,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
 
-        String body = format(CONFIRMATION_SUMMARY, formattedDeadline);
+        String body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(

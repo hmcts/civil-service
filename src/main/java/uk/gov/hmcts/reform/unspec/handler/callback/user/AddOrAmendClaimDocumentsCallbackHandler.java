@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.util.Collections;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_D
 public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_OR_AMEND_CLAIM_DOCUMENTS);
+    private final ExitSurveyContentService exitSurveyContentService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,7 +48,7 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
                 "# Documents uploaded successfully%n## Claim number: %s",
                 callbackParams.getCaseData().getLegacyCaseReference()
             ))
-            .confirmationBody("<br />")
+            .confirmationBody(exitSurveyContentService.applicantSurvey())
             .build();
     }
 }

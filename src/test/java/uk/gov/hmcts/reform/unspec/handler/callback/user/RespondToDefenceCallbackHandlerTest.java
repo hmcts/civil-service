@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
+import uk.gov.hmcts.reform.unspec.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.unspec.model.dq.Witnesses;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
@@ -57,6 +59,8 @@ import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToDefenceCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
@@ -69,6 +73,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RespondToDefenceCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @Nested
     class AboutToStartCallback {
@@ -361,7 +368,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# You've chosen to proceed with the claim%n## Claim number: 000DC001"))
                     .confirmationBody(format(
                         "<br />We'll review the case and contact you to tell you what to do next.%n%n"
-                            + "[Download directions questionnaire](http://www.google.com)"))
+                            + "[Download directions questionnaire](http://www.google.com)"
+                    ) + exitSurveyContentService.applicantSurvey())
                     .build());
         }
 
@@ -379,7 +387,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You've chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000DC001"))
-                    .confirmationBody("<br />")
+                    .confirmationBody(exitSurveyContentService.applicantSurvey())
                     .build());
         }
     }

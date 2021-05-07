@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESUBMIT_CLAIM);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -59,8 +61,10 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim pending")
-            .confirmationBody("<br />Once your payment is confirmed your claim will be processed ready to be issued. "
-                                  + "Wait for us to contact you.")
+            .confirmationBody("## What happens next %n "
+                                  + "You claim will be processed. Wait for us to contact you."
+                                  + exitSurveyContentService.applicantSurvey()
+            )
             .build();
     }
 }

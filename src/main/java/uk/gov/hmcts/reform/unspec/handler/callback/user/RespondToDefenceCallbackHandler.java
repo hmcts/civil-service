@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
+    private final ExitSurveyContentService exitSurveyContentService;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -124,10 +126,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         if (proceeding == YES) {
             return format(
                 "<br />We'll review the case and contact you to tell you what to do next.%n%n"
-                    + "[Download directions questionnaire](%s)",
-                dqLink
-            );
+                    + "[Download directions questionnaire](%s)", dqLink)
+                + exitSurveyContentService.applicantSurvey();
         }
-        return "<br />";
+        return exitSurveyContentService.applicantSurvey();
     }
 }

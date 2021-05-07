@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
@@ -44,6 +45,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -133,8 +135,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         String body = format(
             "<br />The claimant has until %s to proceed. We will let you know when they respond.",
-            formatLocalDateTime(responseDeadline, DATE)
-        );
+            formatLocalDateTime(responseDeadline, DATE))
+            + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
