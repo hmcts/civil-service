@@ -21,10 +21,13 @@ import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
+import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.unspec.model.dq.Expert;
 import uk.gov.hmcts.reform.unspec.model.dq.Experts;
 import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
+import uk.gov.hmcts.reform.unspec.model.dq.Witness;
+import uk.gov.hmcts.reform.unspec.model.dq.Witnesses;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
@@ -34,6 +37,7 @@ import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -90,6 +94,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().plusYears(5)).build()))
@@ -112,6 +117,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().minusYears(5)).build()))
@@ -134,6 +140,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().plusDays(5)).build()))
@@ -159,6 +166,67 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenUnavailableDatesNotRequired() {
+            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
+            caseDataBuilder
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(hearing).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventCallbackValidateWitnesses {
+
+        private static final String PAGE_ID = "witnesses";
+
+        @Test
+        void shouldReturnError_whenWitnessRequiredAndNullDetails() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessNotRequired() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }

@@ -14,20 +14,18 @@ import uk.gov.hmcts.reform.unspec.enums.YesOrNo;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
-import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
-import uk.gov.hmcts.reform.unspec.model.common.Element;
 import uk.gov.hmcts.reform.unspec.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
+import uk.gov.hmcts.reform.unspec.validation.interfaces.WitnessesValidator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
@@ -37,7 +35,7 @@ import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator {
+public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
     private final UnavailableDateValidator unavailableDateValidator;
@@ -55,6 +53,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateApplicantDqExperts,
+            callbackKey(MID, "witnesses"), this::validateApplicantDqWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -63,9 +62,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<Element<UnavailableDate>> unavailableDates =
-            ofNullable(caseData.getApplicant1DQ().getHearing().getUnavailableDates()).orElse(emptyList());
-        List<String> errors = unavailableDateValidator.validate(unavailableDates);
+        Hearing hearing = caseData.getApplicant1DQ().getHearing();
+        List<String> errors = unavailableDateValidator.validate(hearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
