@@ -77,11 +77,11 @@ xui-webapp:
     image: hmctspublic.azurecr.io/xui/webapp:prod-816d45c5
     ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
     environment:
-      HEALTH_CCD_COMPONENT_API: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal/health
-      HEALTH_CCD_DATA_API: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal/health
+      HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
+      HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-aat.service.core-compute-aat.internal/health
-      SERVICES_CCD_COMPONENT_API: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal
-      SERVICES_CCD_DATA_STORE_API: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
+      SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
+      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-aat.service.core-compute-aat.internal
       JURISDICTIONS: DIVORCE,PROBATE,FR,PUBLICLAW,IA,SSCS,EMPLOYMENT,CIVIL
       SERVICES_IDAM_ISS_URL: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
@@ -102,10 +102,10 @@ ccd:
       enabled: false
 
   global:
-    ccdApiGatewayIngress: http://civil-service-gateway-staging-aat.service.core-compute-aat.internal
+    ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
     ccdDataStoreUrl: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
     ccdDefinitionStoreUrl: http://civil-service-definition-store-staging-aat.service.core-compute-aat.internal
-    ccdUserProfileUrl: http://civil-service-user-profile-staging-aat.service.core-compute-aat.internal
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -119,7 +119,7 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
-      ingressHost: civil-service-gateway-staging-aat.service.core-compute-aat.internal
+      ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
       keyVaults: []
   ccd-data-store-api:
@@ -149,7 +149,7 @@ ccd:
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
       keyVaults: []
-      ingressHost: civil-service-user-profile-staging-aat.service.core-compute-aat.internal
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
   postgresql:
     persistence:
