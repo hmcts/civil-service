@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
@@ -72,9 +73,9 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Claim pending")
-                    .confirmationBody("## What happens next %n "
-                                          + "You claim will be processed. Wait for us to contact you."
-                                          + exitSurveyContentService.applicantSurvey()
+                    .confirmationBody(
+                        format("## What happens next %n%nYou claim will be processed. Wait for us to contact you.")
+                            + exitSurveyContentService.applicantSurvey()
                     )
                     .build());
         }
