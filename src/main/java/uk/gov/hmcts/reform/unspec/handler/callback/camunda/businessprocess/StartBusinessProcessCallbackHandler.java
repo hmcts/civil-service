@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
-import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.unspec.model.CaseData;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.START_BUSINESS_PROCESS;
 
 @Service
@@ -27,7 +27,7 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::startBusinessProcess);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::startBusinessProcess);
     }
 
     @Override

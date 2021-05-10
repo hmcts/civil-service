@@ -275,7 +275,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnExtensionRequested_whenCaseDataAtStateExtensionRequested() {
+        void shouldReturnExtensionRequested_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -789,7 +789,8 @@ class StateFlowEngineTest {
             "false,FULL_DEFENCE_NOT_PROCEED",
             "false,NOTIFICATION_ACKNOWLEDGED",
         })
-        void shouldReturnValidResult_whenCaseDataAtStateClaimCreated(boolean expected, FlowState.Main state) {
+        void shouldReturnValidResult_whenCaseDataAtStateAwaitingRespondentAcknowledgement(boolean expected,
+                                                                                          FlowState.Main state) {
             CaseDetails caseDetails = CaseDetailsBuilder.builder()
                 .atStateAwaitingRespondentAcknowledgement()
                 .build();

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
@@ -25,29 +26,32 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.N
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ClaimantResponseRespondentNotificationHandler.class,
+    ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private ClaimantResponseRespondentNotificationHandler handler;
+    private ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        void shouldNotifyRespondentSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED")
+                    .build()).build();
 
             handler.handle(params);
 
@@ -55,7 +59,24 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
                 "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "claimant-response-respondent-notification-000DC001"
+                "claimant-confirms-not-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder()
+                    .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC").build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-not-to-proceed-respondent-notification-000DC001"
             );
         }
 
@@ -63,8 +84,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
             );
         }
     }

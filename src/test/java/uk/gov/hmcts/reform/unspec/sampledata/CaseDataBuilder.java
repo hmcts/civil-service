@@ -74,6 +74,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = LocalDateTime.now().plusDays(120);
     public static final LocalDate CLAIM_ISSUED_DATE = now();
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
+    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
 
     // Create Claim
     private Long ccdCaseReference;
@@ -457,7 +458,8 @@ public class CaseDataBuilder {
             .version("version 1")
             .build();
         paymentReference = "some reference";
-        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
+        respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal().build();
         submittedDate = LocalDateTime.now();
         return this;
@@ -632,7 +634,8 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY").build())
             .build();
-        respondentSolicitor1EmailAddress = "civilunspecified@gmail.com";
+        respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("civilunspecified@gmail.com").correct(YES).build();
         return this;
@@ -694,7 +697,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssued() {
         atStatePendingClaimIssued();
-        claimNotificationDeadline = LocalDateTime.now().plusDays(1);
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
         return this;
     }

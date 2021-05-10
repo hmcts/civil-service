@@ -77,6 +77,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .respondent1TimeExtensionDate(time.now())
             .respondent1ResponseDeadline(newDeadline);
+        //TODO: merge on last CMC-1442 PR
+        //.businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

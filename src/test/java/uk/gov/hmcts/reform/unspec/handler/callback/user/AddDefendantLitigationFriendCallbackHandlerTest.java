@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.unspec.handler.callback.user;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
+    JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {

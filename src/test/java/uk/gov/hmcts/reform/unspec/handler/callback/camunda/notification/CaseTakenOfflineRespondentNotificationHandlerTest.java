@@ -25,28 +25,29 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.N
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ClaimantResponseRespondentNotificationHandler.class,
+    CaseTakenOfflineRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private ClaimantResponseRespondentNotificationHandler handler;
+    private CaseTakenOfflineRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
+            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
+        void shouldNotifyRespondentSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
@@ -55,7 +56,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
                 "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "claimant-response-respondent-notification-000DC001"
+                "case-taken-offline-respondent-notification-000DC001"
             );
         }
 
@@ -63,8 +64,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
             );
         }
     }

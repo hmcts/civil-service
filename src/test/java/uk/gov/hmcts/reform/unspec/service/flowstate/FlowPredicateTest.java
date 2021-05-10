@@ -221,7 +221,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateClaimCreated() {
+        void shouldReturnFalse_whenCaseDataAtStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             assertFalse(notificationAcknowledged.test(caseData));
         }
@@ -237,7 +237,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateClaimCreated() {
+        void shouldReturnFalse_whenCaseDataAtStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             assertFalse(notificationAcknowledgedTimeExtension.test(caseData));
         }

@@ -17,12 +17,16 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC;
+import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
 public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT);
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT,
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC);
 
     public static final String TASK_ID = "AcknowledgeClaimNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "acknowledge-claim-applicant-notification-%s";
@@ -49,9 +53,12 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
 
     private CallbackResponse notifyApplicantSolicitorForClaimAcknowledgement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var recipient = isCcNotification(callbackParams)
+            ? caseData.getRespondentSolicitor1EmailAddress()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         notificationService.sendMail(
-            notificationsProperties.getApplicantSolicitorEmail(),
+            recipient,
             notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -63,8 +70,14 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            RESPONSE_DEADLINE, caseData.getRespondent1ResponseDeadline().toString()
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            RESPONSE_DEADLINE, caseData.getRespondent1ResponseDeadline().toString(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
+    }
+
+    private boolean isCcNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC.name());
     }
 }

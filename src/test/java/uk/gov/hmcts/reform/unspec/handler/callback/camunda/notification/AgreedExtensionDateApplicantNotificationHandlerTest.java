@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
@@ -22,32 +23,54 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ClaimantResponseRespondentNotificationHandler.class,
+    AgreedExtensionDateApplicantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private ClaimantResponseRespondentNotificationHandler handler;
+    private AgreedExtensionDateApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
+            when(notificationsProperties.getClaimantSolicitorAgreedExtensionDate()).thenReturn("template-id");
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        void shouldNotifyApplicantSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE").build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "agreed-extension-date-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build())
+                .build();
 
             handler.handle(params);
 
@@ -55,7 +78,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
                 "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "claimant-response-respondent-notification-000DC001"
+                "agreed-extension-date-applicant-notification-000DC001"
             );
         }
 
@@ -64,7 +87,7 @@ class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHand
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                "agreedExtensionDate", formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
             );
         }
     }

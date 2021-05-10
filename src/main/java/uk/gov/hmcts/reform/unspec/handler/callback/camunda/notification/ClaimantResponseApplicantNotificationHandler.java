@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_APPLICANT_SOL
 
 @Service
 @RequiredArgsConstructor
+//TODO: remove on last CMC-1442 PR
 public class ClaimantResponseApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -51,8 +52,8 @@ public class ClaimantResponseApplicantNotificationHandler extends CallbackHandle
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getApplicantSolicitorEmail(),
-            notificationsProperties.getSolicitorResponseToCase(),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -63,7 +64,9 @@ public class ClaimantResponseApplicantNotificationHandler extends CallbackHandle
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
     }
 }

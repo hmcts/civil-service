@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
@@ -25,47 +24,53 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.N
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ClaimantResponseRespondentNotificationHandler.class,
+    ClaimDismissedApplicantNotificationHandler.class,
+    NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-class ClaimantResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimDismissedApplicantNotificationHandlerTest {
+
+    public static final String TEMPLATE_ID = "template-id";
 
     @MockBean
     private NotificationService notificationService;
+
     @MockBean
     private NotificationsProperties notificationsProperties;
+
     @Autowired
-    private ClaimantResponseRespondentNotificationHandler handler;
+    private ClaimDismissedApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
+            when(notificationsProperties.getSolicitorClaimDismissed()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
-        void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
+        void shouldNotifyApplicantSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
+                "applicantsolicitor@example.com",
+                TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "claimant-response-respondent-notification-000DC001"
-            );
-        }
-
-        @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                "claim-dismissed-applicant-notification-000DC001"
             );
         }
     }
+
+    @NotNull
+    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
+        );
+    }
+
 }
