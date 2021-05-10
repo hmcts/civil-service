@@ -29,7 +29,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE,
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC);
 
-    public static final String TASK_ID = "CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1";
+    public static final String TASK_ID = "NotifyDefendantSolicitor1";
+    public static final String TASK_ID_CC = "NotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -44,8 +45,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override

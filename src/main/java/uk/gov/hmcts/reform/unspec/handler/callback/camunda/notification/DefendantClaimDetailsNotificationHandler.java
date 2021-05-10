@@ -31,6 +31,8 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC);
 
     public static final String TASK_ID = "NotifyClaimDetailsRespondentSolicitor1";
+    public static final String TASK_ID_CC = "NotifyClaimDetailsApplicantSolicitor1CC";
+
     private static final String REFERENCE_TEMPLATE = "claim-details-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -45,8 +47,8 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override

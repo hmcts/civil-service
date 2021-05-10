@@ -37,7 +37,7 @@ public class FailedPaymentApplicantNotificationHandler extends CallbackHandler i
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 

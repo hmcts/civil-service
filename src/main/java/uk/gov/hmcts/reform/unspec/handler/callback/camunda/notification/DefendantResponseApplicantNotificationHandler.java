@@ -29,6 +29,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC);
 
     public static final String TASK_ID = "DefendantResponseFullDefenceNotifyApplicantSolicitor1";
+    public static final String TASK_ID_CC = "DefendantResponseFullDefenceNotifyRespondentSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -42,8 +43,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override

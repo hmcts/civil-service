@@ -29,6 +29,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC);
 
     public static final String TASK_ID = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1";
+    public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -42,8 +43,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override

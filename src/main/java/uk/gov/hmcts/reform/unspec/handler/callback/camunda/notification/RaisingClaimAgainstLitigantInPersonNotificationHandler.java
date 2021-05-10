@@ -41,7 +41,7 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 

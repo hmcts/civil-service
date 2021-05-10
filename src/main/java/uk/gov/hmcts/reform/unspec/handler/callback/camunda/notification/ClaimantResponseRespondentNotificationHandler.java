@@ -39,7 +39,7 @@ public class ClaimantResponseRespondentNotificationHandler extends CallbackHandl
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 

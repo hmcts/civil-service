@@ -30,6 +30,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC);
 
     public static final String TASK_ID = "AgreedExtensionDateNotifyApplicantSolicitor1";
+    public static final String TASK_ID_CC = "AgreedExtensionDateNotifyRespondentSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "agreed-extension-date-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -43,8 +44,8 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override
