@@ -97,8 +97,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateDateOfBirth)
-            .put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible)
-            .put(callbackKey(V_1, MID, "fee"), this::calculateFee)
+            .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimBackwardsCompatible)
@@ -150,26 +149,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse calculateFeeBackwardsCompatible(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String paymentReference = ofNullable(caseData.getPaymentReference())
-            .orElse(references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""));
-
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<String> pbaNumbers = getPbaAccounts(authToken);
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
-            .paymentReference(paymentReference);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

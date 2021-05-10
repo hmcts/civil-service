@@ -62,7 +62,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
@@ -283,7 +282,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private final String pageId = "fee";
         private final Fee feeData = Fee.builder()
-            .version("1")
             .code("CODE")
             .calculatedAmountInPence(BigDecimal.valueOf(100))
             .build();
@@ -297,130 +295,64 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
         }
 
-        @Nested
-        class NewCode {
+        @Test
+        void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
 
-            @Test
-            void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-                given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-                CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("claimFee")
+                .extracting("calculatedAmountInPence", "code", "version")
+                .containsExactly(
+                    String.valueOf(feeData.getCalculatedAmountInPence()),
+                    feeData.getCode(),
+                    feeData.getVersion()
+                );
 
-                assertThat(response.getData())
-                    .extracting("claimFee")
-                    .extracting("calculatedAmountInPence", "code", "version")
-                    .containsExactly(
-                        String.valueOf(feeData.getCalculatedAmountInPence()),
-                        feeData.getCode(),
-                        feeData.getVersion()
-                    );
+            assertThat(response.getData())
+                .extracting("claimIssuedPaymentDetails")
+                .extracting("customerReference")
+                .isEqualTo("12345");
 
-                assertThat(response.getData())
-                    .extracting("claimIssuedPaymentDetails")
-                    .extracting("customerReference")
-                    .isEqualTo("12345");
+            DynamicList dynamicList = getDynamicList(response);
 
-                DynamicList dynamicList = getDynamicList(response);
+            List<String> actualPbas = dynamicList.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
 
-                List<String> actualPbas = dynamicList.getListItems().stream()
-                    .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
-
-                assertThat(actualPbas).containsOnly("12345", "98765");
-                assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
-            }
-
-            @Test
-            void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
-                given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-                CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getData())
-                    .extracting("claimFee")
-                    .extracting("calculatedAmountInPence", "code", "version")
-                    .containsExactly(
-                        String.valueOf(feeData.getCalculatedAmountInPence()),
-                        feeData.getCode(),
-                        feeData.getVersion()
-                    );
-
-                assertThat(response.getData())
-                    .extracting("claimIssuedPaymentDetails")
-                    .extracting("customerReference")
-                    .isEqualTo("12345");
-
-                assertThat(getDynamicList(response))
-                    .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
-            }
+            assertThat(actualPbas).containsOnly("12345", "98765");
+            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
         }
 
-        @Nested
-        class OldCode {
+        @Test
+        void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
 
-            @Test
-            void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-                given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-                CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("claimFee")
+                .extracting("calculatedAmountInPence", "code", "version")
+                .containsExactly(
+                    String.valueOf(feeData.getCalculatedAmountInPence()),
+                    feeData.getCode(),
+                    feeData.getVersion()
+                );
 
-                assertThat(response.getData())
-                    .extracting("claimFee")
-                    .extracting("calculatedAmountInPence", "code", "version")
-                    .containsExactly(
-                        String.valueOf(feeData.getCalculatedAmountInPence()),
-                        feeData.getCode(),
-                        feeData.getVersion()
-                    );
+            assertThat(response.getData())
+                .extracting("claimIssuedPaymentDetails")
+                .extracting("customerReference")
+                .isEqualTo("12345");
 
-                assertThat(response.getData())
-                    .extracting("paymentReference")
-                    .isEqualTo("12345");
-
-                DynamicList dynamicList = getDynamicList(response);
-
-                List<String> actualPbas = dynamicList.getListItems().stream()
-                    .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
-
-                assertThat(actualPbas).containsOnly("12345", "98765");
-                assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
-            }
-
-            @Test
-            void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
-                given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-                CallbackParams params = callbackParamsOf(caseData, MID, pageId);
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getData())
-                    .extracting("claimFee")
-                    .extracting("calculatedAmountInPence", "code", "version")
-                    .containsExactly(
-                        String.valueOf(feeData.getCalculatedAmountInPence()),
-                        feeData.getCode(),
-                        feeData.getVersion()
-                    );
-
-                assertThat(response.getData())
-                    .extracting("paymentReference")
-                    .isEqualTo("12345");
-
-                assertThat(getDynamicList(response))
-                    .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
-            }
+            assertThat(getDynamicList(response))
+                .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
         }
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
