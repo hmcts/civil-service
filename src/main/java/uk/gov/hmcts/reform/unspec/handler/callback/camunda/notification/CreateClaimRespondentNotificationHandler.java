@@ -18,16 +18,19 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
-import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC;
 import static uk.gov.hmcts.reform.unspec.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
 public class CreateClaimRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-    public static final String TASK_ID = "CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1";
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC);
+
+    public static final String TASK_ID = "NotifyDefendantSolicitor1";
+    public static final String TASK_ID_CC = "NotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -42,8 +45,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     }
 
     @Override
-    public String camundaActivityId() {
-        return TASK_ID;
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override
@@ -53,9 +56,12 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
 
     private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var recipient = isCcNotification(callbackParams)
+            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+            : caseData.getRespondentSolicitor1EmailAddress();
 
         notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
+            recipient,
             notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -70,9 +76,14 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE)
+            CLAIM_NOTIFICATION_DEADLINE, caseData.getClaimNotificationDeadline().toString(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
+    }
+
+    private boolean isCcNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
     }
 }

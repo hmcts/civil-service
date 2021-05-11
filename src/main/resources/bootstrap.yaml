@@ -21,3 +21,4 @@ spring:
         robotics-notification-sender: robotics.notification.sender
         robotics-notification-recipient: robotics.notification.recipient
         launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
+

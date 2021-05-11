@@ -40,23 +40,29 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorResponseToCase()).thenReturn("template-id");
-            when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn("claimantsolicitor@example.com");
-            when(notificationsProperties.getRespondentSolicitorEmail()).thenReturn("defendantsolicitor@example.com");
+            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
         }
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "defendantsolicitor@example.com",
+                "respondentsolicitor@example.com",
                 "template-id",
-                Map.of(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE),
+                getNotificationDataMap(caseData),
                 "defendant-response-case-handed-offline-respondent-notification-000DC001"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
             );
         }
     }

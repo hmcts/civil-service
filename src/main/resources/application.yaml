@@ -90,16 +90,20 @@ reference:
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
-  respondentSolicitorClaimIssueEmailTemplate: "1e55aae6-879e-4e63-93ce-cf4cf93636f2"
-  respondentSolicitorClaimDetailsEmailTemplate: "642c0bbf-044e-411e-bb90-b25b7f752c7c"
-  solicitorResponseToCase: "a2b3d626-bf20-406e-ac8c-8d8a5ea43c66"
-  respondentSolicitorAcknowledgeClaim: "6ba538b6-f3f6-4943-862d-b436c0c3d741"
+  respondentSolicitorClaimIssueEmailTemplate: "aca69f2f-cfc7-4e16-ab7a-76a7e25d3d01"
+  respondentSolicitorClaimDetailsEmailTemplate: "fcd7be87-5eae-4227-8bf5-c7c6962ec804"
+  solicitorDefendantResponseCaseTakenOffline: "513af1f3-e2be-49db-a463-b6f12641d13d"
+  claimantSolicitorDefendantResponseFullDefence: "063699f2-3647-4aa8-ad39-113ff4ecb8ec"
+  respondentSolicitorAcknowledgeClaim: "a40576c3-c95b-4ac5-9096-c70267580663"
   failedPayment: "51aee712-459c-4b64-ae82-4e3b81c83da0"
-  applicantSolicitorClaimDismissed: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
-  respondentSolicitorClaimDismissed: "de0b10a2-37b7-423c-90a6-f08872d9d61e"
+  solicitorClaimDismissed: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
   claimantSolicitorCaseWillProgressOffline: "290461ee-7b1d-404d-9b19-e46b1f6458d1"
-  applicantSolicitorEmail: civil.damages.claims+organisation.1.solicitor.1@gmail.com
-  respondentSolicitorEmail: civil.damages.claims+organisation.2.solicitor.1@gmail.com
+  claimantSolicitorAgreedExtensionDate: "83cd651c-50ba-4026-b597-d82877644fd2"
+  claimantSolicitorConfirmsToProceed: "5a27048a-ed18-4a7c-b33b-e7ff5b8279a6"
+  claimantSolicitorConfirmsNotToProceed: "891843df-f641-4c91-b5d4-d6a0899b722d"
+  claimantSolicitorClaimContinuingOnline: "eacc12e2-c4b9-470c-bf49-23441bcd8386"
+  solicitorCaseTakenOffline: "976d4b4a-43e0-498a-8c1e-8a0dc48e7fe8"
+  solicitorLitigationFriendAdded: "b659b48e-2585-4162-911e-4166b51c3d0e"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -112,6 +116,11 @@ launchdarkly:
 testing:
   support:
     enabled: ${TESTING_SUPPORT_ENABLED:false}
+
+exit-survey:
+  applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
+  respondent-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Defendant/
+
 ---
 
 spring:
@@ -240,8 +249,6 @@ feign:
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
-  applicantSolicitorEmail: civil.damages.claims+organisation.1.solicitor.1@gmail.com
-  respondentSolicitorEmail: civil.damages.claims+organisation.2.solicitor.1@gmail.com
 
 testing:
   support:

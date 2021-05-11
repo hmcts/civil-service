@@ -11,14 +11,18 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
 import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 
 import java.time.LocalDate;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.unspec.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,14 +103,26 @@ class UnavailableDateValidatorTest {
         void shouldReturnNoError_whenToday() {
             UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now()).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            assertThat(validator.validate(unavailableDates)).isEmpty();
+
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(unavailableDates)
+                .build();
+
+            assertThat(validator.validate(hearing)).isEmpty();
         }
 
         @Test
         void shouldReturnError_whenMoreThanOneYearInFuture() {
             UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now().plusYears(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            assertThat(validator.validate(unavailableDates))
+
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(unavailableDates)
+                .build();
+
+            assertThat(validator.validate(hearing))
                 .containsExactly("The date cannot be in the past and must not be more than a year in the future");
         }
 
@@ -114,8 +130,42 @@ class UnavailableDateValidatorTest {
         void shouldReturnError_whenInPast() {
             UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now().minusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            assertThat(validator.validate(unavailableDates))
+
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(unavailableDates)
+                .build();
+
+            assertThat(validator.validate(hearing))
                 .containsExactly("The date cannot be in the past and must not be more than a year in the future");
+        }
+
+        @Test
+        void shouldReturnError_whenRequiredButNullDates() {
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .build();
+
+            assertThat(validator.validate(hearing)).containsExactly("Details of unavailable date required");
+        }
+
+        @Test
+        void shouldReturnError_whenRequiredButEmptyDates() {
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(emptyList())
+                .build();
+
+            assertThat(validator.validate(hearing)).containsExactly("Details of unavailable date required");
+        }
+
+        @Test
+        void shouldReturnNoError_whenNotRequiredAndNoDates() {
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(NO)
+                .build();
+
+            assertThat(validator.validate(hearing)).isEmpty();
         }
     }
 }

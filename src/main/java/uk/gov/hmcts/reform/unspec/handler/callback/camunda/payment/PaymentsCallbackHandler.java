@@ -74,6 +74,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), e.contentUTF8()
                 ));
+                caseData = updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
@@ -85,6 +86,15 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData, FeignException e) {
+        return caseData.toBuilder()
+            .paymentDetails(PaymentDetails.builder()
+                                .status(FAILED)
+                                .errorMessage(e.contentUTF8())
+                                .build())
+            .build();
+    }
+
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -92,9 +102,12 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         try {
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
+                .map(PaymentDetails::toBuilder)
+                .orElse(PaymentDetails.builder())
                 .status(SUCCESS)
                 .reference(paymentReference)
+                .errorCode(null)
+                .errorMessage(null)
                 .build();
 
             caseData = caseData.toBuilder()
@@ -110,6 +123,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), e.contentUTF8()
                 ));
+                caseData = updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }

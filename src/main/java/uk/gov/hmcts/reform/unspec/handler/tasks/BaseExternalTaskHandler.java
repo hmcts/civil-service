@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.tasks;
 
+import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -71,10 +72,18 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
-            Arrays.toString(e.getStackTrace()),
+            getStackTrace(e),
             remainingRetries - 1,
             calculateExponentialRetryTimeout(500, maxRetries, remainingRetries)
         );
+    }
+
+    private String getStackTrace(Throwable throwable) {
+        if (throwable instanceof FeignException) {
+            return ((FeignException) throwable).contentUTF8();
+        }
+
+        return Arrays.toString(throwable.getStackTrace());
     }
 
     /**

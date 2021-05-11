@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.unspec.handler.tasks;
 
+import feign.FeignException;
+import feign.Request;
+import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.unspec.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.unspec.service.flowstate.StateFlowEngine;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -113,6 +117,42 @@ class CaseEventTaskHandlerTest {
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
+            anyString(),
+            eq(2),
+            eq(500L)
+        );
+    }
+
+    @Test
+    void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        String errorMessage = "there was an error";
+        int status = 422;
+        Request.HttpMethod requestType = Request.HttpMethod.POST;
+        String exampleUrl = "example url";
+
+        when(mockTask.getRetries()).thenReturn(null);
+        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            .thenAnswer(invocation -> {
+                throw FeignException.errorStatus(errorMessage, Response.builder()
+                    .request(
+                        Request.create(
+                            requestType,
+                            exampleUrl,
+                            new HashMap<>(), //this field is required for construtor//
+                            null,
+                            null,
+                            null
+                        ))
+                    .status(status)
+                    .build());
+            });
+
+        caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService).handleFailure(
+            eq(mockTask),
+            eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
             anyString(),
             eq(2),
             eq(500L)

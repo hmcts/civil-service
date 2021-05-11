@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DeadlineExtensionValidator;
 
@@ -36,6 +37,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final DeadlineExtensionValidator validator;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -75,6 +77,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .respondent1TimeExtensionDate(time.now())
             .respondent1ResponseDeadline(newDeadline);
+        //TODO: merge on last CMC-1442 PR
+        //.businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -86,9 +90,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
         String body = format(
-            "<br />What happens next.%n%n You must respond to the claimant by %s",
-            formatLocalDateTime(responseDeadline, DATE_TIME_AT)
-        );
+            "<br />What happens next%n%n You must respond to the claimant by %s",
+            formatLocalDateTime(responseDeadline, DATE_TIME_AT)) + exitSurveyContentService.respondentSurvey();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Extension deadline submitted")
             .confirmationBody(body)

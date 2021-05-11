@@ -56,7 +56,7 @@ class EventAllowedAspectTest {
         when(proceedingJoinPoint.proceed()).thenReturn(response);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(callbackType, CaseDetailsBuilder.builder().atStateAwaitingCaseNotification().build())
+            .of(callbackType, CaseDetailsBuilder.builder().atStateCaseIssued().build())
             .build();
         Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);
 
@@ -76,7 +76,7 @@ class EventAllowedAspectTest {
             .type(ABOUT_TO_START)
             .request(CallbackRequest.builder()
                          .eventId(DEFENDANT_RESPONSE.name())
-                         .caseDetails(CaseDetailsBuilder.builder().atStateClaimDraft().build())
+                         .caseDetails(CaseDetailsBuilder.builder().atStatePendingClaimIssued().build())
                          .build())
             .build();
         Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);

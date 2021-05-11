@@ -103,6 +103,9 @@ allprojects {
     maven {
       url  "https://repo.spring.io/libs-milestone"
     }
+    maven {
+      url "https://jitpack.io"
+    }
   }
 }
 
@@ -285,8 +288,8 @@ dependencies {
 
   implementation group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.6'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'fees-java-client', version: '0.0.6'
-  implementation group: 'uk.gov.hmcts.reform', name: 'payments-client', version: '1.0.1'
+  implementation group: 'com.github.hmcts', name: 'fees-java-client', version: '0.0.6'
+  implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.0.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.17.0-RELEASE'

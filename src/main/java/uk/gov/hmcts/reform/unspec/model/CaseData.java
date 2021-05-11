@@ -56,6 +56,7 @@ public class CaseData implements MappableObject {
     private final PersonalInjuryType personalInjuryType;
     private final String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
+    private final StatementOfTruth uiStatementOfTruth;
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
@@ -127,5 +128,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime applicant1ResponseDate;
     private final LocalDateTime takenOfflineDate;
+    private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
 }

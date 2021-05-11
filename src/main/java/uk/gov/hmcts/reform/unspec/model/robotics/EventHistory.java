@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.unspec.model.robotics;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 
 import java.util.List;
 
@@ -9,8 +10,8 @@ import java.util.List;
 @Builder
 public class EventHistory {
 
-    @Builder.Default
-    private List<Event> miscellaneous = List.of(Event.builder().build());
+    @Singular("miscellaneous")
+    private List<Event> miscellaneous;
     @Builder.Default
     private List<Event> acknowledgementOfServiceReceived = List.of(Event.builder().build());
     @Builder.Default
@@ -25,6 +26,6 @@ public class EventHistory {
     private List<Event> receiptOfAdmission = List.of(Event.builder().build());
     @Builder.Default
     private List<Event> replyToDefence = List.of(Event.builder().build());
-    @Builder.Default
-    private List<Event> directionsQuestionnaireFiled = List.of(Event.builder().build());
+    @Singular("directionsQuestionnaire")
+    private List<Event> directionsQuestionnaireFiled;
 }

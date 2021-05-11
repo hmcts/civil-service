@@ -21,6 +21,9 @@ public class ResourceReader {
 
     public static byte[] readBytes(String resourcePath) {
         try (InputStream inputStream = ResourceReader.class.getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                throw new IllegalStateException("Unable to read resource: " + resourcePath);
+            }
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);

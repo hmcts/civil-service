@@ -82,7 +82,7 @@ class AcknowledgementOfClaimGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
 
         AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
             .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
@@ -113,7 +113,7 @@ class AcknowledgementOfClaimGeneratorTest {
 
         @Test
         void whenCaseIsAtClaimAcknowledge_shouldGetAcknowledgementOfClaimFormData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1LitigationFriend(LitigationFriend.builder().fullName("LF name").build())
                 .build();
 

@@ -14,14 +14,16 @@ import uk.gov.hmcts.reform.unspec.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.model.Party;
-import uk.gov.hmcts.reform.unspec.model.UnavailableDate;
-import uk.gov.hmcts.reform.unspec.model.common.Element;
+import uk.gov.hmcts.reform.unspec.model.StatementOfTruth;
+import uk.gov.hmcts.reform.unspec.model.dq.Hearing;
 import uk.gov.hmcts.reform.unspec.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.unspec.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ExpertsValidator;
+import uk.gov.hmcts.reform.unspec.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -29,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
@@ -41,10 +41,11 @@ import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDat
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator {
+public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -63,6 +64,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateRespondentDqExperts,
+            callbackKey(MID, "witnesses"), this::validateRespondentDqWitnesses,
             callbackKey(MID, "upload"), this::emptyCallbackResponse,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
@@ -72,9 +74,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<Element<UnavailableDate>> unavailableDates =
-            ofNullable(caseData.getRespondent1DQ().getHearing().getUnavailableDates()).orElse(emptyList());
-        List<String> errors = unavailableDateValidator.validate(unavailableDates);
+        Hearing hearing = caseData.getRespondent1DQ().getHearing();
+        List<String> errors = unavailableDateValidator.validate(hearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -108,10 +109,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder().respondent1DQStatementOfTruth(null).build();
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQStatementOfTruth(statementOfTruth)
+            .build();
+
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(null)
+            .respondent1DQ(dq)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().respondent1DQ(dq).build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
@@ -126,8 +135,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         String body = format(
             "<br />The claimant has until %s to proceed. We will let you know when they respond.",
-            formatLocalDateTime(responseDeadline, DATE)
-        );
+            formatLocalDateTime(responseDeadline, DATE))
+            + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))

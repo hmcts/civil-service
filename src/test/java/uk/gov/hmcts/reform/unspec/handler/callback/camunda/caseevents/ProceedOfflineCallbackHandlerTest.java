@@ -6,12 +6,12 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
+import uk.gov.hmcts.reform.unspec.callback.CallbackType;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
     ProceedOfflineCallbackHandler.class,
@@ -23,12 +23,12 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
     ProceedOfflineCallbackHandler handler;
 
     @Test
-    void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+    void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isNull();
+        assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
     }
 }

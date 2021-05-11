@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
@@ -31,6 +33,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESUBMIT_CLAIM);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -59,8 +62,10 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim pending")
-            .confirmationBody(String.format("## What happens next %n "
-                                                + "You claim will be processed. Wait for us to contact you."))
+            .confirmationBody(
+                format("## What happens next %n%nYou claim will be processed. Wait for us to contact you.")
+                    + exitSurveyContentService.applicantSurvey()
+            )
             .build();
     }
 }

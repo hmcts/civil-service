@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 
 @Service
@@ -39,7 +40,8 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "transfer-date"), this::validateTransferDate,
-            callbackKey(ABOUT_TO_SUBMIT), this::addTakenOfflineDate
+            callbackKey(ABOUT_TO_SUBMIT), this::addTakenOfflineDate,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -60,7 +62,11 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder().takenOfflineDate(time.now()).build();
+        CaseData caseData = callbackParams.getCaseData().toBuilder()
+            //TODO: merge on last CMC-1442 PR
+            //.businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
+            .takenOfflineByStaffDate(time.now())
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

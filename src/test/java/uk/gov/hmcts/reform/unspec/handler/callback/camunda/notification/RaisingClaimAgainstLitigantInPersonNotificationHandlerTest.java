@@ -19,6 +19,8 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
     RaisingClaimAgainstLitigantInPersonNotificationHandler.class,
@@ -28,7 +30,6 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
-    public static final String EMAIL = "claimantsolicitor@example.com";
 
     @MockBean
     private NotificationService notificationService;
@@ -45,7 +46,6 @@ class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getClaimantSolicitorCaseWillProgressOffline()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn(EMAIL);
         }
 
         @Test
@@ -56,17 +56,17 @@ class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                EMAIL,
+                "applicantsolicitor@example.com",
                 TEMPLATE_ID,
-                getExpectedMap(),
+                getNotificationDataMap(caseData),
                 "applicant-create-case-handed-offline-notification-000DC001"
             );
         }
     }
 
-    private Map<String, String> getExpectedMap() {
+    private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            "claimReferenceNumber", "000DC001"
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
         );
     }
 }

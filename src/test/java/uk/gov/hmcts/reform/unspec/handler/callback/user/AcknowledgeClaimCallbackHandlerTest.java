@@ -14,12 +14,14 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CallbackType;
+import uk.gov.hmcts.reform.unspec.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.unspec.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.unspec.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.DateOfBirthValidator;
 
@@ -42,6 +44,8 @@ import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.RESPONSE_DEA
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     AcknowledgeClaimCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
@@ -58,12 +62,15 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private AcknowledgeClaimCallbackHandler handler;
 
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
+
     @Nested
     class AboutToStartCallback {
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -79,7 +86,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
@@ -93,7 +100,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().soleTrader()
                                  .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
@@ -107,7 +114,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
@@ -121,7 +128,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().soleTrader()
                                  .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
@@ -149,7 +156,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -175,7 +182,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -187,8 +194,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         "<br />You need to respond to the claim before %s."
                             + "%n%n[Download the Acknowledgement of Claim form]"
                             + "(/cases/case-details/%s#CaseDocuments)",
-                        formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference()
-                    ))
+
+                formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference())
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

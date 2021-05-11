@@ -32,4 +32,22 @@ public interface ParticularsOfClaimValidator {
             .errors(getServedDocumentFiles(caseData).getErrorsAddOrAmendDocuments())
             .build();
     }
+
+    default CallbackResponse validateParticularsOfClaimBackwardsCompatible(CallbackParams callbackParams) {
+        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
+            .orElse(ServedDocumentFiles.builder().build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(servedDocumentFiles.getErrorsBackwardsCompatible())
+            .build();
+    }
+
+    default CallbackResponse validateParticularsOfClaimAddOrAmendDocumentsBackwardsCompatible(CallbackParams
+                                                                                                  callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(getServedDocumentFiles(caseData).getErrorsAddOrAmendDocumentsBackwardsCompatible())
+            .build();
+    }
 }

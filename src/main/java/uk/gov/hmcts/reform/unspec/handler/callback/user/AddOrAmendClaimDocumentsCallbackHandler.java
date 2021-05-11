@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.unspec.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 
 @Service
@@ -23,12 +25,15 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_OR_AMEND_CLAIM_D
 public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_OR_AMEND_CLAIM_DOCUMENTS);
+    private final ExitSurveyContentService exitSurveyContentService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimAddOrAmendDocuments,
+            callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaimAddOrAmendDocuments,
+            callbackKey(MID, "particulars-of-claim"),
+            this::validateParticularsOfClaimAddOrAmendDocumentsBackwardsCompatible,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -44,7 +49,7 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
                 "# Documents uploaded successfully%n## Claim number: %s",
                 callbackParams.getCaseData().getLegacyCaseReference()
             ))
-            .confirmationBody("<br />")
+            .confirmationBody(exitSurveyContentService.applicantSurvey())
             .build();
     }
 }
