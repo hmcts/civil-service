@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
@@ -145,6 +146,16 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(INFORM_AGREED_EXTENSION_DATE.name());
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
         }
     }
 

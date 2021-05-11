@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
 import uk.gov.hmcts.reform.unspec.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.Time;
 
@@ -50,8 +51,7 @@ public class DismissClaimCallbackHandler extends CallbackHandler {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            //TODO: merge on last CMC-1442 PR
-            //.businessProcess(BusinessProcess.ready(DISMISS_CLAIM))
+            .businessProcess(BusinessProcess.ready(DISMISS_CLAIM))
             .claimDismissedDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
