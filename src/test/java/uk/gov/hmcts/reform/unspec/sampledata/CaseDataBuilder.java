@@ -928,7 +928,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
         atStateRespondentFullDefence();
-        takenOfflineDate = LocalDateTime.now().plusDays(2);
+        takenOfflineDate = LocalDateTime.now();
+        applicant1ResponseDeadline = LocalDateTime.now().minusDays(1);
         return this;
     }
 
