@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 import uk.gov.hmcts.reform.unspec.service.Time;
 import uk.gov.hmcts.reform.unspec.validation.groups.CasemanTransferDateGroup;
@@ -63,8 +64,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
-            //TODO: merge on last CMC-1442 PR
-            //.businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
+            .businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
             .takenOfflineByStaffDate(time.now())
             .build();
 

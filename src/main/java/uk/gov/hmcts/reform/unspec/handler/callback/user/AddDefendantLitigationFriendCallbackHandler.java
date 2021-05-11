@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.unspec.callback.Callback;
 import uk.gov.hmcts.reform.unspec.callback.CallbackHandler;
 import uk.gov.hmcts.reform.unspec.callback.CallbackParams;
 import uk.gov.hmcts.reform.unspec.callback.CaseEvent;
+import uk.gov.hmcts.reform.unspec.model.BusinessProcess;
 import uk.gov.hmcts.reform.unspec.model.CaseData;
 
 import java.util.List;
@@ -44,8 +45,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
     private CallbackResponse updateBusinessStatusToReady(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            //TODO: merge on last CMC-1442 PR
-            //.businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
+            .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.unspec.sampledata.CaseDetailsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
@@ -42,6 +44,28 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+    }
+
+    @Nested
+    class AboutToSubmit {
+
+        @Test
+        void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(ADD_DEFENDANT_LITIGATION_FRIEND.name());
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
         }
     }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.unspec.handler.callback.user;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,6 @@ class DismissClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(localDateTime);
         }
 
-        //TODO: enable on last CMC-1442 PR
-        @Disabled
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
