@@ -1,0 +1,33 @@
+apiVersion: v2
+description: A Helm chart for civil-service App
+name: civil-service
+home: https://github.com/hmcts/civil-service
+version: 0.0.1
+maintainers:
+  - name: HMCTS Civil team
+
+dependencies:
+  - name: java
+    version: 3.4.5
+    repository: '@hmctspublic'
+  - name: ccd
+    version: 5.0.2
+    repository: '@hmctspublic'
+    tags:
+      - civil-ccd-stack
+  - name: xui-webapp
+    version: ~0.2.1
+    repository: '@hmctspublic'
+    condition: xui-webapp.enabled
+  - name: idam-pr
+    version: ~2.2.3
+    repository: '@hmctspublic'
+    condition: idam-pr.enabled
+  - name: postgresql
+    version: 8.9.8
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: camunda-bpm
+    version: 0.0.12
+    repository: '@hmctspublic'
+    condition: camunda-bpm.enabled

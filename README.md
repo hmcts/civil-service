@@ -1,6 +1,6 @@
-# civil-damages-service
+# civil-service
 
-Civil Damages CCD Callback Service.
+Civil CCD Callback Service.
 
 ### Contents:
 - [Building and deploying application](#building-and-deploying-the-application)
@@ -10,11 +10,11 @@ Civil Damages CCD Callback Service.
 
 ### Dependencies
 
-The project is dependent on other Civil Damages repositories:
-- [civil-damages-ccd-definition](https://github.com/hmcts/civil-damages-ccd-definition)
-- [civil-damages-camunda-bpmn-definition](https://github.com/hmcts/civil-damages-camunda-bpmn-definition)
+The project is dependent on other Civil repositories:
+- [civil-ccd-definition](https://github.com/hmcts/civil-ccd-definition)
+- [civil-camunda-bpmn-definition](https://github.com/hmcts/civil-camunda-bpmn-definition)
 
-To set up complete local environment for Civil Damages check [civil-damages-sdk](https://github.com/hmcts/civil-damages-sdk)
+To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
 
 ### Building the application
 
@@ -41,7 +41,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/unspec-service` directory)
+Run the distribution (created in `build/install/civil-service` directory)
 by executing the following command:
 
 ```bash
@@ -69,10 +69,10 @@ Preview environment will be created when opening new PR.
 CCD and Camunda BPMN definitions will be pulled from the latest GitHub releases.
 
 To access XUI visit url (make sure that it starts with `https`, otherwise IDAM won't let you log in):
-- `https://xui-civil-damages-service-pr-PR_NUMBER.service.core-compute-preview.internal`
+- `https://xui-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
 To access Camunda visit url (login and password are both `admin`):
-- `https://camunda-civil-damages-service-pr-PR_NUMBER.service.core-compute-preview.internal`
+- `https://camunda-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
 ## Contract testing
 
@@ -93,7 +93,7 @@ export PACT_BROKER_FULL_URL=http://pact-broker.platform.hmcts.net/
 and if you want to publish the RPA contract to the PactFlow pact broker, please set this env variable accordingly before running the publish command.
 By setting your env variable to this, the IDAM contract will be ignored and only the RPA contract will be published to PactFlow.
 ```
-export PACT_BROKER_FULL_URL=https://civil-damages-claims.pactflow.io/
+export PACT_BROKER_FULL_URL=https://civil-claims.pactflow.io/
 ```
 Before running, you should set the API token to connect to the pactflow portal as follows:
 

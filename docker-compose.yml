@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  civil-damages-service:
+  civil-service:
     build:
       context: .
       args:

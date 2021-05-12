@@ -176,7 +176,7 @@ task checkDependenciesIntegrity(type: Exec, description: 'Checks integrity of Ya
 
 task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
   commandLine './bin/wait-for.sh', System.env.URL
-  commandLine './bin/wait-for.sh', System.env.UNSPEC_SERVICE_URL
+  commandLine './bin/wait-for.sh', System.env.CIVIL_SERVICE_URL
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
@@ -184,7 +184,7 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:functional'
+  commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
@@ -210,8 +210,8 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 
 sonarqube {
   properties {
-    property "sonar.projectName", "UNSPEC :: civil-damages-service"
-    property "sonar.projectKey", "civil-damages-service"
+    property "sonar.projectName", "CIVIL :: service"
+    property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -365,11 +365,11 @@ dependencies {
 
 }
 
-mainClassName = 'uk.gov.hmcts.reform.unspec.Application'
+mainClassName = 'uk.gov.hmcts.reform.civil.Application'
 
 bootJar {
   getArchiveFileName().set(provider {
-    'unspec-service.jar'
+    'civil-service.jar'
   })
 
   manifest {
@@ -400,8 +400,8 @@ pact {
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if(pactBrokerUrl == 'https://civil-damages-claims.pactflow.io/') {
-      excludes = ['unspec_service-Idam_api']
+    if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
+      excludes = ['civil_service-Idam_api']
       pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
     }
     tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
