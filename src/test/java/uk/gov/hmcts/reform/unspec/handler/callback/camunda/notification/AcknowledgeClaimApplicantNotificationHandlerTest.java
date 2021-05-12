@@ -28,6 +28,8 @@ import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.A
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.unspec.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.unspec.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -91,7 +93,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-                RESPONSE_DEADLINE, caseData.getRespondent1ResponseDeadline().toString()
+                RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
             );
         }
     }
