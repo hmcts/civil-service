@@ -43,7 +43,7 @@ public class CallbackHandlerFactory {
         return Optional.ofNullable(callbackParams.getRequest().getCaseDetailsBefore())
             .map(caseDetailsConverter::toCaseData)
             .map(CaseData::getBusinessProcess)
-            .map(handler::isEventAlreadyProcessed)
+            .map(businessProcess -> handler.isEventAlreadyProcessed(callbackParams, businessProcess))
             .filter(isProcessed -> isProcessed)
             .map(isProcessed -> eventAlreadyProcessedResponse(eventId))
             .orElse(handler.handle(callbackParams));

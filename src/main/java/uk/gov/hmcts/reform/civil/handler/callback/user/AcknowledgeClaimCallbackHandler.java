@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 
@@ -38,8 +39,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGE_CLAIM);
 
     public static final String CONFIRMATION_SUMMARY = "<br />You need to respond to the claim before %s."
-        + "\n\n[Download the Acknowledgement of Claim form](%s)";
+        + "%n%n[Download the Acknowledgement of Claim form](%s)";
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper objectMapper;
@@ -91,8 +93,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         String body = format(
             CONFIRMATION_SUMMARY,
             formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference())
-        );
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()))
+            + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(

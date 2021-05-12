@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -17,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 
 @Service
@@ -32,7 +34,8 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::setTakenOfflineDate
+            callbackKey(ABOUT_TO_SUBMIT), this::setTakenOfflineDate,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -43,6 +46,7 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setTakenOfflineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
+            .businessProcess(BusinessProcess.ready(TAKE_CASE_OFFLINE))
             .takenOfflineDate(time.now())
             .build();
 

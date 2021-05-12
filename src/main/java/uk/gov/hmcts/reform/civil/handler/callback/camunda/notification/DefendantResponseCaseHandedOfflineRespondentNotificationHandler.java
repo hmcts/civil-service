@@ -39,7 +39,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 
@@ -52,8 +52,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getRespondentSolicitorEmail(),
-            notificationsProperties.getSolicitorResponseToCase(),
+            caseData.getRespondentSolicitor1EmailAddress(),
+            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -64,7 +64,9 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
     }
 }

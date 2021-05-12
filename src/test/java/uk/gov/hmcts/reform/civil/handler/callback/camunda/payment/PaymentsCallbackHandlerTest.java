@@ -68,7 +68,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
+        caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
 
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
@@ -79,7 +79,6 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-
         }
 
         @Test
@@ -129,7 +128,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentReference").isEqualTo("12345");
+            assertThat(response.getData()).extracting("paymentReference").isNull();
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("paymentErrorMessage", "paymentErrorCode")
                 .containsExactly(null, null);
@@ -201,7 +200,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentReference").isEqualTo("12345");
+            assertThat(response.getData()).extracting("paymentReference").isNull();
             assertThat(response.getData()).extracting("paymentDetails").isNull();
             assertThat(response.getErrors()).containsOnly("Technical error occurred");
         }
@@ -220,7 +219,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeignException buildFeignException(int status) {
         return buildFeignClientException(status, objectMapper.writeValueAsBytes(
             PaymentDto.builder()
-                .statusHistories(new StatusHistoryDto[]{
+                .statusHistories(new StatusHistoryDto[] {
                     StatusHistoryDto.builder()
                         .errorCode(PAYMENT_ERROR_CODE)
                         .errorMessage(PAYMENT_ERROR_MESSAGE)
@@ -238,7 +237,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         return new FeignException.FeignClientException(
             status,
             "exception message",
-            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            Request.create(GET, "", Map.of(), new byte[] {}, UTF_8, null),
             body
         );
     }

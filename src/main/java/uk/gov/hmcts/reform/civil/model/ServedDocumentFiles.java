@@ -20,11 +20,26 @@ public class ServedDocumentFiles {
     private List<Element<DocumentWithRegex>> medicalReport;
     private List<Element<DocumentWithRegex>> scheduleOfLoss;
     private Document particularsOfClaimDocument;
+    private List<Element<Document>> particularsOfClaimDocumentNew;
     private String particularsOfClaimText;
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
     @JsonIgnore
     public List<String> getErrors() {
+        List<String> errors = new ArrayList<>();
+        if (ofNullable(particularsOfClaimDocumentNew).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
+            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
+                           + "of claim text in the field provided. You cannot do both.");
+        }
+
+        if (ofNullable(particularsOfClaimDocumentNew).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
+            errors.add("You must add Particulars of claim details");
+        }
+        return errors;
+    }
+
+    @JsonIgnore
+    public List<String> getErrorsBackwardsCompatible() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
             errors.add("More than one Particulars of claim details added");
