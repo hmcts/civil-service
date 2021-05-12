@@ -96,17 +96,17 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:aat') {
-//    validateRpaContract()
-//    sh """
-//      eval \$(./bin/variables/load-staging-environment-variables.sh)
-//      ./bin/add-roles.sh
-//      ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
-//      ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-//      ./bin/import-ccd-definition.sh
-//      ./bin/import-bpmn-diagram.sh .
-//    """
-    env.URL="https://manage-case.aat.platform.hmcts.net/"
-    env.CIVIL_SERVICE_URL="https://manage-case.aat.platform.hmcts.net/"
+    validateRpaContract()
+    sh """
+      eval \$(./bin/variables/load-staging-environment-variables.sh)
+      ./bin/add-roles.sh
+      ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
+      ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
+      ./bin/import-ccd-definition.sh
+      ./bin/import-bpmn-diagram.sh .
+    """
+    env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
+    env.CIVIL_SERVICE_URL="http://civil-service-staging.service.core-compute-aat.internal"
   }
 
   after('smoketest:aat') {
