@@ -74,7 +74,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline.toLocalDate());
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
 
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())

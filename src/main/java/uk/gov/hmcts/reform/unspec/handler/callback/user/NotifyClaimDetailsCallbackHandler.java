@@ -71,7 +71,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData updatedCaseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
             .claimDetailsNotificationDate(notificationDateTime)
-            .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDate))
+            .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
             .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, notificationDate))
             .build();
 

@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.unspec.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.unspec.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
 @Service
 @RequiredArgsConstructor
@@ -65,13 +66,15 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
             .claimNotificationDate(claimNotificationDate);
 
-        LocalDateTime deadline = getDeadline(claimNotificationDate);
+        LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         LocalDateTime claimNotificationDeadline = caseData.getClaimNotificationDeadline();
 
-        if (deadline.isAfter(claimNotificationDeadline)) {
-            caseDataBuilder.claimDetailsNotificationDeadline(claimNotificationDeadline);
+        if (claimDetailsNotificationDeadline.isAfter(claimNotificationDeadline)) {
+            LocalDateTime notificationDeadlineAt4pm = claimNotificationDeadline.toLocalDate()
+                .atTime(END_OF_BUSINESS_DAY);
+            caseDataBuilder.claimDetailsNotificationDeadline(notificationDeadlineAt4pm);
         } else {
-            caseDataBuilder.claimDetailsNotificationDeadline(deadline);
+            caseDataBuilder.claimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -80,7 +83,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getDeadline(LocalDateTime claimNotificationDate) {
-        return deadlinesCalculator.plus14DaysAt4pmDeadline(claimNotificationDate.toLocalDate());
+        return deadlinesCalculator.plus14DaysAt4pmDeadline(claimNotificationDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
