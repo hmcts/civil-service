@@ -43,6 +43,8 @@ import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.unspec.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
@@ -266,6 +268,18 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS
                     }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
+                    new CaseEvent[] {
+                        CASE_PROCEEDS_IN_CASEMAN
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+                    new CaseEvent[] {
+                        CASE_PROCEEDS_IN_CASEMAN
+                    }
                 )
             );
         }
@@ -359,7 +373,10 @@ class FlowStateAllowedEventServiceTest {
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
+                        CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
+
                     }
                 ),
                 of(
