@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.unspec.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.unspec.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.unspec.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.unspec.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.unspec.enums.YesOrNo.NO;
@@ -299,13 +300,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidStatementOfTruth {
 
         @Test
-        void shouldSetStatementOfTruthToNull_whenPopulated() {
+        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
             String name = "John Smith";
             String role = "Solicitor";
 
             CaseData caseData = CaseDataBuilder.builder()
                 .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                .applicant1DQ()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -313,12 +313,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("uiStatementOfTruth")
-                .isNull();
-
-            assertThat(response.getData())
-                .extracting("applicant1DQStatementOfTruth")
                 .extracting("name", "role")
-                .containsExactly(name, role);
+                .containsExactly(null, null);
         }
     }
 
@@ -348,6 +344,61 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldKeepStatementOfTruth_whenInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("Bob Jones", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .isNull();
+            }
+
+            @Test
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenV1Callback() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        V_1,
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("John Smith", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
         }
     }
 
