@@ -25,9 +25,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
 public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCESS_CLAIM_ISSUE);
+    private static final String TASK_ID = "IssueClaim";
 
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {

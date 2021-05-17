@@ -38,10 +38,16 @@ public class PaymentsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
+    private static final String TASK_ID = "CreateClaimMakePayment";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
     private final Time time;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {

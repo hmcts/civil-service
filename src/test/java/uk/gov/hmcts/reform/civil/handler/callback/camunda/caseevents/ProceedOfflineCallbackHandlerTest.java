@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -14,21 +15,43 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {
-    ProceedOfflineCallbackHandler.class,
+    ProceedOfflineForUnRepresentedCallbackHandler.class,
+    ProceedOfflineForUnRegisteredCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
 class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    ProceedOfflineCallbackHandler handler;
+    @Nested
+    class UnregisteredCallback {
 
-    @Test
-    void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
-        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+        @Autowired
+        ProceedOfflineForUnRegisteredCallbackHandler handler;
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        @Test
+        void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+        }
+    }
+
+    @Nested
+    class UnrepresentedCallback {
+
+        @Autowired
+        ProceedOfflineForUnRepresentedCallbackHandler handler;
+
+        @Test
+        void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+        }
     }
 }
