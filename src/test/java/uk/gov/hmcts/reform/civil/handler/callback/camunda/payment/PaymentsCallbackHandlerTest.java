@@ -143,6 +143,13 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThrows(FeignException.class, () -> handler.handle(params));
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
         }
+
+        @Test
+        void shouldReturnCorrectActivityId_whenRequested() {
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePayment");
+        }
     }
 
     @Nested
