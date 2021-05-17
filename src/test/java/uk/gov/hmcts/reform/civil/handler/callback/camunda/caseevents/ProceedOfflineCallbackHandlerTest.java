@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
     ProceedOfflineForUnRepresentedCallbackHandler.class,
@@ -36,6 +37,15 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
         }
+
+        @Test
+        void shouldReturnCorrectActivityId_whenRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            assertThat(handler.camundaActivityId(params)).isEqualTo("ProceedOfflineForUnregisteredFirm");
+        }
     }
 
     @Nested
@@ -52,6 +62,15 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+        }
+
+        @Test
+        void shouldReturnCorrectActivityId_whenRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            assertThat(handler.camundaActivityId(params)).isEqualTo("ProceedOfflineForUnRepresentedSolicitor");
         }
     }
 }

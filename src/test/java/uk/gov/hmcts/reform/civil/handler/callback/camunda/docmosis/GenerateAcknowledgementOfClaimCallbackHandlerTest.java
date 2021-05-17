@@ -82,4 +82,13 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
     }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("AcknowledgeClaimGenerateAcknowledgementOfClaim");
+    }
 }
