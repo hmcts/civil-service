@@ -17,6 +17,7 @@ public class GetWelcomeTest extends BaseIntegrationTest {
     public void welcomeRootEndpoint() {
         MvcResult response = mockMvc.perform(get("/")).andExpect(status().isOk()).andReturn();
 
-        assertThat(response.getResponse().getContentAsString()).startsWith("Welcome");
+        assertThat(response.getResponse().getContentAsString())
+            .isEqualTo("{\"message\": \"Welcome to civil-service\"}");
     }
 }
