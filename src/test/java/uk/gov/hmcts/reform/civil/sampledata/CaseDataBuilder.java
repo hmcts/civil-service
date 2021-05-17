@@ -900,6 +900,7 @@ public class CaseDataBuilder {
             .build();
         applicant1DQ();
         applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
 
@@ -907,6 +908,7 @@ public class CaseDataBuilder {
         atStateRespondentFullDefence();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
 

@@ -104,7 +104,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -194,11 +195,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
 
+        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
+        // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
             .uiStatementOfTruth(null)
-            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -206,7 +207,31 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private CallbackResponse submitClaimBackwardsCompatible(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -228,10 +253,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
+        return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
