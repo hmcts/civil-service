@@ -19,7 +19,7 @@ public class ServedDocumentFiles {
     private List<Element<Document>> medicalReports;
     private List<Element<DocumentWithRegex>> medicalReport;
     private List<Element<DocumentWithRegex>> scheduleOfLoss;
-    private Document particularsOfClaimDocument;
+    private List<Element<Document>> particularsOfClaimDocument;
     private List<Element<Document>> particularsOfClaimDocumentNew;
     private String particularsOfClaimText;
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
@@ -42,7 +42,8 @@ public class ServedDocumentFiles {
     public List<String> getErrorsBackwardsCompatible() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("More than one Particulars of claim details added");
+            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
+                           + "of claim text in the field provided. You cannot do both.");
         }
 
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
