@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,7 +28,6 @@ public class RoboticsNotificationService {
     private final SendGridClient sendGridClient;
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
-    private final ObjectMapper objectMapper;
 
     public void notifyRobotics(@NotNull CaseData caseData) {
         requireNonNull(caseData);
@@ -38,21 +36,17 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailData(CaseData caseData) {
-        RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-        byte[] roboticsJsonData = toJson(roboticsCaseData);
-        String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
-
-        return EmailData.builder()
-            .message(String.format("Robotics case data JSON is attached for %s", caseData.getLegacyCaseReference()))
-            .subject(String.format("Robotics case data for %s", caseData.getLegacyCaseReference()))
-            .to(roboticsEmailConfiguration.getRecipient())
-            .attachments(of(json(roboticsJsonData, fileName)))
-            .build();
-    }
-
-    private byte[] toJson(RoboticsCaseData roboticsCaseData) {
         try {
-            return objectMapper.writeValueAsBytes(roboticsCaseData);
+            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+            byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
+
+            return EmailData.builder()
+                .message(String.format("Robotics case data JSON is attached for %s", caseData.getLegacyCaseReference()))
+                .subject(String.format("Robotics case data for %s", caseData.getLegacyCaseReference()))
+                .to(roboticsEmailConfiguration.getRecipient())
+                .attachments(of(json(roboticsJsonData, fileName)))
+                .build();
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
