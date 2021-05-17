@@ -900,6 +900,7 @@ public class CaseDataBuilder {
             .build();
         applicant1DQ();
         applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
 
@@ -907,6 +908,7 @@ public class CaseDataBuilder {
         atStateRespondentFullDefence();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
 
@@ -928,7 +930,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
         atStateRespondentFullDefence();
-        takenOfflineDate = LocalDateTime.now().plusDays(2);
+        takenOfflineDate = LocalDateTime.now();
+        applicant1ResponseDeadline = LocalDateTime.now().minusDays(1);
         return this;
     }
 
