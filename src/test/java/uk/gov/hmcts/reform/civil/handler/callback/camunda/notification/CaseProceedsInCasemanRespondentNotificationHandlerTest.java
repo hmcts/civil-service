@@ -15,14 +15,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 
 @SpringBootTest(classes = {
     CaseProceedsInCasemanRespondentNotificationHandler.class,
@@ -34,6 +39,8 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
+    @MockBean
+    private StateFlowEngine stateFlowEngine;
     @Autowired
     private CaseProceedsInCasemanRespondentNotificationHandler handler;
 
@@ -46,9 +53,12 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
         }
 
         @Test
-        void shouldNotifyRespondentSolicitor_whenInvoked() {
+        void shouldNotifyRespondentSolicitor_whenFlowStateHasTransitionedToClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(stateFlowEngine.hasTransitionedTo(params.getRequest().getCaseDetails(), CLAIM_NOTIFIED))
+                .thenReturn(true);
 
             handler.handle(params);
 
@@ -58,6 +68,19 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
                 getNotificationDataMap(caseData),
                 "case-proceeds-in-caseman-respondent-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotNotifyRespondentSolicitor_whenFlowStateHasNotTransitionedToClaimNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(stateFlowEngine.hasTransitionedTo(params.getRequest().getCaseDetails(), CLAIM_NOTIFIED))
+                .thenReturn(false);
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
         }
 
         @NotNull
