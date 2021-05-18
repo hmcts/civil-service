@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final StateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -50,12 +53,14 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
     private CallbackResponse notifyRespondentSolicitorForCaseProceedsInCaseman(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getSolicitorCaseTakenOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                notificationsProperties.getSolicitorCaseTakenOffline(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
