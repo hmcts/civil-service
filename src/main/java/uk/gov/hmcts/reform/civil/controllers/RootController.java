@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.ok;
 
 /**
  * Default endpoints per application.
@@ -21,8 +21,8 @@ public class RootController {
      *
      * @return Welcome message from the service.
      */
-    @GetMapping(path = "/", produces = APPLICATION_JSON_VALUE)
+    @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ResponseEntity.ok().body("{\"message\": \"Welcome to civil-service\"}");
+        return ok("Welcome to civil-service");
     }
 }
