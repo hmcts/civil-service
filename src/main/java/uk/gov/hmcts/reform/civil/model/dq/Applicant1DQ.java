@@ -53,19 +53,19 @@ public class Applicant1DQ implements DQ {
     @Override
     @JsonProperty("applicant1DQExperts")
     public Experts getExperts() {
-        return applicant1DQExperts;
+        return getExperts(applicant1DQExperts);
     }
 
     @Override
     @JsonProperty("applicant1DQWitnesses")
     public Witnesses getWitnesses() {
-        return applicant1DQWitnesses;
+        return getWitnesses(applicant1DQWitnesses);
     }
 
     @Override
     @JsonProperty("applicant1DQHearing")
     public Hearing getHearing() {
-        return applicant1DQHearing;
+        return getHearing(applicant1DQHearing);
     }
 
     @Override
