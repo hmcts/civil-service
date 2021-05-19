@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Experts {
 
     private final YesOrNo expertRequired;
