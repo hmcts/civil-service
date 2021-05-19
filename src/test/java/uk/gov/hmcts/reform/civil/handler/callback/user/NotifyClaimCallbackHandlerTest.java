@@ -12,15 +12,16 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -37,6 +38,8 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 
 @SpringBootTest(classes = {
     NotifyClaimCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
@@ -52,60 +55,128 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private NotifyClaimCallbackHandler handler;
 
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
+
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
-
-    @BeforeEach
-    void setup() {
-        when(time.now()).thenReturn(notificationDate);
-        when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDate.class))).thenReturn(deadline);
-    }
 
     @Nested
     class AboutToSubmit {
 
-        @Test
-        void shouldUpdateBusinessProcessAndAddNotificationDeadline_when14DaysIsBeforeThe4MonthDeadline() {
-            LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
-                .claimNotificationDeadline(claimNotificationDeadline)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        @Nested
+        class SubmittedAtCurrentTime {
 
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM.name(), "READY");
+            @BeforeEach
+            void setup() {
+                when(time.now()).thenReturn(notificationDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+            }
 
-            assertThat(response.getData())
-                .containsEntry("claimNotificationDate", notificationDate.format(ISO_DATE_TIME))
-                .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+            @Test
+            void shouldUpdateBusinessProcessAndAddNotificationDeadline_when14DaysIsBeforeThe4MonthDeadline() {
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("businessProcess")
+                    .extracting("camundaEvent", "status")
+                    .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM.name(), "READY");
+
+                assertThat(response.getData())
+                    .containsEntry("claimNotificationDate", notificationDate.format(ISO_DATE_TIME))
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetClaimDetailsNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
+                LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                LocalDateTime expectedTime = claimNotificationDeadline.toLocalDate().atTime(END_OF_BUSINESS_DAY);
+
+                assertThat(response.getData())
+                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsSameDayAs4MonthDeadline() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .claimNotificationDeadline(deadline)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+            }
         }
 
-        @Test
-        void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsAfterThe4MonthDeadline() {
-            LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
-                .claimNotificationDeadline(claimNotificationDeadline)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        @Nested
+        class SubmittedOnDeadlineDay {
 
-            assertThat(response.getData())
-                .containsEntry("claimDetailsNotificationDeadline", claimNotificationDeadline.format(ISO_DATE_TIME));
-        }
+            LocalDateTime claimNotificationDeadline = LocalDateTime.of(2021, 4, 6, 23, 59, 59);
+            LocalDateTime claimDetailsNotificationDeadline = LocalDateTime.of(2021, 4, 5, 15, 15, 59);
+            LocalDateTime expectedDeadline = claimDetailsNotificationDeadline;
 
-        @Test
-        void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsSameDayAs4MonthDeadline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification()
-                .claimNotificationDeadline(deadline)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            @BeforeEach
+            void setup() {
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
+                    .thenReturn(claimDetailsNotificationDeadline);
+            }
 
-            assertThat(response.getData())
-                .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+            @Test
+            void shouldSetDetailsNotificationDeadlineTo4pmDeadline_whenNotifyClaimBefore4pm() {
+                LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 10, 0);
+                when(time.now()).thenReturn(notifyClaimDateTime);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetDetailsNotificationDeadlineTo4pmDeadline_whenNotifyClaimAfter4pm() {
+                LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
+                when(time.now()).thenReturn(notifyClaimDateTime);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
+            }
         }
     }
 
@@ -113,17 +184,18 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         private static final String CONFIRMATION_BODY = "<br />The defendant legal representative's organisation has "
-            + "been notified and granted access to this claim.\n\n"
+            + "been notified and granted access to this claim.%n%n"
             + "You must notify the defendant with the claim details by %s";
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
-            String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline);
+            String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

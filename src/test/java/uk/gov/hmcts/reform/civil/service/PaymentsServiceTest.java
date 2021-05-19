@@ -69,7 +69,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
 

@@ -24,7 +24,9 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS =
-        List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON);
+        List.of(
+            NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON
+        );
     public static final String TASK_ID = "CreateClaimProceedsOfflineNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "applicant-create-case-handed-offline-notification-%s";
 
@@ -39,7 +41,7 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 
@@ -52,7 +54,7 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getApplicantSolicitorEmail(),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getClaimantSolicitorCaseWillProgressOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -64,7 +66,8 @@ public class RaisingClaimAgainstLitigantInPersonNotificationHandler extends Call
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
     }
 }

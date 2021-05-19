@@ -45,43 +45,43 @@ public class CaseDetailsBuilder {
         return this;
     }
 
-    public CaseDetailsBuilder atStateClaimDraft() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingCaseIssued().build();
+    public CaseDetailsBuilder atStatePendingClaimIssued() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = PENDING_CASE_ISSUED.name();
         return this;
     }
 
-    public CaseDetailsBuilder atStateAwaitingCaseNotification() {
-        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseNotification().build();
+    public CaseDetailsBuilder atStateCaseIssued() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = CASE_ISSUED.name();
         return this;
     }
 
     public CaseDetailsBuilder atStateAwaitingCaseDetailsNotification() {
-        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingCaseDetailsNotification().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_CASE_DETAILS_NOTIFICATION.name();
         return this;
     }
 
-    public CaseDetailsBuilder atStateClaimCreated() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+    public CaseDetailsBuilder atStateAwaitingRespondentAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         return this;
     }
 
     public CaseDetailsBuilder atStateClaimAcknowledge() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimAcknowledge().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         return this;
     }
 
     public CaseDetailsBuilder atStateExtensionRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         return this;

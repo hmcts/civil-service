@@ -70,11 +70,11 @@ class PaymentTaskHandlerTest {
 
         @Test
         void shouldTriggerMakePbaPaymentCCDEvent_whenHandlerIsExecuted() {
-            CaseData caseData = new CaseDataBuilder().atStatePendingCaseIssued()
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
             VariableMap variables = Variables.createVariables();
-            variables.putValue(FLOW_STATE, "MAIN.PENDING_CASE_ISSUED");
+            variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 

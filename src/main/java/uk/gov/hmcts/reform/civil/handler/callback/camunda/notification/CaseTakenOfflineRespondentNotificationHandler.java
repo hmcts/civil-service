@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseRespondentNotificationHandler extends CallbackHandler implements NotificationData {
+public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TRANSFERRED_TO_LOCAL_COURT);
-    public static final String TASK_ID = "ClaimantResponseNotifyRespondentSolicitor1";
-    private static final String REFERENCE_TEMPLATE = "claimant-response-respondent-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE);
+
+    public static final String TASK_ID = "TakeCaseOfflineNotifyRespondentSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "case-taken-offline-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -33,12 +33,12 @@ public class ClaimantResponseRespondentNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseTransferredToLocalCourt
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseTakenOffline
         );
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 
@@ -47,23 +47,23 @@ public class ClaimantResponseRespondentNotificationHandler extends CallbackHandl
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondentSolicitorForCaseTransferredToLocalCourt(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getRespondentSolicitorEmail(),
-            notificationsProperties.getSolicitorResponseToCase(),
+            caseData.getRespondentSolicitor1EmailAddress(),
+            notificationsProperties.getSolicitorCaseTakenOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
     }
 }

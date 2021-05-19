@@ -81,7 +81,7 @@ class SealedClaimFormGeneratorTest {
 
     @Test
     void shouldGenerateSealedClaimForm_whenValidDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
             .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
@@ -102,7 +102,7 @@ class SealedClaimFormGeneratorTest {
 
         @Test
         void whenCaseIsAtClaimCreated_shouldGetSealedClaimFormData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .build();
 

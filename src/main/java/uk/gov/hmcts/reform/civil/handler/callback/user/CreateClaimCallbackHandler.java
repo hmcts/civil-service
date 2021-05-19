@@ -22,8 +22,10 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -63,21 +65,22 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
-        + "\n\n Your claim will not be issued until payment is confirmed. Once payment is confirmed you will "
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
-        + "\n\n You must notify the defendant of the claim within 4 months of the claim being issued. The exact "
+        + "%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. The exact "
         + "date when you must notify the claim details will be provided when you first notify "
         + "the defendant of the claim.";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
-        + "\n\n To continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
+        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
         + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
         + "the defendant within 4 months. "
-        + "\n\nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
+        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
+    private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
@@ -94,14 +97,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateDateOfBirth)
-            .put(callbackKey(MID, "fee"), this::calculateFeeBackwardsCompatible)
-            .put(callbackKey(V_1, MID, "fee"), this::calculateFee)
+            .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
-            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
+            .put(callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim)
+            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimBackwardsCompatible)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -149,26 +153,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse calculateFeeBackwardsCompatible(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String paymentReference = ofNullable(caseData.getPaymentReference())
-            .orElse(references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""));
-
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<String> pbaNumbers = getPbaAccounts(authToken);
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
-            .paymentReference(paymentReference);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
@@ -212,12 +196,42 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
+        // must be to do with the way XUI cache data entered through the lifecycle of an event.
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(null)
+            .build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().applicantSolicitor1ClaimStatementOfTruth(null).build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse submitClaimBackwardsCompatible(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -239,10 +253,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
+        return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -275,6 +286,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
-        );
+        ) + exitSurveyContentService.applicantSurvey();
     }
 }

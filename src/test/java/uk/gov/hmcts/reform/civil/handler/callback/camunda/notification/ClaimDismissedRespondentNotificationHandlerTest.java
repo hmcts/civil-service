@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.claimdismissed;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,16 +20,17 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    ApplicantClaimDismissedNotificationHandler.class,
+    ClaimDismissedRespondentNotificationHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-class ApplicantClaimDismissedNotificationHandlerTest {
+class ClaimDismissedRespondentNotificationHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
-    public static final String EMAIL = "claimantsolicitor@example.com";
 
     @MockBean
     private NotificationService notificationService;
@@ -37,15 +39,14 @@ class ApplicantClaimDismissedNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
 
     @Autowired
-    private ApplicantClaimDismissedNotificationHandler handler;
+    private ClaimDismissedRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getApplicantSolicitorClaimDismissed()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getApplicantSolicitorEmail()).thenReturn(EMAIL);
+            when(notificationsProperties.getSolicitorClaimDismissed()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
@@ -56,19 +57,20 @@ class ApplicantClaimDismissedNotificationHandlerTest {
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                EMAIL,
+                "respondentsolicitor@example.com",
                 TEMPLATE_ID,
-                getExpectedMap(),
-                "applicant-claim-strike-out-notification-000DC001"
+                getNotificationDataMap(caseData),
+                "claim-dismissed-respondent-notification-000DC001"
             );
         }
     }
 
-    private Map<String, String> getExpectedMap() {
+    @NotNull
+    private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            "claimReferenceNumber", "000DC001",
-            "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
-            "defendantName", "Mr. Sole Trader"
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
         );
     }
+
 }

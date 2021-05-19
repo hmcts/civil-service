@@ -19,7 +19,10 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimDetailsEmailTemplate;
 
     @NotEmpty
-    private String solicitorResponseToCase;
+    private String solicitorDefendantResponseCaseTakenOffline;
+
+    @NotEmpty
+    private String claimantSolicitorDefendantResponseFullDefence;
 
     @NotEmpty
     private String respondentSolicitorAcknowledgeClaim;
@@ -28,17 +31,26 @@ public class NotificationsProperties {
     private String failedPayment;
 
     @NotEmpty
-    private String applicantSolicitorEmail;
-
-    @NotEmpty
-    private String respondentSolicitorEmail;
-
-    @NotEmpty
-    private String applicantSolicitorClaimDismissed;
-
-    @NotEmpty
-    private String respondentSolicitorClaimDismissed;
+    private String solicitorClaimDismissed;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
+
+    @NotEmpty
+    private String claimantSolicitorAgreedExtensionDate;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsToProceed;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceed;
+
+    @NotEmpty
+    private String claimantSolicitorClaimContinuingOnline;
+
+    @NotEmpty
+    private String solicitorCaseTakenOffline;
+
+    @NotEmpty
+    private String solicitorLitigationFriendAdded;
 }

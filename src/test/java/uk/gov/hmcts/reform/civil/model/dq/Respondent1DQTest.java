@@ -1,23 +1,14 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.HearingLength;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
-import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-class Respondent1DQTest {
+class Respondent1DQTest extends DQTest {
 
     @Test
     void shouldGetVariables_usingInterfaceMethods() {
@@ -56,114 +47,117 @@ class Respondent1DQTest {
             .build();
     }
 
-    private DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments() {
-        return DisclosureOfNonElectronicDocuments.builder()
-            .directionsForDisclosureProposed(YesOrNo.YES)
-            .standardDirectionsRequired(YesOrNo.YES)
-            .bespokeDirections("non electronic documents")
-            .build();
+    @Nested
+    class GetExperts {
+
+        @Test
+        void shouldRemoveDetails_whenNoExpertsRequired() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQExperts(dq.getExperts().toBuilder()
+                                          .expertRequired(NO)
+                                          .build())
+                .build();
+
+            assertThat(dq.getExperts().getDetails()).isNull();
+        }
+
+        @Test
+        void shouldNotRemoveDetails_whenExpertsRequired() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQExperts(dq.getExperts().toBuilder()
+                                          .expertRequired(YES)
+                                          .build())
+                .build();
+
+            assertThat(dq.getExperts()).isEqualTo(experts());
+        }
+
+        @Test
+        void shouldReturnNull_whenExpertsIsNull() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQExperts(null)
+                .build();
+
+            assertThat(dq.getExperts()).isNull();
+        }
     }
 
-    private Witnesses witnesses() {
-        return Witnesses.builder()
-            .witnessesToAppear(YesOrNo.YES)
-            .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
-            .build();
+    @Nested
+    class GetWitnesses {
+
+        @Test
+        void shouldRemoveDetails_whenNoWitnessesToAppear() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
+                                          .witnessesToAppear(NO)
+                                          .build())
+                .build();
+
+            assertThat(dq.getWitnesses().getDetails()).isNull();
+        }
+
+        @Test
+        void shouldNotRemoveDetails_whenWitnessesToAppear() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
+                                          .witnessesToAppear(YES)
+                                          .build())
+                .build();
+
+            assertThat(dq.getWitnesses()).isEqualTo(witnesses());
+        }
+
+        @Test
+        void shouldReturnNull_whenWitnessesIsNull() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQWitnesses(null)
+                .build();
+
+            assertThat(dq.getWitnesses()).isNull();
+        }
     }
 
-    private StatementOfTruth statementOfTruth() {
-        return StatementOfTruth.builder()
-            .name("John Smith")
-            .role("Solicitor")
-            .build();
-    }
+    @Nested
+    class GetHearing {
 
-    private RequestedCourt requestedCourt() {
-        return RequestedCourt.builder()
-            .responseCourtCode("343")
-            .reasonForHearingAtSpecificCourt("reason for court")
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
-            .build();
-    }
+        @Test
+        void shouldRemoveUnavailableDates_whenNoUnavailableDatesRequired() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQHearing(dq.getHearing().toBuilder()
+                                            .unavailableDatesRequired(NO)
+                                            .build())
+                .build();
 
-    private HearingSupport hearingSupport() {
-        return HearingSupport.builder()
-            .requirements(List.of(SupportRequirements.values()))
-            .languageToBeInterpreted("English")
-            .signLanguageRequired("Spanish")
-            .otherSupport("other support")
-            .build();
-    }
+            assertThat(dq.getHearing().getUnavailableDates()).isNull();
+        }
 
-    private Hearing hearing() {
-        return Hearing.builder()
-            .hearingLength(HearingLength.LESS_THAN_DAY)
-            .hearingLengthHours("1")
-            .unavailableDatesRequired(YesOrNo.YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder().who("John Smith").date(LocalDate.now()).build()))
-            .build();
-    }
+        @Test
+        void shouldNotRemoveUnavailableDates_whenUnavailableDatesRequired() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQHearing(dq.getHearing().toBuilder()
+                                            .unavailableDatesRequired(YES)
+                                            .build())
+                .build();
 
-    private FurtherInformation furtherInformation() {
-        return FurtherInformation.builder()
-            .futureApplications(YesOrNo.YES)
-            .otherInformationForJudge("Other information")
-            .reasonForFutureApplications("Reason for future applications")
-            .build();
-    }
+            assertThat(dq.getHearing().getUnavailableDates()).isEqualTo(hearing().getUnavailableDates());
+        }
 
-    private FileDirectionsQuestionnaire fileDirectionsQuestionnaire() {
-        return FileDirectionsQuestionnaire.builder()
-            .explainedToClient(List.of("yes"))
-            .oneMonthStayRequested(YesOrNo.YES)
-            .reactionProtocolCompliedWith(YesOrNo.NO)
-            .reactionProtocolNotCompliedWithReason("Not complied with reason")
-            .build();
-    }
+        @Test
+        void shouldReturnNull_whenUnavailableDatesIsNull() {
+            Respondent1DQ dq = buildRespondent1Dq();
+            dq = dq.toBuilder()
+                .respondent1DQHearing(null)
+                .build();
 
-    private Experts experts() {
-        return Experts.builder()
-            .expertRequired(YesOrNo.YES)
-            .expertReportsSent(ExpertReportsSent.YES)
-            .jointExpertSuitable(YesOrNo.YES)
-            .details(wrapElements(Expert.builder()
-                .name("John Smith")
-                .fieldOfExpertise("Science")
-                .estimatedCost(BigDecimal.ONE)
-                .whyRequired("Reason")
-                .build()))
-            .build();
-    }
-
-    private Document draftDirections() {
-        return Document.builder()
-            .documentBinaryUrl("binary url")
-            .documentFileName("Order")
-            .documentUrl("url")
-            .build();
-    }
-
-    private DisclosureReport disclosureReport() {
-        return DisclosureReport.builder()
-            .disclosureFormFiledAndServed(YesOrNo.YES)
-            .disclosureProposalAgreed(YesOrNo.YES)
-            .draftOrderNumber("order number")
-            .build();
-    }
-
-    private DisclosureOfElectronicDocuments disclosureOfElectronicDocuments() {
-        return DisclosureOfElectronicDocuments.builder()
-            .agreementLikely(YesOrNo.YES)
-            .reachedAgreement(YesOrNo.NO)
-            .reasonForNoAgreement("reason")
-            .build();
-    }
-
-    private WelshLanguageRequirements welshLanguageRequirements() {
-        return WelshLanguageRequirements.builder()
-            .court(Language.WELSH)
-            .documents(Language.WELSH)
-            .evidence(Language.WELSH)
-            .build();
+            assertThat(dq.getHearing()).isNull();
+        }
     }
 }

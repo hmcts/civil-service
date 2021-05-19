@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
@@ -41,6 +44,8 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 
 @SpringBootTest(classes = {
     InformAgreedExtensionDateCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     DeadlineExtensionValidator.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
@@ -50,6 +55,9 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Autowired
     private InformAgreedExtensionDateCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
@@ -62,7 +70,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateClaimCreated().build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -79,7 +87,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnExpectedError_whenValuesAreInvalid() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .extensionDate(now().minusDays(1))
                 .build();
 
@@ -94,7 +102,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnNoError_whenValuesAreValid() {
-            CaseData caseData = CaseDataBuilder.builder().atStateExtensionRequested()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
                 .build();
 
@@ -138,13 +146,23 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(INFORM_AGREED_EXTENSION_DATE.name());
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
         }
     }
 
     @Nested
     class SubmittedCallback {
 
-        private static final String BODY = "<br />What happens next.%n%n You must respond to the claimant by %s";
+        private static final String BODY = "<br />What happens next%n%n You must respond to the claimant by %s";
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
@@ -159,7 +177,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response).isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Extension deadline submitted")
-                    .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT)))
+                    .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

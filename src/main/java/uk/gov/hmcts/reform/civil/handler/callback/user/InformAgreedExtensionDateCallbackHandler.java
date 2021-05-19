@@ -10,8 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 
@@ -36,6 +38,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE);
 
+    private final ExitSurveyContentService exitSurveyContentService;
     private final DeadlineExtensionValidator validator;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -74,7 +77,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
             .respondent1TimeExtensionDate(time.now())
-            .respondent1ResponseDeadline(newDeadline);
+            .respondent1ResponseDeadline(newDeadline)
+            .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -86,9 +90,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
         String body = format(
-            "<br />What happens next.%n%n You must respond to the claimant by %s",
-            formatLocalDateTime(responseDeadline, DATE_TIME_AT)
-        );
+            "<br />What happens next%n%n You must respond to the claimant by %s",
+            formatLocalDateTime(responseDeadline, DATE_TIME_AT)) + exitSurveyContentService.respondentSurvey();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Extension deadline submitted")
             .confirmationBody(body)

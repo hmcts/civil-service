@@ -22,15 +22,6 @@ module "key-vault" {
   create_managed_identity = true
 }
 
-locals {
-  vaultName = "${var.product}-${var.env}"
-}
-
-data "azurerm_key_vault" "civil_key_vault" {
-  name = local.vaultName
-  resource_group_name = "${var.product}-${var.component}-${var.env}"
-}
-
 resource "azurerm_application_insights" "appinsights" {
   name                = "${var.product}-${var.component}-${var.env}"
   location            = var.appinsights_location
@@ -49,13 +40,17 @@ data "azurerm_key_vault_secret" "send_grid_api_key" {
   provider = azurerm.send-grid
 
   key_vault_id = data.azurerm_key_vault.send_grid.id
-  name         = "hmcts-damages-api-key"
+  name         = "hmcts-civil-api-key"
 }
 
 resource "azurerm_key_vault_secret" "sendgrid_api_key" {
-  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+  key_vault_id = module.key-vault.key_vault_id
   name         = "sendgrid-api-key"
   value        = data.azurerm_key_vault_secret.send_grid_api_key.value
+
+  depends_on = [
+    module.key-vault
+  ]
 }
 
 data "azurerm_key_vault" "s2s_vault" {
@@ -71,7 +66,11 @@ data "azurerm_key_vault_secret" "s2s_secret" {
 resource "azurerm_key_vault_secret" "civil_s2s_secret" {
   name         = "microservicekey-civil-service"
   value        = data.azurerm_key_vault_secret.s2s_secret.value
-  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+  key_vault_id = module.key-vault.key_vault_id
+
+  depends_on = [
+    module.key-vault
+  ]
 }
 
 data "azurerm_key_vault" "cmc_vault" {
@@ -87,5 +86,29 @@ data "azurerm_key_vault_secret" "db_password_secret" {
 resource "azurerm_key_vault_secret" "civil_db_password_secret" {
   name         = "cmc-db-password"
   value        = data.azurerm_key_vault_secret.db_password_secret.value
-  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+  key_vault_id = module.key-vault.key_vault_id
+
+  depends_on = [
+    module.key-vault
+  ]
+}
+
+data "azurerm_key_vault" "ethos_vault" {
+  name                = "ethos-${var.env}"
+  resource_group_name = "ethos-repl-docmosis-backend-${var.env}"
+}
+
+data "azurerm_key_vault_secret" "tornado_access_secret" {
+  key_vault_id = "${data.azurerm_key_vault.ethos_vault.id}"
+  name = "tornado-access-key"
+}
+
+resource "azurerm_key_vault_secret" "civil_docmosis_api_key" {
+  name         = "docmosis-api-key"
+  value        = data.azurerm_key_vault_secret.tornado_access_secret.value
+  key_vault_id = module.key-vault.key_vault_id
+
+  depends_on = [
+    module.key-vault
+  ]
 }

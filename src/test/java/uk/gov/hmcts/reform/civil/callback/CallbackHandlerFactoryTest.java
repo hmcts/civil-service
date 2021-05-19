@@ -87,7 +87,7 @@ class CallbackHandlerFactoryTest {
                 }
 
                 @Override
-                public String camundaActivityId() {
+                public String camundaActivityId(CallbackParams callbackParams) {
                     return "CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1";
                 }
 

@@ -163,7 +163,7 @@ task contract(type: Test) {
 }
 
 task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine './bin/pull-latest-release-asset.sh', 'civil-damages-ccd-definition', 'civil-damages-e2e.zip'
+  commandLine './bin/pull-latest-release-asset.sh', 'civil-ccd-definition', 'civil-e2e.zip'
 }
 
 task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
@@ -184,7 +184,7 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
+  commandLine '/usr/bin/yarn', '--silent', 'test:functional'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {

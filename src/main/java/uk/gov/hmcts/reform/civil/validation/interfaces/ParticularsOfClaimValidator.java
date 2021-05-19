@@ -17,4 +17,13 @@ public interface ParticularsOfClaimValidator {
             .errors(servedDocumentFiles.getErrors())
             .build();
     }
+
+    default CallbackResponse validateParticularsOfClaimBackwardsCompatible(CallbackParams callbackParams) {
+        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
+            .orElse(ServedDocumentFiles.builder().build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(servedDocumentFiles.getErrorsBackwardsCompatible())
+            .build();
+    }
 }

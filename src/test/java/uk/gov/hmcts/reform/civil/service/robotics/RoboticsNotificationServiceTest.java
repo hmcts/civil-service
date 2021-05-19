@@ -76,7 +76,7 @@ class RoboticsNotificationServiceTest {
     @Test
     @SneakyThrows
     void shouldSendNotificationEmail_whenCaseDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         service.notifyRobotics(caseData);
 

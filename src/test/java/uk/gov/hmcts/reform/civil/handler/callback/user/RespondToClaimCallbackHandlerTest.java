@@ -14,26 +14,33 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -45,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -56,6 +64,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToClaimCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
@@ -72,6 +82,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RespondToClaimCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @Nested
     class AboutToStartCallback {
@@ -95,7 +108,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
@@ -109,7 +122,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
@@ -123,7 +136,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
@@ -138,7 +151,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimCreated()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
                                  .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
@@ -159,10 +172,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
-            Hearing hearing = Hearing.builder().unavailableDates(wrapElements(
-                UnavailableDate.builder()
-                    .date(now().plusYears(5))
-                    .build()))
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusYears(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -179,9 +191,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenUnavailableDateIsInPast() {
             Hearing hearing = Hearing.builder()
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .date(now().minusYears(5))
-                                                   .build()))
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().minusYears(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -197,9 +208,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenUnavailableDateIsValid() {
             Hearing hearing = Hearing.builder()
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .date(now().plusDays(5))
-                                                   .build()))
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -215,6 +225,20 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenNoUnavailableDate() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(Hearing.builder().build()).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenUnavailableDatesNotRequired() {
+            Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -282,18 +306,70 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class StatementOfTruth {
+    class MidEventCallbackValidateWitnesses {
+
+        private static final String PAGE_ID = "witnesses";
 
         @Test
-        void shouldSetStatementOfTruthToNull_whenPopulated() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        void shouldReturnError_whenWitnessRequiredAndNullDetails() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessNotRequired() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidStatementOfTruth {
+
+        @Test
+        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("respondent1DQStatementOfTruth")
-                .isNull();
+                .extracting("uiStatementOfTruth")
+                .extracting("name", "role")
+                .containsExactly(null, null);
         }
     }
 
@@ -342,6 +418,61 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
         }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_whenInvoked() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        V_1,
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("respondent1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(name, role);
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
+
+            @Test
+            void shouldKeepApplicantStatementOfTruth_whenV1Callback() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("respondent1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("John Doe", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .isNull();
+            }
+        }
     }
 
     @Nested
@@ -359,8 +490,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# You've submitted your response%n## Claim number: 000DC001"))
                     .confirmationBody(format(
                         "<br />The claimant has until %s to proceed. We will let you know when they respond.",
-                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE)
-                    ))
+                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
+                        + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

@@ -16,23 +16,30 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -43,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -52,6 +60,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToDefenceCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
@@ -64,6 +74,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RespondToDefenceCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @Nested
     class AboutToStartCallback {
@@ -89,6 +102,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().plusYears(5)).build()))
@@ -111,6 +125,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().minusYears(5)).build()))
@@ -133,6 +148,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
+                                                           .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
                                                                UnavailableDate.builder().date(
                                                                    LocalDate.now().plusDays(5)).build()))
@@ -158,6 +174,67 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenUnavailableDatesNotRequired() {
+            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
+            caseDataBuilder
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(hearing).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventCallbackValidateWitnesses {
+
+        private static final String PAGE_ID = "witnesses";
+
+        @Test
+        void shouldReturnError_whenWitnessRequiredAndNullDetails() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessNotRequired() {
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
@@ -220,18 +297,24 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class StatementOfTruth {
+    class MidStatementOfTruth {
 
         @Test
-        void shouldSetStatementOfTruthToNull_whenPopulated() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("applicant1DQStatementOfTruth")
-                .isNull();
+                .extracting("uiStatementOfTruth")
+                .extracting("name", "role")
+                .containsExactly(null, null);
         }
     }
 
@@ -262,6 +345,61 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldKeepStatementOfTruth_whenInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("Bob Jones", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .isNull();
+            }
+
+            @Test
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenV1Callback() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        V_1,
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("John Smith", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
+        }
     }
 
     @Nested
@@ -281,7 +419,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# You've chosen to proceed with the claim%n## Claim number: 000DC001"))
                     .confirmationBody(format(
                         "<br />We'll review the case and contact you to tell you what to do next.%n%n"
-                            + "[Download directions questionnaire](http://www.google.com)"))
+                            + "[Download directions questionnaire](http://www.google.com)"
+                    ) + exitSurveyContentService.applicantSurvey())
                     .build());
         }
 
@@ -299,7 +438,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You've chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000DC001"))
-                    .confirmationBody("<br />")
+                    .confirmationBody(exitSurveyContentService.applicantSurvey())
                     .build());
         }
     }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.claimdismissed;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -17,16 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_CLAIM_DISMISSED;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE;
 
 @Service
 @RequiredArgsConstructor
-public class ApplicantClaimDismissedNotificationHandler extends CallbackHandler implements NotificationData {
+public class CaseTakenOfflineApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_CLAIM_DISMISSED);
-    public static final String TASK_ID = "NotifyApplicantSolicitor1ClaimDismissed";
-    private static final String REFERENCE_TEMPLATE = "applicant-claim-strike-out-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE);
+
+    public static final String TASK_ID = "TakeCaseOfflineNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "case-taken-offline-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -34,12 +33,12 @@ public class ApplicantClaimDismissedNotificationHandler extends CallbackHandler 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorOfClaimDismissed
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseTakenOffline
         );
     }
 
     @Override
-    public String camundaActivityId() {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 
@@ -48,16 +47,15 @@ public class ApplicantClaimDismissedNotificationHandler extends CallbackHandler 
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantSolicitorOfClaimDismissed(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            notificationsProperties.getApplicantSolicitorEmail(),
-            notificationsProperties.getApplicantSolicitorClaimDismissed(),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSolicitorCaseTakenOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -65,7 +63,6 @@ public class ApplicantClaimDismissedNotificationHandler extends CallbackHandler 
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
         );
     }
