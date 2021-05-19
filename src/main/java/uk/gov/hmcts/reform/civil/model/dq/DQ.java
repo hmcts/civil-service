@@ -18,9 +18,30 @@ public interface DQ {
 
     Experts getExperts();
 
+    default Experts getExperts(Experts experts) {
+        if (ofNullable(experts).map(Experts::getExpertRequired).map(NO::equals).orElse(false)) {
+            return experts.toBuilder().details(null).build();
+        }
+        return experts;
+    }
+
     Witnesses getWitnesses();
 
+    default Witnesses getWitnesses(Witnesses witnesses) {
+        if (ofNullable(witnesses).map(Witnesses::getWitnessesToAppear).map(NO::equals).orElse(false)) {
+            return witnesses.toBuilder().details(null).build();
+        }
+        return witnesses;
+    }
+
     Hearing getHearing();
+
+    default Hearing getHearing(Hearing hearing) {
+        if (ofNullable(hearing).map(Hearing::getUnavailableDatesRequired).map(NO::equals).orElse(false)) {
+            return hearing.toBuilder().unavailableDates(null).build();
+        }
+        return hearing;
+    }
 
     Document getDraftDirections();
 
@@ -33,25 +54,4 @@ public interface DQ {
     WelshLanguageRequirements getWelshLanguageRequirements();
 
     StatementOfTruth getStatementOfTruth();
-
-    default Experts getExperts(Experts experts) {
-        if (ofNullable(experts).map(Experts::getExpertRequired).map(NO::equals).orElse(false)) {
-            return experts.toBuilder().details(null).build();
-        }
-        return experts;
-    }
-
-    default Witnesses getWitnesses(Witnesses witnesses) {
-        if (ofNullable(witnesses).map(Witnesses::getWitnessesToAppear).map(NO::equals).orElse(false)) {
-            return witnesses.toBuilder().details(null).build();
-        }
-        return witnesses;
-    }
-
-    default Hearing getHearing(Hearing hearing) {
-        if (ofNullable(hearing).map(Hearing::getUnavailableDatesRequired).map(NO::equals).orElse(false)) {
-            return hearing.toBuilder().unavailableDates(null).build();
-        }
-        return hearing;
-    }
 }
