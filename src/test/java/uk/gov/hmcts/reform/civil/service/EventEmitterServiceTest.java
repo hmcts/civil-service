@@ -5,10 +5,12 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
+import uk.gov.hmcts.reform.civil.config.CamundaConfiguration;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -19,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {JacksonAutoConfiguration.class, CaseDetailsConverter.class})
+@SpringBootTest(classes = {JacksonAutoConfiguration.class, CaseDetailsConverter.class, CamundaConfiguration.class})
 class EventEmitterServiceTest {
 
     @Mock
@@ -31,12 +33,16 @@ class EventEmitterServiceTest {
     @MockBean
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
+    @Autowired
+    private CamundaConfiguration camundaConfiguration;
+
     private EventEmitterService eventEmitterService;
 
     @BeforeEach
     void setup() {
-        eventEmitterService = new EventEmitterService(applicationEventPublisher, runtimeService);
+        eventEmitterService = new EventEmitterService(applicationEventPublisher, runtimeService, camundaConfiguration);
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
+        when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
     }
 
@@ -51,6 +57,7 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
+        verify(messageCorrelationBuilder).tenantId("civil");
         verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
@@ -68,6 +75,7 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
+        verify(messageCorrelationBuilder).tenantId("civil");
         verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verifyNoInteractions(applicationEventPublisher);
@@ -85,6 +93,7 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
         verify(runtimeService).createMessageCorrelation("TEST_EVENT");
+        verify(messageCorrelationBuilder).tenantId("civil");
         verify(messageCorrelationBuilder).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).correlateStartMessage();
         verifyNoInteractions(applicationEventPublisher);
