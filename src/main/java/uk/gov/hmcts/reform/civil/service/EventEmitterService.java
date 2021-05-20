@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.config.CamundaConfiguration;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -18,7 +17,6 @@ public class EventEmitterService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RuntimeService runtimeService;
-    private final CamundaConfiguration camundaConfiguration;
 
     public void emitBusinessProcessCamundaEvent(CaseData caseData, boolean dispatchProcess) {
         var caseId = caseData.getCcdCaseReference();
@@ -27,7 +25,6 @@ public class EventEmitterService {
         log.info(format("Emitting %s camunda event for case: %d", camundaEvent, caseId));
         try {
             runtimeService.createMessageCorrelation(camundaEvent)
-                .tenantId(camundaConfiguration.getTenantId())
                 .setVariable("caseId", caseId)
                 .correlateStartMessage();
 
