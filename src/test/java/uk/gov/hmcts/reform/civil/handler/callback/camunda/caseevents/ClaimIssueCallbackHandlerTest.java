@@ -64,4 +64,12 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
     }
 
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("IssueClaim");
+    }
 }

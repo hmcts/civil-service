@@ -24,8 +24,14 @@ public class ValidateFeeCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(VALIDATE_FEE);
     private static final String ERROR_MESSAGE = "Fee has changed since claim submitted. It needs to be validated again";
+    private static final String TASK_ID = "ValidateClaimFee";
 
     private final FeesService feesService;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
