@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -45,10 +46,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
+            .documentUrl("fake-url")
+            .documentFileName("file-name")
+            .documentBinaryUrl("binary-url")
+            .build())
         .build();
 
     @MockBean
@@ -68,9 +69,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
-                                                           .documentType(DIRECTIONS_QUESTIONNAIRE)
-                                                           .build()))
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -82,25 +81,5 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
-    }
-
-    @Test
-    void shouldReturnDefendantResponseActivityId_whenDefendantRespond() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        assertThat(handler.camundaActivityId(params))
-            .isEqualTo("DefendantResponseFullDefenceGenerateDirectionsQuestionnaire");
-    }
-
-    @Test
-    void shouldReturnResponseToDefenceActivityId_whenClaimantProceedsCase() {
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        assertThat(handler.camundaActivityId(params))
-            .isEqualTo("ClaimantResponseGenerateDirectionsQuestionnaire");
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -13,64 +12,23 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
-    ProceedOfflineForUnRepresentedCallbackHandler.class,
-    ProceedOfflineForUnRegisteredCallbackHandler.class,
+    ProceedOfflineCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
 class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Nested
-    class UnregisteredCallback {
+    @Autowired
+    ProceedOfflineCallbackHandler handler;
 
-        @Autowired
-        ProceedOfflineForUnRegisteredCallbackHandler handler;
+    @Test
+    void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        @Test
-        void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
-        }
-
-        @Test
-        void shouldReturnCorrectActivityId_whenRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            assertThat(handler.camundaActivityId(params)).isEqualTo("ProceedOfflineForUnregisteredFirm");
-        }
-    }
-
-    @Nested
-    class UnrepresentedCallback {
-
-        @Autowired
-        ProceedOfflineForUnRepresentedCallbackHandler handler;
-
-        @Test
-        void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
-        }
-
-        @Test
-        void shouldReturnCorrectActivityId_whenRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            assertThat(handler.camundaActivityId(params)).isEqualTo("ProceedOfflineForUnRepresentedSolicitor");
-        }
+        assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
     }
 }

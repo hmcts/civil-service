@@ -28,18 +28,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_DIRECTIONS_QUESTIONNAIRE);
-    private static final String TASK_ID = "DefendantResponseFullDefenceGenerateDirectionsQuestionnaire";
-    private static final String CLAIMANT_TASK_ID = "ClaimantResponseGenerateDirectionsQuestionnaire";
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final ObjectMapper objectMapper;
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return callbackParams.getCaseData().getApplicant1ResponseDate() != null
-            ? CLAIMANT_TASK_ID
-            : TASK_ID;
-    }
 
     @Override
     protected Map<String, Callback> callbacks() {

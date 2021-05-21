@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
@@ -18,8 +19,9 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 
+@Service
 @RequiredArgsConstructor
-public abstract class ProceedOfflineCallbackHandler extends CallbackHandler {
+public class ProceedOfflineCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCEEDS_IN_HERITAGE_SYSTEM);
 
@@ -30,7 +32,7 @@ public abstract class ProceedOfflineCallbackHandler extends CallbackHandler {
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::captureTakenOfflineDate);
     }
 
-    protected CallbackResponse captureTakenOfflineDate(CallbackParams callbackParams) {
+    private CallbackResponse captureTakenOfflineDate(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
             .takenOfflineDate(LocalDateTime.now())
             .build();
