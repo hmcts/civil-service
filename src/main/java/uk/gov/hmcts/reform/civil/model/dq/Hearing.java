@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Hearing {
 
     private final HearingLength hearingLength;
