@@ -31,8 +31,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim,
-            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimBackwardsCompatible,
+            callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaimAddOrAmendDocuments,
+            callbackKey(MID, "particulars-of-claim"),
+            this::validateParticularsOfClaimAddOrAmendDocumentsBackwardsCompatible,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
