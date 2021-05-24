@@ -29,10 +29,16 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
+    private static final String TASK_ID = "GenerateClaimForm";
 
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
