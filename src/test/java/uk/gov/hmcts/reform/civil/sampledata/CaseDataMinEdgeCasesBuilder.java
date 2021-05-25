@@ -152,4 +152,43 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendantMinimumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendantMinimumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendantMinimumData() {
+        atStatePaymentSuccessfulMinimumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = NO;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulMinimumData() {
+        atStateClaimSubmittedMinimumData();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentReference = "12345";
+        paymentSuccessfulDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimSubmittedMinimumData() {
+        atStateClaimDraftWithMinimalData();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = FAST_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = LocalDateTime.now();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .customerReference("r")
+            .build();
+        return this;
+    }
 }
