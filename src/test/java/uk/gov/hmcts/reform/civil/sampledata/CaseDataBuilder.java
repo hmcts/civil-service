@@ -77,74 +77,74 @@ public class CaseDataBuilder {
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
 
     // Create Claim
-    private Long ccdCaseReference;
-    private SolicitorReferences solicitorReferences;
-    private CourtLocation courtLocation;
-    private Party applicant1;
-    private YesOrNo applicant1LitigationFriendRequired;
-    private Party respondent1;
-    private YesOrNo respondent1Represented;
-    private String respondentSolicitor1EmailAddress;
-    private ClaimValue claimValue;
-    private ClaimType claimType;
-    private String claimTypeOther;
-    private PersonalInjuryType personalInjuryType;
-    private String personalInjuryTypeOther;
-    private DynamicList applicantSolicitor1PbaAccounts;
-    private Fee claimFee;
-    private StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
-    private StatementOfTruth uiStatementOfTruth;
-    private String paymentReference;
-    private String legacyCaseReference;
-    private AllocatedTrack allocatedTrack;
-    private CaseState ccdState;
-    private List<Element<CaseDocument>> systemGeneratedCaseDocuments;
-    private PaymentDetails claimIssuedPaymentDetails;
-    private CorrectEmail applicantSolicitor1CheckEmail;
-    private IdamUserDetails applicantSolicitor1UserDetails;
+    protected Long ccdCaseReference;
+    protected SolicitorReferences solicitorReferences;
+    protected CourtLocation courtLocation;
+    protected Party applicant1;
+    protected YesOrNo applicant1LitigationFriendRequired;
+    protected Party respondent1;
+    protected YesOrNo respondent1Represented;
+    protected String respondentSolicitor1EmailAddress;
+    protected ClaimValue claimValue;
+    protected ClaimType claimType;
+    protected String claimTypeOther;
+    protected PersonalInjuryType personalInjuryType;
+    protected String personalInjuryTypeOther;
+    protected DynamicList applicantSolicitor1PbaAccounts;
+    protected Fee claimFee;
+    protected StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
+    protected StatementOfTruth uiStatementOfTruth;
+    protected String paymentReference;
+    protected String legacyCaseReference;
+    protected AllocatedTrack allocatedTrack;
+    protected CaseState ccdState;
+    protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    protected PaymentDetails claimIssuedPaymentDetails;
+    protected CorrectEmail applicantSolicitor1CheckEmail;
+    protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
-    private LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    protected LocalDate respondentSolicitor1AgreedDeadlineExtension;
     //Acknowledge Claim
-    private ResponseIntention respondent1ClaimResponseIntentionType;
+    protected ResponseIntention respondent1ClaimResponseIntentionType;
     // Defendant Response
-    private RespondentResponseType respondent1ClaimResponseType;
-    private ResponseDocument respondent1ClaimResponseDocument;
-    private Respondent1DQ respondent1DQ;
-    private Applicant1DQ applicant1DQ;
+    protected RespondentResponseType respondent1ClaimResponseType;
+    protected ResponseDocument respondent1ClaimResponseDocument;
+    protected Respondent1DQ respondent1DQ;
+    protected Applicant1DQ applicant1DQ;
     // Claimant Response
-    private YesOrNo applicant1ProceedWithClaim;
-    private ResponseDocument applicant1DefenceResponseDocument;
-    private BusinessProcess businessProcess;
+    protected YesOrNo applicant1ProceedWithClaim;
+    protected ResponseDocument applicant1DefenceResponseDocument;
+    protected BusinessProcess businessProcess;
 
     //Case proceeds in caseman
-    private ClaimProceedsInCaseman claimProceedsInCaseman;
+    protected ClaimProceedsInCaseman claimProceedsInCaseman;
 
-    private CloseClaim withdrawClaim;
-    private CloseClaim discontinueClaim;
-    private YesOrNo respondent1OrgRegistered;
-    private OrganisationPolicy applicant1OrganisationPolicy;
-    private OrganisationPolicy respondent1OrganisationPolicy;
+    protected CloseClaim withdrawClaim;
+    protected CloseClaim discontinueClaim;
+    protected YesOrNo respondent1OrgRegistered;
+    protected OrganisationPolicy applicant1OrganisationPolicy;
+    protected OrganisationPolicy respondent1OrganisationPolicy;
 
     //dates
-    private LocalDateTime submittedDate;
-    private LocalDateTime paymentSuccessfulDate;
-    private LocalDate issueDate;
-    private LocalDateTime claimNotificationDeadline;
-    private LocalDateTime claimNotificationDate;
-    private LocalDateTime claimDetailsNotificationDeadline;
-    private LocalDateTime claimDetailsNotificationDate;
-    private LocalDateTime respondent1ResponseDeadline;
-    private LocalDateTime claimDismissedDeadline;
-    private LocalDateTime respondent1TimeExtensionDate;
-    private LocalDateTime respondent1AcknowledgeNotificationDate;
-    private LocalDateTime respondent1ResponseDate;
-    private LocalDateTime applicant1ResponseDeadline;
-    private LocalDateTime applicant1ResponseDate;
-    private LocalDateTime takenOfflineDate;
-    private LocalDateTime takenOfflineByStaffDate;
-    private LocalDateTime claimDismissedDate;
+    protected LocalDateTime submittedDate;
+    protected LocalDateTime paymentSuccessfulDate;
+    protected LocalDate issueDate;
+    protected LocalDateTime claimNotificationDeadline;
+    protected LocalDateTime claimNotificationDate;
+    protected LocalDateTime claimDetailsNotificationDeadline;
+    protected LocalDateTime claimDetailsNotificationDate;
+    protected LocalDateTime respondent1ResponseDeadline;
+    protected LocalDateTime claimDismissedDeadline;
+    protected LocalDateTime respondent1TimeExtensionDate;
+    protected LocalDateTime respondent1AcknowledgeNotificationDate;
+    protected LocalDateTime respondent1ResponseDate;
+    protected LocalDateTime applicant1ResponseDeadline;
+    protected LocalDateTime applicant1ResponseDate;
+    protected LocalDateTime takenOfflineDate;
+    protected LocalDateTime takenOfflineByStaffDate;
+    protected LocalDateTime claimDismissedDate;
 
-    private SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
@@ -769,7 +769,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private CaseDataBuilder takenOfflineByStaff() {
+    public CaseDataBuilder takenOfflineByStaff() {
         claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
             .date(LocalDate.now())
             .reason(ReasonForProceedingOnPaper.APPLICATION)

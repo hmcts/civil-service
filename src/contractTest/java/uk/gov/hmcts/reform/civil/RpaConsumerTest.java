@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -108,6 +109,23 @@ class RpaConsumerTest extends BaseRpaTest {
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_WithMaximumData() {
+            CaseData caseData = CaseDataEdgeCasesBuilder.builder()
+                .atStateProceedsOfflineUnrepresentedDefendantMaximumData()
+                .legacyCaseReference("100DC001")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim against unrepresented defendant - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
     }
 
     @Nested
@@ -132,7 +150,7 @@ class RpaConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendantWithMinimalData() {
+        void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_withMinimalData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantWithMinimalData()
                 .legacyCaseReference("000DC003")
@@ -142,6 +160,23 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for claim against unrepresented defendant - minimal data";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendantWithMinimalData_withMaximalData() {
+            CaseData caseData = CaseDataEdgeCasesBuilder.builder()
+                .atStateProceedsOfflineUnregisteredDefendantMaximumData()
+                .legacyCaseReference("100DC003")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim against unrepresented defendant - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
