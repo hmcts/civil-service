@@ -968,6 +968,23 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnPaymentFailed_whenCaseDataAtStatePaymentFailed() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(3)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+        }
+
+        @Test
         void shouldReturnAwaitingCaseNotification_whenCaseDataAtStateAwaitingCaseNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             if (caseData.getRespondent2OrgRegistered() != null
