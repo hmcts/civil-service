@@ -40,6 +40,8 @@ class ServedDocumentFilesTest {
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
             assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
+            assertThat(servedDocumentFiles.getErrorsBackwardsCompatible()).isEmpty();
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocumentsBackwardsCompatible()).isEmpty();
         }
 
         @Test
@@ -47,6 +49,8 @@ class ServedDocumentFilesTest {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder().build();
 
             assertThat(servedDocumentFiles.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(servedDocumentFiles.getErrorsBackwardsCompatible()).containsOnly(
+                "You must add Particulars of claim details");
         }
 
         @Test
