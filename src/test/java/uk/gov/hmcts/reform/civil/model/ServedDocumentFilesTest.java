@@ -23,6 +23,16 @@ class ServedDocumentFilesTest {
         }
 
         @Test
+        void shouldReturnEmptyList_WhenOnlyDocumentBackwardsCompatible() {
+            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
+                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
+                .build();
+
+            assertThat(servedDocumentFiles.getErrorsBackwardsCompatible()).isEmpty();
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocumentsBackwardsCompatible()).isEmpty();
+        }
+
+        @Test
         void shouldReturnEmptyList_WhenOnlyText() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
                 .particularsOfClaimText("Some string")
@@ -50,6 +60,21 @@ class ServedDocumentFilesTest {
                 .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "
                                   + "of claim text in the field provided. You cannot do both.");
             assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments())
+                .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "
+                                  + "of claim text in the field provided. You cannot do both.");
+        }
+
+        @Test
+        void shouldReturnMoreThanOneError_WhenBothParticularsOfClaimFieldsAreNotNullBackwardsCompatible() {
+            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
+                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
+                .particularsOfClaimText("Some string")
+                .build();
+
+            assertThat(servedDocumentFiles.getErrorsBackwardsCompatible())
+                .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "
+                                  + "of claim text in the field provided. You cannot do both.");
+            assertThat(servedDocumentFiles.getErrorsAddOrAmendDocumentsBackwardsCompatible())
                 .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "
                                   + "of claim text in the field provided. You cannot do both.");
         }

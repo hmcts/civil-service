@@ -78,7 +78,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
+        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmittedBackwardsCompatible() {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
                                                                         .particularsOfClaimText("Some string")
                                                                         .particularsOfClaimDocument(
