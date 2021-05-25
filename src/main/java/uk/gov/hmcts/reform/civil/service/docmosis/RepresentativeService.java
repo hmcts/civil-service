@@ -34,6 +34,15 @@ public class RepresentativeService {
             .orElse(Representative.builder().build());
     }
 
+    public Representative getApplicantRepresentative(CaseData caseData) {
+        var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
+                                                  .orElseThrow(RuntimeException::new));
+        return representative.toBuilder()
+            .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
+            .build();
+    }
+
     private boolean organisationPicked(CaseData caseData) {
         var flowState = fromFullName(stateFlowEngine.evaluate(caseData).getState().getName());
         return flowState != PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT

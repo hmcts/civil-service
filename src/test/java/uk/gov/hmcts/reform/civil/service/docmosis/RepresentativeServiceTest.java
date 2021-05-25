@@ -127,5 +127,40 @@ class RepresentativeServiceTest {
 
         }
     }
+
+    @Nested
+    class GetApplicantRepresentative {
+
+        @Test
+        void shouldReturnValidOrganisationDetails_whenApplicantIsRepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+
+            Representative representative = representativeService.getApplicantRepresentative(caseData);
+
+            verify(organisationService).findOrganisationById(
+                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
+            assertThat(representative).extracting("organisationName").isEqualTo(organisation.getName());
+            assertThat(representative).extracting("dxAddress").isEqualTo(
+                contactInformation.getDxAddress().get(0).getDxNumber());
+            assertThat(representative).extracting("emailAddress").isEqualTo(
+                caseData.getApplicantSolicitor1UserDetails().getEmail());
+            assertThat(representative).extracting("serviceAddress").extracting(
+                "AddressLine1",
+                "AddressLine2",
+                "AddressLine3",
+                "County",
+                "Country",
+                "PostCode"
+            ).containsExactly(
+                contactInformation.getAddressLine1(),
+                contactInformation.getAddressLine2(),
+                contactInformation.getAddressLine3(),
+                contactInformation.getCounty(),
+                contactInformation.getCountry(),
+                contactInformation.getPostCode()
+            );
+        }
+
+    }
 }
 
