@@ -15,7 +15,8 @@ import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataEdgeCasesBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -113,7 +114,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_WithMaximumData() {
-            CaseData caseData = CaseDataEdgeCasesBuilder.builder()
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantMaximumData()
                 .legacyCaseReference("100DC001")
                 .build();
@@ -151,7 +152,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_withMinimalData() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantWithMinimalData()
                 .legacyCaseReference("000DC003")
                 .build();
@@ -168,7 +169,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendantWithMinimalData_withMaximalData() {
-            CaseData caseData = CaseDataEdgeCasesBuilder.builder()
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnregisteredDefendantMaximumData()
                 .legacyCaseReference("100DC003")
                 .build();
@@ -207,7 +208,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmissionWithMinimalData() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
                 .legacyCaseReference("000DC005")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
@@ -246,7 +247,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmissionWithMinimalData() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(FULL_ADMISSION)
                 .legacyCaseReference("000DC007")
                 .build();
@@ -285,7 +286,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaimWithMinimalData() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(COUNTER_CLAIM)
                 .legacyCaseReference("000DC009")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)

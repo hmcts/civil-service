@@ -25,15 +25,15 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
+public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
 
     public static final int MAX_ALLOWED = 255;
 
-    public static CaseDataEdgeCasesBuilder builder() {
-        return new CaseDataEdgeCasesBuilder();
+    public static CaseDataMaxEdgeCasesBuilder builder() {
+        return new CaseDataMaxEdgeCasesBuilder();
     }
 
-    public CaseDataEdgeCasesBuilder atStateClaimDraftWithMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStateClaimDraftWithMaximumData() {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
             .build();
@@ -72,7 +72,7 @@ public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStateClaimSubmittedMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStateClaimSubmittedMaximumData() {
         atStateClaimDraftWithMaximumData();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
@@ -85,7 +85,7 @@ public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendantMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendantMaximumData() {
         atStatePendingClaimIssuedUnRepresentedDefendantMaximumData();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -94,14 +94,14 @@ public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendantMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendantMaximumData() {
         atStatePaymentSuccessfulMaximumData();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStatePaymentSuccessfulMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStatePaymentSuccessfulMaximumData() {
         atStateClaimSubmittedMaximumData();
         claimIssuedPaymentDetails = PaymentDetails.builder()
             .status(SUCCESS)
@@ -112,7 +112,7 @@ public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendantMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendantMaximumData() {
         atStatePendingClaimIssuedUnRegisteredDefendantMaximumData();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -129,7 +129,7 @@ public class CaseDataEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataEdgeCasesBuilder atStatePendingClaimIssuedUnRegisteredDefendantMaximumData() {
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRegisteredDefendantMaximumData() {
         atStatePaymentSuccessfulMaximumData();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;

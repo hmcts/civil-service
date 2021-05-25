@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import static com.google.common.base.Strings.repeat;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataEdgeCasesBuilder.MAX_ALLOWED;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder.MAX_ALLOWED;
 
 public class StatementOfTruthBuilder {
 
