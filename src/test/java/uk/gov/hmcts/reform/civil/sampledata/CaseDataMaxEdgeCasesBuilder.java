@@ -4,6 +4,7 @@ import joptsimple.internal.Strings;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -14,14 +15,20 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.google.common.base.Strings.repeat;
 import static java.math.BigDecimal.TEN;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -134,6 +141,66 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateRespondentRespondToClaimWithMaximalData(
+        RespondentResponseType respondentResponseType
+    ) {
+        atStateNotificationAcknowledgedWithMaximumData();
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateNotificationAcknowledgedWithMaximumData() {
+        atStateClaimDetailsNotifiedWithMaximumData();
+        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent1AcknowledgeNotificationDate = LocalDateTime.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateClaimDetailsNotifiedWithMaximumData() {
+        atStateClaimNotifiedWithMaximumData();
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateClaimNotifiedWithMaximumData() {
+        atStateClaimIssuedWihMaximumData();
+        claimNotificationDate = LocalDate.now().atStartOfDay();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateClaimIssuedWihMaximumData() {
+        atStatePendingClaimIssuedWithMaximumData();
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedWithMaximumData() {
+        atStatePaymentSuccessfulWithMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePaymentSuccessfulWithMaximumData() {
+        atStateClaimSubmittedMaximumData();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentReference = "12345";
+        paymentSuccessfulDate = LocalDateTime.now();
         return this;
     }
 }

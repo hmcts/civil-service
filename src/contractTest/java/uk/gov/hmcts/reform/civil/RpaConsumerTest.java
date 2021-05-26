@@ -224,7 +224,7 @@ class RpaConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenDefendantRespondedWithPartAdmissionWithMinimalData() {
+        void shouldGeneratePact_whenDefendantRespondedWithPartAdmission_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
                 .legacyCaseReference("000DC005")
@@ -235,6 +235,24 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for defendant responded with part admission - minimal data";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenDefendantRespondedWithPartAdmission_withMaximalData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateRespondentRespondToClaimWithMaximalData(PART_ADMISSION)
+                .legacyCaseReference("100DC005")
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with part admission - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
