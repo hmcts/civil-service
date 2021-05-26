@@ -23,6 +23,6 @@ public class RootController {
      */
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to civil-service");
+        return ok("Welcome to civil-service orchestration test branch");
     }
 }
