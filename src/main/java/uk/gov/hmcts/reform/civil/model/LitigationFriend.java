@@ -15,5 +15,5 @@ public class LitigationFriend {
     private final String fullName;
     private final YesOrNo hasSameAddressAsLitigant;
     private final Address primaryAddress;
-    private final List<Element<Document>> certificateOfSuitability;
+    private final List<Element<DocumentWithRegex>> certificateOfSuitability;
 }
