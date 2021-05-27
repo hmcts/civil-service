@@ -108,6 +108,11 @@ notifications:
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
+os-postcode-lookup:
+  url: https://api.ordnancesurvey.co.uk/opennames/v1/find
+  key: ${OS_POSTCODE_LOOKUP_API_KEY:}
+  offline-mode: false
+
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
   offline-mode: false

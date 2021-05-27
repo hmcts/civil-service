@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -90,6 +91,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final OnBoardingOrganisationControlService onboardingOrganisationControlService;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final PostcodeValidator postcodeValidator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -107,6 +109,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .build();
     }
 
@@ -287,5 +290,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 }
