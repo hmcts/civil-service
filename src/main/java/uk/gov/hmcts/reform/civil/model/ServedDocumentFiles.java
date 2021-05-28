@@ -24,12 +24,16 @@ public class ServedDocumentFiles {
     private String particularsOfClaimText;
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
+    private final String bothParticularsOfClaimError = "You need to either upload 1 Particulars of claim only "
+        + "or enter the Particulars of claim text in the field provided. You cannot do both.";
+    private final String emptyError = "You must add Particulars of claim details";
+
     @JsonIgnore
     public List<String> getErrors() {
         List<String> errors = getErrorsAddOrAmendDocuments();
 
         if (ofNullable(particularsOfClaimDocumentNew).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("You must add Particulars of claim details");
+            errors.add(emptyError);
         }
         return errors;
     }
@@ -38,8 +42,7 @@ public class ServedDocumentFiles {
     public List<String> getErrorsAddOrAmendDocuments() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocumentNew).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
-                + "of claim text in the field provided. You cannot do both.");
+            errors.add(bothParticularsOfClaimError);
         }
         return errors;
     }
@@ -49,7 +52,7 @@ public class ServedDocumentFiles {
         List<String> errors = getErrorsAddOrAmendDocumentsBackwardsCompatible();
 
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("You must add Particulars of claim details");
+            errors.add(emptyError);
         }
         return errors;
     }
@@ -58,8 +61,7 @@ public class ServedDocumentFiles {
     public List<String> getErrorsAddOrAmendDocumentsBackwardsCompatible() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
-                           + "of claim text in the field provided. You cannot do both.");
+            errors.add(bothParticularsOfClaimError);
         }
         return errors;
     }

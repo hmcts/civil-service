@@ -10,44 +10,39 @@ import static java.util.Optional.ofNullable;
 
 public interface ParticularsOfClaimValidator {
 
-    private ServedDocumentFiles getServedDocumentFiles(CaseData caseData) {
-        ServedDocumentFiles servedDocumentFiles = caseData.getServedDocumentFiles();
+    private ServedDocumentFiles getServedDocumentFiles(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
 
-        return ofNullable(servedDocumentFiles)
+        return ofNullable(caseData.getServedDocumentFiles())
            .orElse(ServedDocumentFiles.builder().build());
     }
 
     default CallbackResponse validateParticularsOfClaim(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(caseData).getErrors())
+            .errors(getServedDocumentFiles(callbackParams).getErrors())
             .build();
     }
 
     default CallbackResponse validateParticularsOfClaimAddOrAmendDocuments(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(caseData).getErrorsAddOrAmendDocuments())
+            .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocuments())
             .build();
     }
 
     default CallbackResponse validateParticularsOfClaimBackwardsCompatible(CallbackParams callbackParams) {
-        ServedDocumentFiles servedDocumentFiles = ofNullable(callbackParams.getCaseData().getServedDocumentFiles())
-            .orElse(ServedDocumentFiles.builder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(servedDocumentFiles.getErrorsBackwardsCompatible())
+            .errors(getServedDocumentFiles(callbackParams).getErrorsBackwardsCompatible())
             .build();
     }
 
     default CallbackResponse validateParticularsOfClaimAddOrAmendDocumentsBackwardsCompatible(CallbackParams
                                                                                                   callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(caseData).getErrorsAddOrAmendDocumentsBackwardsCompatible())
+            .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocumentsBackwardsCompatible())
             .build();
     }
 }
