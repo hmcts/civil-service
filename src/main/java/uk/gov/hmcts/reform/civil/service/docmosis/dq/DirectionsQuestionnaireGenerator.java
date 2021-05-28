@@ -59,14 +59,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private String getFileName(CaseData caseData) {
-        return String.format(N181.getDocumentTitle(), caseData.getLegacyCaseReference());
+        String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
+        return String.format(N181.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-        String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        DQ dq = state.equals(FULL_DEFENCE.fullName()) ? caseData.getRespondent1DQ()
-            : caseData.getApplicant1DQ();
+        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -87,6 +86,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
+    }
+
+    private Boolean isRespondentState(CaseData caseData) {
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        return state.equals(FULL_DEFENCE.fullName());
     }
 
     private Applicant getApplicant(CaseData caseData) {
