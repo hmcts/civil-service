@@ -281,7 +281,7 @@ class RpaConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenDefendantRespondedWithFullAdmissionWithMinimalData() {
+        void shouldGeneratePact_whenDefendantRespondedWithFullAdmission_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(FULL_ADMISSION)
                 .legacyCaseReference("000DC007")
@@ -291,6 +291,23 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for defendant responded with full admission - minimal data";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenDefendantRespondedWithFullAdmission_withMaximalData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateRespondentRespondToClaimWithMaximalData(FULL_ADMISSION)
+                .legacyCaseReference("100DC007")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with full admission - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
@@ -320,7 +337,7 @@ class RpaConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenDefendantRespondedWithCounterClaimWithMinimalData() {
+        void shouldGeneratePact_whenDefendantRespondedWithCounterClaim_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(COUNTER_CLAIM)
                 .legacyCaseReference("000DC009")
@@ -331,6 +348,24 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for defendant responded with counter claim - minimal data";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenDefendantRespondedWithCounterClaim_withMaximalData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateRespondentRespondToClaimWithMaximalData(COUNTER_CLAIM)
+                .legacyCaseReference("100DC009")
+                .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for defendant responded with counter claim - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
