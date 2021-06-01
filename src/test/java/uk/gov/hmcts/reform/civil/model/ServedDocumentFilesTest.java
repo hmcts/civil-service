@@ -15,7 +15,7 @@ class ServedDocumentFilesTest {
         @Test
         void shouldReturnEmptyList_WhenOnlyDocument() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocumentNew(wrapElements(Document.builder().build()))
+                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
                 .build();
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
@@ -40,7 +40,7 @@ class ServedDocumentFilesTest {
         @Test
         void shouldReturnMoreThanOneError_WhenBothParticularsOfClaimFieldsAreNotNull() {
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocumentNew(wrapElements(Document.builder().build()))
+                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
                 .particularsOfClaimText("Some string")
                 .build();
 
