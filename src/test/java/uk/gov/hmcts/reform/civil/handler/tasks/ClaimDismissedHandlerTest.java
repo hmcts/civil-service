@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -111,5 +112,34 @@ class ClaimDismissedHandlerTest {
             anyInt(),
             anyLong()
         );
+    }
+
+    @Test
+    void shouldHandleExceptionAndContinue_whenOneCaseErrors() {
+        long caseId = 1L;
+        long otherId = 2L;
+        Map<String, Object> data = Map.of("data", "some data");
+        List<CaseDetails> caseDetails = List.of(
+            CaseDetails.builder().id(caseId).data(data).build(),
+            CaseDetails.builder().id(otherId).data(data).build());
+
+        when(searchService.getCases()).thenReturn(caseDetails);
+
+        String errorMessage = "there was an error";
+
+        doThrow(new NullPointerException(errorMessage))
+            .when(applicationEventPublisher).publishEvent(eq(new DismissClaimEvent(caseId)));
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService, never()).handleFailure(
+            any(ExternalTask.class),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyLong()
+        );
+
+        verify(applicationEventPublisher, times(2)).publishEvent(any(DismissClaimEvent.class));
     }
 }
