@@ -116,7 +116,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_WithMaximumData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantMaximumData()
-                .legacyCaseReference("100DC001")
+                .legacyCaseReference("000DC002")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -133,7 +133,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_WithMinimumData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantMinimumData()
-                .legacyCaseReference("001DC001")
+                .legacyCaseReference("000DC003")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -154,7 +154,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
-                .legacyCaseReference("000DC002")
+                .legacyCaseReference("000DC004")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -171,7 +171,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendant_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendantWithMinimalData()
-                .legacyCaseReference("000DC003")
+                .legacyCaseReference("000DC005")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -188,7 +188,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenClaimAgainstUnrepresentedDefendantWithMinimalData_withMaximalData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateProceedsOfflineUnregisteredDefendantMaximumData()
-                .legacyCaseReference("100DC003")
+                .legacyCaseReference("000DC006")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -209,7 +209,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmission()
-                .legacyCaseReference("000DC004")
+                .legacyCaseReference("000DC007")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -227,7 +227,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
-                .legacyCaseReference("000DC005")
+                .legacyCaseReference("000DC008")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -245,7 +245,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission_withMaximalData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMaximalData(PART_ADMISSION)
-                .legacyCaseReference("100DC005")
+                .legacyCaseReference("000DC009")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -267,7 +267,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullAdmission()
-                .legacyCaseReference("000DC006")
+                .legacyCaseReference("000DC010")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -284,7 +284,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(FULL_ADMISSION)
-                .legacyCaseReference("000DC007")
+                .legacyCaseReference("000DC011")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -301,7 +301,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission_withMaximalData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMaximalData(FULL_ADMISSION)
-                .legacyCaseReference("100DC007")
+                .legacyCaseReference("000DC012")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -322,7 +322,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentCounterClaim()
-                .legacyCaseReference("000DC008")
+                .legacyCaseReference("000DC013")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -340,7 +340,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(COUNTER_CLAIM)
-                .legacyCaseReference("000DC009")
+                .legacyCaseReference("000DC014")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -358,7 +358,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDefendantRespondedWithCounterClaim_withMaximalData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMaximalData(COUNTER_CLAIM)
-                .legacyCaseReference("100DC009")
+                .legacyCaseReference("000DC015")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -380,7 +380,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceNotProceeds() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
-                .legacyCaseReference("000DC010")
+                .legacyCaseReference("000DC016")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -398,7 +398,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceNotProceeds_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateApplicantRespondToDefenceAndNotProceedMinimumData()
-                .legacyCaseReference("000DC010")
+                .legacyCaseReference("000DC017")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -420,7 +420,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceProceeds() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .legacyCaseReference("000DC011")
+                .legacyCaseReference("000DC018")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -438,7 +438,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceProceeds_withMinimalData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .legacyCaseReference("000DC011")
+                .legacyCaseReference("000DC019")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -459,7 +459,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenCaseTakenOfflineAfterClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff()
-                .legacyCaseReference("000DC012")
+                .legacyCaseReference("000DC020")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -475,7 +475,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenCaseTakenOfflineAfterClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimNotified()
-                .legacyCaseReference("000DC013")
+                .legacyCaseReference("000DC021")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -491,7 +491,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenCaseTakenOfflineAfterClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified()
-                .legacyCaseReference("000DC014")
+                .legacyCaseReference("000DC022")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -508,7 +508,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
-                .legacyCaseReference("000DC015")
+                .legacyCaseReference("000DC023")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -525,7 +525,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenCaseTakenOfflineAfterNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledged()
-                .legacyCaseReference("000DC016")
+                .legacyCaseReference("000DC024")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -542,7 +542,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
-                .legacyCaseReference("000DC017")
+                .legacyCaseReference("000DC025")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -559,7 +559,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenCaseTakenOfflineAfterDefendantResponse() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterDefendantResponse()
-                .legacyCaseReference("000DC018")
+                .legacyCaseReference("000DC026")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -579,7 +579,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenDeadlinePassedAfterStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed()
-                .legacyCaseReference("000DC018")
+                .legacyCaseReference("000DC027")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -596,7 +596,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDeadlinePassedAfterStateClaimDetailsNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
-                .legacyCaseReference("000DC019")
+                .legacyCaseReference("000DC028")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -613,7 +613,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
-                .legacyCaseReference("000DC020")
+                .legacyCaseReference("000DC029")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -630,7 +630,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
-                .legacyCaseReference("000DC021")
+                .legacyCaseReference("000DC030")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -652,7 +652,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
-                .legacyCaseReference("000DC022")
+                .legacyCaseReference("000DC031")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
