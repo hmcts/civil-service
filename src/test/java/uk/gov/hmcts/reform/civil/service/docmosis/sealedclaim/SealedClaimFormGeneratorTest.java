@@ -43,7 +43,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator.TEMP_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
 
 @ExtendWith(SpringExtension.class)
@@ -77,6 +76,7 @@ class SealedClaimFormGeneratorTest {
     @BeforeEach
     void setup() {
         when(representativeService.getRespondentRepresentative(any())).thenReturn(representative);
+        when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
     }
 
     @Test
@@ -108,7 +108,7 @@ class SealedClaimFormGeneratorTest {
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
 
-            verify(representativeService).getRespondentRepresentative(caseData);
+            verify(representativeService).getApplicantRepresentative(caseData);
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 
@@ -124,7 +124,7 @@ class SealedClaimFormGeneratorTest {
                     templateData.getStatementOfTruth(),
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
                 ),
-                () -> assertEquals(TEMP_CLAIM_DETAILS, templateData.getClaimDetails()),
+                () -> assertEquals(templateData.getClaimDetails(), caseData.getDetailsOfClaim()),
                 () -> assertEquals(
                     templateData.getHearingCourtLocation(),
                     caseData.getCourtLocation().getApplicantPreferredCourt()
@@ -158,22 +158,6 @@ class SealedClaimFormGeneratorTest {
                                .build());
         }
 
-        private Representative getRepresentative() {
-            return Representative.builder()
-                .organisationName("MiguelSpooner")
-                .dxAddress("DX 751Newport")
-                .organisationName("DBE Law")
-                .phoneNumber("0800 206 1592")
-                .emailAddress("jim.smith@slatergordon.com")
-                .serviceAddress(Address.builder()
-                                    .addressLine1("AdmiralHouse")
-                                    .addressLine2("Queensway")
-                                    .postTown("Newport")
-                                    .postCode("NP204AG")
-                                    .build())
-                .build();
-        }
-
         private List<Applicant> getApplicants(CaseData caseData) {
             Party applicant = caseData.getApplicant1();
             return List.of(Applicant.builder()
@@ -182,5 +166,20 @@ class SealedClaimFormGeneratorTest {
                                .litigationFriendName("applicant LF")
                                .build());
         }
+    }
+
+    private Representative getRepresentative() {
+        return Representative.builder()
+            .organisationName("MiguelSpooner")
+            .dxAddress("DX 751Newport")
+            .organisationName("DBE Law")
+            .emailAddress("jim.smith@slatergordon.com")
+            .serviceAddress(Address.builder()
+                                .addressLine1("AdmiralHouse")
+                                .addressLine2("Queensway")
+                                .postTown("Newport")
+                                .postCode("NP204AG")
+                                .build())
+            .build();
     }
 }
