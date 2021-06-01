@@ -10,7 +10,9 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -189,6 +191,47 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         claimIssuedPaymentDetails = PaymentDetails.builder()
             .customerReference("r")
             .build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateApplicantRespondToDefenceAndProceed() {
+        atStateRespondentFullDefenceMinimumData();
+        applicant1ProceedWithClaim = YES;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateApplicantRespondToDefenceAndNotProceedMinimumData() {
+        atStateRespondentFullDefenceMinimumData();
+        applicant1ProceedWithClaim = NO;
+        applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateRespondentFullDefenceMinimumData() {
+        atStateRespondentRespondToClaimMinimumData(RespondentResponseType.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateRespondentRespondToClaimMinimumData(
+        RespondentResponseType respondentResponseType
+    ) {
+        atStateServiceAcknowledgeWithMinimalData();
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 }

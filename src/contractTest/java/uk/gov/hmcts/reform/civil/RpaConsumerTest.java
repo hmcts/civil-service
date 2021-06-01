@@ -392,6 +392,24 @@ class RpaConsumerTest extends BaseRpaTest {
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceNotProceeds_withMinimalData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateApplicantRespondToDefenceAndNotProceedMinimumData()
+                .legacyCaseReference("000DC010")
+                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for applicant responded with not to proceeds - minimal data";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
     }
 
     @Nested
@@ -410,6 +428,24 @@ class RpaConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data for applicant responded with confirms to proceeds";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceProceeds_withMinimalData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .legacyCaseReference("000DC011")
+                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for applicant responded with confirms to proceeds - minimal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
