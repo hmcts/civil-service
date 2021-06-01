@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
 import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
 
@@ -142,5 +141,7 @@ class TakeCaseOfflineHandlerTest {
         );
 
         verify(applicationEventPublisher, times(2)).publishEvent(any(TakeCaseOfflineEvent.class));
+        verify(applicationEventPublisher).publishEvent(new TakeCaseOfflineEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new TakeCaseOfflineEvent(otherId));
     }
 }

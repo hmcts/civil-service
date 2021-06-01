@@ -141,5 +141,7 @@ class ClaimDismissedHandlerTest {
         );
 
         verify(applicationEventPublisher, times(2)).publishEvent(any(DismissClaimEvent.class));
+        verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(otherId));
     }
 }
