@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = List.of(ADD_DEFENDANT_LITIGATION_FRIEND);
 
     private final ObjectMapper objectMapper;
+    private final ExitSurveyContentService exitSurveyContentService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,7 +58,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# You have added litigation friend details")
-            .confirmationBody("<br />")
+            .confirmationBody(exitSurveyContentService.respondentSurvey())
             .build();
     }
 }
