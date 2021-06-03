@@ -103,8 +103,9 @@ class DirectionsQuestionnaireGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE)))
-            .thenReturn(CASE_DOCUMENT_DEFENDANT);
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+        ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
@@ -122,8 +123,9 @@ class DirectionsQuestionnaireGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE)))
-            .thenReturn(CASE_DOCUMENT_CLAIMANT);
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+        ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
 
