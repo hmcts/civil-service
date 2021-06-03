@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +59,13 @@ public class FlowStateAllowedEventService {
             DRAFT.fullName(),
             List.of(
                 CREATE_CLAIM
+            )
+        ),
+
+        entry(
+            SPEC_DRAFT.fullName(),
+            List.of(
+                CREATE_CLAIM_SPEC
             )
         ),
 
@@ -247,8 +256,14 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
-        return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
+        if (caseEvent.toString() == "CREATE_CLAIM_SPEC") {
+            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
+            return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
+        } else {
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
+            return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
+        }
+
     }
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
