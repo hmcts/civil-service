@@ -36,6 +36,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
     }
 
+    public boolean isMultipartyEnabled() {
+        return internalClient.boolVariation("multiparty", createLDUser().build(), false);
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
