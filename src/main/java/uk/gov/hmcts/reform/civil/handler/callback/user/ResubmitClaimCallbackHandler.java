@@ -53,7 +53,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId() != null
-            && callbackParams.getRequest().getEventId().toString() == "CREATE_CLAIM_SPEC") {
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
                 .build();

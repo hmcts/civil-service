@@ -284,4 +284,10 @@ public class StateFlowEngine {
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
     }
+
+    public boolean hasSpecTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
+        return evaluateSpec(caseDetails).getStateHistory().stream()
+            .map(State::getName)
+            .anyMatch(name -> name.equals(state.fullName()));
+    }
 }

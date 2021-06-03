@@ -256,7 +256,7 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        if (caseEvent.toString() == "CREATE_CLAIM_SPEC") {
+        if (caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
             StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
         } else {
