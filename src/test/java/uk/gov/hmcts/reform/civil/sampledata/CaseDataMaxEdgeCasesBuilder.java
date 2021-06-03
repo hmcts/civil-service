@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
@@ -201,6 +202,47 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
             .build();
         paymentReference = "12345";
         paymentSuccessfulDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateApplicantRespondToDefenceAndNotProceedMaximumData() {
+        atStateRespondentFullDefenceMaximumData();
+        applicant1ProceedWithClaim = NO;
+        applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruthBuilder.maximal().build();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateApplicantRespondToDefenceAndProceed() {
+        atStateRespondentFullDefenceMaximumData();
+        applicant1ProceedWithClaim = YES;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = LocalDateTime.now();
+        uiStatementOfTruth = StatementOfTruthBuilder.maximal().build();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateRespondentFullDefenceMaximumData() {
+        atStateRespondentRespondToClaimMaximumData(RespondentResponseType.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateRespondentRespondToClaimMaximumData(
+        RespondentResponseType respondentResponseType
+    ) {
+        atStateNotificationAcknowledgedWithMaximumData();
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 }
