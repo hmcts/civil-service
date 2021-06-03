@@ -99,7 +99,7 @@ class DirectionsQuestionnaireGeneratorTest {
     }
 
     @Test
-    void shouldGenerateCertificateOfService_whenValidDataIsProvided_forDefendant() {
+    void shouldGenerateDefendantCertificateOfService_whenStateFlowIsFullDefence() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
@@ -118,7 +118,7 @@ class DirectionsQuestionnaireGeneratorTest {
     }
 
     @Test
-    void shouldGenerateCertificateOfService_whenValidDataIsProvided_forClaimant() {
+    void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
