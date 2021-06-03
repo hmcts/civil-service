@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -24,12 +25,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
-    public static final String FLOW_STATE = "flowState";
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
 
     private VariableMap variables;
 
@@ -38,6 +39,7 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
         CaseData caseData = startBusinessProcess(externalTask);
         variables = Variables.createVariables();
         variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(caseData).getState().getName());
+        variables.putValue(MULTIPARTY_ENABLED, featureToggleService.isMultipartyEnabled());
     }
 
     @Override
