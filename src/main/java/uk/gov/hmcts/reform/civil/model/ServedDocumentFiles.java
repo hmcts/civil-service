@@ -24,30 +24,44 @@ public class ServedDocumentFiles {
     private String particularsOfClaimText;
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
+    private static final String BOTH_PARTICULARS_OF_CLAIM_ERROR = "You need to either upload 1 Particulars of claim "
+        + "only or enter the Particulars of claim text in the field provided. You cannot do both.";
+    private static final String EMPTY_ERROR = "You must add Particulars of claim details";
+
     @JsonIgnore
     public List<String> getErrors() {
-        List<String> errors = new ArrayList<>();
-        if (ofNullable(particularsOfClaimDocumentNew).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
-                           + "of claim text in the field provided. You cannot do both.");
-        }
+        List<String> errors = getErrorsAddOrAmendDocuments();
 
         if (ofNullable(particularsOfClaimDocumentNew).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("You must add Particulars of claim details");
+            errors.add(EMPTY_ERROR);
+        }
+        return errors;
+    }
+
+    @JsonIgnore
+    public List<String> getErrorsAddOrAmendDocuments() {
+        List<String> errors = new ArrayList<>();
+        if (ofNullable(particularsOfClaimDocumentNew).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
+            errors.add(BOTH_PARTICULARS_OF_CLAIM_ERROR);
         }
         return errors;
     }
 
     @JsonIgnore
     public List<String> getErrorsBackwardsCompatible() {
-        List<String> errors = new ArrayList<>();
-        if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add("You need to either upload 1 Particulars of claim only or enter the Particulars "
-                           + "of claim text in the field provided. You cannot do both.");
-        }
+        List<String> errors = getErrorsAddOrAmendDocumentsBackwardsCompatible();
 
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add("You must add Particulars of claim details");
+            errors.add(EMPTY_ERROR);
+        }
+        return errors;
+    }
+
+    @JsonIgnore
+    public List<String> getErrorsAddOrAmendDocumentsBackwardsCompatible() {
+        List<String> errors = new ArrayList<>();
+        if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
+            errors.add(BOTH_PARTICULARS_OF_CLAIM_ERROR);
         }
         return errors;
     }

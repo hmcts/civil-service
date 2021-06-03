@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
@@ -20,6 +21,8 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     AddOrAmendClaimDocumentsCallbackHandler.class,
@@ -44,23 +47,43 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
 
         @Test
-        void shouldReturnErrors_whenNoDocuments() {
+        void shouldNotReturnErrors_whenNoDocuments() {
+            CaseData caseData = caseDataBuilder.build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenNoDocumentsBackwardsCompatible() {
             CaseData caseData = caseDataBuilder.build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
-        void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
+        void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmpty() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmptyBackwardsCompatible() {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -68,6 +91,74 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
                                                                         .particularsOfClaimText("Some string")
                                                                         .build()).build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValidBackwardsCompatible() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .particularsOfClaimDocumentNew(
+                                                                            wrapElements(Document.builder().build()))
+                                                                        .build()).build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly(
+                "You need to either upload 1 Particulars of claim only or enter the "
+                    + "Particulars of claim text in the field provided. You cannot do both.");
+        }
+
+        @Test
+        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmittedBackwardsCompatible() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .particularsOfClaimDocument(
+                                                                            wrapElements(Document.builder().build()))
+                                                                        .build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly(
+                "You need to either upload 1 Particulars of claim only or enter the "
+                    + "Particulars of claim text in the field provided. You cannot do both.");
+        }
+
+        @Test
+        void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmitted() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string").build())
+                                                                        .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmittedBackwardsCompatible() {
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimText("Some string").build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
