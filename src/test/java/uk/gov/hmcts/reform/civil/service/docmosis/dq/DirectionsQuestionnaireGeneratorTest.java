@@ -67,11 +67,15 @@ class DirectionsQuestionnaireGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
-    private static final String USER_PREFIX = "defendant";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N181.getDocumentTitle(), USER_PREFIX, REFERENCE_NUMBER);
-    private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+    private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final CaseDocument CASE_DOCUMENT_DEFENDANT = CaseDocumentBuilder.builder()
+        .documentName(FILE_NAME_DEFENDANT)
+        .documentType(DIRECTIONS_QUESTIONNAIRE)
+        .build();
+    private static final CaseDocument CASE_DOCUMENT_CLAIMANT = CaseDocumentBuilder.builder()
+        .documentName(FILE_NAME_CLAIMANT)
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .build();
 
@@ -95,21 +99,40 @@ class DirectionsQuestionnaireGeneratorTest {
     }
 
     @Test
-    void shouldGenerateCertificateOfService_whenValidDataIsProvided() {
+    void shouldGenerateCertificateOfService_whenValidDataIsProvided_forDefendant() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DIRECTIONS_QUESTIONNAIRE)))
-            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE)))
+            .thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
         verify(representativeService).getRespondentRepresentative(caseData);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DIRECTIONS_QUESTIONNAIRE));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+        verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+    }
+
+    @Test
+    void shouldGenerateCertificateOfService_whenValidDataIsProvided_forClaimant() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+            .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE)))
+            .thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
         verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
     }
 
