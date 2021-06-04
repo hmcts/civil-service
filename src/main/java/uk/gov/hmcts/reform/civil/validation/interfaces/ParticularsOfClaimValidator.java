@@ -14,7 +14,7 @@ public interface ParticularsOfClaimValidator {
         CaseData caseData = callbackParams.getCaseData();
 
         return ofNullable(caseData.getServedDocumentFiles())
-           .orElse(ServedDocumentFiles.builder().build());
+            .orElse(ServedDocumentFiles.builder().build());
     }
 
     default CallbackResponse validateParticularsOfClaim(CallbackParams callbackParams) {
@@ -28,21 +28,6 @@ public interface ParticularsOfClaimValidator {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocuments())
-            .build();
-    }
-
-    default CallbackResponse validateParticularsOfClaimBackwardsCompatible(CallbackParams callbackParams) {
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(callbackParams).getErrorsBackwardsCompatible())
-            .build();
-    }
-
-    default CallbackResponse validateParticularsOfClaimAddOrAmendDocumentsBackwardsCompatible(CallbackParams
-                                                                                                  callbackParams) {
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocumentsBackwardsCompatible())
             .build();
     }
 }

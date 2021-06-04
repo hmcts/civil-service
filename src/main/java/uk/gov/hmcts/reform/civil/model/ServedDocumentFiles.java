@@ -20,7 +20,6 @@ public class ServedDocumentFiles {
     private List<Element<DocumentWithRegex>> medicalReport;
     private List<Element<DocumentWithRegex>> scheduleOfLoss;
     private List<Element<Document>> particularsOfClaimDocument;
-    private List<Element<Document>> particularsOfClaimDocumentNew;
     private String particularsOfClaimText;
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
 
@@ -32,25 +31,6 @@ public class ServedDocumentFiles {
     public List<String> getErrors() {
         List<String> errors = getErrorsAddOrAmendDocuments();
 
-        if (ofNullable(particularsOfClaimDocumentNew).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
-            errors.add(EMPTY_ERROR);
-        }
-        return errors;
-    }
-
-    @JsonIgnore
-    public List<String> getErrorsAddOrAmendDocuments() {
-        List<String> errors = new ArrayList<>();
-        if (ofNullable(particularsOfClaimDocumentNew).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
-            errors.add(BOTH_PARTICULARS_OF_CLAIM_ERROR);
-        }
-        return errors;
-    }
-
-    @JsonIgnore
-    public List<String> getErrorsBackwardsCompatible() {
-        List<String> errors = getErrorsAddOrAmendDocumentsBackwardsCompatible();
-
         if (ofNullable(particularsOfClaimDocument).isEmpty() && ofNullable(particularsOfClaimText).isEmpty()) {
             errors.add(EMPTY_ERROR);
         }
@@ -58,7 +38,7 @@ public class ServedDocumentFiles {
     }
 
     @JsonIgnore
-    public List<String> getErrorsAddOrAmendDocumentsBackwardsCompatible() {
+    public List<String> getErrorsAddOrAmendDocuments() {
         List<String> errors = new ArrayList<>();
         if (ofNullable(particularsOfClaimDocument).isPresent() && ofNullable(particularsOfClaimText).isPresent()) {
             errors.add(BOTH_PARTICULARS_OF_CLAIM_ERROR);
