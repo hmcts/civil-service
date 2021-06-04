@@ -10,12 +10,14 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted;
@@ -445,7 +447,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
-                .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
         }
@@ -453,7 +455,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
@@ -461,7 +463,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
-                .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
@@ -469,7 +471,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
@@ -485,15 +487,31 @@ class FlowPredicateTest {
     class ApplicantOutOfTime {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateServiceAcknowledgeWithClaimDismissedDate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
+        void shouldReturnTrue_whenCaseDataIsAtStatePastApplicantResponseDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline().build();
             assertTrue(applicantOutOfTime.test(caseData));
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataAtStateServiceAcknowledge() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        void shouldReturnFalse_whenCaseDataIsAtStateApplicantRespondToDefenceAndProceed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             assertFalse(applicantOutOfTime.test(caseData));
+        }
+    }
+
+    @Nested
+    class ApplicantOutOfTimeProcessedByCamunda {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflinePastApplicantResponseDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
+            assertTrue(applicantOutOfTimeProcessedByCamunda.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefenceAndProceed() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            assertFalse(applicantOutOfTimeProcessedByCamunda.test(caseData));
         }
     }
 
@@ -519,7 +537,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedPastClaimDetailsNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
+                .atStateClaimPastClaimDetailsNotificationDeadline()
                 .build();
             assertTrue(pastClaimDetailsNotificationDeadline.test(caseData));
         }
@@ -528,6 +546,24 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             assertFalse(pastClaimDetailsNotificationDeadline.test(caseData));
+        }
+    }
+
+    @Nested
+    class DismissedByCamunda {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedPastClaimDetailsNotificationDeadline() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
+                .build();
+            assertTrue(claimDismissedByCamunda.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimPastClaimDetailsNotificationDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
+            assertFalse(claimDismissedByCamunda.test(caseData));
         }
     }
 }

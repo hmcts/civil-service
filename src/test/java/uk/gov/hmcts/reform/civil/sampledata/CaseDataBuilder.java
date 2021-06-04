@@ -376,6 +376,8 @@ public class CaseDataBuilder {
                 return atStateClaimDismissed();
             case CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE:
                 return atStateClaimDismissedPastClaimDetailsNotificationDeadline();
+            case PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA:
+                return atStatePastApplicantResponseDeadline();
             case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                 return atStateTakenOfflinePastApplicantResponseDeadline();
             case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
@@ -385,17 +387,28 @@ public class CaseDataBuilder {
         }
     }
 
-    public CaseDataBuilder atStateClaimDismissedPastClaimNotificationDeadline() {
+    public CaseDataBuilder atStateClaimPastClaimNotificationDeadline() {
         atStateClaimIssued();
         ccdState = CASE_DISMISSED;
         claimNotificationDeadline = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDismissedPastClaimNotificationDeadline() {
+        atStateClaimPastClaimNotificationDeadline();
+        ccdState = CASE_DISMISSED;
         claimDismissedDate = LocalDateTime.now();
         return this;
     }
 
-    public CaseDataBuilder atStateClaimDismissedPastClaimDetailsNotificationDeadline() {
+    public CaseDataBuilder atStateClaimPastClaimDetailsNotificationDeadline() {
         atStateClaimNotified();
         claimDetailsNotificationDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDismissedPastClaimDetailsNotificationDeadline() {
+        atStateClaimPastClaimDetailsNotificationDeadline();
         ccdState = CASE_DISMISSED;
         claimDismissedDate = LocalDateTime.now();
         return this;
@@ -600,6 +613,11 @@ public class CaseDataBuilder {
             .date(LocalDate.now())
             .reason("My reason")
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder claimDismissedDeadline(LocalDateTime date) {
+        this.claimDismissedDeadline = date;
         return this;
     }
 
@@ -885,8 +903,14 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimDismissed() {
+    public CaseDataBuilder atStatePastClaimDismissedDeadline() {
         atStateClaimDetailsNotified();
+        claimDismissedDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDismissed() {
+        atStatePastClaimDismissedDeadline();
         ccdState = CASE_DISMISSED;
         claimDismissedDate = LocalDateTime.now();
         return this;
@@ -928,10 +952,15 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
+    public CaseDataBuilder atStatePastApplicantResponseDeadline() {
         atStateRespondentFullDefence();
-        takenOfflineDate = LocalDateTime.now();
         applicant1ResponseDeadline = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
+        atStatePastApplicantResponseDeadline();
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
