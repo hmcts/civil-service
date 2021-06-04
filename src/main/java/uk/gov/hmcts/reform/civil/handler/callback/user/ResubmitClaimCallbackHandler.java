@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 
 @Slf4j
@@ -51,12 +52,22 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
-            .build();
-        return AboutToStartOrSubmitCallbackResponse.builder()
+        if (callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+                .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
+                .build();
+            return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
+        } else {
+            CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+                .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
+                .build();
+            return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+        }
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -73,6 +74,24 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnSpecClaimSubmitted_whenCaseDataAtStateClaimSubmitted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
         @Test
@@ -814,6 +833,30 @@ class StateFlowEngineTest {
                 .build();
 
             assertThat(stateFlowEngine.hasTransitionedTo(caseDetails, state)).isEqualTo(expected);
+        }
+    }
+
+    @Nested
+    class HasSpecTransitionedTo {
+
+        @ParameterizedTest
+        @CsvSource({
+            "true,CLAIM_ISSUED",
+            "true,CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+            "true,PENDING_CLAIM_ISSUED",
+            "true,SPEC_DRAFT",
+            "false,FULL_DEFENCE",
+            "false,FULL_DEFENCE_PROCEED",
+            "false,FULL_DEFENCE_NOT_PROCEED",
+            "false,NOTIFICATION_ACKNOWLEDGED",
+        })
+        void shouldReturnValidResult_whenCaseDataAtStateAwaitingRespondentAcknowledgement(boolean expected,
+                                                                                          FlowState.Main state) {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder()
+                .atStateAwaitingRespondentAcknowledgement()
+                .build();
+
+            assertThat(stateFlowEngine.hasSpecTransitionedTo(caseDetails, state)).isEqualTo(expected);
         }
     }
 }

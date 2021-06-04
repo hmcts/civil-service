@@ -73,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -173,6 +174,95 @@ public class StateFlowEngine {
             .build();
     }
 
+    public StateFlow buildSpec() {
+        return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
+            .initial(SPEC_DRAFT)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .state(CLAIM_SUBMITTED)
+                .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
+                .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
+            .state(CLAIM_ISSUED_PAYMENT_FAILED)
+                .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
+            .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
+                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered)
+            .state(PENDING_CLAIM_ISSUED)
+                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem)
+            .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+                .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
+            .state(CLAIM_ISSUED)
+                .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(pastClaimNotificationDeadline)
+            .state(CLAIM_NOTIFIED)
+                .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimNotified)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
+                    .onlyIf(pastClaimDetailsNotificationDeadline)
+            .state(CLAIM_DETAILS_NOTIFIED)
+                .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION).onlyIf(claimDetailsNotifiedTimeExtension)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceAfterNotifyDetails)
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionAfterNotifyDetails)
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionAfterNotifyDetails)
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimAfterNotifyDetails)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(caseDismissedAfterDetailNotified)
+            .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledgedTimeExtension)
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefence)
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmission)
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmission)
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaim)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotifiedExtension)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
+                    .onlyIf(caseDismissedAfterDetailNotifiedExtension)
+            .state(NOTIFICATION_ACKNOWLEDGED)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
+                    .onlyIf(notificationAcknowledgedTimeExtension)
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceAfterAcknowledge)
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionAfterAcknowledge)
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionAfterAcknowledge)
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimAfterAcknowledge)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF)
+                    .onlyIf(takenOfflineByStaffAfterNotificationAcknowledged)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(caseDismissedAfterClaimAcknowledged)
+            .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefence)
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmission)
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmission)
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaim)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF)
+                    .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
+                .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
+                    .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
+            .state(FULL_DEFENCE)
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(fullDefenceProceed)
+                .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                .transitionTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE).onlyIf(applicantOutOfTime)
+            .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+            .state(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+            .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
+            .state(FULL_ADMISSION)
+            .state(PART_ADMISSION)
+            .state(COUNTER_CLAIM)
+            .state(FULL_DEFENCE_PROCEED)
+            .state(FULL_DEFENCE_NOT_PROCEED)
+            .state(TAKEN_OFFLINE_BY_STAFF)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+            .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+            .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
+            .state(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+            .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
+            .build();
+    }
+
     public StateFlow evaluate(CaseDetails caseDetails) {
         return evaluate(caseDetailsConverter.toCaseData(caseDetails));
     }
@@ -181,8 +271,22 @@ public class StateFlowEngine {
         return build().evaluate(caseData);
     }
 
+    public StateFlow evaluateSpec(CaseDetails caseDetails) {
+        return evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
+    }
+
+    public StateFlow evaluateSpec(CaseData caseData) {
+        return buildSpec().evaluate(caseData);
+    }
+
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
+            .map(State::getName)
+            .anyMatch(name -> name.equals(state.fullName()));
+    }
+
+    public boolean hasSpecTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
+        return evaluateSpec(caseDetails).getStateHistory().stream()
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
     }

@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,7 +64,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
+    private static final List<CaseEvent> EVENTS = Arrays.asList(CaseEvent.CREATE_CLAIM_SPEC,
+                                                                CaseEvent.CREATE_CLAIM);
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
