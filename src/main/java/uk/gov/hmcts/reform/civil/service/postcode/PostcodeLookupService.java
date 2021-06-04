@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.postcode;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -46,11 +47,13 @@ public class PostcodeLookupService {
 
     private String fetchCountryFromPostCode(String postcode) {
         String countryName = null;
+        String postcodeFromApilookup = null;
         HttpEntity<String> response = null;
         try {
 
             Map<String, String> params = new HashMap<>();
-            params.put("query", postcode);
+            String postcodeQueryParam = StringUtils.deleteWhitespace(postcode) + "+localtype=postcode";
+            params.put("query", postcodeQueryParam);
             params.put("maxresults", "1");
             String url = configuration.getUrl();
             String key = configuration.getAccessKey();
@@ -76,14 +79,19 @@ public class PostcodeLookupService {
                 String.class
             );
 
-            System.out.println(response);
             HttpStatus responseStatus = ((ResponseEntity) response).getStatusCode();
 
             if (responseStatus.value() == org.apache.http.HttpStatus.SC_OK) {
-                System.out.println("Trueee");
                 JSONObject jsonObj = new JSONObject(response.getBody().toString());
-                countryName = new JSONObject(new JSONObject(((JSONArray) jsonObj.get("results")).get(0).toString()).get(
-                    "GAZETTEER_ENTRY").toString()).get("COUNTRY").toString();
+
+                if (jsonObj.has("results")) {
+                    JSONObject gazeteerEntry = new JSONObject(new JSONObject(((JSONArray) jsonObj.get("results")).get(0).toString()).get(
+                        "GAZETTEER_ENTRY").toString());
+                    postcodeFromApilookup = StringUtils.deleteWhitespace(gazeteerEntry.get("NAME1").toString());
+                    if (postcodeFromApilookup.equals(StringUtils.deleteWhitespace(postcode))) {
+                        countryName = gazeteerEntry.get("COUNTRY").toString();
+                    }
+                }
             } else if (responseStatus.value() == org.apache.http.HttpStatus.SC_NOT_FOUND) {
                 LOG.info("Postcode " + postcode + " not found");
             } else {

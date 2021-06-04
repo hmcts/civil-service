@@ -18,7 +18,7 @@ public class PostcodeValidator {
     public List<String> validatePostCodeForDefendant(String postcode) {
         List<String> errors = new ArrayList<>();
         if (postcode != null) {
-            /*CreateClaimCallbackHandlerTest
+            /*
             Lookup to the PostCode service. Currently, the Postcode lookup service
             returns England for Northern Ireland Postcodes starting with BT.
             Hence, added below check for Northern Ireland postcodes.
@@ -28,7 +28,7 @@ public class PostcodeValidator {
             */
             if (postcode.toUpperCase().trim().startsWith("BT") || !(postcodeLookupService.validatePostCodeForDefendant(
                 postcode))) {
-                errors.add("Defendant should be part of England and Wales");
+                errors.add("Postcode must be in England or Wales");
             }
         } else {
             errors.add("Please enter Postcode");
