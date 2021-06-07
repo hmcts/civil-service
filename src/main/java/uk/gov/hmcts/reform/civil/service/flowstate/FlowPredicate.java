@@ -15,6 +15,19 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class FlowPredicate {
 
+    public static final Predicate<CaseData> oneVOne = caseData ->
+        caseData.getAddApplicant2() == NO && caseData.getAddRespondent2() == NO;
+    public static final Predicate<CaseData> twoVOne = caseData ->
+        caseData.getAddApplicant2() == YES && caseData.getAddRespondent2() == NO;
+    public static final Predicate<CaseData> oneVTwoSameRepresentative = caseData ->
+        caseData.getAddApplicant2() == NO
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
+    public static final Predicate<CaseData> oneVTwoDifferentRepresentative = caseData ->
+        caseData.getAddApplicant2() == NO
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == NO;
+
     public static final Predicate<CaseData> claimSubmitted = caseData ->
         caseData.getSubmittedDate() != null;
 
