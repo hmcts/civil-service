@@ -14,12 +14,10 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -39,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
@@ -108,7 +107,7 @@ class SealedClaimFormGeneratorTest {
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
 
-            verify(representativeService).getApplicantRepresentative(caseData);
+            verify(representativeService, times(2)).getApplicantRepresentative(caseData);
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 
@@ -149,21 +148,22 @@ class SealedClaimFormGeneratorTest {
             );
         }
 
-        private List<Respondent> getRespondents(CaseData caseData) {
-            Party respondent = caseData.getRespondent1();
-            return List.of(Respondent.builder()
+        private List<Party> getRespondents(CaseData caseData) {
+            uk.gov.hmcts.reform.civil.model.Party respondent = caseData.getRespondent1();
+            return List.of(Party.builder()
                                .name(respondent.getPartyName())
                                .primaryAddress(respondent.getPrimaryAddress())
                                .representative(representative)
                                .build());
         }
 
-        private List<Applicant> getApplicants(CaseData caseData) {
-            Party applicant = caseData.getApplicant1();
-            return List.of(Applicant.builder()
+        private List<Party> getApplicants(CaseData caseData) {
+            uk.gov.hmcts.reform.civil.model.Party applicant = caseData.getApplicant1();
+            return List.of(Party.builder()
                                .name(applicant.getPartyName())
                                .primaryAddress(applicant.getPrimaryAddress())
                                .litigationFriendName("applicant LF")
+                               .representative(getRepresentative())
                                .build());
         }
     }
