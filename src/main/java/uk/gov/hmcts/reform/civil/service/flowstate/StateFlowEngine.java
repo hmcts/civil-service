@@ -32,6 +32,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVOne;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVTwoDifferentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVTwoSameRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterNotifyDetails;
@@ -50,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoVOne;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -69,6 +73,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_TWO_DIFFERENT_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_TWO_SAME_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -77,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TWO_V_ONE;
 
 @Component
 @RequiredArgsConstructor
@@ -87,6 +95,17 @@ public class StateFlowEngine {
     public StateFlow build() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
+                .transitionTo(ONE_V_ONE).onlyIf(oneVOne)
+                .transitionTo(TWO_V_ONE).onlyIf(twoVOne)
+                .transitionTo(ONE_V_TWO_SAME_REPRESENTATIVE).onlyIf(oneVTwoSameRepresentative)
+                .transitionTo(ONE_V_TWO_DIFFERENT_REPRESENTATIVE).onlyIf(oneVTwoDifferentRepresentative)
+            .state(ONE_V_ONE)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .state(TWO_V_ONE)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .state(ONE_V_TWO_SAME_REPRESENTATIVE)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .state(ONE_V_TWO_DIFFERENT_REPRESENTATIVE)
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)

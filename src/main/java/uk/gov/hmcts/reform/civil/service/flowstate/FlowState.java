@@ -22,6 +22,10 @@ public interface FlowState {
 
     enum Main implements FlowState {
         DRAFT,
+        ONE_V_ONE,
+        TWO_V_ONE,
+        ONE_V_TWO_SAME_REPRESENTATIVE,
+        ONE_V_TWO_DIFFERENT_REPRESENTATIVE,
         CLAIM_SUBMITTED,
         CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
         CLAIM_ISSUED_PAYMENT_FAILED,
