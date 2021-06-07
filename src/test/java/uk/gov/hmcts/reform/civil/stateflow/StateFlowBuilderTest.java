@@ -206,10 +206,11 @@ class StateFlowBuilderTest {
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
                 .subflow(subflow)
+                .transitionTo(FlowState.STATE_2)
                 .state(FlowState.STATE_2)
                 .build();
 
-            StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "SUBFLOW.STATE_1", "SUBFLOW.STATE_2");
+            StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "SUBFLOW.STATE_1", "SUBFLOW.STATE_2", "FLOW.STATE_2");
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
         }
 
