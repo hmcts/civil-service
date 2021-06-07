@@ -85,8 +85,8 @@ public class PostcodeLookupService {
                 JSONObject jsonObj = new JSONObject(response.getBody().toString());
 
                 if (jsonObj.has("results")) {
-                    JSONObject gazeteerEntry = new JSONObject(new JSONObject(((JSONArray) jsonObj.get("results")).get(0).toString()).get(
-                        "GAZETTEER_ENTRY").toString());
+                    JSONObject gazeteerEntry = new JSONObject(new JSONObject(((JSONArray) jsonObj
+                        .get("results")).get(0).toString()).get("GAZETTEER_ENTRY").toString());
                     postcodeFromApilookup = StringUtils.deleteWhitespace(gazeteerEntry.get("NAME1").toString());
                     if (postcodeFromApilookup.equals(StringUtils.deleteWhitespace(postcode))) {
                         countryName = gazeteerEntry.get("COUNTRY").toString();
