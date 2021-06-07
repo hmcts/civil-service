@@ -7,7 +7,10 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlowContext;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
+import java.util.function.Consumer;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
@@ -54,6 +57,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoVOne;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_TWO_DIFFERENT_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_TWO_SAME_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -73,9 +80,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_TWO_DIFFERENT_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_V_TWO_SAME_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -84,7 +88,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TWO_V_ONE;
 
 @Component
 @RequiredArgsConstructor
@@ -93,20 +96,20 @@ public class StateFlowEngine {
     private final CaseDetailsConverter caseDetailsConverter;
 
     public StateFlow build() {
-        return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
-            .initial(DRAFT)
+        Consumer<StateFlowContext> draftSubflow = stateFlowContext ->
+            StateFlowBuilder.<FlowState>subflow(FlowState.DraftSubflow.FLOW_NAME, stateFlowContext)
                 .transitionTo(ONE_V_ONE).onlyIf(oneVOne)
                 .transitionTo(TWO_V_ONE).onlyIf(twoVOne)
                 .transitionTo(ONE_V_TWO_SAME_REPRESENTATIVE).onlyIf(oneVTwoSameRepresentative)
                 .transitionTo(ONE_V_TWO_DIFFERENT_REPRESENTATIVE).onlyIf(oneVTwoDifferentRepresentative)
             .state(ONE_V_ONE)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(TWO_V_ONE)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(ONE_V_TWO_SAME_REPRESENTATIVE)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(ONE_V_TWO_DIFFERENT_REPRESENTATIVE)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .build();
+
+        return StateFlowBuilder.<FlowState>flow(FLOW_NAME)
+            .initial(DRAFT).subflow(draftSubflow)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)

@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -60,6 +62,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData = caseData.toBuilder().addApplicant2(NO).addRespondent2(NO).build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -72,7 +75,7 @@ class StateFlowEngineTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+                    DRAFT.fullName(), ONE_V_ONE.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
         @Test
