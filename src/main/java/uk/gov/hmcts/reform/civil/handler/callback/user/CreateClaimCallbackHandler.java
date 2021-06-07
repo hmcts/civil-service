@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -253,7 +254,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
         dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+        if (callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
+        } else {
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+        }
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
