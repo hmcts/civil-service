@@ -65,8 +65,10 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
-    private static final List<CaseEvent> EVENTS = Arrays.asList(CaseEvent.CREATE_CLAIM_SPEC,
-                                                                CaseEvent.CREATE_CLAIM);
+    private static final List<CaseEvent> EVENTS = Arrays.asList(
+        CaseEvent.CREATE_CLAIM_SPEC,
+        CaseEvent.CREATE_CLAIM
+    );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
@@ -100,7 +102,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
-            .put(callbackKey(MID, "applicant"), this::validateDateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim)
@@ -128,9 +130,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party applicant = callbackParams.getCaseData().getApplicant1();
+    private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Party applicant = caseData.getApplicant1();
+
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        if (errors.size() == 0 && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            errors = postcodeValidator.validatePostCodeForDefendant(
+                caseData.getApplicant1().getPrimaryAddress().getPostCode());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -300,12 +308,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                caseData.getRespondent1().getPrimaryAddress().getPostCode());
 
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
             .build();
     }
 }
