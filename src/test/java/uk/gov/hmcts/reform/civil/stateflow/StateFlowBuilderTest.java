@@ -211,7 +211,12 @@ class StateFlowBuilderTest {
                 .state(FlowState.STATE_2)
                 .build();
 
-            StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "SUBFLOW.STATE_1", "SUBFLOW.STATE_2", "FLOW.STATE_2");
+            StateFlowAssert.assertThat(stateFlow).enteredStates(
+                "FLOW.STATE_1",
+                "SUBFLOW.STATE_1",
+                "SUBFLOW.STATE_2",
+                "FLOW.STATE_2"
+            );
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
         }
 

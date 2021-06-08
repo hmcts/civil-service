@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.*;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
 public class StateFlow {
 

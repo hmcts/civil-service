@@ -46,8 +46,18 @@ class TransitionTest {
             flags -> flags.put("KEY", true)
         );
         assertThat(transition)
-            .extracting(Transition::getSourceState, Transition::getTargetState, Transition::getCondition, Transition::getFlags)
+            .extracting(
+                Transition::getSourceState,
+                Transition::getTargetState,
+                Transition::getCondition,
+                Transition::getFlags
+            )
             .doesNotContainNull()
-            .containsExactly(transition.getSourceState(), transition.getTargetState(), transition.getCondition(), transition.getFlags());
+            .containsExactly(
+                transition.getSourceState(),
+                transition.getTargetState(),
+                transition.getCondition(),
+                transition.getFlags()
+            );
     }
 }
