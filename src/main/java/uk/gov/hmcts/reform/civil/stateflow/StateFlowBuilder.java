@@ -6,28 +6,14 @@ import org.springframework.statemachine.config.configurers.ExternalTransitionCon
 import org.springframework.statemachine.config.configurers.StateConfigurer;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.Build;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.BuildNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateFlowNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateSubflow;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateSubflowNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.Initial;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.InitialNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.OnlyIf;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.OnlyIfNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.State;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.StateNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.Subflow;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.SubflowNext;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
-import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionToNext;
+import uk.gov.hmcts.reform.civil.stateflow.grammar.*;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.*;
 
 /**
  * DSL for creating a StateFlow which wraps a state engine backed by Spring State Machine.
@@ -117,6 +103,7 @@ public class StateFlowBuilder<S> {
         InitialNext<S>, Initial<S>,
         TransitionToNext<S>, TransitionTo<S>,
         OnlyIfNext<S>, OnlyIf<S>,
+        SetNext<S>, Set<S>,
         StateNext<S>, State<S>,
         SubflowNext<S>, Subflow<S>,
         BuildNext, Build {
@@ -160,6 +147,14 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
+        public SetNext<S> set(Consumer<Map<String, Boolean>> flags) {
+            checkNull(flags, STATE);
+            stateFlowContext.getCurrentTransition()
+                .ifPresent(currentTransition -> currentTransition.setFlags(flags));
+            return this;
+        }
+
+        @Override
         public StateNext<S> state(S state) {
             return addState(state);
         }
@@ -172,9 +167,12 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public StateFlow build() {
             StateMachineBuilder.Builder<String, String> stateMachineBuilder =
                 StateMachineBuilder.builder();
+
+
 
             try {
                 // Config
@@ -200,6 +198,14 @@ public class StateFlowBuilder<S> {
                         transitionConfigurer.guard(
                             context -> transition.getCondition().test(
                                 context.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseData.class)
+                            )
+                        );
+                    }
+
+                    if (transition.getFlags() != null) {
+                        transitionConfigurer.action(
+                            action -> transition.getFlags().accept(
+                                (Map<String, Boolean>)action.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class)
                             )
                         );
                     }

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StateFlowBuilderTest {
@@ -335,6 +336,47 @@ class StateFlowBuilderTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+        }
+
+        @Test
+        void shouldEvaluateStateAndFlags() {
+            CaseData caseData = CaseData.builder().build();
+
+            Predicate<CaseData> firstPredicate = c -> {
+                assertThat(c).isSameAs(caseData);
+                return true;
+            };
+
+            Predicate<CaseData> secondPredicate = c -> {
+                assertThat(c).isSameAs(caseData);
+                return false;
+            };
+
+            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
+                .initial(FlowState.STATE_1)
+                    .transitionTo(FlowState.STATE_2)
+                    .onlyIf(firstPredicate)
+                    .set(flags -> flags.put("FIRST_FLAG", true))
+                .state(FlowState.STATE_2)
+                    .transitionTo(FlowState.STATE_3)
+                    .onlyIf(secondPredicate)
+                    .set(flags -> flags.put("SECOND_FLAG", true))
+                .state(FlowState.STATE_3)
+                .build();
+
+            stateFlow.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isEqualTo("FLOW.STATE_2");
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+
+            assertThat(stateFlow.getFlags())
+                .contains(entry("FIRST_FLAG", true));
         }
 
         @Test

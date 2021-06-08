@@ -16,14 +16,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
-import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.*;
 
 @ExtendWith(SpringExtension.class)
 class StateFlowTest {
@@ -140,6 +138,24 @@ class StateFlowTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+        }
+    }
+
+    @Nested
+    class GetFlags {
+
+        @Test
+        void shouldGetFlags() {
+            Map<String, Boolean> flags = Map.of("flag", true);
+
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+            when(mockedExtendedState.get(EXTENDED_STATE_FLAGS_KEY, Map.class)).thenReturn(flags);
+
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            assertThat(stateFlow.getFlags())
+                .contains(entry("flag", true));
         }
     }
 }
