@@ -92,7 +92,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private Party getApplicant(CaseData caseData) {
-        uk.gov.hmcts.reform.civil.model.Party applicant = caseData.getApplicant1();
+        var applicant = caseData.getApplicant1();
         return Party.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())
@@ -104,7 +104,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private List<Party> getRespondents(CaseData caseData) {
-        uk.gov.hmcts.reform.civil.model.Party respondent = caseData.getRespondent1();
+        var respondent = caseData.getRespondent1();
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())

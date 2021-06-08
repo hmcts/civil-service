@@ -149,7 +149,7 @@ class SealedClaimFormGeneratorTest {
         }
 
         private List<Party> getRespondents(CaseData caseData) {
-            uk.gov.hmcts.reform.civil.model.Party respondent = caseData.getRespondent1();
+            var respondent = caseData.getRespondent1();
             return List.of(Party.builder()
                                .name(respondent.getPartyName())
                                .primaryAddress(respondent.getPrimaryAddress())
@@ -158,7 +158,7 @@ class SealedClaimFormGeneratorTest {
         }
 
         private List<Party> getApplicants(CaseData caseData) {
-            uk.gov.hmcts.reform.civil.model.Party applicant = caseData.getApplicant1();
+            var applicant = caseData.getApplicant1();
             return List.of(Party.builder()
                                .name(applicant.getPartyName())
                                .primaryAddress(applicant.getPrimaryAddress())
