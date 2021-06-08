@@ -114,6 +114,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
+            .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .build();
     }
 
@@ -318,6 +319,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.totalClaimAmount(10000).build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
