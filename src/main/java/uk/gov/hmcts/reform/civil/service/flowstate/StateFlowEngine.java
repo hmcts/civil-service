@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterNotifyDetails;
@@ -35,9 +34,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledgedTimeExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVOne;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVTwoDifferentRepresentative;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVTwoSameRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterNotifyDetails;
@@ -56,11 +53,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoVOne;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_TWO_DIFFERENT_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_V_TWO_SAME_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoRespondentRepresentatives;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_RESPONDENT_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -98,14 +93,10 @@ public class StateFlowEngine {
     public StateFlow build() {
         Consumer<StateFlowContext> draftSubflow = stateFlowContext ->
             StateFlowBuilder.<FlowState>subflow(FlowState.DraftSubflow.FLOW_NAME, stateFlowContext)
-                .transitionTo(ONE_V_ONE).onlyIf(oneVOne)
-                .transitionTo(TWO_V_ONE).onlyIf(twoVOne)
-                .transitionTo(ONE_V_TWO_SAME_REPRESENTATIVE).onlyIf(oneVTwoSameRepresentative)
-                .transitionTo(ONE_V_TWO_DIFFERENT_REPRESENTATIVE).onlyIf(oneVTwoDifferentRepresentative)
-            .state(ONE_V_ONE)
-            .state(TWO_V_ONE)
-            .state(ONE_V_TWO_SAME_REPRESENTATIVE)
-            .state(ONE_V_TWO_DIFFERENT_REPRESENTATIVE)
+                .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
+                .transitionTo(TWO_RESPONDENT_REPRESENTATIVES).onlyIf(twoRespondentRepresentatives)
+            .state(ONE_RESPONDENT_REPRESENTATIVE)
+            .state(TWO_RESPONDENT_REPRESENTATIVES)
             .build();
 
         return StateFlowBuilder.<FlowState>flow(FLOW_NAME)

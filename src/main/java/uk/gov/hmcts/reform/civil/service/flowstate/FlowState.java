@@ -21,10 +21,8 @@ public interface FlowState {
     }
 
     enum DraftSubflow implements FlowState {
-        ONE_V_ONE,
-        TWO_V_ONE,
-        ONE_V_TWO_SAME_REPRESENTATIVE,
-        ONE_V_TWO_DIFFERENT_REPRESENTATIVE;
+        ONE_RESPONDENT_REPRESENTATIVE,
+        TWO_RESPONDENT_REPRESENTATIVES;
 
         public static final String FLOW_NAME = "DRAFT";
 
