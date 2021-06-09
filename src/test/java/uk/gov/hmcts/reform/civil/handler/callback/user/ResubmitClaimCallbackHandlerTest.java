@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -74,7 +73,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Claim pending")
                     .confirmationBody(
-                        format("## What happens next %n%nYou claim will be processed. Wait for us to contact you.")
+                        "<br />You claim will be processed. Wait for us to contact you."
                             + exitSurveyContentService.applicantSurvey()
                     )
                     .build());
