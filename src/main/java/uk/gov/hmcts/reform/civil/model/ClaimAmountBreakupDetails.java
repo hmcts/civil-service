@@ -11,13 +11,15 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class ClaimAmountBreakupDetails {
+
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal claimAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final String claimReason;
 
     @JsonCreator
-    public ClaimAmountBreakupDetails(@JsonProperty("claimAmount") BigDecimal claimAmount, @JsonProperty("claimReason") String claimReason ) {
+    public ClaimAmountBreakupDetails(@JsonProperty("claimAmount") BigDecimal claimAmount,
+                                     @JsonProperty("claimReason") String claimReason) {
         this.claimAmount = claimAmount;
         this.claimReason = claimReason;
     }
