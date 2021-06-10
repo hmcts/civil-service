@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -45,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TWO_RESPONDENT_REPRESENTATIVES;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -60,9 +60,42 @@ class StateFlowEngineTest {
     class EvaluateStateFlowEngine {
 
         @Test
+        void shouldReturnOneRespondentRepresentative_whenCaseDataAtStateOneRespondentRepresentative() {
+            CaseData caseData = CaseDataBuilder.builder().atStateOneRespondentRepresentative().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(ONE_RESPONDENT_REPRESENTATIVE.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(DRAFT.fullName(), ONE_RESPONDENT_REPRESENTATIVE.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
+        }
+
+        @Test
+        void shouldReturnTwoRespondentRepresentatives_whenCaseDataAtStateTwoRespondentRepresentatives() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTwoRespondentRepresentatives().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TWO_RESPONDENT_REPRESENTATIVES.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(DRAFT.fullName(), TWO_RESPONDENT_REPRESENTATIVES.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("TWO_RESPONDENT_REPRESENTATIVES", true);
+        }
+
+        @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData = caseData.toBuilder().addRespondent2(NO).build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -70,12 +103,12 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
-
             assertThat(stateFlow.getStateHistory())
                 .hasSize(3)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), ONE_RESPONDENT_REPRESENTATIVE.fullName(), CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -89,13 +122,17 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(5)
+                .hasSize(6)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -109,13 +146,17 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(5)
+                .hasSize(6)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -129,10 +170,15 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(3)
+                .hasSize(4)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName()
+                );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -146,10 +192,15 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_FAILED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(3)
+                .hasSize(4)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_FAILED.fullName()
+                );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -163,12 +214,16 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(4)
+                .hasSize(5)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -182,12 +237,18 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_NOTIFIED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -201,13 +262,19 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DETAILS_NOTIFIED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(8)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -221,13 +288,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -241,13 +315,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(NOTIFICATION_ACKNOWLEDGED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -261,14 +342,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -284,15 +372,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(),
-                    CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -306,13 +400,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -326,13 +427,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(FULL_DEFENCE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    FULL_DEFENCE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -346,13 +455,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(FULL_ADMISSION.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_ADMISSION.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    FULL_ADMISSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -366,13 +483,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(PART_ADMISSION.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), PART_ADMISSION.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    PART_ADMISSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -386,13 +511,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(COUNTER_CLAIM.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), COUNTER_CLAIM.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    COUNTER_CLAIM.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -407,13 +540,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @ParameterizedTest
@@ -433,14 +573,22 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(flowState.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
+                .hasSize(11)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    FULL_DEFENCE.fullName(),
                     flowState.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -454,12 +602,18 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -473,14 +627,22 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
+                .hasSize(11)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    FULL_DEFENCE.fullName(),
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -494,13 +656,18 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -516,13 +683,19 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(8)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 
@@ -539,12 +712,18 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(6)
+                .hasSize(7)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -556,13 +735,19 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(8)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -574,13 +759,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -593,14 +785,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -613,14 +812,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -635,14 +841,22 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
+                .hasSize(11)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -655,14 +869,22 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
+                .hasSize(11)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                    FULL_DEFENCE.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    FULL_DEFENCE.fullName(),
+                    TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -676,14 +898,19 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(7)
+                .hasSize(8)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -697,14 +924,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 
@@ -720,13 +953,20 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
+                .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -740,14 +980,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    DRAFT.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -761,15 +1008,21 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(),
-                    CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -783,16 +1036,22 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
+                .hasSize(11)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(),
-                    CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    ONE_RESPONDENT_REPRESENTATIVE.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 

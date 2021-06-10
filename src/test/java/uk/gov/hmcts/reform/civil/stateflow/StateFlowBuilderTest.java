@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -198,7 +197,7 @@ class StateFlowBuilderTest {
         }
 
         @Test
-        @Disabled("StateFlow doesn't transition from subflow back to main flow when one of predicates is false.")
+        @Disabled("Subflow currently allows only one final state to transition back to main flow")
         void shouldBuildStateFlow_whenInitialStateHasSubflow() {
             Consumer<StateFlowContext> subflow = stateFlowContext ->
                 StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)

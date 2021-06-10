@@ -125,6 +125,9 @@ public class CaseDataBuilder {
     protected OrganisationPolicy applicant1OrganisationPolicy;
     protected OrganisationPolicy respondent1OrganisationPolicy;
     protected OrganisationPolicy respondent2OrganisationPolicy;
+    protected YesOrNo addApplicant2;
+    protected YesOrNo addRespondent2;
+    protected YesOrNo respondent2SameLegalRepresentative;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -341,6 +344,10 @@ public class CaseDataBuilder {
         switch (flowState) {
             case DRAFT:
                 return atStateClaimDraft();
+            case ONE_RESPONDENT_REPRESENTATIVE:
+                return atStateOneRespondentRepresentative();
+            case TWO_RESPONDENT_REPRESENTATIVES:
+                return atStateTwoRespondentRepresentatives();
             case CLAIM_SUBMITTED:
                 return atStateClaimSubmitted();
             case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
@@ -540,8 +547,21 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimSubmitted() {
+    public CaseDataBuilder atStateOneRespondentRepresentative() {
         atStateClaimDraft();
+        addRespondent2 = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateTwoRespondentRepresentatives() {
+        atStateClaimDraft();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted() {
+        atStateOneRespondentRepresentative();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
@@ -901,6 +921,9 @@ public class CaseDataBuilder {
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
             .respondent2OrganisationPolicy(respondent2OrganisationPolicy)
+            .addApplicant2(addApplicant2)
+            .addRespondent2(addRespondent2)
+            .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
 
             //dates
             .submittedDate(submittedDate)

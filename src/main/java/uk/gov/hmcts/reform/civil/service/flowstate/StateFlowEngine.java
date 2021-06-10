@@ -89,7 +89,7 @@ public class StateFlowEngine {
     private final CaseDetailsConverter caseDetailsConverter;
 
     public StateFlow build() {
-        return StateFlowBuilder.<FlowState>flow(FLOW_NAME)
+        return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
                 .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
                     .set(flags -> flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true))

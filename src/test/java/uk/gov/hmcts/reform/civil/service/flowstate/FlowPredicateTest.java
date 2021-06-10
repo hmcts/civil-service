@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterNotifyDetails;
@@ -48,8 +49,41 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoRespondentRepresentatives;
 
 class FlowPredicateTest {
+
+    @Nested
+    class OneRespondentRepresentative {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtOneRespondentRepresentativeState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateOneRespondentRepresentative().build();
+            assertTrue(oneRespondentRepresentative.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataIsAtDraftState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            assertFalse(oneRespondentRepresentative.test(caseData));
+        }
+    }
+
+    @Nested
+    class TwoRespondentRepresentatives {
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtTwoRespondentRepresentativesState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTwoRespondentRepresentatives().build();
+            assertTrue(twoRespondentRepresentatives.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataIsAtDraftState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            assertFalse(twoRespondentRepresentatives.test(caseData));
+        }
+    }
 
     @Nested
     class ClaimSubmittedPredicate {
@@ -61,8 +95,8 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenCaseDataIsAtDraftState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        void shouldReturnTrue_whenCaseDataAtOneRespondentRepresentativeState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateOneRespondentRepresentative().build();
             assertFalse(claimSubmitted.test(caseData));
         }
     }
