@@ -334,7 +334,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         };
         List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
-        String str1 = " | Claim Reason |  Claim Amount | \n |---|---| \n | ";
+        String str1 = " | Description | Amount | \n |---|---| \n | ";
         StringBuilder stringBuilder = new StringBuilder();
         claimAmountBreakups.stream().forEach(
             claimAmountBreakup -> {
@@ -347,6 +347,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         );
         str1 = str1.concat(stringBuilder.toString());
+
         List<String> errors = new ArrayList<>();
         if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 10000) {
             errors.add("Total Claim Amount cannot exceed £ 10,000");
@@ -358,6 +359,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue());
+
+        str1 = str1.concat(" | **Total** | " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(str1);
 
