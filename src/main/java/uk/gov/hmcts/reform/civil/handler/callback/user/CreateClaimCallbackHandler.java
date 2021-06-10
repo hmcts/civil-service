@@ -360,7 +360,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue());
 
-        str1 = str1.concat(" | **Total** | " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
+        str1 = str1.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(str1);
 
