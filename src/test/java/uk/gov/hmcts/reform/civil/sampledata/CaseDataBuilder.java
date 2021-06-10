@@ -344,10 +344,6 @@ public class CaseDataBuilder {
         switch (flowState) {
             case DRAFT:
                 return atStateClaimDraft();
-            case ONE_RESPONDENT_REPRESENTATIVE:
-                return atStateOneRespondentRepresentative();
-            case TWO_RESPONDENT_REPRESENTATIVES:
-                return atStateTwoRespondentRepresentatives();
             case CLAIM_SUBMITTED:
                 return atStateClaimSubmitted();
             case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
@@ -547,27 +543,22 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateOneRespondentRepresentative() {
+    public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
         addRespondent2 = NO;
-        return this;
-    }
-
-    public CaseDataBuilder atStateTwoRespondentRepresentatives() {
-        atStateClaimDraft();
-        addRespondent2 = YES;
-        respondent2SameLegalRepresentative = NO;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimSubmitted() {
-        atStateOneRespondentRepresentative();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
         claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentatives() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
         return this;
     }
 

@@ -18,7 +18,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterNotifyDetails;
@@ -32,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledgedTimeExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionAfterNotifyDetails;
@@ -51,7 +51,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -71,7 +70,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_RESPONDENT_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -80,7 +78,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
 @RequiredArgsConstructor
@@ -91,14 +88,10 @@ public class StateFlowEngine {
     public StateFlow build() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
-                .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
                     .set(flags -> flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true))
-                .transitionTo(TWO_RESPONDENT_REPRESENTATIVES).onlyIf(twoRespondentRepresentatives)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
                     .set(flags -> flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true))
-            .state(ONE_RESPONDENT_REPRESENTATIVE)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
-            .state(TWO_RESPONDENT_REPRESENTATIVES)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
