@@ -37,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
@@ -107,7 +106,7 @@ class SealedClaimFormGeneratorTest {
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
 
-            verify(representativeService, times(2)).getApplicantRepresentative(caseData);
+            verify(representativeService).getApplicantRepresentative(caseData);
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 
@@ -128,7 +127,6 @@ class SealedClaimFormGeneratorTest {
                     templateData.getHearingCourtLocation(),
                     caseData.getCourtLocation().getApplicantPreferredCourt()
                 ),
-                () -> assertEquals(templateData.getApplicantRepresentative(), getRepresentative()),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(templateData.getSubmittedOn(), caseData.getSubmittedDate().toLocalDate()),

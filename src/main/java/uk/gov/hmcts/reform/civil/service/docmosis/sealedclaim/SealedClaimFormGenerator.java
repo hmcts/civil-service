@@ -55,7 +55,6 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
-            .applicantRepresentative(representativeService.getApplicantRepresentative(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())

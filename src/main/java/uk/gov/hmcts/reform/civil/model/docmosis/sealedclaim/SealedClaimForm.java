@@ -24,8 +24,6 @@ public class SealedClaimForm implements MappableObject {
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private final List<Party> applicants;
-    @Deprecated(since = "This will be removed after removal from the docmosis template, moved inside Party object")
-    private final Representative applicantRepresentative;
     private final List<Party> respondents;
     private final String referenceNumber;
     private final String applicantExternalReference;
