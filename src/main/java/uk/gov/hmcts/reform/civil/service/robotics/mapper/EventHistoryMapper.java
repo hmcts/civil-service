@@ -162,6 +162,7 @@ public class EventHistoryMapper {
             case NOTIFICATION_ACKNOWLEDGED:
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
             case CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
+            case PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA:
                 return "RPA Reason: Claim dismissed. No user action has been taken for 6 months.";
             default:
                 throw new IllegalStateException("Unexpected flow state " + flowState.fullName());

@@ -1302,6 +1302,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimNotificationDeadline()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             String text = "RPA Reason: Claim dismissed. Claimant hasn't taken action since the claim was issued.";
@@ -1341,6 +1342,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             String detailsText = "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
@@ -1390,6 +1392,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotifiedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1452,6 +1455,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1515,6 +1519,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
