@@ -7,10 +7,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowBuilder;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlowContext;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
-import java.util.function.Consumer;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
@@ -55,8 +52,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.twoRespondentRepresentatives;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.ONE_RESPONDENT_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.DraftSubflow.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -76,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ONE_RESPONDENT_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -84,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
 @RequiredArgsConstructor
@@ -92,15 +89,15 @@ public class StateFlowEngine {
     private final CaseDetailsConverter caseDetailsConverter;
 
     public StateFlow build() {
-        Consumer<StateFlowContext> draftSubflow = stateFlowContext ->
-            StateFlowBuilder.<FlowState.DraftSubflow>subflow(FlowState.DraftSubflow.FLOW_NAME, stateFlowContext)
-                .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
-                .transitionTo(TWO_RESPONDENT_REPRESENTATIVES).onlyIf(twoRespondentRepresentatives)
-            .state(ONE_RESPONDENT_REPRESENTATIVE)
-            .state(TWO_RESPONDENT_REPRESENTATIVES);
-
         return StateFlowBuilder.<FlowState>flow(FLOW_NAME)
-            .initial(DRAFT).subflow(draftSubflow)
+            .initial(DRAFT)
+                .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
+                    .set(flags -> flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true))
+                .transitionTo(TWO_RESPONDENT_REPRESENTATIVES).onlyIf(twoRespondentRepresentatives)
+                    .set(flags -> flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true))
+            .state(ONE_RESPONDENT_REPRESENTATIVE)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+            .state(TWO_RESPONDENT_REPRESENTATIVES)
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)

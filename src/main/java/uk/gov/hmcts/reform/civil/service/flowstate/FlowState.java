@@ -20,20 +20,10 @@ public interface FlowState {
         }
     }
 
-    enum DraftSubflow implements FlowState {
-        ONE_RESPONDENT_REPRESENTATIVE,
-        TWO_RESPONDENT_REPRESENTATIVES;
-
-        public static final String FLOW_NAME = "DRAFT";
-
-        @Override
-        public String fullName() {
-            return FLOW_NAME + "." + name();
-        }
-    }
-
     enum Main implements FlowState {
         DRAFT,
+        ONE_RESPONDENT_REPRESENTATIVE,
+        TWO_RESPONDENT_REPRESENTATIVES,
         CLAIM_SUBMITTED,
         CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
         CLAIM_ISSUED_PAYMENT_FAILED,

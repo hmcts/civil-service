@@ -146,7 +146,7 @@ class StateFlowTest {
     }
 
     @Nested
-    class GetFlags {
+    class GetFlowFlag {
 
         @Test
         void shouldGetFlags() {
