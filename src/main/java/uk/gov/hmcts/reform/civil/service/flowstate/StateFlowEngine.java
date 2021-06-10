@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterNotifyDetails;
@@ -92,15 +93,15 @@ public class StateFlowEngine {
 
     public StateFlow build() {
         Consumer<StateFlowContext> draftSubflow = stateFlowContext ->
-            StateFlowBuilder.<FlowState>subflow(FlowState.DraftSubflow.FLOW_NAME, stateFlowContext)
+            StateFlowBuilder.<FlowState.DraftSubflow>subflow(FlowState.DraftSubflow.FLOW_NAME, stateFlowContext)
                 .transitionTo(ONE_RESPONDENT_REPRESENTATIVE).onlyIf(oneRespondentRepresentative)
                 .transitionTo(TWO_RESPONDENT_REPRESENTATIVES).onlyIf(twoRespondentRepresentatives)
             .state(ONE_RESPONDENT_REPRESENTATIVE)
-            .state(TWO_RESPONDENT_REPRESENTATIVES)
-            .build();
+            .state(TWO_RESPONDENT_REPRESENTATIVES);
 
         return StateFlowBuilder.<FlowState>flow(FLOW_NAME)
             .initial(DRAFT).subflow(draftSubflow)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)

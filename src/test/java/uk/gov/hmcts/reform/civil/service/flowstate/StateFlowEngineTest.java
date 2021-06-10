@@ -72,7 +72,7 @@ class StateFlowEngineTest {
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
 
             assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
+                .hasSize(3)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), ONE_RESPONDENT_REPRESENTATIVE.fullName(), CLAIM_SUBMITTED.fullName());
