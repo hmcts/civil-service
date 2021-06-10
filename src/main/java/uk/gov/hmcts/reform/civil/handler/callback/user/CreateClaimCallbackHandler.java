@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
@@ -119,6 +120,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
+            .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
             .build();
     }
 
@@ -358,11 +360,28 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
-            MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue());
+            MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
 
         str1 = str1.concat(" | **Total** | " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(str1);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse calculateInterest(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        InterestCalculator ic = new InterestCalculator();
+
+        caseDataBuilder.calculatedInterest(ic.calculateInterest(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

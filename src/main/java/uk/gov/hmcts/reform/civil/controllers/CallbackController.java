@@ -55,6 +55,8 @@ public class CallbackController {
         log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
                  callback.getEventId(), callbackType, pageId, version
         );
+
+        System.out.println("callback controller "+ callback);
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))

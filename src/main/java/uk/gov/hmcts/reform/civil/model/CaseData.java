@@ -18,7 +18,12 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,7 +84,19 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
-    private double totalClaimAmount;
+    private BigDecimal totalClaimAmount;
+    private final YesOrNo claimInterest;
+    private final InterestClaimOptions interestClaimOptions;
+    private final SameRateInterestSelection sameRateInterestSelection;
+    private final BigDecimal breakDownInterestTotal;
+    private final String breakDownInterestDescription;
+    private final InterestClaimFromType interestClaimFrom;
+    private final InterestClaimUntilType interestClaimUntil;
+    private final LocalDate interestFromSpecificDate;
+    private final String interestFromSpecificDateDescription;
+    private final BigDecimal calculatedInterest;
+
+
 
     @Valid
     private final CloseClaim withdrawClaim;
