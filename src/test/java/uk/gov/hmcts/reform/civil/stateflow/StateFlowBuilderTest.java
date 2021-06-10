@@ -21,8 +21,8 @@ class StateFlowBuilderTest {
     }
 
     enum SubflowState {
-        SUBSTATE_A,
-        SUBSTATE_B
+        STATE_1,
+        STATE_2
     }
 
     @Nested
@@ -199,10 +199,10 @@ class StateFlowBuilderTest {
         void shouldBuildStateFlow_whenInitialStateHasSubflow() {
             Consumer<StateFlowContext> subflow = stateFlowContext ->
                 StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                        .transitionTo(SubflowState.SUBSTATE_A).onlyIf(caseData -> true)
-                        .transitionTo(SubflowState.SUBSTATE_B).onlyIf(caseData -> false)
-                    .state(SubflowState.SUBSTATE_A)
-                    .state(SubflowState.SUBSTATE_B);
+                        .transitionTo(SubflowState.STATE_1).onlyIf(caseData -> true)
+                        .transitionTo(SubflowState.STATE_2).onlyIf(caseData -> false)
+                    .state(SubflowState.STATE_1)
+                    .state(SubflowState.STATE_2);
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
@@ -223,10 +223,10 @@ class StateFlowBuilderTest {
         void shouldBuildStateFlow_whenTransitionHasSubflow() {
             Consumer<StateFlowContext> subflow = stateFlowContext ->
                 StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                    .transitionTo(SubflowState.SUBSTATE_A)
-                    .state(SubflowState.SUBSTATE_A)
-                    .transitionTo(SubflowState.SUBSTATE_B)
-                    .state(SubflowState.SUBSTATE_B);
+                    .transitionTo(SubflowState.STATE_1)
+                    .state(SubflowState.STATE_1)
+                    .transitionTo(SubflowState.STATE_2)
+                    .state(SubflowState.STATE_2);
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
@@ -290,8 +290,8 @@ class StateFlowBuilderTest {
         void shouldBuildStateFlowWithSubflowButSetStateMachineError_whenAmbiguousTransitions() {
             Consumer<StateFlowContext> subflow = stateFlowContext ->
                 StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                    .transitionTo(SubflowState.SUBSTATE_A)
-                    .state(SubflowState.SUBSTATE_A);
+                    .transitionTo(SubflowState.STATE_1)
+                    .state(SubflowState.STATE_1);
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
