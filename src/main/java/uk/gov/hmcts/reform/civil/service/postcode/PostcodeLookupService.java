@@ -36,7 +36,7 @@ public class PostcodeLookupService {
     }
 
     public boolean validatePostCodeForDefendant(String postcode) {
-        String countryName = fetchCountryFromPostCode(postcode);
+        String countryName = fetchCountryFromPostCode(postcode.toUpperCase());
         if (countryName != null
             && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase())
             || CountriesAllowed.WALES.name().equals(countryName.toUpperCase()))) {
