@@ -50,7 +50,7 @@ dependencies {
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.9.0'
 
