@@ -545,13 +545,18 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
-        addRespondent2 = NO;
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
         claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedOneRespondentRepresentative() {
+        atStateClaimSubmitted();
+        addRespondent2 = NO;
         return this;
     }
 
