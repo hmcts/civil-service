@@ -338,9 +338,9 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.0'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.3.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.4.1'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.1'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.9.0'
 
