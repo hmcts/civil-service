@@ -62,7 +62,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim pending")
             .confirmationBody(
-                "<br />You claim will be processed. Wait for us to contact you."
+                "<br />Your claim will be processed. Wait for us to contact you."
                     + exitSurveyContentService.applicantSurvey()
             )
             .build();
