@@ -61,8 +61,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
+                "reason", caseData.getRespondent1ClaimResponseType().getDisplayedValue()
             );
         }
     }
