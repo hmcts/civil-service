@@ -62,8 +62,7 @@ public class LitigationFriendAddedRespondentNotificationHandler extends Callback
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 }

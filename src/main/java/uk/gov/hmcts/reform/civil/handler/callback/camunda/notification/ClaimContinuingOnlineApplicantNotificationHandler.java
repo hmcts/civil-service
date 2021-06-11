@@ -67,8 +67,7 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
+            NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
         );
     }
 }

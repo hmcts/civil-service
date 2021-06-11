@@ -89,7 +89,6 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
                 "agreedExtensionDate", formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
             );
         }

@@ -88,7 +88,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
                 "claimDetailsNotificationDeadline", formatLocalDate(CLAIM_ISSUED_DATE, DATE)
             );
         }

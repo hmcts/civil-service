@@ -65,8 +65,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
+            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
         );
     }
 }
