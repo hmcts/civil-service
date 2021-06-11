@@ -121,8 +121,13 @@ public class CaseDataBuilder {
     protected CloseClaim withdrawClaim;
     protected CloseClaim discontinueClaim;
     protected YesOrNo respondent1OrgRegistered;
+    protected YesOrNo respondent2OrgRegistered;
     protected OrganisationPolicy applicant1OrganisationPolicy;
     protected OrganisationPolicy respondent1OrganisationPolicy;
+    protected OrganisationPolicy respondent2OrganisationPolicy;
+    protected YesOrNo addApplicant2;
+    protected YesOrNo addRespondent2;
+    protected YesOrNo respondent2SameLegalRepresentative;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -280,6 +285,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2OrgRegistered(YesOrNo respondent2OrgRegistered) {
+        this.respondent2OrgRegistered = respondent2OrgRegistered;
+        return this;
+    }
+
     public CaseDataBuilder claimProceedsInCaseman(ClaimProceedsInCaseman claimProceedsInCaseman) {
         this.claimProceedsInCaseman = claimProceedsInCaseman;
         return this;
@@ -292,6 +302,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent1OrganisationPolicy(OrganisationPolicy respondent1OrganisationPolicy) {
         this.respondent1OrganisationPolicy = respondent1OrganisationPolicy;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2OrganisationPolicy(OrganisationPolicy respondent2OrganisationPolicy) {
+        this.respondent2OrganisationPolicy = respondent2OrganisationPolicy;
         return this;
     }
 
@@ -418,6 +433,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
         return this;
     }
@@ -427,6 +443,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -527,11 +544,15 @@ public class CaseDataBuilder {
         respondent1 = PartyBuilder.builder().soleTrader().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
+        respondent2OrgRegistered = YES;
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY").build())
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTZ").build())
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
@@ -548,6 +569,19 @@ public class CaseDataBuilder {
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
         claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedOneRespondentRepresentative() {
+        atStateClaimSubmitted();
+        addRespondent2 = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentatives() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
         return this;
     }
 
@@ -584,6 +618,7 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
         return this;
     }
 
@@ -877,6 +912,7 @@ public class CaseDataBuilder {
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
             .respondent1OrgRegistered(respondent1OrgRegistered)
+            .respondent2OrgRegistered(respondent2OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
@@ -909,6 +945,10 @@ public class CaseDataBuilder {
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
+            .respondent2OrganisationPolicy(respondent2OrganisationPolicy)
+            .addApplicant2(addApplicant2)
+            .addRespondent2(addRespondent2)
+            .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
 
             //dates
             .submittedDate(submittedDate)

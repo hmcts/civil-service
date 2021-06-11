@@ -20,7 +20,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterAcknowledge;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimAfterNotifyDetails;
@@ -93,7 +94,10 @@ public class StateFlowEngine {
     public StateFlow build() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
+                    .set(flags -> flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true))
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
+                    .set(flags -> flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)

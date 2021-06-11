@@ -68,7 +68,7 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.68'
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.69'
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.7'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
@@ -340,7 +340,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.3.1'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.9.0'
 
