@@ -102,6 +102,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
+            .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
@@ -146,6 +147,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
         YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
         List<String> errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
+        YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
+        List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

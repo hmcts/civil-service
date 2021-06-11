@@ -58,7 +58,7 @@ class StateFlowEngineTest {
     class EvaluateStateFlowEngine {
 
         @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted() {
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedWithOneRespondentRepresentative() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -67,12 +67,30 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
-
             assertThat(stateFlow.getStateHistory())
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRespondentRepresentatives() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("TWO_RESPONDENT_REPRESENTATIVES", true);
         }
 
         @Test
@@ -93,6 +111,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -113,6 +132,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -130,6 +150,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -147,6 +168,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -166,6 +188,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -185,6 +208,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -205,6 +229,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -225,6 +250,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -245,6 +271,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -266,6 +293,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -290,6 +318,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -310,6 +339,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -330,6 +360,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -350,6 +381,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_ADMISSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -370,6 +402,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), PART_ADMISSION.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -390,6 +423,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), COUNTER_CLAIM.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -411,6 +445,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @ParameterizedTest
@@ -438,6 +473,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName(),
                     flowState.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -457,6 +493,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -478,6 +515,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(), FULL_DEFENCE.fullName(),
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -498,6 +536,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -520,6 +559,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 
@@ -542,6 +582,7 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -560,6 +601,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -578,6 +620,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -598,6 +641,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -618,6 +662,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -640,6 +685,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -660,6 +706,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     FULL_DEFENCE.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -681,6 +728,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -702,6 +750,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 
@@ -724,6 +773,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -745,6 +795,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -767,6 +818,7 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
 
         @Test
@@ -790,6 +842,7 @@ class StateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
+            assertThat(stateFlow.getFlags()).hasSize(1).containsEntry("ONE_RESPONDENT_REPRESENTATIVE", true);
         }
     }
 
