@@ -344,7 +344,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
                 stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append(
+                stringBuilder.append( "£ "+
                     MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()) + " |\n ");
             }
         );
@@ -362,7 +362,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
 
-        str1 = str1.concat(" | **Total** | " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
+        str1 = str1.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount) + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(str1);
 
