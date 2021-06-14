@@ -140,7 +140,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         Party applicant = caseData.getApplicant1();
 
         List<String> errors = dateOfBirthValidator.validate(applicant);
-        if (errors.size() == 0 && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getApplicant1().getPrimaryAddress().getPostCode());
         }
@@ -342,8 +343,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
                 stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append("£ " +
-                                         MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()) + " |\n ");
+                stringBuilder.append("£ "
+                                         + MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue()
+                                                                                   .getClaimAmount()) + " |\n ");
             }
         );
         str1 = str1.concat(stringBuilder.toString());
@@ -360,7 +362,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue());
 
-        str1 = str1.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
+        str1 = str1.concat(" | **Total** | £ "
+                               + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(str1);
 
