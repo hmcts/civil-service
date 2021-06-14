@@ -9,7 +9,7 @@ buildscript {
 
 def versions = [
   junit        : '5.7.0',
-  junitPlatform: '1.7.1',
+  junitPlatform: '1.7.2',
   lombok       : '1.18.12'
 ]
 
