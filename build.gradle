@@ -314,7 +314,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.4.6'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.8.1'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.10'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
