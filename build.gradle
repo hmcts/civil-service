@@ -79,7 +79,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.4.32'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.4.32'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.4.31'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.4.32'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.5.10'
       // CVE-2020-29582
 
       // CVE-2021-29425
