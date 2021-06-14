@@ -78,6 +78,8 @@ public class CaseData implements MappableObject {
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
+    private final List<ClaimAmountBreakup> claimAmountBreakup;
+    private double totalClaimAmount;
 
     @Valid
     private final CloseClaim withdrawClaim;
@@ -129,4 +131,5 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
+    private final String claimAmountBreakupSummaryObject;
 }

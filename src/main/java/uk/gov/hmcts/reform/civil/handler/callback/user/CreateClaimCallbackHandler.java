@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -37,8 +39,10 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +118,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
+            .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .build();
     }
 
@@ -318,6 +323,49 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        var ref = new Object() {
+            BigDecimal totalClaimAmount = new BigDecimal(0);
+        };
+        List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
+
+        String str1 = " | Description | Amount | \n |---|---| \n | ";
+        StringBuilder stringBuilder = new StringBuilder();
+        claimAmountBreakups.stream().forEach(
+            claimAmountBreakup -> {
+                ref.totalClaimAmount =
+                    ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
+
+                stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
+                stringBuilder.append("£ " +
+                                         MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()) + " |\n ");
+            }
+        );
+        str1 = str1.concat(stringBuilder.toString());
+
+        List<String> errors = new ArrayList<>();
+        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
+            errors.add("Total Claim Amount cannot exceed £ 25,000");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.totalClaimAmount(
+            MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue());
+
+        str1 = str1.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() + " | ");
+
+        caseDataBuilder.claimAmountBreakupSummaryObject(str1);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
