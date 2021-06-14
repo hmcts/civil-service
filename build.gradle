@@ -291,7 +291,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.2'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.6'
