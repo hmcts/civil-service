@@ -553,6 +553,76 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventRespondent2OrgPolicyCallback {
+
+        private static final String PAGE_ID = "rep2OrgPolicy";
+
+        @Test
+        void shouldReturnError_whenOrganisationPolicyIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(null)
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIdIsNull() {
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID(null)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldBeSuccessful_whenValid() {
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
     class MidStatementOfTruth {
 
         @Test

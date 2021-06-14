@@ -68,7 +68,7 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.68'
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.69'
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.7'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
@@ -83,7 +83,7 @@ allprojects {
       // CVE-2020-29582
 
       // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.8.0'
+      dependency group: 'commons-io', name: 'commons-io', version: '2.9.0'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.2'
@@ -338,9 +338,9 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.0'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.3.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.4.1'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.9.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.9.0'
 
