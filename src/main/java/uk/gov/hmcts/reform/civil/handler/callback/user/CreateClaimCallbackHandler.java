@@ -349,8 +349,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         str1 = str1.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 10000) {
-            errors.add("Total Claim Amount cannot exceed £ 10,000");
+        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
+            errors.add("Total Claim Amount cannot exceed £ 25,000");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
