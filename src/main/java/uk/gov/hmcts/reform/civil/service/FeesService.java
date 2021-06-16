@@ -51,13 +51,13 @@ public class FeesService {
 
     //calculate fee for specified claim total amount
     public Fee getFeeDataByTotalClaimAmount(BigDecimal totalClaimAmount) {
-        FeeLookupResponseDto feeLookupResponseDto = lookupFee(totalClaimAmount);
+        FeeLookupResponseDto feeLookupResponseDto = specLookupFee(totalClaimAmount);
 
         return buildFeeDto(feeLookupResponseDto);
     }
 
     //lookup fee for specified claim total amount
-    private FeeLookupResponseDto lookupFee(BigDecimal totalClaimAmount) {
+    private FeeLookupResponseDto specLookupFee(BigDecimal totalClaimAmount) {
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),

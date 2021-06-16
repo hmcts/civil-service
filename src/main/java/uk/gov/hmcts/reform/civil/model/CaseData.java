@@ -96,8 +96,6 @@ public class CaseData implements MappableObject {
     private final String interestFromSpecificDateDescription;
     private final String calculatedInterest;
 
-
-
     @Valid
     private final CloseClaim withdrawClaim;
 

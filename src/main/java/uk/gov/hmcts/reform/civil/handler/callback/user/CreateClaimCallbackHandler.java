@@ -364,8 +364,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
                 stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append( "£ "+
-                    MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()) + " |\n ");
+                stringBuilder.append("£ "
+                                         + MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue()
+                                                                                   .getClaimAmount()) + " |\n ");
             }
         );
         str1 = str1.concat(stringBuilder.toString());
@@ -402,7 +403,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         BigDecimal interest = ic.calculateInterest(caseData);
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
-        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ " + caseData.getTotalClaimAmount() + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
+            + caseData.getTotalClaimAmount()
+            + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
         caseDataBuilder.calculatedInterest(str1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

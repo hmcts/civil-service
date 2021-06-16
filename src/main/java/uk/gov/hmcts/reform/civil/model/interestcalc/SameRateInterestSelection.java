@@ -8,8 +8,9 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class SameRateInterestSelection {
+
     private final SameRateInterestType sameRateInterestType;
-    private final BigDecimal aDifferentRate;
-    private final String aDifferentRateReason;
+    private final BigDecimal differentRate;
+    private final String differentRateReason;
 
 }
