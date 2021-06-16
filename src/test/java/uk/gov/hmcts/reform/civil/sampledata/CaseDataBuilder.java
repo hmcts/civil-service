@@ -80,6 +80,7 @@ public class CaseDataBuilder {
     protected SolicitorReferences solicitorReferences;
     protected CourtLocation courtLocation;
     protected Party applicant1;
+    protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected Party respondent1;
     protected YesOrNo respondent1Represented;
@@ -262,6 +263,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1(Party party) {
         this.applicant1 = party;
+        return this;
+    }
+
+    public CaseDataBuilder applicant2(Party party) {
+        this.applicant2 = party;
         return this;
     }
 
@@ -909,6 +915,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1PbaAccounts(applicantSolicitor1PbaAccounts)
             .claimFee(claimFee)
             .applicant1(applicant1)
+            .applicant2(applicant2)
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
             .respondent1OrgRegistered(respondent1OrgRegistered)

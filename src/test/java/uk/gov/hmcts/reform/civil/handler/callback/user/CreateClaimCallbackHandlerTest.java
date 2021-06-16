@@ -238,6 +238,68 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventApplicant2Callback {
+
+        private static final String PAGE_ID = "applicant2";
+
+        @Test
+        void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
     class MidEventParticularsOfClaimCallback {
 
         private final String pageId = "particulars-of-claim";
