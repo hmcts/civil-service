@@ -33,7 +33,7 @@ public class FeatureToggleService {
 
     public boolean isOrganisationOnboarded(String orgId) {
         LDUser ldUser = createLDUser().custom("orgId", orgId).build();
-        internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
+        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
     }
 
     public LDUser.Builder createLDUser() {
