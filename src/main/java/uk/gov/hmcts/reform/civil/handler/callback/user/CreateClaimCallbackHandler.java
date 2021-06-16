@@ -66,10 +66,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
-        + "%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. The exact "
+        + "receive an email. The email will also include the date when you need to notify the Defendant legal representative of the claim."
+        + "%n%nYou must notify the Defendant legal representative of the claim within 4 months of the claim being issued. The exact "
         + "date when you must notify the claim details will be provided when you first notify "
-        + "the defendant of the claim.";
+        + "the Defendant legal representative of the claim.";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
