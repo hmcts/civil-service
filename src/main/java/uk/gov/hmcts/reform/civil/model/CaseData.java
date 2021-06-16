@@ -94,7 +94,7 @@ public class CaseData implements MappableObject {
     private final InterestClaimUntilType interestClaimUntil;
     private final LocalDate interestFromSpecificDate;
     private final String interestFromSpecificDateDescription;
-    private final BigDecimal calculatedInterest;
+    private final String calculatedInterest;
 
 
 

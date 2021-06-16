@@ -56,7 +56,6 @@ public class CallbackController {
                  callback.getEventId(), callbackType, pageId, version
         );
 
-        System.out.println("callback controller "+ callback);
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))

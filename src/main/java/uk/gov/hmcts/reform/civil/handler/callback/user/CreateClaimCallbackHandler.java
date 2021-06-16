@@ -121,6 +121,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
+            .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .build();
     }
 
@@ -207,6 +208,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    //WARNING! below function getPbaAccounts is being used by both damages and specified claims,
+    // changes to this code may break one of the claim journeys, check with respective teams before changing it
     private List<String> getPbaAccounts(String authToken) {
         return organisationService.findOrganisation(authToken)
             .map(Organisation::getPaymentAccount)
@@ -328,6 +331,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    //calculate total amount for specified claim by adding up the claim break up amounts
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
@@ -351,8 +355,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         str1 = str1.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 10000) {
-            errors.add("Total Claim Amount cannot exceed £ 10,000");
+        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
+            errors.add("Total Claim Amount cannot exceed £ 25,000");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
@@ -371,17 +375,42 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    //calculate interest for specified claim
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
 
-
-
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         InterestCalculator ic = new InterestCalculator();
+        BigDecimal interest = ic.calculateInterest(caseData);
+        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
-        caseDataBuilder.calculatedInterest(ic.calculateInterest(caseData));
+        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ " + caseData.getTotalClaimAmount() + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+        caseDataBuilder.calculatedInterest(str1);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    //calculate fee for specified claim
+    private CallbackResponse calculateSpecFee(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
+        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
+        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
+        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount()))
+            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
