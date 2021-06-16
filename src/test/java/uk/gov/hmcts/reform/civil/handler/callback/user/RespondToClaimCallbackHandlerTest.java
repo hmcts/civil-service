@@ -487,12 +487,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(
-                        format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
+                    .confirmationHeader(format("# You've submitted your response%n## Claim number: 000DC001"))
                     .confirmationBody(format(
-                        "<br /> The Claimant's legal representative will get a notification to confirm you have "
-                            + "provided the Defendant defence. You will be CC'ed.%n"
-                            + "The Claimant has until %s to discontinue or proceed with this claim",
+                        "<br />The claimant has until %s to proceed. We will let you know when they respond.",
                         formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
                         + exitSurveyContentService.respondentSurvey())
                     .build());
