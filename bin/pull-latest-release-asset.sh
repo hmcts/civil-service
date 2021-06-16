@@ -4,10 +4,18 @@ repoName=$1
 assetName=$2
 
 retries=0
-while [ -z "$latestRelease" ]
+until [ -f "$assetName" ]
 do
-  latestRelease=$(curl https://api.github.com/repos/hmcts/${repoName}/releases/latest)
+  latestAssetId=$(curl https://api.github.com/repos/hmcts/${repoName}/releases/latest \
+   | docker run --rm --interactive stedolan/jq ".assets[] | select(.name==\"${assetName}\") | .id")
+
+  curl -L \
+    -H "Accept: application/octet-stream" \
+    --output $assetName \
+    https://api.github.com/repos/hmcts/${repoName}/releases/assets/${latestAssetId}
+
   retries=$((retries+1))
+  echo "Try ${retries}"
 
   if [ "$retries" -eq 5 ]
   then
@@ -15,13 +23,6 @@ do
       exit 1
   fi
 done
-
-latestAssetId=$(echo "$latestRelease" | docker run --rm --interactive stedolan/jq ".assets[] | select(.name==\"${assetName}\") | .id")
-
-curl -L \
-  -H "Accept: application/octet-stream" \
-  --output $assetName \
-  https://api.github.com/repos/hmcts/${repoName}/releases/assets/${latestAssetId} \
 
 unzip $assetName
 rm $assetName
