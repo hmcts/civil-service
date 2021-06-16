@@ -9,8 +9,11 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -91,6 +94,54 @@ class RepresentativeServiceTest {
                 contactInformation.getCounty(),
                 contactInformation.getCountry(),
                 contactInformation.getPostCode()
+            );
+        }
+
+        @Test
+        void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddress() {
+            Address address = Address.builder()
+                .addressLine1("address line 1 provided")
+                .addressLine2("address line 2")
+                .addressLine3("address line 3")
+                .postCode("SW1 1AA")
+                .county("London")
+                .country("UK")
+                .build();
+            ContactInformation providedContact = contactInformation.toBuilder()
+                .addressLine1("address line 1 provided")
+                .build();
+            SolicitorServiceAddress solicitorServiceAddress = SolicitorServiceAddress.builder()
+                .hasServiceAddress(YesOrNo.YES)
+                .address(address)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
+                .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
+                .build();
+
+            Representative representative = representativeService.getRespondentRepresentative(caseData);
+
+            verify(organisationService).findOrganisationById(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+            assertThat(representative).extracting("organisationName").isEqualTo(organisation.getName());
+            assertThat(representative).extracting("dxAddress").isEqualTo(
+                providedContact.getDxAddress().get(0).getDxNumber());
+            assertThat(representative).extracting("emailAddress").isEqualTo(
+                caseData.getRespondentSolicitor1EmailAddress());
+            assertThat(representative).extracting("serviceAddress").extracting(
+                "AddressLine1",
+                "AddressLine2",
+                "AddressLine3",
+                "County",
+                "Country",
+                "PostCode"
+            ).containsExactly(
+                providedContact.getAddressLine1(),
+                providedContact.getAddressLine2(),
+                providedContact.getAddressLine3(),
+                providedContact.getCounty(),
+                providedContact.getCountry(),
+                providedContact.getPostCode()
             );
         }
 
