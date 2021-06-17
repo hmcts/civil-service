@@ -159,7 +159,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
-            "<br /> The Claimant's legal representative will get a notification to confirm you have provided the "
+            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
                 + "Defendant defence. You will be CC'ed.%n"
                 + "The Claimant has until %s to discontinue or proceed with this claim",
             formatLocalDateTime(responseDeadline, DATE)

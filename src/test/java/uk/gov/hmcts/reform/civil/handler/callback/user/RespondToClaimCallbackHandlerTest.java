@@ -490,7 +490,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(
                         format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
                     .confirmationBody(format(
-                        "<br /> The Claimant's legal representative will get a notification to confirm you have "
+                        "<br /> The Claimant legal representative will get a notification to confirm you have "
                             + "provided the Defendant defence. You will be CC'ed.%n"
                             + "The Claimant has until %s to discontinue or proceed with this claim",
                         formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
