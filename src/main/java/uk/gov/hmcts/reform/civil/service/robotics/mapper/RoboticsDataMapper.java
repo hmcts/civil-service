@@ -149,7 +149,7 @@ public class RoboticsDataMapper {
 
     private RoboticsAddresses fromProvidedAddress(
         List<ContactInformation> contactInformation, SolicitorServiceAddress providedServiceAddress) {
-        if (providedServiceAddress != null && providedServiceAddress.getHasServiceAddress().equals(YesOrNo.YES)) {
+        if (providedServiceAddress != null && providedServiceAddress.getRequired().equals(YesOrNo.YES)) {
             return addressMapper.toRoboticsAddresses(providedServiceAddress.getAddress());
         }
         return addressMapper.toRoboticsAddresses(contactInformation);

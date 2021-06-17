@@ -8,6 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder(toBuilder = true)
 public class SolicitorServiceAddress {
 
-    private final YesOrNo hasServiceAddress;
+    private final YesOrNo required;
     private final Address address;
 }

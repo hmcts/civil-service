@@ -141,7 +141,7 @@ class RoboticsDataMapperTest {
         ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
 
         SolicitorServiceAddress solicitorServiceAddress = SolicitorServiceAddress.builder()
-            .hasServiceAddress(YesOrNo.YES)
+            .required(YesOrNo.YES)
             .address(address)
             .build();
 

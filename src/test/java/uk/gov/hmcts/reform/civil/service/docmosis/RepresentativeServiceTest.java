@@ -111,7 +111,7 @@ class RepresentativeServiceTest {
                 .addressLine1("address line 1 provided")
                 .build();
             SolicitorServiceAddress solicitorServiceAddress = SolicitorServiceAddress.builder()
-                .hasServiceAddress(YesOrNo.YES)
+                .required(YesOrNo.YES)
                 .address(address)
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()

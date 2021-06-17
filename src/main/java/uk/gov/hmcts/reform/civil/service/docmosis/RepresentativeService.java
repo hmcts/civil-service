@@ -55,7 +55,7 @@ public class RepresentativeService {
 
     private Address fromProvidedAddress(
         Address registeredServiceAddress, SolicitorServiceAddress providedServiceAddress) {
-        if (providedServiceAddress != null && providedServiceAddress.getHasServiceAddress().equals(YesOrNo.YES)) {
+        if (providedServiceAddress != null && providedServiceAddress.getRequired().equals(YesOrNo.YES)) {
             return providedServiceAddress.getAddress();
         }
         return registeredServiceAddress;
