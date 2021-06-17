@@ -72,6 +72,9 @@ public class CaseData implements MappableObject {
     private final OrganisationPolicy respondent1OrganisationPolicy;
     private final OrganisationPolicy respondent2OrganisationPolicy;
     private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    private final SolicitorServiceAddress applicantSolicitor1ServiceAddress;
+    private final SolicitorServiceAddress respondentSolicitor1ServiceAddress;
+    private final SolicitorServiceAddress respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
 

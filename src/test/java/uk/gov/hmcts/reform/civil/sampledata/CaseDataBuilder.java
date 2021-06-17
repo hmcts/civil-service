@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -150,6 +151,8 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    protected SolicitorServiceAddress applicantSolicitor1ServiceAddress;
+    protected SolicitorServiceAddress respondentSolicitor1ServiceAddress;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
@@ -158,6 +161,18 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent1AcknowledgeNotificationDate(LocalDateTime dateTime) {
         this.respondent1AcknowledgeNotificationDate = dateTime;
+        return this;
+    }
+
+    public CaseDataBuilder applicantSolicitor1ServiceAddress(
+        SolicitorServiceAddress applicantSolicitor1ServiceAddress) {
+        this.applicantSolicitor1ServiceAddress = applicantSolicitor1ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1ServiceAddress(
+        SolicitorServiceAddress respondentSolicitor1ServiceAddress) {
+        this.respondentSolicitor1ServiceAddress = respondentSolicitor1ServiceAddress;
         return this;
     }
 
@@ -977,7 +992,8 @@ public class CaseDataBuilder {
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .claimDismissedDate(claimDismissedDate)
-
+            .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
+            .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .build();
