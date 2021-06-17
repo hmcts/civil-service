@@ -15,7 +15,7 @@ do
     --output $assetName \
     https://api.github.com/repos/hmcts/${repoName}/releases/assets/${latestAssetId}
 
-  unzip $assetName
+  unzip -o $assetName
   returnValue=$?
   rm $assetName
 
