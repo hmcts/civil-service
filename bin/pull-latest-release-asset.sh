@@ -16,10 +16,10 @@ do
     https://api.github.com/repos/hmcts/${repoName}/releases/assets/${latestAssetId}
 
   unzip -o $assetName
-  returnValue=$?
+  unzipExitStatus=$?
   rm $assetName
 
-  if [ "$returnValue" -eq 0 ]
+  if [ "$unzipExitStatus" -eq 0 ]
   then
     exit 0
   fi
