@@ -11,13 +11,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -209,7 +207,7 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
-        Address address = Address.builder()
+        var solicitorServiceAddress = Address.builder()
             .addressLine1("line 1 provided")
             .addressLine2("line 2")
             .postCode("AB1 2XY")
@@ -217,11 +215,6 @@ class RoboticsDataMapperTest {
             .build();
 
         ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
-
-        SolicitorServiceAddress solicitorServiceAddress = SolicitorServiceAddress.builder()
-            .required(YesOrNo.YES)
-            .address(address)
-            .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
