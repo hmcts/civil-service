@@ -11,9 +11,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -70,6 +72,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
     FlowStateAllowedEventService.class
 })
 class FlowStateAllowedEventServiceTest {
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
