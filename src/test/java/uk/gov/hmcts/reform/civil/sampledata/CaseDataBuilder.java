@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -151,8 +151,8 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
-    protected SolicitorServiceAddress applicantSolicitor1ServiceAddress;
-    protected SolicitorServiceAddress respondentSolicitor1ServiceAddress;
+    protected Address applicantSolicitor1ServiceAddress;
+    protected Address respondentSolicitor1ServiceAddress;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
@@ -164,14 +164,12 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicantSolicitor1ServiceAddress(
-        SolicitorServiceAddress applicantSolicitor1ServiceAddress) {
+    public CaseDataBuilder applicantSolicitor1ServiceAddress(Address applicantSolicitor1ServiceAddress) {
         this.applicantSolicitor1ServiceAddress = applicantSolicitor1ServiceAddress;
         return this;
     }
 
-    public CaseDataBuilder respondentSolicitor1ServiceAddress(
-        SolicitorServiceAddress respondentSolicitor1ServiceAddress) {
+    public CaseDataBuilder respondentSolicitor1ServiceAddress(Address respondentSolicitor1ServiceAddress) {
         this.respondentSolicitor1ServiceAddress = respondentSolicitor1ServiceAddress;
         return this;
     }

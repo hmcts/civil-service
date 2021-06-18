@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative.fromOrganisation;
@@ -28,11 +27,14 @@ public class RepresentativeService {
             var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
-            var providedServiceAddress = caseData.getRespondentSolicitor1ServiceAddress();
 
-            return representative.toBuilder()
+            var representativeBuilder = representative.toBuilder();
+
+            Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
+                .ifPresent(representativeBuilder::serviceAddress);
+
+            return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor1EmailAddress())
-                .serviceAddress(fromProvidedAddress(representative.getServiceAddress(), providedServiceAddress))
                 .build();
         }
         return ofNullable(caseData.getRespondentSolicitor1OrganisationDetails())
@@ -45,20 +47,13 @@ public class RepresentativeService {
         var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                   .orElseThrow(RuntimeException::new));
 
-        var providedSolicitor1ServiceAddress = caseData.getApplicantSolicitor1ServiceAddress();
+        var representativeBuilder = representative.toBuilder();
+        Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
+            .ifPresent(representativeBuilder::serviceAddress);
 
-        return representative.toBuilder()
+        return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
-            .serviceAddress(fromProvidedAddress(representative.getServiceAddress(), providedSolicitor1ServiceAddress))
             .build();
-    }
-
-    private Address fromProvidedAddress(
-        Address registeredServiceAddress, SolicitorServiceAddress providedServiceAddress) {
-        if (providedServiceAddress != null && providedServiceAddress.getRequired().equals(YesOrNo.YES)) {
-            return providedServiceAddress.getAddress();
-        }
-        return registeredServiceAddress;
     }
 
     private boolean organisationPicked(CaseData caseData) {
