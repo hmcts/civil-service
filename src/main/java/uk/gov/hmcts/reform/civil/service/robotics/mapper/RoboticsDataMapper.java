@@ -5,13 +5,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
@@ -136,7 +135,7 @@ public class RoboticsDataMapper {
     }
 
     private Consumer<uk.gov.hmcts.reform.prd.model.Organisation> buildOrganisation(
-        Solicitor.SolicitorBuilder solicitorBuilder, SolicitorServiceAddress providedServiceAddress
+        Solicitor.SolicitorBuilder solicitorBuilder, Address providedServiceAddress
     ) {
         return organisation -> {
             List<ContactInformation> contactInformation = organisation.getContactInformation();
@@ -147,12 +146,10 @@ public class RoboticsDataMapper {
         };
     }
 
-    private RoboticsAddresses fromProvidedAddress(
-        List<ContactInformation> contactInformation, SolicitorServiceAddress providedServiceAddress) {
-        if (providedServiceAddress != null && providedServiceAddress.getRequired().equals(YesOrNo.YES)) {
-            return addressMapper.toRoboticsAddresses(providedServiceAddress.getAddress());
-        }
-        return addressMapper.toRoboticsAddresses(contactInformation);
+    private RoboticsAddresses fromProvidedAddress(List<ContactInformation> contactInformation, Address provided) {
+        return Optional.ofNullable(provided)
+            .map(address -> addressMapper.toRoboticsAddresses(provided))
+            .orElse(addressMapper.toRoboticsAddresses(contactInformation));
     }
 
     private String getContactDX(List<ContactInformation> contactInformation) {

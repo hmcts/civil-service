@@ -9,11 +9,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SolicitorServiceAddress;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -99,7 +97,7 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddress() {
-            Address address = Address.builder()
+            var solicitorServiceAddress = Address.builder()
                 .addressLine1("address line 1 provided")
                 .addressLine2("address line 2")
                 .addressLine3("address line 3")
@@ -110,10 +108,7 @@ class RepresentativeServiceTest {
             ContactInformation providedContact = contactInformation.toBuilder()
                 .addressLine1("address line 1 provided")
                 .build();
-            SolicitorServiceAddress solicitorServiceAddress = SolicitorServiceAddress.builder()
-                .required(YesOrNo.YES)
-                .address(address)
-                .build();
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
                 .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
