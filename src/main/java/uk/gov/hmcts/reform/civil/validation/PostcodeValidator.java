@@ -33,7 +33,6 @@ public class PostcodeValidator {
         } else {
             errors.add("Please enter Postcode");
         }
-        System.out.println("errors ---" + errors);
         return errors;
     }
 }
