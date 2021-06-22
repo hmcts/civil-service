@@ -122,6 +122,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .put(callbackKey(MID, "respondentSolicitor1"), this::validateRespondentSolicitorAddress)
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
+            .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .build();
     }
@@ -406,6 +407,22 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount()
             + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+        caseDataBuilder.calculatedInterest(str1);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
+
+        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
+            + caseData.getTotalClaimAmount()
+            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
         caseDataBuilder.calculatedInterest(str1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
