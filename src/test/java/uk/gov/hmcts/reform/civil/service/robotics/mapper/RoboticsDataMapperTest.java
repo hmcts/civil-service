@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
@@ -65,6 +66,8 @@ class RoboticsDataMapperTest {
     AuthTokenGenerator authTokenGenerator;
     @MockBean
     IdamClient idamClient;
+    @MockBean
+    FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
 
