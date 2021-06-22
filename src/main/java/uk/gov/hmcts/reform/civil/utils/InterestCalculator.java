@@ -6,66 +6,75 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+
+import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
+import static java.math.BigDecimal.ZERO;
+import static java.math.BigDecimal.valueOf;
 
 public class InterestCalculator {
 
-    private BigDecimal interest;
+    public static final int TO_FULL_PENNIES = 2;
+    private static final String FROM_CLAIM_SUBMIT_DATE = "FROM_CLAIM_SUBMIT_DATE";
+    private static final String FROM_SPECIFIC_DATE = "FROM_A_SPECIFIC_DATE";
+    private static final String UNTIL_CLAIM_SUBMIT_DATE = "UNTIL_CLAIM_SUBMIT_DATE";
+    private static final String UNTIL_SETTLED_OR_JUDGEMENT_MADE = "UNTIL_SETTLED_OR_JUDGEMENT_MADE";
+    public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
+    public static LocalDateTime localDateTime = LocalDateTime.now();
 
-    public BigDecimal calculateInterest(CaseData caseData) {
-
+    public static BigDecimal calculateInterest(CaseData caseData) {
+        BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (caseData.getInterestClaimOptions().name() == "SAME_RATE_INTEREST") {
                 if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
                     == "SAME_RATE_INTEREST_8_PC") {
-                    return calculateInterestAmount(caseData, new BigDecimal(8));
+                    interestAmount = calculateInterestAmount(caseData, valueOf(8));
                 }
                 if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
                     == "SAME_RATE_INTEREST_DIFFERENT_RATE") {
-                    return calculateInterestAmount(caseData,
+                    interestAmount = calculateInterestAmount(caseData,
                                                    caseData.getSameRateInterestSelection().getDifferentRate());
                 }
             } else if (caseData.getInterestClaimOptions().name() == "BREAK_DOWN_INTEREST") {
-                return  caseData.getBreakDownInterestTotal();
-            }
-        } else {
-            return new BigDecimal(0.00);
-        }
-        return new BigDecimal(0.00);
-    }
-
-    private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
-
-        if (caseData.getInterestClaimFrom().name() == "FROM_CLAIM_SUBMIT_DATE") {
-            return new BigDecimal(0.00); //change this
-        }
-
-        if (caseData.getInterestClaimFrom().name() == "FROM_A_SPECIFIC_DATE") {
-            //logic for specific date, calculate number of days here
-            if (caseData.getInterestClaimUntil().name() == "UNTIL_CLAIM_SUBMIT_DATE"
-                || caseData.getInterestClaimUntil().name() == "UNTIL_SETTLED_OR_JUDGEMENT_MADE") {
-
-                BigDecimal numberOfDays
-                    = new BigDecimal(calculateDaysBetweenDates(caseData.getInterestFromSpecificDate()));
-                BigDecimal interestForAYear
-                    = caseData.getTotalClaimAmount().multiply(interestRate.divide(new BigDecimal(100)));
-                BigDecimal  interestPerDay = interestForAYear.divide(new BigDecimal(365.00), 2, RoundingMode.HALF_UP);
-                return interestPerDay.multiply(numberOfDays);
+                interestAmount =  caseData.getBreakDownInterestTotal();
             }
         }
-        return new BigDecimal(0.00);
+        return interestAmount;
     }
 
-    public long calculateDaysBetweenDates(LocalDate specificDate) {
+    public static BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
+        if (caseData.getInterestClaimFrom().name() == FROM_CLAIM_SUBMIT_DATE) {
+            LocalDate claimIssueDate = isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) :
+                localDateTime.toLocalDate();
+            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, claimIssueDate);
+        } else if (caseData.getInterestClaimFrom().name() == FROM_SPECIFIC_DATE) {
+            if (caseData.getInterestClaimUntil().name() == UNTIL_CLAIM_SUBMIT_DATE
+                || caseData.getInterestClaimUntil().name() == UNTIL_SETTLED_OR_JUDGEMENT_MADE) {
+                LocalDate claimIssueDate = isAfterFourPM() ?
+                    caseData.getInterestFromSpecificDate().minusDays(1) :
+                    caseData.getInterestFromSpecificDate();
+                return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
+                                         claimIssueDate);
+            }
+        }
+        return ZERO;
+    }
 
-        Date today = new Date();
-        long diff =
-            today.getTime() - Date.from(specificDate.atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime();
-        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-        return days;
+    public static BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
+        InterestFromSpecificDate) {
+        long numberOfDays
+            = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), InterestFromSpecificDate));
+        BigDecimal interestForAYear
+            = claimAmount.multiply(interestRate.divide(HUNDRED));
+        BigDecimal  interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
+                                                             RoundingMode.HALF_UP);
+        return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
+    }
+
+    private static boolean isAfterFourPM() {
+        LocalTime localTime = localDateTime.toLocalTime();
+        return localTime.getHour() > 15;
     }
 }
-
-
