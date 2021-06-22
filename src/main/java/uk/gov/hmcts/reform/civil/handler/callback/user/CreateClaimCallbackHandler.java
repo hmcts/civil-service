@@ -274,11 +274,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-        if (callbackParams.getRequest().getEventId() != null
+
+        if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         } else {
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
         }
 
