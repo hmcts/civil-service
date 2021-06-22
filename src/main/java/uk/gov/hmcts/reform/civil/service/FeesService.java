@@ -61,7 +61,7 @@ public class FeesService {
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),
-            MonetaryConversions.penniesToPounds(totalClaimAmount)
+            totalClaimAmount.setScale(2)
         );
     }
 
