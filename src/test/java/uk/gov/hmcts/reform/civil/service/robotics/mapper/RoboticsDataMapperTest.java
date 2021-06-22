@@ -77,6 +77,8 @@ class RoboticsDataMapperTest {
     @MockBean
     FeatureToggleService featureToggleService;
     @MockBean
+    FeatureToggleService featureToggleService;
+    @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
