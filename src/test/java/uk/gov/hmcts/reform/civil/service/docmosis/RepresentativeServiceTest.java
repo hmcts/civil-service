@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
@@ -53,6 +54,9 @@ class RepresentativeServiceTest {
 
     @MockBean
     private OrganisationService organisationService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private RepresentativeService representativeService;
