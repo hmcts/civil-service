@@ -349,7 +349,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         class ResetStatementOfTruth {
 
             @Test
-            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth() {
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
                 String name = "John Smith";
                 String role = "Solicitor";
 
