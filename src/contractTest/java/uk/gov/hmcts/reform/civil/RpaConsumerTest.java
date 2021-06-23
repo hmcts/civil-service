@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
@@ -81,6 +82,8 @@ class RpaConsumerTest extends BaseRpaTest {
     OrganisationApi organisationApi;
     @MockBean
     AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    FeatureToggleService featureToggleService;
     @MockBean
     IdamClient idamClient;
     @MockBean
