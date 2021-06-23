@@ -350,9 +350,7 @@ dependencies {
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-  testImplementation group: 'io.rest-assured', name: 'rest-assured', {
-    exclude group: 'io.rest-assured', module: 'xml-path'
-  }
+  testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
