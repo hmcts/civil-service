@@ -183,35 +183,37 @@ public class FlowPredicate {
             && caseData.getRespondent1ResponseDate() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
-        caseData.getClaimDismissedDate() != null
+        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1ClaimResponseIntentionType() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotifiedExtension = caseData ->
-        caseData.getClaimDismissedDate() != null
+        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1ClaimResponseIntentionType() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledged = caseData ->
-        caseData.getClaimDismissedDate() != null
+        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1AcknowledgeNotificationDate() != null;
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData ->
-        caseData.getClaimDismissedDate() != null
+        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1AcknowledgeNotificationDate() != null;
 
     public static final Predicate<CaseData> applicantOutOfTime = caseData ->
-        caseData.getTakenOfflineDate() != null
-            && caseData.getApplicant1ResponseDeadline() != null
-            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+        caseData.getApplicant1ResponseDeadline() != null
+            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
+            && caseData.getApplicant1ProceedWithClaim() == null;
+
+    public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
+        caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> pastClaimNotificationDeadline = caseData ->
-        caseData.getClaimDismissedDate() != null
-            && caseData.getClaimNotificationDeadline() != null
+        caseData.getClaimNotificationDeadline() != null
             && caseData.getClaimNotificationDeadline().isBefore(LocalDateTime.now())
             && caseData.getClaimNotificationDate() == null;
 
@@ -219,8 +221,10 @@ public class FlowPredicate {
         caseData.getClaimDetailsNotificationDeadline() != null
             && caseData.getClaimDetailsNotificationDeadline().isBefore(LocalDateTime.now())
             && caseData.getClaimDetailsNotificationDate() == null
-            && caseData.getClaimNotificationDate() != null
-            && caseData.getClaimDismissedDate() != null;
+            && caseData.getClaimNotificationDate() != null;
+
+    public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
+        caseData.getClaimDismissedDate() != null;
 
     private FlowPredicate() {
         //Utility class

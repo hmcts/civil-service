@@ -77,6 +77,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked() {
+        var multipartyFeatureKey = "rpaContinuousFeed";
+        givenToggle(multipartyFeatureKey, true);
+
+        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isTrue();
+        verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
         var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
         givenToggle(organisationOnboardedFeatureKey, true);
