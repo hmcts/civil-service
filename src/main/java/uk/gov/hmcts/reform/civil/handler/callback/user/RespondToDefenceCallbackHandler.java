@@ -55,13 +55,21 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "experts"), this::validateApplicantDqExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantDqWitnesses,
+            callbackKey(MID, "experts"), this::validateApplicantExperts,
+            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmitBackwardsCompatible,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {

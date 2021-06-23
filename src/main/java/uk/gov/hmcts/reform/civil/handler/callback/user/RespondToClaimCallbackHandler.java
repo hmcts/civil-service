@@ -64,14 +64,22 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "experts"), this::validateRespondentDqExperts,
-            callbackKey(MID, "witnesses"), this::validateRespondentDqWitnesses,
+            callbackKey(MID, "experts"), this::validateRespondentExperts,
+            callbackKey(MID, "witnesses"), this::validateRespondentWitnesses,
             callbackKey(MID, "upload"), this::emptyCallbackResponse,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineBackwardsCompatible,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+    }
+
+    private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
