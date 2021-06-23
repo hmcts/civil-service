@@ -7,7 +7,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
@@ -38,6 +40,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 class EventHistoryMapperTest {
 
     private static final Event EMPTY_EVENT = Event.builder().build();
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     EventHistoryMapper mapper;
@@ -1302,6 +1307,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimNotificationDeadline()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             String text = "RPA Reason: Claim dismissed. Claimant hasn't taken action since the claim was issued.";
@@ -1341,6 +1347,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             String detailsText = "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
@@ -1390,6 +1397,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotifiedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1452,6 +1460,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1515,6 +1524,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(

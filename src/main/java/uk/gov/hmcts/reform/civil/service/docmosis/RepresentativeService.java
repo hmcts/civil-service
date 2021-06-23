@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.util.Optional;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative.fromOrganisation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -25,7 +27,13 @@ public class RepresentativeService {
             var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
-            return representative.toBuilder()
+
+            var representativeBuilder = representative.toBuilder();
+
+            Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
+                .ifPresent(representativeBuilder::serviceAddress);
+
+            return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor1EmailAddress())
                 .build();
         }
@@ -38,7 +46,12 @@ public class RepresentativeService {
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                   .orElseThrow(RuntimeException::new));
-        return representative.toBuilder()
+
+        var representativeBuilder = representative.toBuilder();
+        Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
+            .ifPresent(representativeBuilder::serviceAddress);
+
+        return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .build();
     }

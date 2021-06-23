@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -114,6 +115,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private IdamClient idamClient;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private CreateClaimCallbackHandler handler;
@@ -226,6 +230,68 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventApplicant2Callback {
+
+        private static final String PAGE_ID = "applicant2";
+
+        @Test
+        void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
                                 .soleTraderDateOfBirth(now().minusDays(1))
                                 .build())
                 .build();
