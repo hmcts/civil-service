@@ -20,10 +20,7 @@ properties([
       description: 'Functional tests waitForTimeout value'),
     string(name: 'SECURITY_RULES',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
-      description: 'The security rules to use'),
-    string(name: 'FUNCTIONAL_TESTS_WORKERS',
-      defaultValue: '1',
-      description: 'Number of workers running functional tests'),
+      description: 'The security rules to use')
   ])
 ])
 

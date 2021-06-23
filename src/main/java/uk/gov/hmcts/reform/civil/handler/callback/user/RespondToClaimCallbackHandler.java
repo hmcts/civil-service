@@ -159,12 +159,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
-            "<br />The claimant has until %s to proceed. We will let you know when they respond.",
-            formatLocalDateTime(responseDeadline, DATE))
+            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
+                + "Defendant defence. You will be CC'ed.%n"
+                + "The Claimant has until %s to discontinue or proceed with this claim",
+            formatLocalDateTime(responseDeadline, DATE)
+        )
             + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
+            .confirmationHeader(
+                format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
     }

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -53,6 +54,8 @@ class PaymentTaskHandlerTest {
     private ExternalTaskService externalTaskService;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private PaymentTaskHandler paymentTaskHandler;
 
@@ -76,7 +79,8 @@ class PaymentTaskHandlerTest {
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
-            variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true));
+            variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                                                  "RPA_CONTINUOUS_FEED", false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
