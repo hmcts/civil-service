@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
@@ -57,7 +55,6 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
-            .applicantRepresentative(representativeService.getApplicantRepresentative(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
@@ -71,24 +68,25 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .build();
     }
 
-    private List<Respondent> getRespondents(CaseData caseData) {
-        Party respondent = caseData.getRespondent1();
-        return List.of(Respondent.builder()
+    private List<Party> getRespondents(CaseData caseData) {
+        var respondent = caseData.getRespondent1();
+        return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(representativeService.getRespondentRepresentative(caseData))
                            .build());
     }
 
-    private List<Applicant> getApplicants(CaseData caseData) {
-        Party applicant = caseData.getApplicant1();
-        return List.of(Applicant.builder()
+    private List<Party> getApplicants(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        return List.of(Party.builder()
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .litigationFriendName(
                                ofNullable(caseData.getApplicant1LitigationFriend())
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
+                           .representative(representativeService.getApplicantRepresentative(caseData))
                            .build());
     }
 }
