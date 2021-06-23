@@ -19,8 +19,8 @@ import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.ca
  */
 public interface BaseExternalTaskHandler extends ExternalTaskHandler {
 
-    static final String FLOW_STATE = "flowState";
-    static final String MULTIPARTY_ENABLED = "multipartyEnabled";
+    String FLOW_STATE = "flowState";
+    String FLOW_FLAGS = "flowFlags";
 
     Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 

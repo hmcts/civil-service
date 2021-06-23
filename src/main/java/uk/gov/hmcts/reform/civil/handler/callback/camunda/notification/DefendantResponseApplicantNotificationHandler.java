@@ -71,8 +71,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 

@@ -162,7 +162,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class SubmittedCallback {
 
-        private static final String BODY = "<br />What happens next%n%n You must respond to the claimant by %s";
+        private static final String BODY = "<br />You must respond to the claimant by %s";
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {

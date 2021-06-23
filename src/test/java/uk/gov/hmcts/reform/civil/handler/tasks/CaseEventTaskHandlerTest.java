@@ -43,7 +43,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.MULTIPARTY_ENABLED;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
@@ -77,7 +77,6 @@ class CaseEventTaskHandlerTest {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");
-        when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
@@ -94,7 +93,7 @@ class CaseEventTaskHandlerTest {
             .build();
         VariableMap variables = Variables.createVariables();
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
-        variables.putValue(MULTIPARTY_ENABLED, true);
+        variables.putValue(FLOW_FLAGS, Map.of());
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.MULTIPARTY_ENABLED;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 
@@ -75,12 +75,11 @@ class StartBusinessProcessTaskHandlerTest {
     @BeforeEach
     void init() {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
-        variables.putValue(MULTIPARTY_ENABLED, true);
+        variables.putValue(FLOW_FLAGS, Map.of());
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");
         when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
-        when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
 
         when(mockTask.getAllVariables()).thenReturn(Map.of(
             "caseId", CASE_ID,
