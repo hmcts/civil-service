@@ -66,7 +66,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateRespondentDqExperts,
             callbackKey(MID, "witnesses"), this::validateRespondentDqWitnesses,
-            callbackKey(MID, "upload"), this::emptyCallbackResponse,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineBackwardsCompatible,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
