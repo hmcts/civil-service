@@ -50,7 +50,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -60,6 +60,17 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
@@ -80,6 +91,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .respondent1Copy(null)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

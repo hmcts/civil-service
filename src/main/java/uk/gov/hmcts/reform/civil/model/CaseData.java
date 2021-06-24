@@ -44,6 +44,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo addRespondent2;
     private final YesOrNo respondent2SameLegalRepresentative;
     private final Party respondent1;
+    private final Party respondent1Copy;
     private final Party respondent2;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
@@ -83,6 +84,7 @@ public class CaseData implements MappableObject {
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final String respondentDetails;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final RespondentResponseType respondent1ClaimResponseType;
