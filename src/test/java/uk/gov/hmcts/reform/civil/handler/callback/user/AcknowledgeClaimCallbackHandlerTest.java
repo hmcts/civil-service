@@ -69,13 +69,14 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+        void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
         }
     }
 
@@ -173,7 +174,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+                .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME))
+                .doesNotContainKey("respondent1Copy");
         }
     }
 

@@ -61,7 +61,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateRespondentDqExperts,
@@ -72,6 +72,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -130,6 +141,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .respondent1Copy(null)
             .respondent1ResponseDate(responseDate)
             .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
