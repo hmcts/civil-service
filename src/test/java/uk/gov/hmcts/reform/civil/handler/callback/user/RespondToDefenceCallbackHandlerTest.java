@@ -416,7 +416,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
+                    .confirmationHeader(format(
+                        "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
                     .confirmationBody(format(
                         "<br />We will review the case and contact you to tell you what to do next.%n%n"
                             + "[Download directions questionnaire](http://www.google.com)"
