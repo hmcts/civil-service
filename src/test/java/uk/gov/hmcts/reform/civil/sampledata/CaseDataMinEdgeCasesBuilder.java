@@ -100,6 +100,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMinEdgeCasesBuilder atStateClaimIssuedWithMinimalData() {
+        atStatePendingCaseIssuedWithMinimalData();
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        return this;
+    }
+
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
         claimIssuedPaymentDetails = PaymentDetails.builder()

@@ -729,5 +729,39 @@ class RpaConsumerTest extends BaseRpaTest {
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant_WithMaximumData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateClaimIssuedMaximumData()
+                .legacyCaseReference("000DC034")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim issued in CCD - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimAgainstUnregisteredDefendantWithMinimumData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateClaimIssuedWithMinimalData()
+                .legacyCaseReference("000DC035")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data for claim issued in CCD - min limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
     }
 }
