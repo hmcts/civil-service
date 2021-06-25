@@ -125,6 +125,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
             .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
+            .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .build();
     }
 
@@ -175,6 +176,24 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            List<String> errors = new ArrayList<String>();
+            if (caseData.getInterestFromSpecificDate() != null) {
+                if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
+                    errors.add("Correct the date. You can’t use a future date.");
+                }
+            }
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 

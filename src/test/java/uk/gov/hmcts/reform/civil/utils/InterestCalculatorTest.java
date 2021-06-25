@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.interestcalc.*;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
@@ -37,8 +41,8 @@ public class InterestCalculatorTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder().
-                sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
@@ -52,8 +56,9 @@ public class InterestCalculatorTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder().
-                sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType
+                                                                     .SAME_RATE_INTEREST_DIFFERENT_RATE)
                                            .differentRate(BigDecimal.valueOf(10)).build())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -68,8 +73,9 @@ public class InterestCalculatorTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder().
-                sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType
+                                                                     .SAME_RATE_INTEREST_DIFFERENT_RATE)
                                            .differentRate(BigDecimal.valueOf(10)).build())
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
@@ -86,8 +92,8 @@ public class InterestCalculatorTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder().
-                sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now().minusDays(1))
