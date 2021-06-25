@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -394,8 +395,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
-                .doesNotContainKey("respondent1Copy");
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
         }
 
         @Test
@@ -418,6 +418,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
         }
 
+        @Test
+        void shouldCopyRespondent1PrimaryAddress_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            var expectedAddress = AddressBuilder.defaults().addressLine1("test address").build();
+            caseData = caseData.toBuilder()
+                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("respondent1Copy");
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1")
+                .isEqualTo("test address");
+        }
+
         @Nested
         class ResetStatementOfTruth {
 
@@ -428,6 +445,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
                     .toBuilder()
+                    .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
 

@@ -86,11 +86,15 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
 
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .respondent1(updatedRespondent1)
             .respondent1Copy(null)
             .build();
 

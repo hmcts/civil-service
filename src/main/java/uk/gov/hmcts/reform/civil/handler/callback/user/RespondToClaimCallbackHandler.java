@@ -138,8 +138,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .respondent1(updatedRespondent1)
             .respondent1Copy(null)
             .respondent1ResponseDate(responseDate)
             .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
