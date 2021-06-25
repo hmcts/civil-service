@@ -386,7 +386,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
 
-        totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount) + " | ");
+        totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
+            .penniesToPounds(ref.totalClaimAmount) + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 

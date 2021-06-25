@@ -11,12 +11,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
-import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
+import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 
 @Component
 public class InterestCalculator {
+
+    private  InterestCalculator() {
+        //NO-OP
+    }
 
     public static final int TO_FULL_PENNIES = 2;
     private static final String FROM_CLAIM_SUBMIT_DATE = "FROM_CLAIM_SUBMIT_DATE";
@@ -54,8 +58,8 @@ public class InterestCalculator {
         } else if (caseData.getInterestClaimFrom().name() == FROM_SPECIFIC_DATE) {
             if (caseData.getInterestClaimUntil().name() == UNTIL_CLAIM_SUBMIT_DATE
                 || caseData.getInterestClaimUntil().name() == UNTIL_SETTLED_OR_JUDGEMENT_MADE) {
-                LocalDate claimIssueDate = isAfterFourPM() ?
-                    caseData.getInterestFromSpecificDate().minusDays(1) :
+                LocalDate claimIssueDate = isAfterFourPM()
+                    ? caseData.getInterestFromSpecificDate().minusDays(1) :
                     caseData.getInterestFromSpecificDate();
                 return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
                                          claimIssueDate);
@@ -65,9 +69,9 @@ public class InterestCalculator {
     }
 
     public static BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
-        InterestFromSpecificDate) {
+        interestFromSpecificDate) {
         long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), InterestFromSpecificDate));
+            = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), interestFromSpecificDate));
         BigDecimal interestForAYear
             = claimAmount.multiply(interestRate.divide(HUNDRED));
         BigDecimal  interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,

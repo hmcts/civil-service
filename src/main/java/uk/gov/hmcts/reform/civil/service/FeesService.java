@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.fees.client.FeesClient;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
