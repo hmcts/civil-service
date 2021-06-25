@@ -101,6 +101,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ObjectMapper objectMapper;
     private final Time time;
     private final PostcodeValidator postcodeValidator;
+    private final InterestCalculator interestCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -358,7 +359,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         };
         List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
-        String str1 = " | Description | Amount | \n |---|---| \n | ";
+        String totalAmount = " | Description | Amount | \n |---|---| \n | ";
         StringBuilder stringBuilder = new StringBuilder();
         claimAmountBreakups.stream().forEach(
             claimAmountBreakup -> {
@@ -371,7 +372,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                                                                                    .getClaimAmount()) + " |\n ");
             }
         );
-        str1 = str1.concat(stringBuilder.toString());
+        totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
         if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
@@ -385,9 +386,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.totalClaimAmount(
             MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
 
-        str1 = str1.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount) + " | ");
+        totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions.penniesToPounds(ref.totalClaimAmount) + " | ");
 
-        caseDataBuilder.claimAmountBreakupSummaryObject(str1);
+        caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -401,14 +402,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        InterestCalculator ic = new InterestCalculator();
-        BigDecimal interest = ic.calculateInterest(caseData);
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
-        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
+        String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount()
             + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
-        caseDataBuilder.calculatedInterest(str1);
+        caseDataBuilder.calculatedInterest(calculatedInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -421,10 +421,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
 
-        String str1 = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
+        String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount()
             + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
-        caseDataBuilder.calculatedInterest(str1);
+        caseDataBuilder.calculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -444,8 +444,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
 
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount()))
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 

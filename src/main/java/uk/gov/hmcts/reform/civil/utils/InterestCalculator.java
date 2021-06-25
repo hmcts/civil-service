@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -14,6 +15,7 @@ import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 
+@Component
 public class InterestCalculator {
 
     public static final int TO_FULL_PENNIES = 2;
