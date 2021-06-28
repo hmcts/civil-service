@@ -16,11 +16,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
@@ -196,18 +194,18 @@ class DirectionsQuestionnaireGeneratorTest {
             );
         }
 
-        private Applicant getApplicant(CaseData caseData) {
-            Party applicant = caseData.getApplicant1();
-            return Applicant.builder()
+        private Party getApplicant(CaseData caseData) {
+            var applicant = caseData.getApplicant1();
+            return Party.builder()
                 .name(applicant.getPartyName())
                 .primaryAddress(applicant.getPrimaryAddress())
                 .litigationFriendName("applicant LF")
                 .build();
         }
 
-        private List<Respondent> getRespondents(CaseData caseData) {
-            Party respondent = caseData.getRespondent1();
-            return List.of(Respondent.builder()
+        private List<Party> getRespondents(CaseData caseData) {
+            var respondent = caseData.getRespondent1();
+            return List.of(Party.builder()
                                .name(respondent.getPartyName())
                                .primaryAddress(respondent.getPrimaryAddress())
                                .representative(representative)
