@@ -90,7 +90,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -389,7 +389,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadline_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -403,6 +403,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(
+                V_1,
                 caseData,
                 ABOUT_TO_SUBMIT
             ));
@@ -425,7 +426,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = caseData.toBuilder()
                 .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -465,29 +466,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .extracting("name", "role")
                     .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldKeepApplicantStatementOfTruth_whenV1Callback() {
-                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(null)
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
-
-                assertThat(response.getData())
-                    .extracting("respondent1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("John Doe", "Solicitor");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
             }
         }
     }
