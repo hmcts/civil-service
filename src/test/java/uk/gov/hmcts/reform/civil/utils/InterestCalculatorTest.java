@@ -17,9 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class InterestCalculatorTest {
 
+    private final InterestCalculator interestCalculator = new InterestCalculator();
+
     @Test
     public void shouldReturnValidInterestAmountByDate() {
-        assertThat(InterestCalculator.calculateInterestByDate(
+        assertThat(interestCalculator.calculateInterestByDate(
             new BigDecimal("1000"),
             BigDecimal.valueOf(8),
             LocalDate.now().minusDays(2))).isEqualTo("0.44");
@@ -32,7 +34,7 @@ public class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
     }
 
@@ -47,7 +49,7 @@ public class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
     }
 
@@ -64,7 +66,7 @@ public class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
     }
 
@@ -83,7 +85,7 @@ public class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(1.37));
     }
 
@@ -100,7 +102,7 @@ public class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isGreaterThanOrEqualTo(BigDecimal.valueOf(1.10));
     }
 
@@ -112,7 +114,7 @@ public class InterestCalculatorTest {
             .breakDownInterestTotal(BigDecimal.valueOf(500))
             .build();
 
-        BigDecimal actual = InterestCalculator.calculateInterest(caseData);
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isGreaterThanOrEqualTo(BigDecimal.valueOf(500));
     }
 }

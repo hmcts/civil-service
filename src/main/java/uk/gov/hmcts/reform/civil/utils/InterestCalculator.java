@@ -18,7 +18,7 @@ import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 @Component
 public class InterestCalculator {
 
-    private  InterestCalculator() {
+    InterestCalculator() {
         //NO-OP
     }
 
@@ -28,9 +28,9 @@ public class InterestCalculator {
     private static final String UNTIL_CLAIM_SUBMIT_DATE = "UNTIL_CLAIM_SUBMIT_DATE";
     private static final String UNTIL_SETTLED_OR_JUDGEMENT_MADE = "UNTIL_SETTLED_OR_JUDGEMENT_MADE";
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
-    public static LocalDateTime localDateTime = LocalDateTime.now();
+    public LocalDateTime localDateTime = LocalDateTime.now();
 
-    public static BigDecimal calculateInterest(CaseData caseData) {
+    public BigDecimal calculateInterest(CaseData caseData) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (caseData.getInterestClaimOptions().name() == "SAME_RATE_INTEREST") {
@@ -50,7 +50,7 @@ public class InterestCalculator {
         return interestAmount;
     }
 
-    public static BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
+    public BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
         if (caseData.getInterestClaimFrom().name() == FROM_CLAIM_SUBMIT_DATE) {
             LocalDate claimIssueDate = isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) :
                 localDateTime.toLocalDate();
@@ -68,7 +68,7 @@ public class InterestCalculator {
         return ZERO;
     }
 
-    public static BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
+    public BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
         interestFromSpecificDate) {
         long numberOfDays
             = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), interestFromSpecificDate));
@@ -79,7 +79,7 @@ public class InterestCalculator {
         return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
     }
 
-    private static boolean isAfterFourPM() {
+    private boolean isAfterFourPM() {
         LocalTime localTime = localDateTime.toLocalTime();
         return localTime.getHour() > 15;
     }
