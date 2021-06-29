@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 
 @Data
 @Builder(toBuilder = true)
-public class Respondent {
+public class Party {
 
     private final String name;
     private final Address primaryAddress;
