@@ -138,9 +138,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private String getTitle(YesOrNo proceeding) {
         if (proceeding == YES) {
-            return "# You've chosen to proceed with the claim%n## Claim number: %s";
+            return "# You have chosen to proceed with the claim%n## Claim number: %s";
         }
-        return "# You've chosen not to proceed with the claim%n## Claim number: %s";
+        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
     }
 
     private String getBody(YesOrNo proceeding) {
@@ -148,7 +148,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         if (proceeding == YES) {
             return format(
-                "<br />We'll review the case and contact you to tell you what to do next.%n%n"
+                "<br />We will review the case and contact you to tell you what to do next.%n%n"
                     + "[Download directions questionnaire](%s)", dqLink)
                 + exitSurveyContentService.applicantSurvey();
         }
