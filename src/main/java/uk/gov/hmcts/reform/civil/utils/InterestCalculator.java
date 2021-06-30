@@ -18,10 +18,6 @@ import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 @Component
 public class InterestCalculator {
 
-    InterestCalculator() {
-        //NO-OP
-    }
-
     public static final int TO_FULL_PENNIES = 2;
     private static final String FROM_CLAIM_SUBMIT_DATE = "FROM_CLAIM_SUBMIT_DATE";
     private static final String FROM_SPECIFIC_DATE = "FROM_A_SPECIFIC_DATE";
