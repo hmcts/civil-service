@@ -55,7 +55,7 @@ class RoboticsDataMapperTest {
                                .build()))
         .build();
     private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY")
+        .organisationIdentifier("QWERTY R")
         .name("Org Name")
         .contactInformation(List.of(CONTACT_INFORMATION))
         .build();
@@ -115,19 +115,20 @@ class RoboticsDataMapperTest {
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
-        roboticsCaseData.getSolicitors()
-            .stream()
-            .forEach(
-                solicitor -> {
-                    assertThat(solicitor.getOrganisationId())
-                        .isEqualTo("QWERTY");
-                    assertThat(solicitor.getName())
-                        .isEqualTo("Org Name");
-                    assertThat(solicitor.getContactDX())
-                        .isEqualTo("DX 12345");
-                    CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
-                        .isEqualTo(solicitor.getAddresses().getContactAddress());
-                });
+
+        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
+        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
+
+        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
+        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
+        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
 
     @Test
@@ -150,19 +151,20 @@ class RoboticsDataMapperTest {
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
-        roboticsCaseData.getSolicitors()
-            .stream()
-            .forEach(
-                solicitor -> {
-                    assertThat(solicitor.getOrganisationId())
-                        .isEqualTo("QWERTY");
-                    assertThat(solicitor.getName())
-                        .isEqualTo("Org Name");
-                    assertThat(solicitor.getContactDX())
-                        .isEqualTo("DX 12345");
-                    CustomAssertions.assertThat(List.of(contactInformation))
-                        .isEqualTo(solicitor.getAddresses().getContactAddress());
-                });
+
+        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
+        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(contactInformation))
+            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
+
+        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
+        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
+        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(contactInformation))
+            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
 
     @Test
@@ -175,7 +177,7 @@ class RoboticsDataMapperTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
         var applicantSolicitor = roboticsCaseData.getSolicitors().get(0);
-        assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY");
+        assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
