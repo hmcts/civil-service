@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -25,12 +27,17 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class
+    ValidationAutoConfiguration.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AddDefendantLitigationFriendCallbackHandler handler;
+
+    @Autowired
+    private ExitSurveyContentService exitSurveyContentService;
 
     @Nested
     class AboutToStartCallback {
@@ -81,7 +88,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# You have added litigation friend details")
-                    .confirmationBody("<br />")
+                    .confirmationBody(exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

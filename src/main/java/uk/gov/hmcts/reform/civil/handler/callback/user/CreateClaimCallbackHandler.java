@@ -76,10 +76,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
-        + "%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. The exact "
-        + "date when you must notify the claim details will be provided when you first notify "
-        + "the defendant of the claim.";
+        + "receive an email. The email will also include the date when you need to notify the Defendant legal "
+        + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
@@ -109,12 +109,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
-            .put(callbackKey(V_1, MID, "particulars-of-claim"), this::validateParticularsOfClaim)
-            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaimBackwardsCompatible)
+            .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
+            .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
@@ -145,13 +146,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Party applicant = caseData.getApplicant1();
-
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getApplicant1().getPrimaryAddress().getPostCode());
         }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
+        Party applicant = callbackParams.getCaseData().getApplicant2();
+        List<String> errors = dateOfBirthValidator.validate(applicant);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -194,6 +203,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+
+    private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
+        YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
+        List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 

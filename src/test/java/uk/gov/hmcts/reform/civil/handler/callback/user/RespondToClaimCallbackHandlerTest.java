@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -28,9 +27,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -90,14 +88,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateClaimAcknowledge().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+        void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
         }
     }
 
@@ -390,7 +389,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadline_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -404,6 +403,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(
+                V_1,
                 caseData,
                 ABOUT_TO_SUBMIT
             ));
@@ -419,6 +419,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
         }
 
+        @Test
+        void shouldCopyRespondent1PrimaryAddress_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            var expectedAddress = AddressBuilder.defaults().addressLine1("test address").build();
+            caseData = caseData.toBuilder()
+                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("respondent1Copy");
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1")
+                .isEqualTo("test address");
+        }
+
         @Nested
         class ResetStatementOfTruth {
 
@@ -429,6 +446,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
                     .toBuilder()
+                    .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
 
@@ -449,29 +467,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("name", "role")
                     .containsExactly(null, null);
             }
-
-            @Test
-            void shouldKeepApplicantStatementOfTruth_whenV1Callback() {
-                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(null)
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
-
-                assertThat(response.getData())
-                    .extracting("respondent1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("John Doe", "Solicitor");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
-            }
         }
     }
 
@@ -487,9 +482,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've submitted your response%n## Claim number: 000DC001"))
+                    .confirmationHeader(
+                        format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
                     .confirmationBody(format(
-                        "<br />The claimant has until %s to proceed. We will let you know when they respond.",
+                        "<br /> The Claimant legal representative will get a notification to confirm you have "
+                            + "provided the Defendant defence. You will be CC'ed.%n"
+                            + "The Claimant has until %s to discontinue or proceed with this claim",
                         formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
                         + exitSurveyContentService.respondentSurvey())
                     .build());

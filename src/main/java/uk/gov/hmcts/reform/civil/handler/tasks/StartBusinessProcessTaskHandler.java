@@ -24,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
-    public static final String FLOW_STATE = "flowState";
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -37,7 +36,9 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
     public void handleTask(ExternalTask externalTask) {
         CaseData caseData = startBusinessProcess(externalTask);
         variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(caseData).getState().getName());
+        var stateFlow = stateFlowEngine.evaluate(caseData);
+        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
+        variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
     }
 
     @Override

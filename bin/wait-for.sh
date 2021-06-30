@@ -2,7 +2,12 @@
 
 set -eu
 
-service_base_urls=${@}
+selected_service=${@}
+
+service_base_urls=${CIVIL_SERVICE_URL}
+if [[ "${selected_service}" == 'manage-case' ]]; then
+  service_base_urls=${URL}
+fi
 
 max_health_check_attempts=30
 

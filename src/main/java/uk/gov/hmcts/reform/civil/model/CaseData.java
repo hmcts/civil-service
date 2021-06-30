@@ -45,11 +45,18 @@ public class CaseData implements MappableObject {
     private final Party applicant2;
     private final CorrectEmail applicantSolicitor1CheckEmail;
     private final IdamUserDetails applicantSolicitor1UserDetails;
+    private final YesOrNo addApplicant2;
+    private final YesOrNo addRespondent2;
+    private final YesOrNo respondent2SameLegalRepresentative;
     private final Party respondent1;
+    private final Party respondent1Copy;
     private final Party respondent2;
     private final YesOrNo respondent1Represented;
+    private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
+    private final YesOrNo respondent2OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
+    private final YesOrNo uploadParticularsOfClaim;
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
     private final Fee claimFee;
@@ -71,6 +78,12 @@ public class CaseData implements MappableObject {
     private final OrganisationPolicy respondent1OrganisationPolicy;
     private final OrganisationPolicy respondent2OrganisationPolicy;
     private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    private final YesOrNo applicantSolicitor1ServiceAddressRequired;
+    private final Address applicantSolicitor1ServiceAddress;
+    private final YesOrNo respondentSolicitor1ServiceAddressRequired;
+    private final Address respondentSolicitor1ServiceAddress;
+    private final YesOrNo respondentSolicitor2ServiceAddressRequired;
+    private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
 
@@ -121,6 +134,10 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1LitigationFriendRequired;
 
     private final LitigationFriend applicant1LitigationFriend;
+
+    private final YesOrNo applicant2LitigationFriendRequired;
+
+    private final LitigationFriend applicant2LitigationFriend;
 
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;

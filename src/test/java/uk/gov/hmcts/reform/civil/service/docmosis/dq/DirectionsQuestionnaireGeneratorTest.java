@@ -13,13 +13,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
@@ -68,9 +67,14 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N181.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+    private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final CaseDocument CASE_DOCUMENT_DEFENDANT = CaseDocumentBuilder.builder()
+        .documentName(FILE_NAME_DEFENDANT)
+        .documentType(DIRECTIONS_QUESTIONNAIRE)
+        .build();
+    private static final CaseDocument CASE_DOCUMENT_CLAIMANT = CaseDocumentBuilder.builder()
+        .documentName(FILE_NAME_CLAIMANT)
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .build();
 
@@ -85,6 +89,9 @@ class DirectionsQuestionnaireGeneratorTest {
     @MockBean
     private RepresentativeService representativeService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
 
@@ -94,21 +101,42 @@ class DirectionsQuestionnaireGeneratorTest {
     }
 
     @Test
-    void shouldGenerateCertificateOfService_whenValidDataIsProvided() {
+    void shouldGenerateDefendantCertificateOfService_whenStateFlowIsFullDefence() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
             .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DIRECTIONS_QUESTIONNAIRE)))
-            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+        ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
         verify(representativeService).getRespondentRepresentative(caseData);
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DIRECTIONS_QUESTIONNAIRE));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+        verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+    }
+
+    @Test
+    void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+            .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+        ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
         verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
     }
 
@@ -166,18 +194,18 @@ class DirectionsQuestionnaireGeneratorTest {
             );
         }
 
-        private Applicant getApplicant(CaseData caseData) {
-            Party applicant = caseData.getApplicant1();
-            return Applicant.builder()
+        private Party getApplicant(CaseData caseData) {
+            var applicant = caseData.getApplicant1();
+            return Party.builder()
                 .name(applicant.getPartyName())
                 .primaryAddress(applicant.getPrimaryAddress())
                 .litigationFriendName("applicant LF")
                 .build();
         }
 
-        private List<Respondent> getRespondents(CaseData caseData) {
-            Party respondent = caseData.getRespondent1();
-            return List.of(Respondent.builder()
+        private List<Party> getRespondents(CaseData caseData) {
+            var respondent = caseData.getRespondent1();
+            return List.of(Party.builder()
                                .name(respondent.getPartyName())
                                .primaryAddress(respondent.getPrimaryAddress())
                                .representative(representative)

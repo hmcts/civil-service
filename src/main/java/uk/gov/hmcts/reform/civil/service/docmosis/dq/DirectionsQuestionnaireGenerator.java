@@ -6,10 +6,8 @@ import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
@@ -59,14 +57,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private String getFileName(CaseData caseData) {
-        return String.format(N181.getDocumentTitle(), caseData.getLegacyCaseReference());
+        String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
+        return String.format(N181.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-        String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        DQ dq = state.equals(FULL_DEFENCE.fullName()) ? caseData.getRespondent1DQ()
-            : caseData.getApplicant1DQ();
+        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -89,9 +86,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private Applicant getApplicant(CaseData caseData) {
-        Party applicant = caseData.getApplicant1();
-        return Applicant.builder()
+    private Boolean isRespondentState(CaseData caseData) {
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        return state.equals(FULL_DEFENCE.fullName());
+    }
+
+    private Party getApplicant(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        return Party.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())
             .litigationFriendName(
@@ -101,9 +103,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private List<Respondent> getRespondents(CaseData caseData) {
-        Party respondent = caseData.getRespondent1();
-        return List.of(Respondent.builder()
+    private List<Party> getRespondents(CaseData caseData) {
+        var respondent = caseData.getRespondent1();
+        return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(representativeService.getRespondentRepresentative(caseData))

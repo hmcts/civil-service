@@ -11,9 +11,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -58,6 +60,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 
 @SpringBootTest(classes = {
@@ -67,6 +73,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
     FlowStateAllowedEventService.class
 })
 class FlowStateAllowedEventServiceTest {
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
@@ -281,6 +290,22 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN
                     }
+                ),
+                of(
+                    PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {}
+                ),
+                of(
+                    PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {}
+                ),
+                of(
+                    PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {}
+                ),
+                of(
+                    PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {}
                 )
             );
         }

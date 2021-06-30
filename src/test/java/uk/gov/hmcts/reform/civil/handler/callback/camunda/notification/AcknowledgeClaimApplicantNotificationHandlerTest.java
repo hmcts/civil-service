@@ -91,7 +91,6 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk",
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
             );

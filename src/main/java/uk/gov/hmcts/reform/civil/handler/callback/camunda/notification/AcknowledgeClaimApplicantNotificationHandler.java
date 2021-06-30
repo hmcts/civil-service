@@ -74,8 +74,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
         );
     }
 

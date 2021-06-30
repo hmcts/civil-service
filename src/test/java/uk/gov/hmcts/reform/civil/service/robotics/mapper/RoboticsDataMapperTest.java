@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
@@ -65,6 +66,8 @@ class RoboticsDataMapperTest {
     AuthTokenGenerator authTokenGenerator;
     @MockBean
     IdamClient idamClient;
+    @MockBean
+    FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
 
@@ -123,6 +126,41 @@ class RoboticsDataMapperTest {
                     assertThat(solicitor.getContactDX())
                         .isEqualTo("DX 12345");
                     CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+                        .isEqualTo(solicitor.getAddresses().getContactAddress());
+                });
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
+        var solicitorServiceAddress = Address.builder()
+            .addressLine1("line 1 provided")
+            .addressLine2("line 2")
+            .postCode("AB1 2XY")
+            .county("My county")
+            .build();
+
+        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+            .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
+            .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+        roboticsCaseData.getSolicitors()
+            .stream()
+            .forEach(
+                solicitor -> {
+                    assertThat(solicitor.getOrganisationId())
+                        .isEqualTo("QWERTY");
+                    assertThat(solicitor.getName())
+                        .isEqualTo("Org Name");
+                    assertThat(solicitor.getContactDX())
+                        .isEqualTo("DX 12345");
+                    CustomAssertions.assertThat(List.of(contactInformation))
                         .isEqualTo(solicitor.getAddresses().getContactAddress());
                 });
     }
