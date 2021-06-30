@@ -203,6 +203,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
 
     private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();

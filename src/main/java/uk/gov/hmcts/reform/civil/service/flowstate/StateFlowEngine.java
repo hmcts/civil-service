@@ -204,7 +204,7 @@ public class StateFlowEngine {
     public StateFlow buildSpec() {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(SPEC_DRAFT)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmitted)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
