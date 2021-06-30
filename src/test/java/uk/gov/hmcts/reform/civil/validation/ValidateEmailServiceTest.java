@@ -13,7 +13,7 @@ class ValidateEmailServiceTest {
     private final ValidateEmailService validateEmailService = new ValidateEmailService();
 
     private static final String ERROR_MESSAGE = "Enter an email address in the correct format, "
-        + "for example name@example.com";
+        + "for example john.smith@example.com";
 
     @ParameterizedTest
     @MethodSource("validEmailAddresses")
