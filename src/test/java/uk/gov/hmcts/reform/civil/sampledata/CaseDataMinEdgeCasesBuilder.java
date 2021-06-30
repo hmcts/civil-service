@@ -67,10 +67,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
             .correct(YES)
             .build();
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .build();
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;

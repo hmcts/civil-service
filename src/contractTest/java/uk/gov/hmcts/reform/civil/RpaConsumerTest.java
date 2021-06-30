@@ -69,7 +69,7 @@ class RpaConsumerTest extends BaseRpaTest {
                                .build()))
         .build();
     private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY")
+        .organisationIdentifier("QWERTY A")
         .name("Org Name")
         .contactInformation(List.of(CONTACT_INFORMATION))
         .build();
