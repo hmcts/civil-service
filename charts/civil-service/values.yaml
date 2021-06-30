@@ -68,3 +68,4 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
+        - os-postcode-lookup-api-key

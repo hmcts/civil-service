@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -86,7 +87,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     OrgPolicyValidator.class,
-    StateFlowEngine.class},
+    StateFlowEngine.class,
+    PostcodeValidator.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -124,6 +126,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @MockBean
+    private PostcodeValidator postcodeValidator;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;

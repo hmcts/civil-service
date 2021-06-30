@@ -42,6 +42,10 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -149,10 +153,58 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
+    private InterestClaimOptions interestClaimOptions;
+    private YesOrNo claimInterest;
+    private SameRateInterestSelection sameRateInterestSelection;
+    private InterestClaimFromType interestClaimFrom;
+    private InterestClaimUntilType interestClaimUntil;
+    private BigDecimal totalClaimAmount;
+    private LocalDate interestFromSpecificDate;
+    private BigDecimal breakDownInterestTotal;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
+
+    public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
+        this.sameRateInterestSelection = sameRateInterestSelection;
+        return this;
+    }
+
+    public CaseDataBuilder breakDownInterestTotal(BigDecimal breakDownInterestTotal) {
+        this.breakDownInterestTotal = breakDownInterestTotal;
+        return this;
+    }
+
+    public CaseDataBuilder interestFromSpecificDate(LocalDate interestFromSpecificDate) {
+        this.interestFromSpecificDate = interestFromSpecificDate;
+        return this;
+    }
+
+    public CaseDataBuilder totalClaimAmount(BigDecimal totalClaimAmount) {
+        this.totalClaimAmount = totalClaimAmount;
+        return this;
+    }
+
+    public CaseDataBuilder interestClaimOptions(InterestClaimOptions interestClaimOptions) {
+        this.interestClaimOptions = interestClaimOptions;
+        return this;
+    }
+
+    public CaseDataBuilder interestClaimFrom(InterestClaimFromType interestClaimFrom) {
+        this.interestClaimFrom = interestClaimFrom;
+        return this;
+    }
+
+    public CaseDataBuilder interestClaimUntil(InterestClaimUntilType interestClaimUntil) {
+        this.interestClaimUntil = interestClaimUntil;
+        return this;
+    }
+
+    public CaseDataBuilder claimInterest(YesOrNo claimInterest) {
+        this.claimInterest = claimInterest;
+        return this;
+    }
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
@@ -940,6 +992,14 @@ public class CaseDataBuilder {
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
+            .interestClaimOptions(interestClaimOptions)
+            .claimInterest(claimInterest)
+            .sameRateInterestSelection(sameRateInterestSelection)
+            .interestClaimFrom(interestClaimFrom)
+            .interestClaimUntil(interestClaimUntil)
+            .interestFromSpecificDate(interestFromSpecificDate)
+            .breakDownInterestTotal(breakDownInterestTotal)
+            .totalClaimAmount(totalClaimAmount)
             //Deadline extension
             .respondentSolicitor1AgreedDeadlineExtension(respondentSolicitor1AgreedDeadlineExtension)
             // Acknowledge Claim
