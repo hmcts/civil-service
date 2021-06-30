@@ -721,7 +721,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class ClaimantRepEmail {
 
             @Test
-            void shouldReturnNoErrors_whenIdamEmailIsCorrect() { ;
+            void shouldReturnNoErrors_whenIdamEmailIsCorrect() {
                 CaseData caseData = CaseData.builder()
                     .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(YES).build())
                     .build();
@@ -1019,8 +1019,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID))
-                    + exitSurveyContentService.applicantSurvey();
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
