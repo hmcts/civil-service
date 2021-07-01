@@ -94,7 +94,7 @@ public class CoreCaseUserService {
         );
     }
 
-    private boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
+    public boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
             accessToken,
             authTokenGenerator.generate(),
