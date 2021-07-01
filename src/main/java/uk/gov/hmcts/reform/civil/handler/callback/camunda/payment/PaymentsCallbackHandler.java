@@ -84,6 +84,8 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             } else {
                 errors.add(ERROR_MESSAGE);
             }
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
