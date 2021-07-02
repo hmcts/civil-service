@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -127,6 +128,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
+            .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
             .build();
     }
 
@@ -196,6 +198,27 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
                     errors.add("Correct the date. You can’t use a future date.");
                 }
+            }
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            List<String> errors = new ArrayList<String>();
+            if (caseData.getTimelineOfEvents() != null) {
+                List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
+                timelineOfEvent.forEach(timelineOfEvents -> {
+                    if (timelineOfEvents.getValue().getTimelineDate().isAfter(LocalDate.now())) {
+                        errors.add("Correct the date. You can’t use a future date.");
+                    }
+                });
             }
 
             return AboutToStartOrSubmitCallbackResponse.builder()

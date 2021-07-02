@@ -97,6 +97,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
+    private final List<TimelineOfEvents> timelineOfEvents;
     private BigDecimal totalClaimAmount;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
