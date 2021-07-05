@@ -73,9 +73,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var stateFlow = stateFlowEngine.evaluate(caseData);
         var isRespondent1 = YES;
-        if (stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES) && hasRespondentSolicitorTwoRole(callbackParams)) {
+        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && hasRespondentSolicitorTwoRole(callbackParams)) {
             isRespondent1 = NO;
         }
 
@@ -98,7 +98,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         if (caseData.getIsRespondent1() == NO) {
             agreedExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
         }
-        //TODO: update once multiparty gets implemented in NOTIFY_DEFENDANT_OF_CLAIM_DETAILS
+        //TODO: update to get correct deadline as a part of CMC-1346
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
