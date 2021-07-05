@@ -90,6 +90,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
+    public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
+        + "receive an email. The email will also include the date when you need to notify the defendant "
+        + "of the claim.%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. "
+        +"The exact date when you must notify the claim details will be provided when you first notify "
+        +"the defendant of the claim.";
+
+    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
+        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
+        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
+        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
+        + "the defendant within 4 months. "
+        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
+        + " Court Claims Centre.";
+
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
@@ -353,8 +368,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        return SubmittedCallbackResponse.builder()
+        return callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC") ? SubmittedCallbackResponse.builder()
+            .confirmationHeader(getSpecHeader(caseData))
+            .confirmationBody(getSpecBody(caseData))
+            .build() : SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
             .build();
@@ -515,5 +532,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getSpecHeader(CaseData caseData) {
+        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
+            return format(
+                "# Your claim has been received and will progress offline%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
+        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+    }
+
+    private String getSpecBody(CaseData caseData) {
+        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
+        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
+
+        return format(
+            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
+                ? SPEC_LIP_CONFIRMATION_BODY
+                : SPEC_CONFIRMATION_SUMMARY,
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+            claimIssueConfiguration.getResponsePackLink(),
+            formattedServiceDeadline
+        ) + exitSurveyContentService.applicantSurvey();
     }
 }
