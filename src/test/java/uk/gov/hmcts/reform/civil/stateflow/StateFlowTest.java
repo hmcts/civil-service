@@ -9,16 +9,12 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;

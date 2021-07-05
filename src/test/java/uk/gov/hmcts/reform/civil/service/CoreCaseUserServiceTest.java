@@ -19,10 +19,8 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
@@ -176,7 +174,6 @@ class CoreCaseUserServiceTest {
         }
     }
 
-
     @Nested
     class UserHasCaseRole {
 
@@ -194,7 +191,8 @@ class CoreCaseUserServiceTest {
 
         @Test
         void shouldReturnTrue_whenCaseRoleAssignedToUser() {
-            assertThat(service.userHasCaseRole(CASE_ID, CAA_USER_AUTH_TOKEN, CaseRole.RESPONDENTSOLICITORONE)).isTrue();
+            assertThat(service.userHasCaseRole(CASE_ID, CAA_USER_AUTH_TOKEN, CaseRole.RESPONDENTSOLICITORONE))
+                .isTrue();
 
             verify(caseAccessDataStoreApi).getUserRoles(
                 CAA_USER_AUTH_TOKEN,
@@ -205,7 +203,8 @@ class CoreCaseUserServiceTest {
 
         @Test
         void shouldReturnFalse_whenCaseRoleNotAssignedToUser() {
-            assertThat(service.userHasCaseRole(CASE_ID, CAA_USER_AUTH_TOKEN, CaseRole.RESPONDENTSOLICITORTWO)).isFalse();
+            assertThat(service.userHasCaseRole(CASE_ID, CAA_USER_AUTH_TOKEN, CaseRole.RESPONDENTSOLICITORTWO))
+                .isFalse();
 
             verify(caseAccessDataStoreApi).getUserRoles(
                 CAA_USER_AUTH_TOKEN,
