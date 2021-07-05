@@ -50,6 +50,17 @@ public class CoreCaseUserService {
         }
     }
 
+    public boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+            accessToken,
+            authTokenGenerator.generate(),
+            List.of(caseId)
+        );
+
+        return userRoles.getCaseAssignedUserRoles().stream()
+            .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
+    }
+
     private String getCaaAccessToken() {
         return idamClient.getAccessToken(
             crossAccessUserConfiguration.getUserName(),
@@ -92,16 +103,5 @@ public class CoreCaseUserService {
                 .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
                 .build()
         );
-    }
-
-    public boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-            accessToken,
-            authTokenGenerator.generate(),
-            List.of(caseId)
-        );
-
-        return userRoles.getCaseAssignedUserRoles().stream()
-            .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
     }
 }
