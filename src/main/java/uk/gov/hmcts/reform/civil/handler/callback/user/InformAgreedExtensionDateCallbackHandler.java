@@ -16,8 +16,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +55,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
+    private final UserService userService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -154,11 +157,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private boolean representsRespondent2(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
             && coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            userInfo.getUid(),
             RESPONDENTSOLICITORTWO
         );
     }

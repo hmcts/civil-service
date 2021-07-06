@@ -32,7 +32,7 @@ public class CoreCaseUserService {
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
 
-        if (!userHasCaseRole(caseId, caaAccessToken, caseRole)) {
+        if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
             assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
         } else {
             log.info("Case already have the user with {} role", caseRole.getFormattedName());
@@ -43,21 +43,22 @@ public class CoreCaseUserService {
 
         String caaAccessToken = getCaaAccessToken();
 
-        if (userHasCaseRole(caseId, caaAccessToken, CREATOR)) {
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CREATOR)) {
             removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
         } else {
             log.info("User doesn't have {} role", CREATOR.getFormattedName());
         }
     }
 
-    public boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
+    public boolean userHasCaseRole(String caseId, String userId, CaseRole caseRole) {
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-            accessToken,
+            getCaaAccessToken(),
             authTokenGenerator.generate(),
             List.of(caseId)
         );
 
         return userRoles.getCaseAssignedUserRoles().stream()
+            .filter(c -> c.getUserId().equals(userId))
             .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
     }
 
@@ -103,5 +104,16 @@ public class CoreCaseUserService {
                 .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
                 .build()
         );
+    }
+
+    private boolean userWithCaseRoleExistsOnCase(String caseId, String accessToken, CaseRole caseRole) {
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+            accessToken,
+            authTokenGenerator.generate(),
+            List.of(caseId)
+        );
+
+        return userRoles.getCaseAssignedUserRoles().stream()
+            .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
     }
 }

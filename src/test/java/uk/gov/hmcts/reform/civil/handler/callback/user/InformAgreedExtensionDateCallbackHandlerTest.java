@@ -20,8 +20,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ import static java.time.LocalTime.MIDNIGHT;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -56,7 +59,6 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     DeadlinesCalculator.class,
-    CaseDetailsConverter.class,
     StateFlowEngine.class,
 })
 class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -79,6 +81,9 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     @MockBean
     private CoreCaseUserService coreCaseUserService;
 
+    @Autowired
+    private UserService userService;
+
     @Nested
     class AboutToStartCallback {
 
@@ -100,6 +105,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         @BeforeEach
         void setup() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         }
 
         @Test
@@ -248,6 +254,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             when(deadlinesCalculator.calculateFirstWorkingDay(extensionDateRespondent2))
                 .thenReturn(extensionDateRespondent2);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         }
 
         @Test
