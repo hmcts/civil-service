@@ -583,13 +583,13 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTZ").build())
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
