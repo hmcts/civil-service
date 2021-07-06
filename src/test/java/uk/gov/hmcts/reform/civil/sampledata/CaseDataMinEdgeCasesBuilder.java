@@ -136,7 +136,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataMinEdgeCasesBuilder atStateClaimDetailsNotifiedWithMaximumData() {
+    public CaseDataMinEdgeCasesBuilder atStateClaimDetailsNotifiedWithMinimumData() {
         atStateClaimNotifiedWithMinimumData();
         claimDetailsNotificationDate = LocalDateTime.now();
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
