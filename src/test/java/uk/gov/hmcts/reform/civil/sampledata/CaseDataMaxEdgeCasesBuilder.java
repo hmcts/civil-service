@@ -145,6 +145,14 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMaxEdgeCasesBuilder atStateClaimIssuedMaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        return this;
+    }
+
     public CaseDataMaxEdgeCasesBuilder atStateRespondentRespondToClaimWithMaximalData(
         RespondentResponseType respondentResponseType
     ) {
