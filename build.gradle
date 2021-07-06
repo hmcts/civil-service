@@ -166,6 +166,12 @@ task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
   commandLine './bin/pull-latest-release-asset.sh', 'civil-ccd-definition', 'civil-e2e.zip'
 }
 
+task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
   commandLine '/usr/bin/yarn', '--mutex', 'network', '--frozen-lockfile', '--silent', 'install'
 }
@@ -353,7 +359,7 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-
+  testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.0.1.ccd-1253.4:all'
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
