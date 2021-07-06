@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapp
 public class EventHistoryMapper {
 
     private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -47,6 +49,9 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
+                        break;
+                    case CLAIM_ISSUED:
+                        buildClaimIssued(builder, caseData);
                         break;
                     case CLAIM_NOTIFIED:
                         buildClaimantHasNotifiedDefendant(builder, caseData);
@@ -107,6 +112,22 @@ public class EventHistoryMapper {
             });
 
         return builder.build();
+    }
+
+    private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isRpaContinuousFeedEnabled()) {
+            String miscText = "Claim issued in CCD.";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
@@ -231,7 +252,7 @@ public class EventHistoryMapper {
     private void buildClaimantHasNotifiedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
             Event.builder()
-                .eventSequence(1)
+                .eventSequence((prepareEventSequence(builder.build())))
                 .eventCode("999")
                 .dateReceived(caseData.getClaimNotificationDate().format(ISO_DATE))
                 .eventDetailsText("Claimant has notified defendant.")
@@ -343,7 +364,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             List.of(
                 Event.builder()
-                    .eventSequence(1)
+                    .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode("999")
                     .dateReceived(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
                     .eventDetailsText("RPA Reason: Unrepresented defendant.")
@@ -358,7 +379,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             List.of(
                 Event.builder()
-                    .eventSequence(1)
+                    .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode("999")
                     .dateReceived(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
                     .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm.")
@@ -378,7 +399,7 @@ public class EventHistoryMapper {
             .acknowledgementOfServiceReceived(
                 List.of(
                     Event.builder()
-                        .eventSequence(2)
+                        .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode("38")
                         .dateReceived(dateAcknowledge.format(ISO_DATE))
                         .litigiousPartyID("002")
