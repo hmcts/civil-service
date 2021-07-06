@@ -8,11 +8,7 @@ import au.com.dius.pact.model.RequestResponsePact;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.util.List;
 import java.util.Map;
 
 import static au.com.dius.pact.consumer.ConsumerPactRunnerKt.runConsumerTest;
@@ -24,21 +20,6 @@ public abstract class BaseRpaTest {
     protected static final String PATH = "/fake-endpoint";
     protected static final String CONSUMER = "civil_service";
     protected static final String PROVIDER = "rpa_api";
-
-    protected static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
-        .build();
-    protected static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
 
     protected PactVerificationResult getPactVerificationResult(String payload, String description) {
         Map<String, String> headers = Map.of("Content-Type", "application/json",
