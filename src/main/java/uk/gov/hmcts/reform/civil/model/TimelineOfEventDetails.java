@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import java.time.LocalDate;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @Builder

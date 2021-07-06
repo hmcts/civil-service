@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -94,11 +95,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date when you need to notify the defendant "
         + "of the claim.%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. "
-        +"The exact date when you must notify the claim details will be provided when you first notify "
-        +"the defendant of the claim.";
+        + "The exact date when you must notify the claim details will be provided when you first notify "
+        + "the defendant of the claim.";
 
-    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
-        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
+    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is "
+        + "confirmed. Once payment is confirmed you will receive an email. The claim will then progress offline."
         + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
         + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
         + "the defendant within 4 months. "
@@ -108,6 +109,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
+    private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
@@ -350,13 +352,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         } else {
+            dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
             dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
         }
@@ -368,13 +371,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        return callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC") ? SubmittedCallbackResponse.builder()
-            .confirmationHeader(getSpecHeader(caseData))
-            .confirmationBody(getSpecBody(caseData))
-            .build() : SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
-            .build();
+
+        if (null != callbackParams.getRequest().getEventId()
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getSpecHeader(caseData))
+                .confirmationBody(getSpecBody(caseData))
+                .build();
+        } else {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
+                .build();
+        }
     }
 
     private String getHeader(CaseData caseData) {
