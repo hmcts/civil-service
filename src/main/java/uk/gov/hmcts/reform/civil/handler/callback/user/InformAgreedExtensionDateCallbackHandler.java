@@ -74,8 +74,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         var isRespondent1 = YES;
-        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && hasRespondentSolicitorTwoRole(callbackParams)) {
+        if (representsRespondent2(callbackParams)) {
             isRespondent1 = NO;
         }
 
@@ -84,18 +83,10 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private boolean hasRespondentSolicitorTwoRole(CallbackParams callbackParams) {
-        return coreCaseUserService.userHasCaseRole(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            RESPONDENTSOLICITORTWO
-        );
-    }
-
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-        if (caseData.getIsRespondent1() == NO) {
+        if (representsRespondent2(callbackParams)) {
             agreedExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
         }
         //TODO: update to get correct deadline as a part of CMC-1346
@@ -125,7 +116,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private CallbackResponse setResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-        if (caseData.getIsRespondent1() == NO) {
+        if (representsRespondent2(callbackParams)) {
             agreedExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
         }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
@@ -135,12 +126,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
             .isRespondent1(null);
 
-        if (caseData.getIsRespondent1() == YES) {
-            caseDataBuilder.respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline);
-        } else {
+        if (representsRespondent2(callbackParams)) {
             caseDataBuilder.respondent2TimeExtensionDate(time.now())
                 .respondent2ResponseDeadline(newDeadline);
+        } else {
+            caseDataBuilder.respondent1TimeExtensionDate(time.now())
+                .respondent1ResponseDeadline(newDeadline);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -159,5 +150,16 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .confirmationHeader("# Extension deadline submitted")
             .confirmationBody(body)
             .build();
+    }
+
+    private boolean representsRespondent2(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            RESPONDENTSOLICITORTWO
+        );
     }
 }

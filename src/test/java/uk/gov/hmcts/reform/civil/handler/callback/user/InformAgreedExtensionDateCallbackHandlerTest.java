@@ -247,14 +247,14 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .thenReturn(extensionDateRespondent1);
             when(deadlinesCalculator.calculateFirstWorkingDay(extensionDateRespondent2))
                 .thenReturn(extensionDateRespondent2);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
         }
 
         @Test
-        void shouldUpdateRespondent1ResponseDeadlineToExtensionDate_whenIsRespondentSetToYes() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .isRespondent1(YES)
+        void shouldUpdateRespondent1ResponseDeadlineToExtensionDate_whenRepresentingRespondent1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .addRespondent2(NO)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
-                .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -264,9 +264,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
-                .doesNotContainKey("respondent2ResponseDeadline")
-                .doesNotContainKey("respondent2TimeExtensionDate");
+                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -280,10 +278,10 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldUpdateRespondent2ResponseDeadlineToExtensionDate_whenIsRespondentSetToNo() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .isRespondent1(NO)
-                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+        void shouldUpdateRespondent2ResponseDeadlineToExtensionDate_whenRepresentingRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
                 .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
@@ -294,9 +292,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
-                .doesNotContainKey("respondent1ResponseDeadline")
-                .doesNotContainKey("respondent1TimeExtensionDate");
+                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
                 .extracting("businessProcess")

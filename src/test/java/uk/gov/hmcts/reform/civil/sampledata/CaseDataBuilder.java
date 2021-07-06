@@ -347,6 +347,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addRespondent2(YesOrNo addRespondent2) {
+        this.addRespondent2 = addRespondent2;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2SameLegalRepresentative(YesOrNo respondent2SameLegalRepresentative) {
+        this.respondent2SameLegalRepresentative = respondent2SameLegalRepresentative;
+        return this;
+    }
+
     public CaseDataBuilder caseReference(Long ccdCaseReference) {
         this.ccdCaseReference = ccdCaseReference;
         return this;
