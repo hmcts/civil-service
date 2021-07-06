@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +25,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
@@ -48,11 +46,6 @@ class EventHistoryMapperTest {
 
     @Autowired
     EventHistoryMapper mapper;
-
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(false);
-    }
 
     @Nested
     class UnrepresentedDefendant {
@@ -104,48 +97,6 @@ class EventHistoryMapperTest {
                 .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm.")
                 .eventDetails(EventDetails.builder()
                                   .miscText("RPA Reason: Unregistered defendant solicitor firm.")
-                                  .build())
-                .build();
-
-            var eventHistory = mapper.buildEvents(caseData);
-
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory)
-                .extracting("miscellaneous")
-                .asList()
-                .containsExactly(expectedEvent);
-            assertEmptyEvents(
-                eventHistory,
-                "acknowledgementOfServiceReceived",
-                "consentExtensionFilingDefence",
-                "defenceFiled",
-                "defenceAndCounterClaim",
-                "receiptOfPartAdmission",
-                "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
-            );
-        }
-    }
-
-    @Nested
-    class CreateClaimRpaContinuousFeed {
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldPrepareMiscellaneousEvent_whenClaimIssued() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            Event expectedEvent = Event.builder()
-                .eventSequence(1)
-                .eventCode("999")
-                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
-                .eventDetailsText("Claim issued in CCD.")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("Claim issued in CCD.")
                                   .build())
                 .build();
 
@@ -1748,57 +1699,6 @@ class EventHistoryMapperTest {
                 "receiptOfAdmission",
                 "receiptOfPartAdmission",
                 "replyToDefence"
-            );
-        }
-    }
-
-    @Nested
-    class NotifyClaimRpaContinuousFeed {
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            Event claimIssuedEvent = Event.builder()
-                .eventSequence(1)
-                .eventCode("999")
-                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
-                .eventDetailsText("Claim issued in CCD.")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("Claim issued in CCD.")
-                                  .build())
-                .build();
-            Event claimNotifiedEvent = Event.builder()
-                .eventSequence(2)
-                .eventCode("999")
-                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
-                .eventDetailsText("Claimant has notified defendant.")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("Claimant has notified defendant.")
-                                  .build())
-                .build();
-
-            var eventHistory = mapper.buildEvents(caseData);
-
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory)
-                .extracting("miscellaneous")
-                .asList()
-                .containsExactly(claimIssuedEvent, claimNotifiedEvent);
-            assertEmptyEvents(
-                eventHistory,
-                "acknowledgementOfServiceReceived",
-                "consentExtensionFilingDefence",
-                "defenceFiled",
-                "defenceAndCounterClaim",
-                "receiptOfPartAdmission",
-                "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
             );
         }
     }
