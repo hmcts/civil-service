@@ -1823,7 +1823,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
