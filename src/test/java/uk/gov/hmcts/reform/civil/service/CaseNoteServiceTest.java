@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ class CaseNoteServiceTest {
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @Nested
-    class BuildCaseNote{
+    class BuildCaseNote {
         @BeforeEach
         void setUp() {
             given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
@@ -52,7 +51,7 @@ class CaseNoteServiceTest {
         @ParameterizedTest
         @ValueSource(strings = {"new note"})
         @NullAndEmptySource
-        void shouldBuildNote_whenInvoked(String note){
+        void shouldBuildNote_whenInvoked(String note) {
             CaseNote caseNote = caseNoteService.buildCaseNote(BEARER_TOKEN, note);
 
             assertThat(caseNote).isEqualTo(caseNoteForToday(note));
@@ -76,7 +75,7 @@ class CaseNoteServiceTest {
     }
 
     @Test
-    void shouldAddNoteToListWithNewestAtBottom_WhenExistingNotes(){
+    void shouldAddNoteToListWithNewestAtBottom_WhenExistingNotes() {
         LocalDate today = LocalDate.now();
         CaseNote newNote = caseNoteWithDate(today);
         CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
