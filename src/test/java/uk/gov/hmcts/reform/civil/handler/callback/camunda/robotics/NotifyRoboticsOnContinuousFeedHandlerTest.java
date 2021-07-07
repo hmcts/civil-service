@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
-    NotifyRoboticsOnCaseHandedOfflineHandler.class,
+    NotifyRoboticsOnContinuousFeedHandler.class,
     JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
@@ -49,7 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTest {
+class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
@@ -67,7 +67,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
     class ValidJsonPayload {
 
         @Autowired
-        private NotifyRoboticsOnCaseHandedOfflineHandler handler;
+        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
@@ -86,7 +86,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
         @MockBean
         private JsonSchemaValidationService validationService;
         @Autowired
-        private NotifyRoboticsOnCaseHandedOfflineHandler handler;
+        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
