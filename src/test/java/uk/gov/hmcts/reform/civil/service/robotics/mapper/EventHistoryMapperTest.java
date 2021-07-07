@@ -1752,6 +1752,57 @@ class EventHistoryMapperTest {
         }
     }
 
+    @Nested
+    class NotifyClaimRpaContinuousFeed {
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
             eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));

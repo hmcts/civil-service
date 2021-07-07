@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.math.BigDecimal.TEN;
@@ -119,7 +120,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAwaitingCaseNotificationWithMinimalData() {
+    public CaseDataMinEdgeCasesBuilder atStateAwaitingCaseNotificationWithMinimalData() {
         atStatePaymentSuccessfulWithMinimalData();
         ccdState = CASE_ISSUED;
         issueDate = CLAIM_ISSUED_DATE;
@@ -127,6 +128,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMinEdgeCasesBuilder atStateClaimNotifiedWithMaximumData() {
+        atStateClaimIssuedWithMinimalData();
+        claimNotificationDate = LocalDate.now().atStartOfDay();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+    
     public CaseDataMinEdgeCasesBuilder atStateAwaitingCaseDetailsNotificationWithMinimalData() {
         atStateAwaitingCaseNotificationWithMinimalData();
         claimNotificationDate = LocalDateTime.now();
