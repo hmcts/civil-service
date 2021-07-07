@@ -83,6 +83,7 @@ public class CaseData implements MappableObject {
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
     private final ServedDocumentFiles servedDocumentFiles;
 
@@ -137,8 +138,10 @@ public class CaseData implements MappableObject {
     private final LocalDateTime claimDetailsNotificationDeadline;
     private final LocalDateTime claimDetailsNotificationDate;
     private final LocalDateTime respondent1ResponseDeadline;
+    private final LocalDateTime respondent2ResponseDeadline;
     private final LocalDateTime claimDismissedDeadline;
     private final LocalDateTime respondent1TimeExtensionDate;
+    private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
@@ -146,4 +149,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
+
+    private final YesOrNo isRespondent1;
 }

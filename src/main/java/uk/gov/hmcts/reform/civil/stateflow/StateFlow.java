@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.stateflow;
 
 import org.springframework.statemachine.StateMachine;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
@@ -51,5 +53,9 @@ public class StateFlow {
     @SuppressWarnings("unchecked")
     public Map<String, Boolean> getFlags() {
         return stateMachine.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class);
+    }
+
+    public boolean isFlagSet(FlowFlag flowFlag) {
+        return Optional.ofNullable(getFlags().get(flowFlag.name())).orElse(false);
     }
 }

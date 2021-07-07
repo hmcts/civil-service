@@ -105,6 +105,7 @@ public class CaseDataBuilder {
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
     protected LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
     //Acknowledge Claim
     protected ResponseIntention respondent1ClaimResponseIntentionType;
     // Defendant Response
@@ -140,6 +141,7 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDetailsNotificationDeadline;
     protected LocalDateTime claimDetailsNotificationDate;
     protected LocalDateTime respondent1ResponseDeadline;
+    protected LocalDateTime respondent2ResponseDeadline;
     protected LocalDateTime claimDismissedDeadline;
     protected LocalDateTime respondent1TimeExtensionDate;
     protected LocalDateTime respondent1AcknowledgeNotificationDate;
@@ -153,8 +155,14 @@ public class CaseDataBuilder {
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
+    protected YesOrNo isRespondent1;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
+        this.respondent1ResponseDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
         return this;
     }
@@ -174,8 +182,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder isRespondent1(YesOrNo isRespondent1) {
+        this.isRespondent1 = isRespondent1;
+        return this;
+    }
+
     public CaseDataBuilder respondentSolicitor1AgreedDeadlineExtension(LocalDate extensionDate) {
         this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
         return this;
     }
 
@@ -326,6 +344,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2OrganisationPolicy(OrganisationPolicy respondent2OrganisationPolicy) {
         this.respondent2OrganisationPolicy = respondent2OrganisationPolicy;
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2(YesOrNo addRespondent2) {
+        this.addRespondent2 = addRespondent2;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2SameLegalRepresentative(YesOrNo respondent2SameLegalRepresentative) {
+        this.respondent2SameLegalRepresentative = respondent2SameLegalRepresentative;
         return this;
     }
 
@@ -942,6 +970,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
             //Deadline extension
             .respondentSolicitor1AgreedDeadlineExtension(respondentSolicitor1AgreedDeadlineExtension)
+            .respondentSolicitor2AgreedDeadlineExtension(respondentSolicitor2AgreedDeadlineExtension)
             // Acknowledge Claim
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
             // Defendant Response
@@ -980,11 +1009,11 @@ public class CaseDataBuilder {
             .claimDetailsNotificationDate(claimDetailsNotificationDate)
             .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
             .respondent1ResponseDeadline(respondent1ResponseDeadline)
+            .respondent2ResponseDeadline(respondent2ResponseDeadline)
             .claimDismissedDeadline(claimDismissedDeadline)
             .respondent1TimeExtensionDate(respondent1TimeExtensionDate)
             .respondent1AcknowledgeNotificationDate(respondent1AcknowledgeNotificationDate)
             .respondent1ResponseDate(respondent1ResponseDate)
-            .respondent1ResponseDeadline(respondent1ResponseDeadline)
             .applicant1ResponseDate(applicant1ResponseDate)
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .takenOfflineDate(takenOfflineDate)
@@ -992,6 +1021,7 @@ public class CaseDataBuilder {
             .claimDismissedDate(claimDismissedDate)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
+            .isRespondent1(isRespondent1)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .build();
