@@ -171,6 +171,67 @@ class EventHistoryMapperTest {
     }
 
     @Nested
+    class NotifyClaimDetailsRpaContinuousFeed {
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenClaimIssued() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+
+            Event claimDetailsNotifiedEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claim details notified.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim details notified.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent,  claimDetailsNotifiedEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
     class RespondentFullAdmission {
 
         @Test
@@ -1762,7 +1823,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")

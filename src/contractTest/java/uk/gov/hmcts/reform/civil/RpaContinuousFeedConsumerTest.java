@@ -162,7 +162,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenClaimAgainstUnregisteredDefendantWithMinimumData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
-                .atStateClaimNotifiedWithMaximumData()
+                .atStateClaimNotifiedWithMinimumData()
                 .legacyCaseReference("100DC006")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
@@ -170,6 +170,61 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
             assertThat(payload, validateJson());
 
             String description = "Robotics case data when claimant had notified the defendant - min limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
+
+    @Nested
+    class NotifyClaimDetailsRpaContinuousFeed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenNotifyClaimDetailsAndContinuousFeedEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.CLAIM_NOTIFIED)
+                .legacyCaseReference("100DC007")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when claimant had notified claim details";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimDetailsAgainstUnregisteredDefendantWithMaximumData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateClaimDetailsNotifiedWithMaximumData()
+                .legacyCaseReference("100DC007")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when claimant had notified claim details - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenClaimDetailsAgainstUnregisteredDefendantWithMinimumData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateClaimDetailsNotifiedWithMaximumData()
+                .legacyCaseReference("100DC007")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when claimant had notified claim details - min limit";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);

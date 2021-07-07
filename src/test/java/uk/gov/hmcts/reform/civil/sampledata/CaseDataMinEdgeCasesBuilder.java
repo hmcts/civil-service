@@ -128,14 +128,23 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataMinEdgeCasesBuilder atStateClaimNotifiedWithMaximumData() {
+    public CaseDataMinEdgeCasesBuilder atStateClaimNotifiedWithMinimumData() {
         atStateClaimIssuedWithMinimalData();
         claimNotificationDate = LocalDate.now().atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
         return this;
     }
-    
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimDetailsNotifiedWithMaximumData() {
+        atStateClaimNotifiedWithMinimumData();
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public CaseDataMinEdgeCasesBuilder atStateAwaitingCaseDetailsNotificationWithMinimalData() {
         atStateAwaitingCaseNotificationWithMinimalData();
         claimNotificationDate = LocalDateTime.now();
