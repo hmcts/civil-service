@@ -253,7 +253,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenClaimDetailsAgainstUnregisteredDefendantWithMaximumData() {
+        void shouldGeneratePact_whenNotificationAcknowledgedWithMaximumData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateNotificationAcknowledgedWithMaximumData()
                 .legacyCaseReference("100DC011")
@@ -270,7 +270,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenClaimDetailsAgainstUnregisteredDefendantWithMinimumData() {
+        void shouldGeneratePact_whenNotificationAcknowledgedWithMinimumData() {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateClaimDetailsNotifiedWithMinimumData()
                 .legacyCaseReference("100DC012")
