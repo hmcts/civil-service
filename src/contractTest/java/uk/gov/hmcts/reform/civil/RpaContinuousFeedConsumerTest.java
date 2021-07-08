@@ -285,7 +285,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
-    
+
     @Nested
     class FullDefenceRpaContinuousFeed {
 
