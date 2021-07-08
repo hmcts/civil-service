@@ -90,6 +90,10 @@ allprojects {
     }
   }
 
+  configurations {
+    testCompile.exclude group: 'ch.qos.logback', module: 'logback-classic'
+  }
+
   repositories {
     mavenLocal()
     jcenter()
@@ -359,7 +363,8 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.0.1.ccd-1253.4:all'
+  testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+  testCompile 'com.github.hmcts:fortify-client:1.0.1:all'
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
