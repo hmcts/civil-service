@@ -24,7 +24,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@ccd-1257")
 
 def type = "java"
 def product = "civil"
@@ -57,7 +57,7 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
-
+  enableFortifyScan()
   enableSecurityScan()
 
   enableFullFunctionalTest(200)
@@ -72,6 +72,10 @@ withNightlyPipeline(type, product, component) {
 
   after('crossBrowserTest') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
 }
 
