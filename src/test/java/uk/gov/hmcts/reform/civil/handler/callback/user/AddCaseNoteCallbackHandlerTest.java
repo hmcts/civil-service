@@ -77,7 +77,6 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseNote expectedCaseNote = caseNote(LocalDate.now(), "John Smith", "Example case note");
             List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
-
             CaseData caseData = CaseData.builder()
                 .caseNote("Example case note")
                 .caseNotes(wrapElements(caseNote))
@@ -85,14 +84,14 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(),"Example case note"))
+            when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
             when(caseNoteService.addNoteToList(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(),"Example case note");
-            verify(caseNoteService).addNoteToList(expectedCaseNote,caseData.getCaseNotes());
+            verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
+            verify(caseNoteService).addNoteToList(expectedCaseNote, caseData.getCaseNotes());
 
             assertThat(response.getData())
                 .extracting("caseNote")
