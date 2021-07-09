@@ -63,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -853,7 +852,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
@@ -867,21 +865,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .extracting("name", "role")
                     .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldKeepApplicantStatementOfTruth_whenNotV_1Callback() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData())
-                    .extracting("applicantSolicitor1ClaimStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("Signer Name", "Signer Role");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
             }
         }
     }
