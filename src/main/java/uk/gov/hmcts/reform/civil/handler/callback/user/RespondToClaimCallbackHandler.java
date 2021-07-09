@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -60,18 +61,38 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "experts"), this::validateRespondentDqExperts,
-            callbackKey(MID, "witnesses"), this::validateRespondentDqWitnesses,
-            callbackKey(MID, "upload"), this::emptyCallbackResponse,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineBackwardsCompatible,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
+            .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
+            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+            .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
+            .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
+    }
+
+    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+    }
+
+    private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -108,23 +129,37 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-    private CallbackResponse setApplicantResponseDeadlineBackwardsCompatible(CallbackParams callbackParams) {
+    private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-
-        CaseData updatedData = caseData.toBuilder()
-            .respondent1ResponseDate(responseDate)
-            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
 
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .respondent1(updatedRespondent1)
+            .respondent1Copy(null)
+            .respondent1ResponseDate(responseDate)
+            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
+            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQStatementOfTruth(statementOfTruth)
+            .build();
+
+        updatedData.respondent1DQ(dq);
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.toMap(objectMapper))
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
-    private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
+    private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -159,12 +194,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
-            "<br />The claimant has until %s to proceed. We will let you know when they respond.",
-            formatLocalDateTime(responseDeadline, DATE))
+            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
+                + "Defendant defence. You will be CC'ed.%n"
+                + "The Claimant has until %s to discontinue or proceed with this claim",
+            formatLocalDateTime(responseDeadline, DATE)
+        )
             + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
+            .confirmationHeader(
+                format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
     }

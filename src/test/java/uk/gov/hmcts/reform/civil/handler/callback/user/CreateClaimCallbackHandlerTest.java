@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -62,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -114,6 +114,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private IdamClient idamClient;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private CreateClaimCallbackHandler handler;
@@ -226,6 +229,68 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventApplicant2Callback {
+
+        private static final String PAGE_ID = "applicant2";
+
+        @Test
+        void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("The date entered cannot be in the future");
+        }
+
+        @Test
+        void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
                                 .soleTraderDateOfBirth(now().minusDays(1))
                                 .build())
                 .build();
@@ -553,6 +618,76 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventRespondent2OrgPolicyCallback {
+
+        private static final String PAGE_ID = "rep2OrgPolicy";
+
+        @Test
+        void shouldReturnError_whenOrganisationPolicyIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(null)
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIsNull() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldReturnError_whenOrganisationIdIsNull() {
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID(null)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Organisation selected");
+        }
+
+        @Test
+        void shouldBeSuccessful_whenValid() {
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
     class MidStatementOfTruth {
 
         @Test
@@ -717,7 +852,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
@@ -731,21 +865,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .extracting("name", "role")
                     .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldKeepApplicantStatementOfTruth_whenNotV_1Callback() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData())
-                    .extracting("applicantSolicitor1ClaimStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("Signer Name", "Signer Role");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
             }
         }
     }

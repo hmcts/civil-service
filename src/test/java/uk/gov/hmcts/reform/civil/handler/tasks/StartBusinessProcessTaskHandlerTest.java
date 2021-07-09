@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 
@@ -63,6 +65,8 @@ class StartBusinessProcessTaskHandlerTest {
     private ExternalTaskService externalTaskService;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private StartBusinessProcessTaskHandler handler;
 
@@ -71,6 +75,7 @@ class StartBusinessProcessTaskHandlerTest {
     @BeforeEach
     void init() {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+        variables.putValue(FLOW_FLAGS, Map.of());
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");

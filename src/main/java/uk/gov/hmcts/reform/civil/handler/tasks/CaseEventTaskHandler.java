@@ -27,8 +27,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
 
-    private static final String FLOW_STATE = "flowState";
-
     private CaseData data;
 
     @Override
@@ -46,7 +44,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     @Override
     public VariableMap getVariableMap() {
         VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(data).getState().getName());
+        var stateFlow = stateFlowEngine.evaluate(data);
+        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
+        variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         return variables;
     }
 

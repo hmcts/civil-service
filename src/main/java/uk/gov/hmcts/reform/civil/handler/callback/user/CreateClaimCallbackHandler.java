@@ -51,7 +51,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -66,10 +65,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the defendant of the claim."
-        + "%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. The exact "
-        + "date when you must notify the claim details will be provided when you first notify "
-        + "the defendant of the claim.";
+        + "receive an email. The email will also include the date when you need to notify the Defendant legal "
+        + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
@@ -96,15 +95,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
-            .put(callbackKey(MID, "applicant"), this::validateDateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
+            .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimBackwardsCompatible)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -122,8 +122,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
+        List<String> errors = dateOfBirthValidator.validate(applicant);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
+        Party applicant = callbackParams.getCaseData().getApplicant2();
         List<String> errors = dateOfBirthValidator.validate(applicant);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -146,6 +155,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
         YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
         List<String> errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
+        YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
+        List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -203,14 +223,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse submitClaimBackwardsCompatible(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 

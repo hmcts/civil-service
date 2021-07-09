@@ -70,8 +70,7 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 ISSUED_ON, formatLocalDate(CLAIM_ISSUED_DATE, DATE),
-                NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
+                NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
             );
         }
     }

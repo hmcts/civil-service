@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -350,30 +349,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         class ResetStatementOfTruth {
 
             @Test
-            void shouldKeepStatementOfTruth_whenInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(null)
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("Bob Jones", "Solicitor");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
-            }
-
-            @Test
-            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenV1Callback() {
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
                 String name = "John Smith";
                 String role = "Solicitor";
 
@@ -384,7 +360,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
                         caseData,
                         ABOUT_TO_SUBMIT
                     ));
@@ -416,9 +391,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've chosen to proceed with the claim%n## Claim number: 000DC001"))
+                    .confirmationHeader(format(
+                        "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
                     .confirmationBody(format(
-                        "<br />We'll review the case and contact you to tell you what to do next.%n%n"
+                        "<br />We will review the case and contact you to tell you what to do next.%n%n"
                             + "[Download directions questionnaire](http://www.google.com)"
                     ) + exitSurveyContentService.applicantSurvey())
                     .build());
@@ -436,7 +412,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've chosen not to proceed with the claim%n## Claim number:"
+                    .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
                                                    + " 000DC001"))
                     .confirmationBody(exitSurveyContentService.applicantSurvey())
                     .build());

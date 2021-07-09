@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
@@ -63,6 +65,9 @@ class CaseEventTaskHandlerTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private CaseEventTaskHandler caseEventTaskHandler;
@@ -86,6 +91,9 @@ class CaseEventTaskHandlerTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
+        VariableMap variables = Variables.createVariables();
+        variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+        variables.putValue(FLOW_FLAGS, Map.of());
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
@@ -98,7 +106,7 @@ class CaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
         verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockTask, getVariableMap("MAIN.DRAFT"));
+        verify(externalTaskService).complete(mockTask, variables);
     }
 
     @Test
@@ -174,11 +182,5 @@ class CaseEventTaskHandlerTest {
             anyInt(),
             anyLong()
         );
-    }
-
-    private VariableMap getVariableMap(String value) {
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, value);
-        return variables;
     }
 }

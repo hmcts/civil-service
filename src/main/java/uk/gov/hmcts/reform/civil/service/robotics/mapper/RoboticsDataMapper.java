@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -125,7 +127,7 @@ public class RoboticsDataMapper {
 
         organisationId
             .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder));
+            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
 
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
@@ -133,15 +135,21 @@ public class RoboticsDataMapper {
     }
 
     private Consumer<uk.gov.hmcts.reform.prd.model.Organisation> buildOrganisation(
-        Solicitor.SolicitorBuilder solicitorBuilder
+        Solicitor.SolicitorBuilder solicitorBuilder, Address providedServiceAddress
     ) {
         return organisation -> {
             List<ContactInformation> contactInformation = organisation.getContactInformation();
             solicitorBuilder
                 .name(organisation.getName())
-                .addresses(addressMapper.toRoboticsAddresses(contactInformation))
+                .addresses(fromProvidedAddress(contactInformation, providedServiceAddress))
                 .contactDX(getContactDX(contactInformation));
         };
+    }
+
+    private RoboticsAddresses fromProvidedAddress(List<ContactInformation> contactInformation, Address provided) {
+        return Optional.ofNullable(provided)
+            .map(address -> addressMapper.toRoboticsAddresses(provided))
+            .orElse(addressMapper.toRoboticsAddresses(contactInformation));
     }
 
     private String getContactDX(List<ContactInformation> contactInformation) {
@@ -173,6 +181,7 @@ public class RoboticsDataMapper {
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
+        var providedServiceAddress = caseData.getApplicantSolicitor1ServiceAddress();
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder()
             .id(id)
             .isPayee(true)
@@ -184,7 +193,7 @@ public class RoboticsDataMapper {
 
         organisationId
             .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder));
+            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getApplicantSolicitor1ServiceAddress()));
 
         return solicitorBuilder.build();
     }
