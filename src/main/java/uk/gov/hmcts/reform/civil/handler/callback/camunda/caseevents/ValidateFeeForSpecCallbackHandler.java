@@ -46,7 +46,6 @@ public class ValidateFeeForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse validateFee(CallbackParams callbackParams) {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
             .build();
     }
 }

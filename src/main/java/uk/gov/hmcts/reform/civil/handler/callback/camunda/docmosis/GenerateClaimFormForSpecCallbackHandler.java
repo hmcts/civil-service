@@ -21,7 +21,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -43,7 +42,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimFormForSpec);
     }
 
     @Override
@@ -51,11 +50,11 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+    private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
-
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
+        //caseData.getClaimNotificationDeadline()
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseDataBuilder.build(),
@@ -67,5 +66,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+
+        /*return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();*/
     }
 }

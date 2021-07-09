@@ -99,6 +99,7 @@ public class CaseData implements MappableObject {
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
     private BigDecimal totalClaimAmount;
+    private BigDecimal totalInterest;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
