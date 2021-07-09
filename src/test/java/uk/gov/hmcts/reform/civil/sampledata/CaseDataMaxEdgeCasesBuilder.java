@@ -56,10 +56,10 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
             .correct(YES)
             .build();
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .build();
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
@@ -142,6 +142,14 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateClaimIssuedMaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
         return this;
     }
 

@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -63,7 +62,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim pending")
             .confirmationBody(
-                format("## What happens next %n%nYou claim will be processed. Wait for us to contact you.")
+                "<br />Your claim will be processed. Wait for us to contact you."
                     + exitSurveyContentService.applicantSurvey()
             )
             .build();

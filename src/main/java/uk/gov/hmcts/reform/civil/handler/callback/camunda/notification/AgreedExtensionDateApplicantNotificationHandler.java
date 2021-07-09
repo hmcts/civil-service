@@ -72,7 +72,6 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            FRONTEND_BASE_URL_KEY, FRONTEND_BASE_URL,
             AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
         );
     }

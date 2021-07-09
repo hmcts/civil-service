@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.math.BigDecimal.TEN;
@@ -67,10 +68,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
             .correct(YES)
             .build();
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY").build())
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .build();
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
@@ -100,6 +101,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMinEdgeCasesBuilder atStateClaimIssuedWithMinimalData() {
+        atStatePendingCaseIssuedWithMinimalData();
+        issueDate = CLAIM_ISSUED_DATE;
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        return this;
+    }
+
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
         claimIssuedPaymentDetails = PaymentDetails.builder()
@@ -111,11 +120,28 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAwaitingCaseNotificationWithMinimalData() {
+    public CaseDataMinEdgeCasesBuilder atStateAwaitingCaseNotificationWithMinimalData() {
         atStatePaymentSuccessfulWithMinimalData();
         ccdState = CASE_ISSUED;
         issueDate = CLAIM_ISSUED_DATE;
         claimNotificationDeadline = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimNotifiedWithMinimumData() {
+        atStateClaimIssuedWithMinimalData();
+        claimNotificationDate = LocalDate.now().atStartOfDay();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimDetailsNotifiedWithMinimumData() {
+        atStateClaimNotifiedWithMinimumData();
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
 

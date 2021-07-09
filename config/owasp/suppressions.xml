@@ -61,4 +61,9 @@
                 ]]></notes>
     <cve>CVE-2021-22118</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[file name: hibernate-validator-6.2.0.Final.jar]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.hibernate\.validator/hibernate\-validator@.*$</packageUrl>
+    <vulnerabilityName>CVE-2020-10693</vulnerabilityName>
+  </suppress>
 </suppressions>

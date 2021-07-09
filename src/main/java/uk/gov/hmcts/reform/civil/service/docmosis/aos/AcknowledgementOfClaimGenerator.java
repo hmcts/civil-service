@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.aos.AcknowledgementOfClaimForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
@@ -53,9 +53,9 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             .build();
     }
 
-    private Respondent prepareRespondent(CaseData caseData) {
+    private Party prepareRespondent(CaseData caseData) {
         var respondent = caseData.getRespondent1();
-        return Respondent.builder()
+        return Party.builder()
             .name(respondent.getPartyName())
             .primaryAddress(respondent.getPrimaryAddress())
             .representative(representativeService.getRespondentRepresentative(caseData))

@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -51,8 +52,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -60,6 +63,17 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
@@ -80,6 +94,27 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setNewResponseDeadlineV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
+
+        CaseData caseDataUpdated = caseData.toBuilder()
+            .respondent1AcknowledgeNotificationDate(time.now())
+            .respondent1ResponseDeadline(newResponseDate)
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .respondent1(updatedRespondent1)
+            .respondent1Copy(null)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

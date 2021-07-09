@@ -84,8 +84,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "defendantName", "Mr. Sole Trader",
-                "frontendBaseUrl", "https://www.MyHMCTS.gov.uk"
+                "defendantName", "Mr. Sole Trader"
             );
         }
     }

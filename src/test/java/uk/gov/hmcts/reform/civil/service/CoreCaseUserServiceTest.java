@@ -21,8 +21,10 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +38,7 @@ class CoreCaseUserServiceTest {
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_ID = "1";
     private static final String USER_ID = "User1";
+    private static final String USER_ID2 = "User2";
     public static final String ORG_ID = "62LYJRF";
 
     @MockBean
@@ -173,4 +176,50 @@ class CoreCaseUserServiceTest {
         }
     }
 
+    @Nested
+    class UserHasCaseRole {
+
+        @BeforeEach
+        void setup() {
+            when(idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
+                CAA_USER_AUTH_TOKEN);
+            CaseAssignedUserRolesResource caseAssignedUserRolesResource = CaseAssignedUserRolesResource.builder()
+                .caseAssignedUserRoles(List.of(
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                        .build(),
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID2)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build()))
+                .build();
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(caseAssignedUserRolesResource);
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseRoleAssignedToUser() {
+            assertThat(service.userHasCaseRole(CASE_ID, USER_ID, CaseRole.RESPONDENTSOLICITORONE)).isTrue();
+            assertThat(service.userHasCaseRole(CASE_ID, USER_ID2, CaseRole.RESPONDENTSOLICITORTWO)).isTrue();
+
+            verify(caseAccessDataStoreApi, times(2)).getUserRoles(
+                CAA_USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                List.of(CASE_ID)
+            );
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseRoleNotAssignedToUser() {
+            assertThat(service.userHasCaseRole(CASE_ID, USER_ID, CaseRole.RESPONDENTSOLICITORTWO)).isFalse();
+            assertThat(service.userHasCaseRole(CASE_ID, USER_ID2, CaseRole.RESPONDENTSOLICITORONE)).isFalse();
+
+            verify(caseAccessDataStoreApi, times(2)).getUserRoles(
+                CAA_USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                List.of(CASE_ID)
+            );
+        }
+    }
 }
