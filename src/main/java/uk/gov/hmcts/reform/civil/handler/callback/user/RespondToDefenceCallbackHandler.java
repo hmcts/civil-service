@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -55,13 +54,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "experts"), this::validateApplicantDqExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantDqWitnesses,
+            callbackKey(MID, "experts"), this::validateApplicantExperts,
+            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmitBackwardsCompatible,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -86,17 +92,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse aboutToSubmitBackwardsCompatible(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
-            .applicant1ResponseDate(time.now());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
             .build();
     }
 
@@ -138,9 +133,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private String getTitle(YesOrNo proceeding) {
         if (proceeding == YES) {
-            return "# You've chosen to proceed with the claim%n## Claim number: %s";
+            return "# You have chosen to proceed with the claim%n## Claim number: %s";
         }
-        return "# You've chosen not to proceed with the claim%n## Claim number: %s";
+        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
     }
 
     private String getBody(YesOrNo proceeding) {
@@ -148,7 +143,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         if (proceeding == YES) {
             return format(
-                "<br />We'll review the case and contact you to tell you what to do next.%n%n"
+                "<br />We will review the case and contact you to tell you what to do next.%n%n"
                     + "[Download directions questionnaire](%s)", dqLink)
                 + exitSurveyContentService.applicantSurvey();
         }

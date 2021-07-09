@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.aos.AcknowledgementOfClaimForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
@@ -90,7 +90,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(Respondent.builder()
+            .respondent(Party.builder()
                             .name(caseData.getRespondent1().getPartyName())
                             .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                             .representative(representative)
@@ -137,7 +137,7 @@ class AcknowledgementOfClaimGeneratorTest {
                     templateData.getResponseDeadline(),
                     caseData.getRespondent1ResponseDeadline().toLocalDate()
                 ),
-                () -> assertEquals(templateData.getRespondent(), Respondent.builder()
+                () -> assertEquals(templateData.getRespondent(), Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
                     .representative(representative)
                     .litigationFriendName(caseData.getRespondent1LitigationFriend().getFullName())

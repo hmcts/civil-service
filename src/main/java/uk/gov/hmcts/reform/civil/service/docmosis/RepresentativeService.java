@@ -30,7 +30,7 @@ public class RepresentativeService {
 
             var representativeBuilder = representative.toBuilder();
 
-            Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
+            Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
 
             return representativeBuilder
@@ -48,7 +48,7 @@ public class RepresentativeService {
                                                   .orElseThrow(RuntimeException::new));
 
         var representativeBuilder = representative.toBuilder();
-        Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
+        Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
 
         return representativeBuilder
