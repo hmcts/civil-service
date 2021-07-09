@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
@@ -23,23 +25,39 @@ public class SealedClaimFormForSpec implements MappableObject {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final List<Party> applicants;
-    private final List<Party> respondents;
     private final String referenceNumber;
+    private final String caseName;
     private final String applicantExternalReference;
     private final String respondentExternalReference;
-    private final String caseName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate submittedOn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate issueDate;
-    private final String claimDetails;
-    private final String statementOfValue;
-    private final String claimValue;
-    private final String legalRepCost;
-    private final String courtFee;
-    private final String hearingCourtLocation;
+    private final List<Party> applicants;
+    private final List<Party> respondents;
+    private final String descriptionOfClaim;
+    private final List<TimelineOfEventDetails> timeline;
+    private final List<ClaimAmountBreakupDetails> claimamount;
+    private final String sameInterestRate;
+    private final String breakdownInterestRate;
+    private final String totalInterestAmount;
+    private final String howTheInterestWasCalculated;
+    private final String interestRate;
+    // Static text - The claimant reserves the right to claim interest under Section 69 of the County Courts Act 1984
+    private final String interestExplanationText;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate interestFromDate;
+    private final String whenAreYouClaimingInterestFrom;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate interestEndDate;
+    private final String interestEndDateDescription;
+    private final String totalClaimAmount;
+    private final String interestAmount;
+    private final String claimFee;
+    private final String totalAmountOfClaim;
     private final StatementOfTruth statementOfTruth;
 }
