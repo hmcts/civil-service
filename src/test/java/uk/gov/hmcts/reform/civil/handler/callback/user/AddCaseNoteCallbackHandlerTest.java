@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("caseNotes")
-                .isEqualTo(wrapElements(updatedCaseNotes));
+                .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {}));
         }
     }
 }

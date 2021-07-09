@@ -3,9 +3,6 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -29,10 +27,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class CaseNoteServiceTest {
 
     @Autowired
-    CaseNoteService caseNoteService;
+    private CaseNoteService caseNoteService;
 
     @MockBean
-    IdamClient idamClient;
+    private IdamClient idamClient;
 
     private static final UserDetails USER_DETAILS = UserDetails.builder()
         .forename("John")
@@ -48,13 +46,13 @@ class CaseNoteServiceTest {
             given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
         }
 
-        @ParameterizedTest
-        @ValueSource(strings = {"new note"})
-        @NullAndEmptySource
-        void shouldBuildNote_whenInvoked(String note) {
+        @Test
+        void shouldBuildNote_whenInvoked() {
+            String note = "new note";
             CaseNote caseNote = caseNoteService.buildCaseNote(BEARER_TOKEN, note);
 
             assertThat(caseNote).isEqualTo(caseNoteForToday(note));
+            verify(idamClient).getUserDetails(BEARER_TOKEN);
         }
     }
 
