@@ -285,4 +285,59 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
+
+    @Nested
+    class FullDefenceRpaContinuousFeed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceAndContinuousFeedEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE)
+                .legacyCaseReference("100DC013")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when full defence";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceWithMaximumData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateRespondentFullDefenceMaximumData()
+                .legacyCaseReference("100DC014")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when full defence - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenFullDefenceWithMinimumData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateRespondentFullDefenceMinimumData()
+                .legacyCaseReference("100DC015")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when full defence - min limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
 }
