@@ -1,0 +1,49 @@
+[
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "applicantRequestedCourt",
+    "FieldType": "Label",
+    "ElementLabel": "The Claimant legal representative requested the following court location code. \n ## ${courtLocation.applicantPreferredCourt}",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "courtFinderDirectLinkToCodeLabel",
+    "FieldType": "Label",
+    "ElementLabel": "<a target=\"_blank\" href=https://courttribunalfinder.service.gov.uk/search/results?courtcode=${courtLocation.applicantPreferredCourt}>Use court finder</a>(opens in a new window) to see the court name.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "requestHearingAtSpecificCourt",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you want to ask for the hearing to be held at a specific court?",
+    "HintText": "If not, it'll be held at the claimant's preferred court.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "courtFinderLabel",
+    "FieldType": "Label",
+    "ElementLabel": "<a target=\"_blank\" href=\"https://courttribunalfinder.service.gov.uk/search/address\">Use court finder</a> (opens in a new window) to find the 3 digit court location code of your preferred court.",
+    "FieldShowCondition": "requestHearingAtSpecificCourt = \"Yes\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "responseCourtCode",
+    "FieldType": "Text",
+    "ElementLabel": "The code of your preferred County Court hearing centre",
+    "FieldShowCondition": "requestHearingAtSpecificCourt = \"Yes\"",
+    "SecurityClassification": "Public",
+    "RegularExpression": "[0-9]{3}"
+  },
+  {
+    "ID": "RequestedCourt",
+    "ListElementCode": "reasonForHearingAtSpecificCourt",
+    "FieldType": "TextArea",
+    "ElementLabel": "Briefly explain your reasons",
+    "FieldShowCondition": "requestHearingAtSpecificCourt = \"Yes\"",
+    "SecurityClassification": "Public"
+  }
+]

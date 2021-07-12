@@ -1,0 +1,50 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQHearing",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQHearing",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQFurtherInformation",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQFurtherInformation",
+    "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "applicant1DQHearingSupport",
+    "TabFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Hearings",
+    "TabLabel": "Hearings",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "respondent1DQHearingSupport",
+    "TabFieldDisplayOrder": 6
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "applicantPreferredCourt",
+    "FieldType": "Text",
+    "ElementLabel": "Court location code",
+    "HintText": "This should be your preferred County Court hearing centre.",
+    "SecurityClassification": "Public",
+    "RegularExpression": "[0-9]{3}"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "labelPreferredCourt",
+    "FieldType": "Label",
+    "ElementLabel": "<a target=\"_blank\" href=\"https://courttribunalfinder.service.gov.uk/search/address\">Use court finder</a> (opens in a new window) to find the 3 digit court location code of your preferred court.",
+    "SecurityClassification": "Public"
+  }
+]

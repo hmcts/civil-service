@@ -1,0 +1,59 @@
+[
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "documentsLabel",
+    "FieldType": "Label",
+    "ElementLabel": "Aside from medical reports, any documents you upload must be in the following machine readable format: doc, docx, dot, pdf, rtf, txt, xlt or xlsx. Pdf’s must be text based, not a scanned document.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "particularsOfClaimDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": "Particulars of claim",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx",
+    "SecurityClassification": "Public",
+    "Max": 1
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "particularsOfClaimText",
+    "FieldType": "TextArea",
+    "ElementLabel": "Particulars of claim",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "medicalReport",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Medical reports",
+    "HintText": "Medical reports can be scanned and uploaded as image files such as jpg or png.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "scheduleOfLoss",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Schedule of loss",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Certificate of suitability",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ServedDocumentFiles",
+    "ListElementCode": "other",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Other documents",
+    "SecurityClassification": "Public"
+  }
+]

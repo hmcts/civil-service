@@ -1,0 +1,33 @@
+[
+  {
+    "ID": "ClaimProceedsInCaseman",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Date when claim was transferred to Caseman",
+    "HintText": "The date entered can be today's or a previous date.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimProceedsInCaseman",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "You are taking the claim offline. The claim will now continue by post.",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimProceedsInCaseman",
+    "ListElementCode": "reason",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ReasonForProceedingOnPaper",
+    "ElementLabel": "Reason for proceeding on paper",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimProceedsInCaseman",
+    "ListElementCode": "other",
+    "FieldType": "TextArea",
+    "ElementLabel": "Other reason",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "reason = \"OTHER\""
+  }
+]
