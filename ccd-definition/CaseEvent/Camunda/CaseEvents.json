@@ -1,0 +1,52 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_CLAIM_ISSUE",
+    "Name": "Issue claim",
+    "Description": "Issue claim",
+    "PreConditionState(s)": "PENDING_CASE_ISSUED;CASE_ISSUED",
+    "PostConditionState": "CASE_ISSUED",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_PAYMENT_FAILED",
+    "Name": "Payment failed",
+    "Description": "Payment failed",
+    "PreConditionState(s)": "PENDING_CASE_ISSUED",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "Name": "Proceed in heritage system",
+    "Description": "Proceed in heritage system",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_FULL_DEFENCE",
+    "Name": "Full defence",
+    "Description": "Full defence",
+    "PreConditionState(s)": "AWAITING_APPLICANT_INTENTION",
+    "PostConditionState": "AWAITING_APPLICANT_INTENTION",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

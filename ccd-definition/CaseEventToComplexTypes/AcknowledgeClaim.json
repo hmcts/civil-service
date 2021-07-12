@@ -1,0 +1,39 @@
+[
+  {
+    "ID": "SolicitorReferences",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "solicitorReferences",
+    "ListElementCode": "respondentSolicitor1Reference",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SolicitorReferences",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "solicitorReferences",
+    "ListElementCode": "applicantSolicitor1Reference",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondentSolicitor1Reference = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "individualDateOfBirth",
+    "EventElementLabel": "Defendant's date of birth",
+    "EventHintText": "You must enter this if you know it.",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "EventElementLabel": "Defendant's date of birth",
+    "EventHintText": "You must enter this if you know it.",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  }
+]

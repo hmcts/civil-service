@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQFurtherInformation",
+    "ListElementCode": "futureApplications",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQFurtherInformation",
+    "ListElementCode": "reasonForFutureApplications",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQFurtherInformation",
+    "ListElementCode": "otherInformationForJudge",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQStatementOfTruth",
+    "ListElementCode": "label",
+    "EventElementLabel": "I believe that the facts stated are true",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQStatementOfTruth",
+    "ListElementCode": "name",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondToClaim",
+    "CaseEventID": "DEFENDANT_RESPONSE",
+    "CaseFieldID": "respondent1DQStatementOfTruth",
+    "ListElementCode": "role",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

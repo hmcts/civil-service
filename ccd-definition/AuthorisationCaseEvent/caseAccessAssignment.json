@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CREATE_CLAIM",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  }
+]

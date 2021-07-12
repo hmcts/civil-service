@@ -1,0 +1,51 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PENDING_CASE_ISSUED",
+    "Name": "Claim Issue Pending",
+    "Description": "Holding state whilst payment is taken",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_ISSUED",
+    "Name": "Awaiting Claim Notification",
+    "Description": "Claim is created",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_CASE_DETAILS_NOTIFICATION",
+    "Name": "Awaiting Claim Details Notification",
+    "Description": "Awaiting Claim Details Notification",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "Name": "Awaiting Defendant Response",
+    "Description": "Awaiting Defendant Response",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_APPLICANT_INTENTION",
+    "Name": "Claimant Intent Pending",
+    "Description": "Claimant Intent Pending",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_DISMISSED",
+    "Name": "Claim Dismissed",
+    "Description": "Claim has been dismissed",
+    "DisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "Name": "Case Proceeds Offline",
+    "Description": "Claim is not able to be progressed online in CCD and will be taken offline",
+    "DisplayOrder": 7
+  }
+]

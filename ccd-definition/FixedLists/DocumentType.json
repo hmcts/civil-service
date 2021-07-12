@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SEALED_CLAIM",
+    "ListElement": "Sealed Claim form",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "ACKNOWLEDGEMENT_OF_CLAIM",
+    "ListElement": "Acknowledgement of claim form",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DIRECTIONS_QUESTIONNAIRE",
+    "ListElement": "Directions questionnaire form",
+    "DisplayOrder": 3
+  }
+]

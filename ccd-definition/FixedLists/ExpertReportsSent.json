@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "ExpertReportsSent",
+    "ListElementCode": "YES",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ExpertReportsSent",
+    "ListElementCode": "NO",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ExpertReportsSent",
+    "ListElementCode": "NOT_OBTAINED",
+    "ListElement": "Not yet obtained",
+    "DisplayOrder": 3
+  }
+]

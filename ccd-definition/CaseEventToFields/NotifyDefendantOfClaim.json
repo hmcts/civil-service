@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM",
+    "CaseFieldID": "notifyClaimLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "AccessGrantedWarning",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

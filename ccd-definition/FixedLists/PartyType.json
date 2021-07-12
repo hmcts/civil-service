@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "PartyType",
+    "ListElementCode": "INDIVIDUAL",
+    "ListElement": "Individual",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PartyType",
+    "ListElementCode": "COMPANY",
+    "ListElement": "Company",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "PartyType",
+    "ListElementCode": "ORGANISATION",
+    "ListElement": "Organisation",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "PartyType",
+    "ListElementCode": "SOLE_TRADER",
+    "ListElement": "Sole trader",
+    "DisplayOrder": 4
+  }
+]

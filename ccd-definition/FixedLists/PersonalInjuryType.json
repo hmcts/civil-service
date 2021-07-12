@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "ROAD_ACCIDENT",
+    "ListElement": "Road accident",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "WORK_ACCIDENT",
+    "ListElement": "Work accident",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "PUBLIC_LIABILITY",
+    "ListElement": "Public liability accident",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "HOLIDAY_ILLNESS",
+    "ListElement": "Holiday illness",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "DISEASE_CLAIM",
+    "ListElement": "Disease claim",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "PersonalInjuryType",
+    "ListElementCode": "PERSONAL_INJURY_OTHER",
+    "ListElement": "Personal Injury - other",
+    "DisplayOrder": 6
+  }
+]

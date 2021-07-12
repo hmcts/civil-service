@@ -1,0 +1,69 @@
+[
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "documentsLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "particularsOfClaimDocument",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "particularsOfClaimText",
+    "EventElementLabel": "If you prefer you can copy and paste the details of claim here.",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "medicalReport.document",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "CREATE_CLAIM",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "medicalReport",
+    "DisplayContext": "OPTIONAL",
+    "FieldDisplayOrder": 4,
+    "FieldShowCondition": "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\"",
+    "Comment": "medicalreports.document is just the document input,so this must be defined to hide the whole element"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "scheduleOfLoss.document",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "certificateOfSuitability.document",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Upload",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "servedDocumentFiles.document",
+    "ListElementCode": "other",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL"
+  }
+]
