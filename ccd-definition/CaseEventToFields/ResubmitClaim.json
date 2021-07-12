@@ -1,0 +1,36 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "RESUBMIT_CLAIM",
+    "CaseFieldID": "claimFee",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "ResubmitClaim",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "RESUBMIT_CLAIM",
+    "CaseFieldID": "applicantSolicitor1PbaAccounts",
+    "CaseEventFieldLabel": "PBA number",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ResubmitClaim",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "RESUBMIT_CLAIM",
+    "CaseFieldID": "pbaPaymentFailedLabel",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": "ResubmitClaim",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

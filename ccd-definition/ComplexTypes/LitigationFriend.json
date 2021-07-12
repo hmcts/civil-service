@@ -1,0 +1,33 @@
+[
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "fullName",
+    "FieldType": "Text",
+    "ElementLabel": "Litigation friend's full name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "hasSameAddressAsLitigant",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is the address of the Claimant’s litigation friend the same as the address of the Claimant?",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "primaryAddress",
+    "FieldType": "AddressUK",
+    "FieldShowCondition": "hasSameAddressAsLitigant = \"No\"",
+    "ElementLabel": "Litigation friend's address",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Upload the certificate of suitability",
+    "SecurityClassification": "Public",
+    "Min": 1
+  }
+]

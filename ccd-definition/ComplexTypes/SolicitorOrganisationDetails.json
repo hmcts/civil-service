@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "email",
+    "FieldType": "Text",
+    "ElementLabel": "Email",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "organisationName",
+    "FieldType": "Text",
+    "ElementLabel": "Organisation name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "fax",
+    "FieldType": "Text",
+    "ElementLabel": "Fax",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "dx",
+    "FieldType": "Text",
+    "ElementLabel": "DX",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "phoneNumber",
+    "FieldType": "Text",
+    "ElementLabel": "Phone number",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "SolicitorOrganisationDetails",
+    "ListElementCode": "address",
+    "FieldType": "AddressUK",
+    "ElementLabel": "Address",
+    "SecurityClassification": "Public"
+  }
+]

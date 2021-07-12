@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CASE_PROCEEDS_IN_CASEMAN",
+    "CaseFieldID": "claimProceedsInCaseman",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "Mandatory",
+    "PageID": "CaseProceedsInCaseman",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/transfer-date",
+    "RetriesTimeoutURLMidEvent": 0
+  }
+]

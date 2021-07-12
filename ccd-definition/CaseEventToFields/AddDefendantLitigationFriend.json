@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_DEFENDANT_LITIGATION_FRIEND",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "LitigationFriend",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y"
+  }
+]
