@@ -49,6 +49,12 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnline;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
     private String solicitorCaseTakenOffline;
 
     @NotEmpty

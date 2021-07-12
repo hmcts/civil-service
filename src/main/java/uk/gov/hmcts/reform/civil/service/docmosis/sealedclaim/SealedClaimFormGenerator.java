@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -33,11 +32,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        SealedClaimForm templateData = null;
-        if (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.CREATE_CLAIM_SPEC.name())) {
-            templateData = getTemplateDataForSpec(caseData);
-        } else
-            templateData = getTemplateData(caseData);
+        SealedClaimForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N1);
         return documentManagementService.uploadDocument(
@@ -48,29 +43,6 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     private String getFileName(CaseData caseData) {
         return String.format(N1.getDocumentTitle(), caseData.getLegacyCaseReference());
-    }
-
-    @Override
-    public SealedClaimForm getTemplateDataForSpec(CaseData caseData) {
-        Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
-        return SealedClaimForm.builder()
-            .applicants(getApplicants(caseData))
-            .respondents(getRespondents(caseData))
-            .claimValue(caseData.getTotalClaimAmount().add(interest).formData())
-            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
-            .claimDetails(caseData.getDetailsOfClaim())
-            .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .issueDate(caseData.getIssueDate())
-            .submittedOn(caseData.getSubmittedDate().toLocalDate())
-            .applicantExternalReference(solicitorReferences
-                                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                            .orElse(""))
-            .respondentExternalReference(solicitorReferences
-                                             .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                                             .orElse(""))
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .build();
     }
 
     @Override

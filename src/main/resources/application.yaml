@@ -104,6 +104,8 @@ notifications:
   claimantSolicitorClaimContinuingOnline: "eacc12e2-c4b9-470c-bf49-23441bcd8386"
   solicitorCaseTakenOffline: "976d4b4a-43e0-498a-8c1e-8a0dc48e7fe8"
   solicitorLitigationFriendAdded: "b659b48e-2585-4162-911e-4166b51c3d0e"
+  claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
+  respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

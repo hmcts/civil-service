@@ -52,10 +52,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     private CallbackResponse notifyRespondentSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
+            "civilmoneyclaimsdemo@gmail.com",
+            notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -66,9 +65,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
+            CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicatior",
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDate()
+                                                                     .toLocalDate(), DATE)
         );
     }
 }

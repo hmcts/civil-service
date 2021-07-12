@@ -10,19 +10,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM_SPEC);
     private static final String TASK_ID = "GenerateClaimFormForSpec";
 
-    private final SealedClaimFormGenerator sealedClaimFormGenerator;
+    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -53,15 +53,26 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
+           // .claimNotificationDeadline(LocalDateTime.now().plusDays(5))
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(5))
+            .claimDetailsNotificationDate(LocalDateTime.now().plusDays(5))
+            .respondent1Represented(YES)
+            .respondent1(caseData.getApplicant1())
+            .respondent1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
+            .claimDismissedDate(null)
+            .respondent1OrgRegistered(YES);
         //caseData.getClaimNotificationDeadline()
 
-        CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
+        /*CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
 
-        caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+             && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == YES;
+        );*/
+
+        // caseDataBuilder
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

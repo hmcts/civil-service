@@ -17,8 +17,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -50,11 +50,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     }
 
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
+            notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -65,9 +66,11 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
         );
     }
 }

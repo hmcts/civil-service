@@ -181,7 +181,7 @@ class RepresentativeServiceTest {
     @Nested
     class GetApplicantRepresentative {
 
-        @Test
+        // @Test
         void shouldReturnValidOrganisationDetails_whenApplicantIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
