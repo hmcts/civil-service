@@ -82,23 +82,23 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .totalInterestAmount(caseData.getTotalInterest() + "")
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions().getDescription())
             .interestRate(caseData.getSameRateInterestSelection().getDifferentRate() != null ?
-                              caseData.getSameRateInterestSelection().getDifferentRate() + "" :
+                              caseData.getSameRateInterestSelection().getDifferentRate()+"" :
                               "8%")
             .interestExplanationText("The claimant reserves the right to claim interest under "
-                                         + "Section 69 of the County Courts Act 1984")
+                                         +"Section 69 of the County Courts Act 1984")
             .interestFromDate(caseData.getInterestFromSpecificDate())
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom().name()
                                                 .equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-                                                ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription())
+                 ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription())
             .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
-            .interestEndDateDescription(caseData.getBreakDownInterestDescription() + "")
-            .totalClaimAmount(caseData.getTotalClaimAmount() + "")
+            .interestEndDateDescription(caseData.getBreakDownInterestDescription() +"")
+            .totalClaimAmount(caseData.getTotalClaimAmount() +"")
             .interestAmount(interest.toString())
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                           .toString())
             // Claim amount + interest + claim fees
             .totalAmountOfClaim(caseData.getTotalClaimAmount().add(interest)
-                                    .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
+              .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
             .statementOfTruth(caseData.getUiStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .build();
@@ -117,14 +117,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getTimelineOfEvents();
             List<TimelineOfEventDetails> timelineOfEventDetails = null;
-            for (int index = 0; index < timelineOfEvents.size(); index++) {
+            for (int index =0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
-                    = new TimelineOfEventDetails(
-                    timelineOfEvents.get(index).getValue()
-                        .getTimelineDate(),
-                    timelineOfEvents.get(index).getValue().getTimelineDescription()
-                );
-                timelineOfEventDetails.add(index, timelineOfEventDetail);
+                    = new TimelineOfEventDetails(timelineOfEvents.get(index).getValue()
+                            .getTimelineDate(),timelineOfEvents.get(index).getValue().getTimelineDescription());
+                timelineOfEventDetails.add(index,timelineOfEventDetail);
             }
             return timelineOfEventDetails;
         } else {
@@ -144,10 +141,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                            .representative(representativeService.getApplicantRepresentative(caseData))
                            .build());
     }
-
-
+}
     private boolean isAfterFourPM() {
         LocalTime localTime = localDateTime.toLocalTime();
         return localTime.getHour() > 15;
     }
-}
