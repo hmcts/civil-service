@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -34,17 +33,17 @@ public class AssignCaseSupportController {
     private final CoreCaseUserService coreCaseUserService;
     private final IdamClient idamClient;
     private final OrganisationService organisationService;
-    private final AuthTokenGenerator authTokenGenerator;
 
-    @PostMapping("/assign-case/{caseId}")
-    @ApiOperation("Assign case to defendant")
+    @PostMapping("/assign-case/{caseId}/{caseRole}")
+    @ApiOperation("Assign case to user")
     public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-                           @PathVariable("caseId") String caseId) {
+                           @PathVariable("caseId") String caseId,
+                           @PathVariable("caseRole") CaseRole caseRole) {
         String userId = idamClient.getUserInfo(authorisation).getUid();
 
         String organisationId = organisationService.findOrganisation(authorisation)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
 
-        coreCaseUserService.assignCase(caseId, userId, organisationId, CaseRole.RESPONDENTSOLICITORONE);
+        coreCaseUserService.assignCase(caseId, userId, organisationId, caseRole);
     }
 }
