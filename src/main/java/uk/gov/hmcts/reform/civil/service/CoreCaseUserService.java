@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,11 +56,11 @@ public class CoreCaseUserService {
             authTokenGenerator.generate(),
             List.of(caseId)
         );
-        log.info("Checking if user: " + userId + " has RESPONDENTSOLICITORTWO role for case: " + caseId);
+        log.info(String.format("Checking if user: %s has RESPONDENTSOLICITORTWO role for case: %s", userId, caseId));
 
         return userRoles.getCaseAssignedUserRoles().stream()
             .filter(c -> {
-                log.info("Found case assignment details: " + c.toString());
+                log.info(String.format("Found case assignment details: %s", c.toString()));
                 return c.getUserId().equals(userId);
             })
             .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
