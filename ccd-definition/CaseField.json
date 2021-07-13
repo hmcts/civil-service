@@ -900,5 +900,12 @@
     "Label": "Defendant's legal representative's reference",
     "FieldType": "Text",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantNotificationOptions",
+    "Label": "What parties do you wish to send to?",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public"
   }
 ]

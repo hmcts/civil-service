@@ -8,5 +8,15 @@
     "PageID": "AccessGrantedWarning",
     "PageDisplayOrder": 1,
     "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM",
+    "CaseFieldID": "defendantNotificationOptions",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "AccessGrantedWarning",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
   }
 ]
