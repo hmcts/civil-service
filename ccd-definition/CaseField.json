@@ -205,7 +205,24 @@
   },
   {
     "CaseTypeID": "CIVIL",
+    "ID": "respondent2ResponseDeadline",
+    "Label": "Respondent solicitor deadline",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "_Definition":  "The date time by which the second respondent solicitor has to submit the response to the claim.",
+    "_Category":  "CIVIL"
+  },
+  {
+    "CaseTypeID": "CIVIL",
     "ID": "respondentSolicitor1AgreedDeadlineExtension",
+    "Label": "Enter the extension date that was agreed with the other party",
+    "HintText": "This date cannot be more than 28 days from the original deadline.",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondentSolicitor2AgreedDeadlineExtension",
     "Label": "Enter the extension date that was agreed with the other party",
     "HintText": "This date cannot be more than 28 days from the original deadline.",
     "FieldType": "Date",
@@ -731,6 +748,13 @@
   },
   {
     "CaseTypeID": "CIVIL",
+    "ID": "respondent2TimeExtensionDate",
+    "Label": "Date respondent 2 submitted time extension",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
     "ID": "respondent1AcknowledgeNotificationDate",
     "Label": "Date respondent 1 acknowledged notification",
     "FieldType": "DateTime",
@@ -900,5 +924,14 @@
     "Label": "Defendant's legal representative's reference",
     "FieldType": "Text",
     "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "isRespondent1",
+    "Label": "Is respondent1?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "_Comments": "Temporary workaround - flag used to indicate respondent for whom an event should apply.",
+    "_Category": "WORKAROUND"
   }
 ]

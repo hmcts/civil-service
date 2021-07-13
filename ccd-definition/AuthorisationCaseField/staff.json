@@ -151,6 +151,12 @@
   },
   {
     "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2ResponseDeadline",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
     "CaseFieldID": "submittedDate",
     "UserRole": "caseworker-civil-staff",
     "CRUD": "R"
@@ -499,6 +505,12 @@
   },
   {
     "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondentSolicitor2AgreedDeadlineExtension",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
     "CaseFieldID": "claimProceedsInCaseman",
     "UserRole": "caseworker-civil-staff",
     "CRUD": "R"
@@ -536,6 +548,12 @@
   {
     "CaseTypeID": "CIVIL",
     "CaseFieldID": "respondent1TimeExtensionDate",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2TimeExtensionDate",
     "UserRole": "caseworker-civil-staff",
     "CRUD": "R"
   },

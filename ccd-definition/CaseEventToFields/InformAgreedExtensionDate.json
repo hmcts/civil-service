@@ -2,13 +2,37 @@
   {
     "CaseTypeID": "CIVIL",
     "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
-    "CaseFieldID": "respondentSolicitor1AgreedDeadlineExtension",
+    "CaseFieldID": "isRespondent1",
     "PageFieldDisplayOrder": 1,
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "PageID": "ExtensionDate",
     "PageDisplayOrder": 1,
     "ShowSummaryChangeOption": "N",
     "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/extension-date",
-    "RetriesTimeoutURLMidEvent": 0
+    "FieldShowCondition": "respondentSolicitor1AgreedDeadlineExtension=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
+    "CaseFieldID": "respondentSolicitor1AgreedDeadlineExtension",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ExtensionDate",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "RetriesTimeoutURLMidEvent": 0,
+    "FieldShowCondition": "isRespondent1=\"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
+    "CaseFieldID": "respondentSolicitor2AgreedDeadlineExtension",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ExtensionDate",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "RetriesTimeoutURLMidEvent": 0,
+    "FieldShowCondition": "isRespondent1=\"No\""
   }
 ]
