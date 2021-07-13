@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -47,7 +50,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::prepareDefendantFields,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -56,6 +59,25 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse prepareDefendantFields(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        //build options that will be in the list
+        List<String> dynamicListOptions =
+            List.of("Both", caseData.getRespondent1().getPartyName());
+        if (nonNull(caseData.getRespondent2().getPartyName())) {
+            dynamicListOptions.add(caseData.getRespondent2().getPartyName());
+        }
+        //build defendantNotificationOptions field (Default Value & List Options), add to case data
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        DynamicListElement defaultValue = DynamicListElement.dynamicElement("Both");
+
+        caseDataBuilder.defendantNotificationOptions(DynamicList.fromList(dynamicListOptions, defaultValue));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
