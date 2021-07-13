@@ -65,7 +65,7 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseNote caseNote(LocalDate date, String createdBy, String note) {
             return CaseNote.builder()
-                .date(date)
+                .createdOn(date)
                 .createdBy(createdBy)
                 .note(note)
                 .build();

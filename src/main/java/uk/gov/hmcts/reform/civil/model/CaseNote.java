@@ -10,6 +10,6 @@ import java.time.LocalDate;
 public class CaseNote {
 
     private final String createdBy;
-    private final LocalDate date;
+    private final LocalDate createdOn;
     private final String note;
 }

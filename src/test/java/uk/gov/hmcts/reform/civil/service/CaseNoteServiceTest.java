@@ -87,7 +87,7 @@ class CaseNoteServiceTest {
         return CaseNote.builder()
             .note(note)
             .createdBy(USER_DETAILS.getFullName())
-            .date(LocalDate.now())
+            .createdOn(LocalDate.now())
             .build();
     }
 
@@ -95,7 +95,7 @@ class CaseNoteServiceTest {
         return CaseNote.builder()
             .note("note")
             .createdBy(USER_DETAILS.getFullName())
-            .date(date)
+            .createdOn(date)
             .build();
     }
 }
