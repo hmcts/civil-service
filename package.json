@@ -8,7 +8,7 @@
     "test:smoke": "MOCHAWESOME_REPORTFILENAME=smoke npx codeceptjs run --grep @smoke-tests --reporter mocha-multi --verbose",
     "test:api": "MOCHAWESOME_REPORTFILENAME=api npx codeceptjs run --grep @api-tests --reporter mocha-multi --verbose",
     "test:e2e": "MOCHAWESOME_REPORTFILENAME=functional npx codeceptjs run --grep @e2e-tests --reporter mocha-multi --verbose",
-    "test:functional": "MOCHAWESOME_REPORTFILENAME=functional npx codeceptjs run --grep '@api-tests|@e2e-tests' --reporter mocha-multi --verbose",
+    "test:functional": "MOCHAWESOME_REPORTFILENAME=functional MULTIPARTY_TESTS_ENABLED=true npx codeceptjs run --grep '@api-tests|@e2e-tests' --reporter mocha-multi --verbose",
     "test:rpa": "MOCHAWESOME_REPORTFILENAME=functional npx codeceptjs run --grep @rpa-handoff-tests --reporter mocha-multi --verbose",
     "test:crossbrowser-e2e": "MOCHAWESOME_REPORTFILENAME=crossbrowser codeceptjs run-multiple --grep @cross-browser-tests ${BROWSER_GROUP:-'--all'} -c saucelabs.conf.js --reporter mocha-multi",
     "test:crossbrowser": "./e2e/run-crossbrowser-tests.sh"
