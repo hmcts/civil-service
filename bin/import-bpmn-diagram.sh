@@ -16,16 +16,13 @@ do
     -F "deployment-name=$(date +"%Y%m%d-%H%M%S")-$(basename ${file})" \
     -F "file=@${filepath}/$(basename ${file})")
 
-upload_http_code=$(echo "$uploadResponse" | tail -n1)
-upload_response_content=$(echo "$uploadResponse" | sed '$d')
+  upload_http_code=$(echo "$uploadResponse" | tail -n1)
+  echo "${file} upload, http code: ${upload_http_code}"
 
-if [[ "${upload_http_code}" == '200' ]]; then
-  echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})"
-  continue;
-fi
-
-echo "$(basename ${file}) upload failed with http code ${upload_http_code} and response (${upload_response_content})"
-continue;
+  if [[ ${upload_http_code} != '200' ]]; then
+    echo $uploadResponse
+    continue;
+  fi
 
 done
 exit 0;
