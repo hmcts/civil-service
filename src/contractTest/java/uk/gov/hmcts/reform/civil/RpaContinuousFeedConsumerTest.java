@@ -340,4 +340,59 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
+
+    @Nested
+    class InformTimeExtensionRpaContinuousFeed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenInformTimeExtensionAndContinuousFeedEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
+                .legacyCaseReference("100DC016")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when inform time extension";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenInformTimeExtensionWithMaximumData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionMaximumData()
+                .legacyCaseReference("100DC017")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when inform time extension - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenInformTimeExtensionWithMinimumData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionMinimalData()
+                .legacyCaseReference("100DC018")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when inform time extension - min limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
 }
