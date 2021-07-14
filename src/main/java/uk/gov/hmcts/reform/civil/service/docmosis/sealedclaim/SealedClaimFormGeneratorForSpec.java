@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,28 +78,37 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .applicants(getApplicants(caseData))
             .respondents(getRespondents(caseData))
             .timeline(getTimeLine(caseData))
-            .sameInterestRate(caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "")
-            .breakdownInterestRate(caseData.getInterestClaimOptions().equals(BREAK_DOWN_INTEREST) + "")
+            .sameInterestRate(caseData.getInterestClaimOptions() != null
+                                  ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
+            .breakdownInterestRate(caseData.getInterestClaimOptions() != null
+                                       ? caseData.getInterestClaimOptions().equals(BREAK_DOWN_INTEREST) + "" : null)
             .totalInterestAmount(caseData.getTotalInterest() + "")
-            .howTheInterestWasCalculated(caseData.getInterestClaimOptions().getDescription())
-            .interestRate(caseData.getSameRateInterestSelection().getDifferentRate() != null ?
-                              caseData.getSameRateInterestSelection().getDifferentRate() + "" :
-                              "8%")
+            .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
+                                             ? caseData.getInterestClaimOptions().getDescription() : null)
+            .interestRate(caseData.getSameRateInterestSelection() != null
+                              ? caseData.getSameRateInterestSelection().getDifferentRate() != null ?
+                caseData.getSameRateInterestSelection().getDifferentRate() + "" :
+                "8%" : null)
             .interestExplanationText("The claimant reserves the right to claim interest under "
                                          + "Section 69 of the County Courts Act 1984")
-            .interestFromDate(caseData.getInterestFromSpecificDate())
-            .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom().name()
-                                                .equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-                                                ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription())
+            .interestFromDate(caseData.getInterestFromSpecificDate() != null
+                                  ? caseData.getInterestFromSpecificDate() : null)
+            .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null ? caseData.getInterestClaimFrom().name()
+                .equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+                ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription() : null)
             .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
-            .interestEndDateDescription(caseData.getBreakDownInterestDescription() + "")
+            .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
+                                            ? caseData.getBreakDownInterestDescription() + "" : null)
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
-            .interestAmount(interest.toString())
+            .interestAmount(interest != null ? interest.toString() : null)
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                           .toString())
             // Claim amount + interest + claim fees
-            .totalAmountOfClaim(caseData.getTotalClaimAmount().add(interest)
-                                    .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
+            .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
+                .add(interest)
+                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString()
+                                    : caseData.getTotalClaimAmount()
+                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
             .statementOfTruth(caseData.getUiStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .build();
@@ -116,7 +126,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private List<TimelineOfEventDetails> getTimeLine(CaseData caseData) {
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getTimelineOfEvents();
-            List<TimelineOfEventDetails> timelineOfEventDetails = null;
+            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<TimelineOfEventDetails>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
                     = new TimelineOfEventDetails(
