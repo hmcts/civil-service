@@ -66,7 +66,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         //build options that will be in the list
         List<String> dynamicListOptions =
             List.of("Both", caseData.getRespondent1().getPartyName());
-        if (nonNull(caseData.getRespondent2().getPartyName())) {
+        if (nonNull(caseData.getRespondent2())) {
             dynamicListOptions.add(caseData.getRespondent2().getPartyName());
         }
         //build defendantNotificationOptions field (Default Value & List Options), add to case data

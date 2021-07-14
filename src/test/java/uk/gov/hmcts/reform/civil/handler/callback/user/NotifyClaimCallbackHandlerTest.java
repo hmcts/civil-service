@@ -27,8 +27,10 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -60,6 +62,21 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
+
+    @Nested
+    class AboutToStart {
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertTrue(response.getData().containsKey("defendantNotificationOptions"));
+        }
+    }
 
     @Nested
     class AboutToSubmit {
