@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,8 +36,8 @@ public class SealedClaimFormForSpec implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate issueDate;
-    private final List<Party> applicants;
-    private final List<Party> respondents;
+    private final List<SpecifiedParty> applicants;
+    private final List<SpecifiedParty> respondents;
     private final String descriptionOfClaim;
     private final List<TimelineOfEventDetails> timeline;
     private final List<ClaimAmountBreakupDetails> claimAmount;

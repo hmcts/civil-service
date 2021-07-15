@@ -98,10 +98,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "The exact date when you must notify the claim details will be provided when you first notify "
         + "the defendant of the claim.";
 
-    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is "
-        + "confirmed. Once payment is confirmed you will receive an email. The claim will then progress offline."
-        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
-        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
+    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When payment is confirmed your claim will be issued "
+        + "and you'll be notified by email. The claim will then progress offline."
+        + "%n%nTo continue the claim you need to send the:<ul> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
+        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><li> and any supporting documents </li></ul>to "
         + "the defendant within 4 months. "
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";

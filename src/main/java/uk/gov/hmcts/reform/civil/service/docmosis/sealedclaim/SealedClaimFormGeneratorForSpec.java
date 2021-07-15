@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
@@ -46,7 +47,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private final RepresentativeService representativeService;
     private final InterestCalculator interestCalculator;
     public LocalDateTime localDateTime = LocalDateTime.now();
-    private static final String END_OF_BUSINESS_DAY = "4pm,     ";
+    private static final String END_OF_BUSINESS_DAY = "4pm, ";
     private final DeadlinesCalculator deadlinesCalculator;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -91,13 +92,16 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .interestRate(caseData.getSameRateInterestSelection() != null
                               ? caseData.getSameRateInterestSelection().getDifferentRate() != null ?
                 caseData.getSameRateInterestSelection().getDifferentRate() + "" :
-                "8%" : null)
-            .interestExplanationText("The claimant reserves the right to claim interest under "
-                                         + "Section 69 of the County Courts Act 1984")
+                "8" : null)
+            .interestExplanationText(caseData.getSameRateInterestSelection() != null
+                ? caseData.getSameRateInterestSelection().getDifferentRate() != null
+                ? caseData.getSameRateInterestSelection().getDifferentRateReason() : "The claimant reserves the right to claim interest under "
+              + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
-                                  ? caseData.getInterestFromSpecificDate() : null)
-            .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null ? caseData.getInterestClaimFrom().name()
-                .equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+                  ? caseData.getInterestFromSpecificDate() :
+                  (isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
+            .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
+                ? caseData.getInterestClaimFrom().name().equals("FROM_CLAIM_SUBMIT_DATE")
                 ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription() : null)
             .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
@@ -125,9 +129,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         return END_OF_BUSINESS_DAY + notificationDeadline;
     }
 
-    private List<Party> getRespondents(CaseData caseData) {
+    private List<SpecifiedParty> getRespondents(CaseData caseData) {
         var respondent = caseData.getRespondent1();
-        return List.of(Party.builder()
+        return List.of(SpecifiedParty.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(representativeService.getRespondentRepresentative(caseData))
@@ -172,16 +176,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         }
     }
 
-    private List<Party> getApplicants(CaseData caseData) {
+    private List<SpecifiedParty> getApplicants(CaseData caseData) {
         var applicant = caseData.getApplicant1();
-        return List.of(Party.builder()
+        return List.of(SpecifiedParty.builder()
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
-                           .litigationFriendName(
-                               ofNullable(caseData.getApplicant1LitigationFriend())
-                                   .map(LitigationFriend::getFullName)
-                                   .orElse(""))
                            .representative(representativeService.getApplicantRepresentative(caseData))
+                           .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null ? applicant.getIndividualDateOfBirth() : null)
                            .build());
     }
 
