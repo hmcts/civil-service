@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${polling.event.emitter.enabled:true}")
+@ExternalTaskSubscription("POLLING_EVENT_EMITTER")
 public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;

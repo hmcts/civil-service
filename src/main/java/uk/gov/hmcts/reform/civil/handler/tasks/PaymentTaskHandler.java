@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ExternalTaskSubscription("processPayment")
 public class PaymentTaskHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;

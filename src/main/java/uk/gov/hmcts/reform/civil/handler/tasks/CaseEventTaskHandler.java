@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
+@ExternalTaskSubscription("processCaseEvent")
 public class CaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;

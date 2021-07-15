@@ -338,9 +338,10 @@ dependencies {
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.57'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.15.0'
-  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.14.0'
+  implementation group: 'org.camunda.bpm.springboot', name: 'camunda-bpm-spring-boot-starter-external-task-client', version: '7.15.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.15.0'
+  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.6'
+
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.4'
 
   // JAX-B dependencies for JDK 9+
