@@ -302,14 +302,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(INFORM_AGREED_EXTENSION_DATE.name());
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("status")
-                .isEqualTo("READY");
+                .doesNotContainKey("businessProcess");
         }
     }
 
