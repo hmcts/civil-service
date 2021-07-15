@@ -35,6 +35,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.BREAK_DOWN_INTEREST;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimFormForSpec templateData = getTemplateData(caseData);
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N1);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N2);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
@@ -82,7 +83,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                   ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
             .breakdownInterestRate(caseData.getInterestClaimOptions() != null
                                        ? caseData.getInterestClaimOptions().equals(BREAK_DOWN_INTEREST) + "" : null)
-            .totalInterestAmount(caseData.getTotalInterest() + "")
+            .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                                              ? caseData.getInterestClaimOptions().getDescription() : null)
             .interestRate(caseData.getSameRateInterestSelection() != null
@@ -101,6 +102,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                             ? caseData.getBreakDownInterestDescription() + "" : null)
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
             .interestAmount(interest != null ? interest.toString() : null)
+            .claimAmount()
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                           .toString())
             // Claim amount + interest + claim fees
@@ -111,6 +113,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
             .statementOfTruth(caseData.getUiStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
+         //   .applicantRepresentativeOrganisationName(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
             .build();
     }
 
