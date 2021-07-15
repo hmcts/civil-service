@@ -126,7 +126,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .atTime(END_OF_BUSINESS_DAY);
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
             .isRespondent1(null);
 
         if (representsRespondent2(callbackParams)) {
@@ -134,6 +133,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .respondent2ResponseDeadline(newDeadline);
         } else {
             caseDataBuilder.respondent1TimeExtensionDate(time.now())
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent1ResponseDeadline(newDeadline);
         }
 
