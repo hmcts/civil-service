@@ -27,6 +27,11 @@ module.exports = {
     email: 'hmcts.civil+organisation.2.solicitor.1@gmail.com',
     type: 'defendant_solicitor'
   },
+  secondDefendantSolicitorUser: {
+    password: defaultPassword,
+    email: 'hmcts.civil+organisation.2.solicitor.2@gmail.com',
+    type: 'defendant_solicitor'
+  },
   adminUser: {
     password: defaultPassword,
     email: 'civil-admin@mailnesia.com',

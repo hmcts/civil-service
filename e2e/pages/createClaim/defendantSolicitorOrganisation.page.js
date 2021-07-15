@@ -2,31 +2,31 @@ const { I } = inject();
 
 module.exports = {
 
-  fields: respondent => {
+  fields: respondentNumber => {
     return {
       respondentOrgRepresented: {
-        id: `#${respondent}OrgRegistered`,
+        id: `#respondent${respondentNumber}OrgRegistered`,
         options: {
           yes: 'Yes',
           no: 'No'
         }
       },
-      orgPolicyReference: `#${respondent}OrganisationPolicy_OrgPolicyReference`,
+      orgPolicyReference: `#respondent${respondentNumber}OrganisationPolicy_OrgPolicyReference`,
       searchText: '#search-org-text',
     };
   },
 
-  async enterOrganisationDetails (respondent) {
-    I.waitForElement(this.fields(respondent).respondentOrgRepresented.id);
+  async enterOrganisationDetails (respondentNumber = '1') {
+    I.waitForElement(this.fields(respondentNumber).respondentOrgRepresented.id);
     await I.runAccessibilityTest();
-    await within(this.fields(respondent).respondentOrgRepresented.id, () => {
-      I.click(this.fields(respondent).respondentOrgRepresented.options.yes);
+    await within(this.fields(respondentNumber).respondentOrgRepresented.id, () => {
+      I.click(this.fields(respondentNumber).respondentOrgRepresented.options.yes);
     });
-    I.waitForElement(this.fields(respondent).orgPolicyReference);
-    I.fillField(this.fields(respondent).orgPolicyReference, 'Defendant policy reference');
-    I.waitForElement(this.fields(respondent).searchText);
-    I.fillField(this.fields(respondent).searchText, 'Civil');
-    I.click('a[title="Select the organisation Civil - Organisation 2"]');
+    I.waitForElement(this.fields(respondentNumber).orgPolicyReference);
+    I.fillField(this.fields(respondentNumber).orgPolicyReference, 'Defendant policy reference');
+    I.waitForElement(this.fields(respondentNumber).searchText);
+    I.fillField(this.fields(respondentNumber).searchText, 'Civil');
+    I.click(`a[title="Select the organisation Civil - Organisation ${respondentNumber}"]`);
     await I.clickContinue();
   }
 };

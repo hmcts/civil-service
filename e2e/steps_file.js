@@ -154,7 +154,7 @@ module.exports = function () {
         ]),
         ... conditionalSteps(!litigantInPerson, [
           () => respondentRepresentedPage.enterRespondentRepresented('respondent1', 'yes'),
-          () => defendantSolicitorOrganisation.enterOrganisationDetails('respondent1'),
+          () => defendantSolicitorOrganisation.enterOrganisationDetails('1'),
           () => defendantSolicitorServiceAddress.enterOrganisationServiceAddress(),
           () => defendantSolicitorEmail.enterSolicitorEmail('1')
         ]),
@@ -163,7 +163,7 @@ module.exports = function () {
           () => party.enterParty('respondent2', address),
           () => respondentRepresentedPage.enterRespondentRepresented('respondent2', 'yes'),
           () => respondent2SameLegalRepresentative.enterRespondent2SameLegalRepresentative(),
-          () => defendantSolicitorOrganisation.enterOrganisationDetails('respondent2'),
+          () => defendantSolicitorOrganisation.enterOrganisationDetails('2'),
           () => secondDefendantSolicitorServiceAddress.enterOrganisationServiceAddress(),
           () => secondDefendantSolicitorReference.enterReference(),
           () => defendantSolicitorEmail.enterSolicitorEmail('2')
@@ -221,12 +221,12 @@ module.exports = function () {
       ]);
     },
 
-    async informAgreedExtensionDate() {
+    async informAgreedExtensionDate(respondentSolicitorNumber = '1') {
       eventName = 'Inform agreed extension date';
 
       await this.triggerStepsWithScreenshot([
         () => caseViewPage.startEvent(eventName, caseId),
-        () => extensionDatePage.enterExtensionDate(),
+        () => extensionDatePage.enterExtensionDate(respondentSolicitorNumber),
         () => event.submit('Submit', 'Extension deadline submitted'),
         () => event.returnToCaseDetails()
       ]);

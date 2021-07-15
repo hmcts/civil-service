@@ -4,15 +4,17 @@ const date = require('../../fragments/date');
 
 module.exports = {
 
-  fields: {
-    extensionDate: {
-      id: 'respondentSolicitor1AgreedDeadlineExtension',
-    }
+  fields: respondentSolicitorNumber => {
+    return {
+      extensionDate: {
+        id: `respondentSolicitor${respondentSolicitorNumber}AgreedDeadlineExtension`,
+      }
+    };
   },
 
-  async enterExtensionDate() {
+  async enterExtensionDate(respondentSolicitorNumber) {
     await I.runAccessibilityTest();
-    await date.enterDate(this.fields.extensionDate.id, 50);
+    await date.enterDate(this.fields(respondentSolicitorNumber).extensionDate.id, 50);
     await I.clickContinue();
   }
 };

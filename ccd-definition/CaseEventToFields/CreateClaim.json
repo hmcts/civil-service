@@ -79,7 +79,8 @@
     "PageID": "Notifications",
     "PageDisplayOrder": 6,
     "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-claimant-legal-rep-email"
   },
   {
     "CaseTypeID": "CIVIL",
@@ -215,7 +216,8 @@
     "PageDisplayOrder": 16,
     "PageColumnNumber": 1,
     "ShowSummaryChangeOption": "Y",
-    "PageShowCondition": "respondent1OrgRegistered=\"Yes\""
+    "PageShowCondition": "respondent1OrgRegistered=\"Yes\"",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-defendant-legal-rep-email"
   },
   {
     "CaseTypeID": "CIVIL",

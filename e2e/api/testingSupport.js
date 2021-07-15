@@ -33,12 +33,12 @@ module.exports =  {
       throw new Error(`Business process failed for case: ${caseId}, incident message: ${incidentMessage}`);
   },
 
-  assignCaseToDefendant: async caseId => {
-    const authToken = await idamHelper.accessToken(config.defendantSolicitorUser);
+  assignCaseToDefendant: async (caseId, caseRole = 'RESPONDENTSOLICITORONE', user = config.defendantSolicitorUser) => {
+    const authToken = await idamHelper.accessToken(user);
 
     await retry(() => {
       return restHelper.request(
-        `${config.url.civilService}/testing-support/assign-case/${caseId}`,
+        `${config.url.civilService}/testing-support/assign-case/${caseId}/${caseRole}`,
         {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}` },
