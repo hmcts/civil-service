@@ -126,6 +126,14 @@ camunda:
     client:
       base-url: ${FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL:}
       async-response-timeout: 29000
+      subscriptions:
+        processCaseEvent:
+        CASE_DISMISSED:
+        END_BUSINESS_PROCESS:
+        processPayment:
+        POLLING_EVENT_EMITTER:
+        START_BUSINESS_PROCESS:
+        TAKE_CASE_OFFLINE:
 
 ---
 
