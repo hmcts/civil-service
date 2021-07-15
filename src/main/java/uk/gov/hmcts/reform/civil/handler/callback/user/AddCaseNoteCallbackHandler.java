@@ -27,10 +27,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 @RequiredArgsConstructor
 public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_CASE_NOTE);
+
     private final CaseNoteService caseNoteService;
     private final ObjectMapper objectMapper;
-
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_CASE_NOTE);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,8 +49,10 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseNote caseNote = caseNoteService.buildCaseNote(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                          caseData.getCaseNote());
+        CaseNote caseNote = caseNoteService.buildCaseNote(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            caseData.getCaseNote()
+        );
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, caseData.getCaseNotes());
 

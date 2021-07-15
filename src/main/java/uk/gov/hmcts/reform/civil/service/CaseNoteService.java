@@ -23,7 +23,7 @@ public class CaseNoteService {
     public CaseNote buildCaseNote(String authorisation, String note) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
 
-        return  CaseNote.builder()
+        return CaseNote.builder()
             .createdBy(userDetails.getFullName())
             .createdOn(LocalDate.now())
             .note(note)

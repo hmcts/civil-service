@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     AddCaseNoteCallbackHandler.class,
     JacksonAutoConfiguration.class,
 })
-
 class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired

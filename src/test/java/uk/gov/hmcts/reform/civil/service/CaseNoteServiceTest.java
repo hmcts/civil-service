@@ -26,18 +26,18 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class CaseNoteServiceTest {
 
-    @Autowired
-    private CaseNoteService caseNoteService;
-
-    @MockBean
-    private IdamClient idamClient;
-
     private static final UserDetails USER_DETAILS = UserDetails.builder()
         .forename("John")
         .surname("Smith")
         .build();
 
     private static final String BEARER_TOKEN = "Bearer Token";
+
+    @Autowired
+    private CaseNoteService caseNoteService;
+
+    @MockBean
+    private IdamClient idamClient;
 
     @Nested
     class BuildCaseNote {
@@ -57,7 +57,7 @@ class CaseNoteServiceTest {
     }
 
     @Test
-    void  shouldAddNoteToList_WhenNullList() {
+    void shouldAddNoteToList_WhenNullList() {
         CaseNote caseNote = caseNoteForToday("new note");
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, null);
 
