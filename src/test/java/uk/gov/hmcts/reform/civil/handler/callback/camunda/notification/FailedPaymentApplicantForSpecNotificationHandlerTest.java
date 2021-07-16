@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
     JacksonAutoConfiguration.class
 })
 public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
