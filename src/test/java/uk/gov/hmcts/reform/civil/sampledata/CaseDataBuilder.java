@@ -356,6 +356,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimDetailsNotificationDate(LocalDateTime localDate) {
+        this.claimDetailsNotificationDate = localDate;
+        return this;
+    }
+
     public CaseDataBuilder respondent2OrgRegistered(YesOrNo respondent2OrgRegistered) {
         this.respondent2OrgRegistered = respondent2OrgRegistered;
         return this;
