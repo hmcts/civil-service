@@ -260,4 +260,12 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
+
+    public CaseDataMinEdgeCasesBuilder atStateNotificationAcknowledgedTimeExtensionMinimalData() {
+        atStateServiceAcknowledgeWithMinimalData();
+        respondent1TimeExtensionDate = LocalDateTime.now();
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
 }
