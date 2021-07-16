@@ -106,6 +106,7 @@ notifications:
   solicitorLitigationFriendAdded: "b659b48e-2585-4162-911e-4166b51c3d0e"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
+  failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

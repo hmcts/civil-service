@@ -31,6 +31,9 @@ public class NotificationsProperties {
     private String failedPayment;
 
     @NotEmpty
+    private String failedPaymentForSpec;
+
+    @NotEmpty
     private String solicitorClaimDismissed;
 
     @NotEmpty
