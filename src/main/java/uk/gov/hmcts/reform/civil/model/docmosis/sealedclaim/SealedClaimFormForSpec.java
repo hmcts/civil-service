@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 
 import java.time.LocalDate;

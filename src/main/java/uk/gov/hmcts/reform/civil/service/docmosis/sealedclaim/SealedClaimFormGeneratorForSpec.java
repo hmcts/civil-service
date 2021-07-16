@@ -90,8 +90,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 "8" : null)
             .interestExplanationText(caseData.getSameRateInterestSelection() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() != null
-                ? caseData.getSameRateInterestSelection().getDifferentRateReason() : "The claimant reserves the right to claim interest under "
-              + "Section 69 of the County Courts Act 1984" : null)
+                ? caseData.getSameRateInterestSelection().getDifferentRateReason()
+                : "The claimant reserves the right to claim interest under "
+                + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
                   ? caseData.getInterestFromSpecificDate() :
                   (isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
@@ -108,19 +109,21 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                           .toString())
             // Claim amount + interest + claim fees
             .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
-                .add(interest)
-                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString()
-                                    : caseData.getTotalClaimAmount()
-                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
+              .add(interest)
+              .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString()
+              : caseData.getTotalClaimAmount()
+              .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData).getOrganisationName().toString())
+            .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
+                                                         .getOrganisationName().toString())
             .defendantResponseDeadlineDate(getResponseDedline(caseData))
             .build();
     }
 
     private String getResponseDedline(CaseData caseData) {
-        var notificationDeadline = formatLocalDate(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)), DATE);
+        var notificationDeadline = formatLocalDate(deadlinesCalculator
+                                                 .calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)), DATE);
         return END_OF_BUSINESS_DAY + notificationDeadline;
     }
 
