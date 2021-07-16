@@ -39,7 +39,7 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final List<Party> respondents;
     private final String descriptionOfClaim;
     private final List<TimelineOfEventDetails> timeline;
-    private final List<ClaimAmountBreakupDetails> claimamount;
+    private final List<ClaimAmountBreakupDetails> claimAmount;
     private final String sameInterestRate;
     private final String breakdownInterestRate;
     private final String totalInterestAmount;
@@ -60,4 +60,6 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final String claimFee;
     private final String totalAmountOfClaim;
     private final StatementOfTruth statementOfTruth;
+    private final String applicantRepresentativeOrganisationName;
+    private final String defendantResponseDeadlineDate;
 }
