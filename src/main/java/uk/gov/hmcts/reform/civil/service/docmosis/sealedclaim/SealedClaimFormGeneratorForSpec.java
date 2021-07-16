@@ -161,9 +161,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             List<ClaimAmountBreakupDetails> claimAmountBreakupDetails = new ArrayList<ClaimAmountBreakupDetails>();
             for (int index = 0; index < claimAmountBreakup.size(); index++) {
                 ClaimAmountBreakupDetails claimAmountBreakupDetail
-                    = new ClaimAmountBreakupDetails(
-                    claimAmountBreakup.get(index).getValue()
-                        .getClaimAmount(),
+                    = new ClaimAmountBreakupDetails(MonetaryConversions.penniesToPounds(claimAmountBreakup.get(index)
+                     .getValue().getClaimAmount()),
                     claimAmountBreakup.get(index).getValue().getClaimReason()
                 );
                 claimAmountBreakupDetails.add(index, claimAmountBreakupDetail);
