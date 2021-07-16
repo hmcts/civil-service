@@ -122,6 +122,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
+                INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
