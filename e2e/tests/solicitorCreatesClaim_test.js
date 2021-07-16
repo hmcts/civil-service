@@ -45,6 +45,7 @@ Scenario('Defendant solicitor requests deadline extension', async (I) => {
   await I.login(config.defendantSolicitorUser);
   await I.informAgreedExtensionDate();
   await I.see(caseEventMessage('Inform agreed extension date'));
+
 });
 
 Scenario('Defendant solicitor adds defendant litigation friend', async (I) => {
