@@ -113,8 +113,24 @@ public class EventHistoryMapper {
                         break;
                 }
             });
-
+        buildRespondent1LitigationFriendEvent(builder, caseData);
         return builder.build();
+    }
+
+    private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isRpaContinuousFeedEnabled() && caseData.getRespondent1LitigationFriend() != null) {
+            String miscText = "Litigation friend added for respondent";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent1LitigationFriendDate().format(ISO_DATE))
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
     }
 
     private void buildClaimDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
