@@ -24,6 +24,7 @@ public class ValidateEmailService {
     private static final int EMAIL_MAX_LENGTH = 320;
     private static final int HOST_MAX_LENGTH = 253;
     private static final int HOST_PART_MAX_LENGTH = 63;
+    private static final int USERNAME_MAX_LENGTH = 64;
 
     private static final String ERROR_MESSAGE = "Enter an email address in the correct format,"
         + " for example john.smith@example.com";
@@ -51,6 +52,23 @@ public class ValidateEmailService {
         }
 
         final String emailAddress = StringUtils.trim(email);
+
+        if (emailAddress.startsWith(".")) {
+            log.warn("Email begins with .");
+            return false;
+        }
+
+        final String username = emailAddress.split("@")[0];
+
+        if (username.endsWith(".")) {
+            log.warn("Username ends with .");
+            return false;
+        }
+
+        if (username.length() > USERNAME_MAX_LENGTH) {
+            log.warn("Email username is longer than {} characters", USERNAME_MAX_LENGTH);
+            return false;
+        }
 
         if (emailAddress.length() > EMAIL_MAX_LENGTH) {
             log.warn("Email is longer than {} characters", EMAIL_MAX_LENGTH);

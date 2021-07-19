@@ -45,7 +45,9 @@ class ValidateEmailServiceTest {
             "firstname-lastname@domain.com",
             "info@german-financial-services.vermögensberatung",
             "info@german-financial-services.reallylongarbitrarytldthatiswaytoohugejustincase",
-            "japanese-info@例え.テスト");
+            "japanese-info@例え.テスト",
+            format("%s@example.com", "a".repeat(64)),
+            format("%s@example.com", "a".repeat(63)));
     }
 
     //See https://github.com/alphagov/notifications-utils/blob/master/tests/test_recipient_validation.py#L122-L152
@@ -83,6 +85,9 @@ class ValidateEmailServiceTest {
             "local-with-”-quotes@domain.com",
             "domain-starts-with-a-dot@.domain.com",
             "brackets(in)local@domain.com",
+            ".Douglas.@hmcts.net",
+            "Douglas.@hmcts.net",
+            format("%s@example.com", "a".repeat(65)),
             format("email-too-long-%s@example.com", "a".repeat(320)));
     }
 }
