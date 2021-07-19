@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.search.SupportingDocuments;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -86,6 +87,9 @@ public class CaseData implements MappableObject {
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    private final SupportingDocuments specClaimTemplateDocumentFiles;
+    private final SupportingDocuments specClaimDetailsDocumentFiles;
+    private final List<Evidence> speclistYourEvidenceList;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
