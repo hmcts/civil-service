@@ -37,7 +37,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::buildConfirmation
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -63,12 +63,6 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .build();
-    }
-
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# You have added a note")
             .build();
     }
 }
