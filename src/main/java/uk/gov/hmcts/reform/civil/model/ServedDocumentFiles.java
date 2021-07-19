@@ -12,7 +12,7 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class ServedDocumentFiles {
 
     private List<Element<DocumentWithRegex>> other;

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -73,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbac
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService.ORG_NOT_ONBOARDED;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -144,6 +147,134 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+    }
+
+    @Nested
+    class MidEventClaimTypeCallback {
+        private final String pageId = "claim-type";
+        private final CaseData.CaseDataBuilder caseDataBuilder =
+            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
+
+        private Document doc;
+        private CaseData caseDataBefore;
+        private CaseData caseData;
+
+        @BeforeEach
+        void setup() {
+            doc = Document.builder()
+                .documentUrl("docUrl")
+                .documentBinaryUrl("docBinaryUrl")
+                .documentFileName("docFilename")
+                .build();
+        }
+
+        @Test
+        void shouldResetTheParticularOfClaimDocumentField_whenClaimTypeHasChanged() {
+            caseDataBefore = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimDocument(wrapElements(doc))
+                        .build())
+                .build();
+
+            caseData = caseDataBuilder
+                .claimType(ClaimType.PROFESSIONAL_NEGLIGENCE)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimDocument(wrapElements(doc))
+                        .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseDataBefore, caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("servedDocumentFiles")
+                .extracting("particularsOfClaimDocument")
+                .isEqualTo(null);
+        }
+
+        @Test
+        void shouldResetTheParticularOfClaimTextField_whenClaimTypeHasChanged() {
+            caseDataBefore = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimText("Some text about the claim")
+                        .build())
+                .build();
+
+            caseData = caseDataBuilder
+                .claimType(ClaimType.PROFESSIONAL_NEGLIGENCE)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimText("Some text about the claim")
+                        .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseDataBefore, caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("servedDocumentFiles")
+                .extracting("particularsOfClaimDocumentText")
+                .isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotResetTheParticularOfClaimDocumentField_whenClaimTypeHasNotChanged() {
+            caseDataBefore = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimDocument(wrapElements(doc))
+                        .build())
+                .build();
+
+            caseData = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimDocument(wrapElements(doc))
+                        .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseDataBefore, caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("servedDocumentFiles")
+                .extracting("particularsOfClaimDocument")
+                .isNotNull();
+        }
+
+        @Test
+        void shouldNotResetTheParticularOfClaimTextField_whenClaimTypeHasNotChanged() {
+            caseDataBefore = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimText("Some text about the claim")
+                        .build())
+                .build();
+
+            caseData = caseDataBuilder
+                .claimType(ClaimType.PERSONAL_INJURY)
+                .servedDocumentFiles(
+                    ServedDocumentFiles.builder()
+                        .particularsOfClaimText("Some text about the claim")
+                        .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseDataBefore, caseData, MID, pageId);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("servedDocumentFiles")
+                .extracting("particularsOfClaimText")
+                .isEqualTo("Some text about the claim");
         }
     }
 
@@ -345,7 +476,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
-
     }
 
     @Nested

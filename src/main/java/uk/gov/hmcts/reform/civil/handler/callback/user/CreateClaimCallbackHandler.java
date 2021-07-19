@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -42,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -96,6 +98,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "claim-type"), this::validateClaimType)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -123,6 +126,25 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errors = onboardingOrganisationControlService.validateOrganisation(userBearerToken);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateClaimType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        if (typeOfClaimHasChanged(callbackParams)) {
+            ServedDocumentFiles servedDocumentFiles = caseData.getServedDocumentFiles().toBuilder()
+                .particularsOfClaimDocument(null)
+                .particularsOfClaimText(null)
+                .build();
+
+            caseData = caseData.toBuilder()
+                .servedDocumentFiles(servedDocumentFiles)
+                .build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -324,5 +346,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private boolean typeOfClaimHasChanged(CallbackParams callbackParams) {
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        CaseData caseData = callbackParams.getCaseData();
+
+        if (caseDataBefore.getClaimType() == null) {
+            return false;
+        } else {
+            return ! Objects.equals(caseDataBefore.getClaimType(), caseData.getClaimType());
+        }
     }
 }

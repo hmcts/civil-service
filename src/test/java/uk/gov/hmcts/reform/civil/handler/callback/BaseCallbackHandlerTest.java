@@ -52,25 +52,32 @@ public abstract class BaseCallbackHandlerTest {
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type) {
-        return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(null, caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(CallbackVersion version, CaseData caseData, CallbackType type) {
-        return callbackParamsOf(caseData, type, version, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(null, caseData, type, version, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, String pageId) {
-        return callbackParamsOf(caseData, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(null, caseData, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseDataBefore, CaseData caseData, CallbackType type,
+                                           String pageId) {
+        return callbackParamsOf(caseDataBefore, caseData, type, null, pageId,
+                                Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(CallbackVersion version,
                                            CaseData caseData,
                                            CallbackType type,
                                            String pageId) {
-        return callbackParamsOf(caseData, type, version, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(null, caseData, type, version, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
-    public CallbackParams callbackParamsOf(CaseData caseData,
+    public CallbackParams callbackParamsOf(CaseData caseDataBefore,
+                                           CaseData caseData,
                                            CallbackType type,
                                            CallbackVersion version,
                                            String pageId,
@@ -82,6 +89,7 @@ public abstract class BaseCallbackHandlerTest {
             .request(CallbackRequest.builder()
                          .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
+            .caseDataBefore(caseDataBefore)
             .caseData(caseData)
             .version(version)
             .params(params)

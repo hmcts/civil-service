@@ -61,6 +61,7 @@ public class CallbackController {
             .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
+            .caseDataBefore(caseDetailsConverter.toCaseData(callback.getCaseDetailsBefore()))
             .caseData(caseDetailsConverter.toCaseData(callback.getCaseDetails()))
             .build();
 
