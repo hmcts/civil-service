@@ -32,7 +32,7 @@ public class CaseNoteService {
 
     public List<Element<CaseNote>> addNoteToList(CaseNote caseNote, List<Element<CaseNote>> caseNotes) {
         List<Element<CaseNote>> updatedCaseNotes = ofNullable(caseNotes).orElse(newArrayList());
-        updatedCaseNotes.add(element(caseNote));
+        updatedCaseNotes.add(0, element(caseNote));
 
         return updatedCaseNotes;
     }
