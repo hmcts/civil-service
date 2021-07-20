@@ -73,14 +73,14 @@ class CaseNoteServiceTest {
     }
 
     @Test
-    void shouldAddNoteToListWithNewestAtBottom_WhenExistingNotes() {
+    void shouldAddNoteToListWithNewestAtTop_WhenExistingNotes() {
         LocalDate today = LocalDate.now();
         CaseNote newNote = caseNoteWithDate(today);
         CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(newNote, wrapElements(oldNote));
 
-        assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(oldNote, newNote));
+        assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(newNote, oldNote));
     }
 
     private CaseNote caseNoteForToday(String note) {
