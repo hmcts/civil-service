@@ -153,6 +153,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
+    protected LocalDateTime respondent1LitigationFriendDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -946,6 +947,7 @@ public class CaseDataBuilder {
             .hasSameAddressAsLitigant(YES)
             .certificateOfSuitability(List.of())
             .build();
+        this.respondent1LitigationFriendDate = LocalDateTime.now();
         return this;
     }
 
@@ -1011,6 +1013,7 @@ public class CaseDataBuilder {
             .addRespondent2(addRespondent2)
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             .respondent1LitigationFriend(respondent1LitigationFriend)
+            .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)
