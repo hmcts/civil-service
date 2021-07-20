@@ -65,7 +65,7 @@ class CaseNoteServiceTest {
     }
 
     @Test
-    void shouldAddNoteTolist_WhenEmptyList() {
+    void shouldAddNoteToList_WhenEmptyList() {
         CaseNote caseNote = caseNoteForToday("new note");
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, new ArrayList<>());
 
