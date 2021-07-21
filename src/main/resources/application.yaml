@@ -71,14 +71,14 @@ nonworking-days:
 civil:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
   system-update:
-    username: 'civil-system-update@mailnesia.com'
-    password: 'Password12!'
+    username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
+    password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
   prd-admin:
-    username: 'civil.prd.admin@example.com'
-    password: 'Password12!'
+    username: ${CIVIL_PRD_ADMIN_USERNAME:civil.prd.admin@example.com}
+    password: ${CIVIL_PRD_ADMIN_PASSWORD:Password12!}
   cross-access:
-    username: 'caseworker-caa@mailnesia.com'
-    password: 'Password12!'
+    username: ${CIVIL_CROSS_ACCESS_USERNAME:caseworker-caa@mailnesia.com}
+    password: ${CIVIL_CROSS_ACCESS_PASSWORD:Password12!}
 
 core_case_data:
   api:

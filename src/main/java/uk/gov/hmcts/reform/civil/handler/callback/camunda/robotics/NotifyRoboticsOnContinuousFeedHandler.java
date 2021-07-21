@@ -12,25 +12,21 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
 
 @Service
-public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHandler {
+public class NotifyRoboticsOnContinuousFeedHandler extends NotifyRoboticsHandler {
 
-    public NotifyRoboticsOnCaseHandedOfflineHandler(
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RPA_ON_CONTINUOUS_FEED);
+    public static final String TASK_ID = "NotifyRoboticsOnContinuousFeed";
+
+    public NotifyRoboticsOnContinuousFeedHandler(
         RoboticsNotificationService roboticsNotificationService,
         JsonSchemaValidationService jsonSchemaValidationService,
         RoboticsDataMapper roboticsDataMapper
     ) {
         super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper);
     }
-
-    private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
-        RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE
-    );
-    public static final String TASK_ID = "NotifyRoboticsOnCaseHandedOffline";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -48,4 +44,5 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
 }

@@ -66,8 +66,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
-            .put(callbackKey(MID, "experts"), this::validateRespondentDqExperts)
-            .put(callbackKey(MID, "witnesses"), this::validateRespondentDqWitnesses)
+            .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
@@ -85,6 +85,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
+    }
+
+    private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+    }
+
+    private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {

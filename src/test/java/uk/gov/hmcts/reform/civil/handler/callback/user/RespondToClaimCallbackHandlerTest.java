@@ -452,7 +452,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
                         caseData,
                         ABOUT_TO_SUBMIT
                     ));

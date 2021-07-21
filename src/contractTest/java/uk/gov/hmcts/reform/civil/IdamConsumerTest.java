@@ -156,8 +156,8 @@ public class IdamConsumerTest {
             + " \"client_secret\": \"some_client_secret\","
             + " \"redirect_uri\": \"/oauth2redirect\","
             + " \"scope\": \"openid roles profile\","
-            + " \"username\": \"username\","
-            + " \"password\": \"pwd\"\n"
+            + " \"username\": \"some-name\","
+            + " \"password\": \"some-password\"\n"
             + " }";
     }
 }

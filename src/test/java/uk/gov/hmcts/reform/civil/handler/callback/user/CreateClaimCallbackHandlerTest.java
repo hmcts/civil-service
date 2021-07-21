@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -65,7 +66,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -90,7 +90,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     OrgPolicyValidator.class,
     StateFlowEngine.class,
     PostcodeValidator.class,
-    InterestCalculator.class},
+    InterestCalculator.class,
+    StateFlowEngine.class,
+    ValidateEmailService.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -122,6 +124,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @Autowired
+    private ValidateEmailService validateEmailService;
 
     @Autowired
     private CreateClaimCallbackHandler handler;
@@ -717,6 +722,91 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class ValidateEmails {
+
+        @Nested
+        class ClaimantRepEmail {
+
+            @Test
+            void shouldReturnNoErrors_whenIdamEmailIsCorrect() {
+                CaseData caseData = CaseData.builder()
+                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(YES).build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).isNull();
+            }
+
+            @Test
+            void shouldReturnNoErrors_whenIdamEmailIsNotCorrectButAdditionalEmailIsValid() {
+                String validEmail = "john@example.com";
+
+                CaseData caseData = CaseData.builder()
+                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(NO).build())
+                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnErrors_whenIdamEmailIsNotCorrectAndAdditionalEmailIsInvalid() {
+                String invalidEmail = "a@a";
+
+                CaseData caseData = CaseData.builder()
+                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(NO).build())
+                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(invalidEmail).build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
+                                                                     + " for example john.smith@example.com");
+            }
+        }
+
+        @Nested
+        class DefendantRepEmail {
+
+            @Test
+            void shouldReturnNoErrors_whenEmailIsValid() {
+                String validEmail = "john@example.com";
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor1EmailAddress(validEmail)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "validate-defendant-legal-rep-email");
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnErrors_whenEmailIsInvalid() {
+                String invalidEmail = "a@a";
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor1EmailAddress(invalidEmail)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "validate-defendant-legal-rep-email");
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
+                                                                     + " for example john.smith@example.com");
+            }
+
+        }
+    }
+
+    @Nested
     class AboutToSubmitCallback {
 
         private CallbackParams params;
@@ -860,7 +950,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
@@ -874,21 +963,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .extracting("name", "role")
                     .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldKeepApplicantStatementOfTruth_whenNotV_1Callback() {
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData())
-                    .extracting("applicantSolicitor1ClaimStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("Signer Name", "Signer Role");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .isNull();
             }
         }
     }
@@ -936,8 +1010,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID))
-                    + exitSurveyContentService.applicantSurvey();
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
