@@ -146,6 +146,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
+            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateRespondentSolicitorAddress)
+            .put(callbackKey(MID, "specRespondentCorrespondenceAddress"),
+                 this::validateRespondentSolicitorAddress)
             .build();
     }
 
@@ -536,8 +539,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
-         //   .totalInterest(interest);
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
+            .totalInterest(interest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
