@@ -148,9 +148,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
-            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateRespondentSolicitorAddress)
+            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "specRespondentCorrespondenceAddress"),
-                 this::validateRespondentSolicitorAddress)
+                 this::validateCorrespondenceRespondentAddress)
             .build();
     }
 
@@ -453,6 +453,44 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
+                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                    caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
+                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                    caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .build();
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
