@@ -2,7 +2,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
@@ -85,20 +90,23 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                                              ? caseData.getInterestClaimOptions().getDescription() : null)
             .interestRate(caseData.getSameRateInterestSelection() != null
-                              ? caseData.getSameRateInterestSelection().getDifferentRate() != null ?
-                caseData.getSameRateInterestSelection().getDifferentRate() + "" :
+                              ? caseData.getSameRateInterestSelection().getDifferentRate() != null
+                ? caseData.getSameRateInterestSelection().getDifferentRate() + "" :
                 "8" : null)
             .interestExplanationText(caseData.getSameRateInterestSelection() != null
-                ? caseData.getSameRateInterestSelection().getDifferentRate() != null
+                                         ? caseData.getSameRateInterestSelection().getDifferentRate() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRateReason()
                 : "The claimant reserves the right to claim interest under "
                 + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
-                  ? caseData.getInterestFromSpecificDate() :
-                  (isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
+                                  ? caseData.getInterestFromSpecificDate() :
+                                  (isAfterFourPM()
+                                      ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
-                ? caseData.getInterestClaimFrom().name().equals("FROM_CLAIM_SUBMIT_DATE")
-                ? "From the date the claim was issued" : caseData.getInterestFromSpecificDateDescription() : null)
+                                                ? caseData.getInterestClaimFrom().name()
+                .equals("FROM_CLAIM_SUBMIT_DATE")
+                ? "From the date the claim was issued"
+                : caseData.getInterestFromSpecificDateDescription() : null)
             .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
                                             ? caseData.getBreakDownInterestDescription() + "" : null)
@@ -109,10 +117,12 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                           .toString())
             // Claim amount + interest + claim fees
             .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
-              .add(interest)
-              .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString()
-              : caseData.getTotalClaimAmount()
-              .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
+                .add(interest)
+                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee()
+                                                             .getCalculatedAmountInPence())).toString()
+                                    : caseData.getTotalClaimAmount()
+                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee()
+                                                             .getCalculatedAmountInPence())).toString())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
@@ -122,8 +132,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getResponseDedline(CaseData caseData) {
-        var notificationDeadline = formatLocalDate(deadlinesCalculator
-                                                 .calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)), DATE);
+        var notificationDeadline = formatLocalDate(
+            deadlinesCalculator
+                .calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)),
+            DATE
+        );
         return END_OF_BUSINESS_DAY + notificationDeadline;
     }
 
@@ -161,8 +174,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             List<ClaimAmountBreakupDetails> claimAmountBreakupDetails = new ArrayList<ClaimAmountBreakupDetails>();
             for (int index = 0; index < claimAmountBreakup.size(); index++) {
                 ClaimAmountBreakupDetails claimAmountBreakupDetail
-                    = new ClaimAmountBreakupDetails(MonetaryConversions.penniesToPounds(claimAmountBreakup.get(index)
-                     .getValue().getClaimAmount()),
+                    = new ClaimAmountBreakupDetails(
+                    MonetaryConversions.penniesToPounds(claimAmountBreakup.get(index)
+                                                            .getValue().getClaimAmount()),
                     claimAmountBreakup.get(index).getValue().getClaimReason()
                 );
                 claimAmountBreakupDetails.add(index, claimAmountBreakupDetail);
@@ -179,7 +193,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .representative(representativeService.getApplicantRepresentative(caseData))
-                           .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null ? applicant.getIndividualDateOfBirth() : null)
+                           .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null
+                                                      ? applicant.getIndividualDateOfBirth() : null)
                            .build());
     }
 

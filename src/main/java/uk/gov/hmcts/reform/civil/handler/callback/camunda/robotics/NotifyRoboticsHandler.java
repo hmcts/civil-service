@@ -14,10 +14,12 @@ import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
@@ -25,13 +27,23 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final RoboticsNotificationService roboticsNotificationService;
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
+        RoboticsCaseData roboticsCaseData = null;
+        Set<ValidationMessage> errors = null;
+
         CaseData caseData = callbackParams.getCaseData();
 
         try {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            Set<ValidationMessage> errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
+            if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+                roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validateWithSpecSchema(roboticsCaseData.toJsonString());
+            } else {
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
+            }
+
             if (errors.isEmpty()) {
                 roboticsNotificationService.notifyRobotics(caseData);
             } else {

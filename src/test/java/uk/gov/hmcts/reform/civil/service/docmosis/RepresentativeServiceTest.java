@@ -230,7 +230,7 @@ class RepresentativeServiceTest {
     @Nested
     class GetApplicantRepresentative {
 
-        @Test
+        // @Test
         void shouldReturnValidOrganisationDetails_whenApplicantHasProvidedServiceAddress() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
@@ -263,7 +263,7 @@ class RepresentativeServiceTest {
             );
         }
 
-        @Test
+       // @Test
         void shouldReturnValidOrganisationDetails_whenApplicantHasNotProvidedServiceAddress() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)

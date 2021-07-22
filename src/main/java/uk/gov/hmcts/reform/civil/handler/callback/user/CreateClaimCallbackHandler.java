@@ -63,6 +63,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -166,16 +168,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = caseData.getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        caseDataBuilder.superClaimType(UNSPEC_CLAIM);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getApplicant1().getPrimaryAddress().getPostCode());
+            caseDataBuilder.superClaimType(SPEC_CLAIM);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .data(errors.size() == 0
+                      ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -553,8 +560,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
-         //   .totalInterest(interest);
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
+            .totalInterest(interest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
