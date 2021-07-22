@@ -11,9 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT_SPEC;
@@ -28,6 +31,7 @@ public class FailedPaymentApplicantForSpecNotificationHandler extends CallbackHa
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,9 +65,17 @@ public class FailedPaymentApplicantForSpecNotificationHandler extends CallbackHa
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                .getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
+    }
+
+    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }

@@ -2,7 +2,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
@@ -85,8 +90,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                                              ? caseData.getInterestClaimOptions().getDescription() : null)
             .interestRate(caseData.getSameRateInterestSelection() != null
-                              ? caseData.getSameRateInterestSelection().getDifferentRate() != null ?
-                caseData.getSameRateInterestSelection().getDifferentRate() + "" :
+                ? caseData.getSameRateInterestSelection().getDifferentRate() != null
+                ? caseData.getSameRateInterestSelection().getDifferentRate() + "" :
                 "8" : null)
             .interestExplanationText(caseData.getSameRateInterestSelection() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() != null
@@ -179,7 +184,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                            .name(applicant.getPartyName())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .representative(representativeService.getApplicantRepresentative(caseData))
-                           .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null ? applicant.getIndividualDateOfBirth() : null)
+                           .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null
+                                                      ? applicant.getIndividualDateOfBirth() : null)
                            .build());
     }
 

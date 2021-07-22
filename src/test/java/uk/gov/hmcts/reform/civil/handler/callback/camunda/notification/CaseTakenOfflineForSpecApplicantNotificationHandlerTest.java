@@ -15,9 +15,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -35,6 +39,8 @@ class CaseTakenOfflineForSpecApplicantNotificationHandlerTest extends BaseCallba
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
+    @MockBean
+    private OrganisationService organisationService;
     @Autowired
     private CaseTakenOfflineForSpecApplicantNotificationHandler handler;
 
@@ -44,6 +50,8 @@ class CaseTakenOfflineForSpecApplicantNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSolicitorCaseTakenOfflineForSpec()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         }
 
         @Test
