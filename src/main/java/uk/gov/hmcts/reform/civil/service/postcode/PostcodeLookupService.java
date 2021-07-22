@@ -100,6 +100,7 @@ public class PostcodeLookupService {
 
         } catch (Exception e) {
             LOG.error("Postcode Lookup Failed - ", e.getMessage());
+            throw new RuntimeException(e);
         }
         return countryName;
     }
