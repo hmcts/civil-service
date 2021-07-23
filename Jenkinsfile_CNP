@@ -89,17 +89,8 @@ withPipeline(type, product, component) {
       eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-nonprod.json"
-    """
-
-    dir("${WORKSPACE}/build") {
-      steps.archiveArtifacts artifacts: "ccd-development-config/ccd-civil-dev.xlsx"
-    }
-
-    sh """
-      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-      ./bin/utils/ccd-import-definition.sh ${WORKSPACE}/build/ccd-release-config/civil-ccd-dev.xlsx
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
+      ./bin/import-ccd-definition.sh "-e *-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
     """
 
