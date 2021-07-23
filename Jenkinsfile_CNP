@@ -94,6 +94,15 @@ withPipeline(type, product, component) {
       ./bin/import-bpmn-diagram.sh .
     """
 
+    dir("${WORKSPACE}/build") {
+      steps.archiveArtifacts artifacts: "ccd-release-config/civil-ccd-dev.xlsx"
+    }
+
+    sh """
+      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/utils/ccd-import-definition.sh ${WORKSPACE}/build/ccd-release-config/civil-ccd-dev.xlsx
+    """
+    
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.CIVIL_SERVICE_URL="http://civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
