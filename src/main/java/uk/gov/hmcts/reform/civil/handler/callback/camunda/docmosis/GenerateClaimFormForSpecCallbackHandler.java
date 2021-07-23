@@ -61,8 +61,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             .respondent1Represented(YES)
             .respondent1(caseData.getApplicant1())
             .respondent1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
-            .claimDismissedDate(null)
-            .respondent1OrgRegistered(YES);
+            .claimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString());

@@ -19,21 +19,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE_SPEC;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends CallbackHandler
-    implements NotificationData {
+public class CaseTakenOfflineForSpecApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
-    public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyApplicantSolicitor1ForSpec";
-    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE_SPEC);
+
+    public static final String TASK_ID = "TakeCaseOfflineForSpecNotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "case-taken-offline-spec-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -42,7 +37,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForClaimContinuingOnline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseTakenOffline
         );
     }
 
@@ -56,29 +51,24 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
-
+    private CallbackResponse notifyApplicantSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec(),
+            notificationsProperties.getSolicitorCaseTakenOfflineForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                .getOrganisation().getOrganisationID(), caseData)
         );
     }
 
