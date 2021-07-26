@@ -150,6 +150,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
+            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+            .put(callbackKey(MID, "specRespondentCorrespondenceAddress"),
+                 this::validateCorrespondenceRespondentAddress)
+            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .build();
     }
 
@@ -462,6 +466,44 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
+                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                    caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
+                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                    caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
     //calculate total amount for specified claim by adding up the claim break up amounts
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
 
@@ -590,5 +632,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validateEmailService.validate(caseData.getSpecRespondentSolicitor1EmailAddress()))
+            .build();
     }
 }

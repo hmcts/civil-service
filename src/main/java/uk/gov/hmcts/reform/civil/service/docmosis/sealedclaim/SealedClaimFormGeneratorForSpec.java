@@ -90,7 +90,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                                              ? caseData.getInterestClaimOptions().getDescription() : null)
             .interestRate(caseData.getSameRateInterestSelection() != null
-                              ? caseData.getSameRateInterestSelection().getDifferentRate() != null
+                ? caseData.getSameRateInterestSelection().getDifferentRate() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() + "" :
                 "8" : null)
             .interestExplanationText(caseData.getSameRateInterestSelection() != null

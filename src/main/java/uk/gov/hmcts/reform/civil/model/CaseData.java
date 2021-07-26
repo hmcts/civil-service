@@ -92,6 +92,10 @@ public class CaseData implements MappableObject {
     private final SupportingDocuments specClaimTemplateDocumentFiles;
     private final SupportingDocuments specClaimDetailsDocumentFiles;
     private final List<Evidence> speclistYourEvidenceList;
+    private final YesOrNo specApplicantCorrespondenceAddressRequired;
+    private final Address specApplicantCorrespondenceAddressdetails;
+    private final YesOrNo specRespondentCorrespondenceAddressRequired;
+    private final Address specRespondentCorrespondenceAddressdetails;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
@@ -117,6 +121,7 @@ public class CaseData implements MappableObject {
     private final LocalDate interestFromSpecificDate;
     private final String interestFromSpecificDateDescription;
     private final String calculatedInterest;
+    private final String specRespondentSolicitor1EmailAddress;
 
     @Valid
     private final CloseClaim withdrawClaim;
