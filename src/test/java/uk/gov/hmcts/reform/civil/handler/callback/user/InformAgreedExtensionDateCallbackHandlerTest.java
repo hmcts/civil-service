@@ -304,6 +304,31 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .doesNotContainKey("businessProcess");
         }
+
+        @Test
+        void shouldUpdateBothRespondentResponseDeadlinesToExtensionDate_whenSolicitorRepresentingBothRespondents() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            LocalDateTime newDeadline = extensionDateRespondent1.atTime(END_OF_BUSINESS_DAY);
+
+            assertThat(response.getData())
+                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+        }
     }
 
     @Nested
