@@ -303,7 +303,7 @@ public class StateFlowEngine {
     }
 
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
-        return evaluate(caseDetailsConverter.toCaseData(caseDetails));
+        return buildSpec().evaluate(caseDetailsConverter.toCaseData(caseDetails));
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
