@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -12,8 +13,10 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +39,8 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,6 +61,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     private CallbackResponse notifyRespondentSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime claimNotificationDate = time.now();
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+        //TODO - update target email once mapping is completed
         notificationService.sendMail(
             "civilmoneyclaimsdemo@gmail.com",
             notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
@@ -63,7 +72,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     @Override
@@ -72,7 +83,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDate()
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                      .toLocalDate(), DATE)
         );
     }
