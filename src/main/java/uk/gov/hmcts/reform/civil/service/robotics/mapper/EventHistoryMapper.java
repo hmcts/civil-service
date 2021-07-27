@@ -56,6 +56,9 @@ public class EventHistoryMapper {
                     case CLAIM_NOTIFIED:
                         buildClaimantHasNotifiedDefendant(builder, caseData);
                         break;
+                    case CLAIM_DETAILS_NOTIFIED:
+                        buildClaimDetailsNotified(builder, caseData);
+                        break;
                     case NOTIFICATION_ACKNOWLEDGED:
                         buildAcknowledgementOfServiceReceived(builder, caseData);
                         break;
@@ -112,6 +115,22 @@ public class EventHistoryMapper {
             });
 
         return builder.build();
+    }
+
+    private void buildClaimDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isRpaContinuousFeedEnabled()) {
+            String miscText = "Claim details notified.";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate().format(ISO_DATE))
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
     }
 
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

@@ -35,7 +35,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRoboticsForCaseHandedOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRobotics
         );
     }
 

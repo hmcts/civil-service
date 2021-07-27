@@ -27,12 +27,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,21 +55,6 @@ import static uk.gov.hmcts.reform.civil.matcher.IsValidJson.validateJson;
 })
 class RpaConsumerTest extends BaseRpaTest {
 
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY A")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
-
     @Autowired
     RoboticsDataMapper roboticsDataMapper;
 
@@ -84,11 +65,11 @@ class RpaConsumerTest extends BaseRpaTest {
     @MockBean
     AuthTokenGenerator authTokenGenerator;
     @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
     IdamClient idamClient;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {

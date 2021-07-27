@@ -253,4 +253,12 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
+
+    public CaseDataMaxEdgeCasesBuilder atStateNotificationAcknowledgedTimeExtensionMaximumData() {
+        atStateNotificationAcknowledgedWithMaximumData();
+        respondent1TimeExtensionDate = LocalDateTime.now();
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
 }

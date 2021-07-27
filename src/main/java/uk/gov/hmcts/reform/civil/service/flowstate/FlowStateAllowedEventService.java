@@ -255,19 +255,19 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of()
+            List.of(TAKE_CASE_OFFLINE)
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of()
+            List.of(DISMISS_CLAIM)
         ),
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of()
+            List.of(DISMISS_CLAIM)
         ),
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of()
+            List.of(DISMISS_CLAIM)
         )
     );
 

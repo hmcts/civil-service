@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.math.BigDecimal.TEN;
@@ -119,11 +120,28 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAwaitingCaseNotificationWithMinimalData() {
+    public CaseDataMinEdgeCasesBuilder atStateAwaitingCaseNotificationWithMinimalData() {
         atStatePaymentSuccessfulWithMinimalData();
         ccdState = CASE_ISSUED;
         issueDate = CLAIM_ISSUED_DATE;
         claimNotificationDeadline = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimNotifiedWithMinimumData() {
+        atStateClaimIssuedWithMinimalData();
+        claimNotificationDate = LocalDate.now().atStartOfDay();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateClaimDetailsNotifiedWithMinimumData() {
+        atStateClaimNotifiedWithMinimumData();
+        claimDetailsNotificationDate = LocalDateTime.now();
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
 
@@ -240,6 +258,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = LocalDateTime.now();
         ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateNotificationAcknowledgedTimeExtensionMinimalData() {
+        atStateServiceAcknowledgeWithMinimalData();
+        respondent1TimeExtensionDate = LocalDateTime.now();
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
 }

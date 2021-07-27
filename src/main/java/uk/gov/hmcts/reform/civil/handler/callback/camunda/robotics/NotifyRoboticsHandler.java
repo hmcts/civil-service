@@ -26,7 +26,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
 
-    protected CallbackResponse notifyRoboticsForCaseHandedOffline(CallbackParams callbackParams) {
+    protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         try {
