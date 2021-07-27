@@ -153,6 +153,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "specRespondentCorrespondenceAddress"),
                  this::validateCorrespondenceRespondentAddress)
+            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .build();
     }
 
@@ -631,5 +632,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validateEmailService.validate(caseData.getSpecRespondentSolicitor1EmailAddress()))
+            .build();
     }
 }

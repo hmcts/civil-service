@@ -121,6 +121,7 @@ public class CaseData implements MappableObject {
     private final LocalDate interestFromSpecificDate;
     private final String interestFromSpecificDateDescription;
     private final String calculatedInterest;
+    private final String specRespondentSolicitor1EmailAddress;
 
     @Valid
     private final CloseClaim withdrawClaim;
