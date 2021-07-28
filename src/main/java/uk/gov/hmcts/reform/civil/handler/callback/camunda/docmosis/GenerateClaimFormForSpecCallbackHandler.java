@@ -57,7 +57,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
-            // .respondent1Represented(YES)
+            .respondent1Represented(YES)
             .respondent1(caseData.getApplicant1())
             .respondent1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
             .claimDismissedDate(null);
