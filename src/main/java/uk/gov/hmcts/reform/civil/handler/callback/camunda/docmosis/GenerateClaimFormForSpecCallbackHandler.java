@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 
@@ -36,6 +37,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -56,8 +58,9 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
-            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
-            // .respondent1Represented(YES)
+            .respondent1ResponseDeadline(
+                deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
+            .respondent1Represented(YES)
             .respondent1(caseData.getApplicant1())
             .respondent1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
             .claimDismissedDate(null);
