@@ -125,13 +125,13 @@ class FlowStateAllowedEventServiceTest {
             return Stream.of(
                 of(
                     DRAFT,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CREATE_CLAIM
                     }
                 ),
                 of(
                     CLAIM_ISSUED_PAYMENT_FAILED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         RESUBMIT_CLAIM,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
@@ -140,7 +140,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_ISSUED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         NOTIFY_DEFENDANT_OF_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
@@ -153,7 +153,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_NOTIFIED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
@@ -166,7 +166,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_DETAILS_NOTIFIED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         INFORM_AGREED_EXTENSION_DATE,
@@ -180,7 +180,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -193,7 +193,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -206,7 +206,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -218,7 +218,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     FULL_DEFENCE,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CLAIMANT_RESPONSE,
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -230,7 +230,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     FULL_ADMISSION,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
@@ -240,7 +240,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     PART_ADMISSION,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
@@ -250,7 +250,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     COUNTER_CLAIM,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
@@ -260,7 +260,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     FULL_DEFENCE_PROCEED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
@@ -270,7 +270,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     FULL_DEFENCE_NOT_PROCEED,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
@@ -280,31 +280,39 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
-                    new CaseEvent[] {}
+                    new CaseEvent[]{
+                        TAKE_CASE_OFFLINE
+                    }
                 ),
                 of(
                     PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
-                    new CaseEvent[] {}
+                    new CaseEvent[]{
+                        DISMISS_CLAIM
+                    }
                 ),
                 of(
                     PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
-                    new CaseEvent[] {}
+                    new CaseEvent[]{
+                        DISMISS_CLAIM
+                    }
                 ),
                 of(
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
-                    new CaseEvent[] {}
+                    new CaseEvent[]{
+                        DISMISS_CLAIM
+                    }
                 )
             );
         }
@@ -354,15 +362,15 @@ class FlowStateAllowedEventServiceTest {
         @SneakyThrows
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
-                of(CREATE_CLAIM, new String[] {DRAFT.fullName()}),
-                of(RESUBMIT_CLAIM, new String[] {CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
-                of(ACKNOWLEDGE_CLAIM, new String[] {CLAIM_DETAILS_NOTIFIED.fullName(),
+                of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
+                of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
+                of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()}),
-                of(NOTIFY_DEFENDANT_OF_CLAIM, new String[] {CLAIM_ISSUED.fullName()}),
-                of(CLAIMANT_RESPONSE, new String[] {FULL_DEFENCE.fullName()}),
+                of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),
+                of(CLAIMANT_RESPONSE, new String[]{FULL_DEFENCE.fullName()}),
                 of(
                     DEFENDANT_RESPONSE,
-                    new String[] {NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    new String[]{NOTIFICATION_ACKNOWLEDGED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
@@ -370,7 +378,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     WITHDRAW_CLAIM,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED.fullName(),
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
@@ -381,7 +389,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     DISCONTINUE_CLAIM,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED.fullName(),
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
@@ -392,7 +400,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CASE_PROCEEDS_IN_CASEMAN,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
@@ -406,7 +414,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     ADD_DEFENDANT_LITIGATION_FRIEND,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
@@ -417,14 +425,14 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()}
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()}
                 ),
-                of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[] {CLAIM_NOTIFIED.fullName()}),
-                of(INFORM_AGREED_EXTENSION_DATE, new String[] {CLAIM_DETAILS_NOTIFIED.fullName(),
+                of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[]{CLAIM_NOTIFIED.fullName()}),
+                of(INFORM_AGREED_EXTENSION_DATE, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED.fullName()}),
                 of(
                     AMEND_PARTY_DETAILS,
-                    new String[] {CLAIM_ISSUED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
+                    new String[]{CLAIM_ISSUED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
                         CLAIM_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
@@ -517,7 +525,8 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(false, CaseDetailsBuilder.builder().atStateProceedsOffline().build(), AMEND_PARTY_DETAILS),
                 of(true, CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build(),
-                   AMEND_PARTY_DETAILS)
+                   AMEND_PARTY_DETAILS
+                )
             );
         }
     }
