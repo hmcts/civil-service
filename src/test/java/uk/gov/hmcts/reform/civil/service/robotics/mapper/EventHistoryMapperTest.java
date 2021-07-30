@@ -1864,6 +1864,69 @@ class EventHistoryMapperTest {
         }
     }
 
+    @Nested
+    class Respondent1LitigationFriendRpaContinuousFeed {
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenRespondent1LitigationFriend() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified()
+                .addRespondentLitigationFriend()
+                .build();
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event respondent1LitigationFriendEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1LitigationFriendDate().format(ISO_DATE))
+                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Litigation friend added for respondent.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, respondent1LitigationFriendEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
             eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
