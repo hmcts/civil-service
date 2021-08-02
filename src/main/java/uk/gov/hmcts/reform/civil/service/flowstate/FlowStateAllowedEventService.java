@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
@@ -70,7 +71,8 @@ public class FlowStateAllowedEventService {
                 RESUBMIT_CLAIM,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -84,7 +86,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
-                WITHDRAW_CLAIM
+                WITHDRAW_CLAIM,
+                ADD_CASE_NOTE
                 )
         ),
 
@@ -98,7 +101,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
-                WITHDRAW_CLAIM
+                WITHDRAW_CLAIM,
+                ADD_CASE_NOTE
                 )
         ),
 
@@ -113,7 +117,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -127,7 +132,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -141,7 +147,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -154,7 +161,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -167,7 +175,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -178,7 +187,8 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -189,7 +199,8 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -200,7 +211,8 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -211,7 +223,8 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -222,16 +235,23 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
-            List.of(CASE_PROCEEDS_IN_CASEMAN)
+            List.of(
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
+            )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
-            List.of(CASE_PROCEEDS_IN_CASEMAN)
+            List.of(
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
+            )
         ),
         entry(
             PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
