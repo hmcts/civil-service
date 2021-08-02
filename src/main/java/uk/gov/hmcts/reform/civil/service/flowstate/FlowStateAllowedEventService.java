@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
@@ -115,6 +116,7 @@ public class FlowStateAllowedEventService {
             CLAIM_DETAILS_NOTIFIED.fullName(),
             List.of(
                 ACKNOWLEDGE_CLAIM,
+                ACKNOWLEDGEMENT_OF_SERVICE,
                 DEFENDANT_RESPONSE,
                 INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -130,6 +132,7 @@ public class FlowStateAllowedEventService {
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
                 ACKNOWLEDGE_CLAIM,
+                ACKNOWLEDGEMENT_OF_SERVICE,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,

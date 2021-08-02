@@ -638,7 +638,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(caseData.getSpecRespondentSolicitor1EmailAddress()))
+            .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
             .build();
     }
 }
