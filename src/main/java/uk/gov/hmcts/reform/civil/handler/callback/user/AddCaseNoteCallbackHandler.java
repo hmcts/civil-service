@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -60,6 +61,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
         CaseData updatedCaseData = caseData.toBuilder()
             .caseNotes(caseNotes)
             .caseNote(null)
+            .businessProcess(BusinessProcess.ready(ADD_CASE_NOTE))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
