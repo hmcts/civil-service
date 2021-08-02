@@ -55,6 +55,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
         caseData.getClaimDetailsNotificationDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
+        caseData.getClaimDetailsNotificationDate() != null
+        && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel() != "Both";
+
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         caseData.getRespondent1AcknowledgeNotificationDate() != null;
 

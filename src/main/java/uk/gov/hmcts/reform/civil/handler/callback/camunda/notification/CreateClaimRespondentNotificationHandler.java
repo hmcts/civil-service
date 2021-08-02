@@ -58,6 +58,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
 
     private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();

@@ -7,6 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -28,11 +29,14 @@ public class DynamicList {
     @JsonProperty("list_items")
     private List<DynamicListElement> listItems;
 
-    public static DynamicList fromList(List<String> list) {
+    public static DynamicList fromList(List<String> list, DynamicListElement defaultValue) {
         List<DynamicListElement> items = list.stream()
             .map(DynamicListElement::dynamicElement)
             .collect(toList());
 
-        return DynamicList.builder().listItems(items).value(DynamicListElement.EMPTY).build();
+        return DynamicList.builder()
+            .listItems(items)
+            .value(nonNull(defaultValue) ? defaultValue : DynamicListElement.EMPTY)
+            .build();
     }
 }

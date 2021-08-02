@@ -154,6 +154,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime respondent1LitigationFriendDate;
+    protected DynamicList defendantSolicitorNotifyClaimOptions;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -387,6 +388,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder uiStatementOfTruth(StatementOfTruth statementOfTruth) {
         this.uiStatementOfTruth = statementOfTruth;
+        return this;
+    }
+
+    public CaseDataBuilder defendantSolicitorNotifyClaimOptions(String defaultValue) {
+        this.defendantSolicitorNotifyClaimOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                    .label(defaultValue)
+                    .build())
+            .build();
         return this;
     }
 
@@ -688,6 +698,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimNotified() {
         atStateClaimIssued();
+        defendantSolicitorNotifyClaimOptions("Both");
         claimNotificationDate = LocalDate.now().atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
@@ -1090,6 +1101,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .isRespondent1(isRespondent1)
+            .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .build();
