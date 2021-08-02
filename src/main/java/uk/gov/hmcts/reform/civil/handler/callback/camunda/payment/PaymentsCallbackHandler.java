@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.ArrayList;
@@ -136,6 +137,8 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             } else {
                 errors.add(ERROR_MESSAGE);
             }
+        } catch (InvalidPaymentRequestException e){
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
