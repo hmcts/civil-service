@@ -343,7 +343,7 @@ dependencies {
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.0'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.1'
 
