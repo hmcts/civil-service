@@ -395,4 +395,60 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
+
+    @Nested
+    class AddRespondentLitigationFriendRpaContinuousFeed {
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenAddRespondentLitigationFriendAndContinuousFeedEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE)
+                .addRespondentLitigationFriend()
+                .legacyCaseReference("100DC019")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when add respondent litigation friend";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenAddRespondentLitigationFriendWithMaximumData() {
+            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionMaximumData()
+                .legacyCaseReference("100DC017")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when add respondent litigation friend - max limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldGeneratePact_whenAddRespondentLitigationFriendWithMinimumData() {
+            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionMinimalData()
+                .legacyCaseReference("100DC018")
+                .build();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+            assertThat(payload, validateJson());
+
+            String description = "Robotics case data when add respondent litigation friend - min limit";
+            PactVerificationResult result = getPactVerificationResult(payload, description);
+
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+    }
 }
