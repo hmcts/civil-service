@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -216,7 +218,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory)
                 .extracting("miscellaneous")
                 .asList()
-                .containsExactly(claimIssuedEvent, claimNotifiedEvent,  claimDetailsNotifiedEvent);
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, claimDetailsNotifiedEvent);
             assertEmptyEvents(
                 eventHistory,
                 "acknowledgementOfServiceReceived",
@@ -1913,6 +1915,74 @@ class EventHistoryMapperTest {
                 .extracting("miscellaneous")
                 .asList()
                 .containsExactly(claimIssuedEvent, claimNotifiedEvent, respondent1LitigationFriendEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
+    class AddCaseNoteContinuousFeed {
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified()
+                .caseNotes(CaseNote.builder()
+                               .createdOn(LocalDate.now())
+                               .createdBy("createdBy")
+                               .note("my note")
+                               .build())
+                .build();
+
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().format(ISO_DATE))
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event caseNoteEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(LocalDate.now().format(ISO_DATE))
+                .eventDetailsText("case note added: my note")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("case note added: my note")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, caseNoteEvent);
             assertEmptyEvents(
                 eventHistory,
                 "acknowledgementOfServiceReceived",
