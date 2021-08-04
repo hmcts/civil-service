@@ -103,6 +103,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
+                ACKNOWLEDGEMENT_OF_SERVICE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,

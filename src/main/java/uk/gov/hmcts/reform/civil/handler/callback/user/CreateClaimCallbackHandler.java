@@ -358,6 +358,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            var respondent1Represented = caseData.getSpecRespondent1Represented();
+            dataBuilder.respondent1Represented(respondent1Represented);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
