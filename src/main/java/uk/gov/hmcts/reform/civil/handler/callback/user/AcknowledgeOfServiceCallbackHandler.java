@@ -27,7 +27,6 @@ import java.util.Map;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -118,7 +117,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -137,7 +136,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
             .respondent1(updatedRespondent1)
             .respondent1Copy(null)
             .build();
