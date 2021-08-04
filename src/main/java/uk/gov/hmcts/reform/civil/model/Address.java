@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class Address {
 
@@ -22,6 +22,19 @@ public class Address {
     private final String county;
     private final String country;
     private final String postCode;
+
+    @JsonIgnore
+    public static Address fromContactInformation(ContactInformation contactInformation) {
+        return Address.builder()
+            .addressLine1(contactInformation.getAddressLine1())
+            .addressLine2(contactInformation.getAddressLine2())
+            .addressLine3(contactInformation.getAddressLine3())
+            .postTown(contactInformation.getTownCity())
+            .county(contactInformation.getCounty())
+            .country(contactInformation.getCountry())
+            .postCode(contactInformation.getPostCode())
+            .build();
+    }
 
     @JsonIgnore
     public String firstNonNull() {
@@ -76,18 +89,5 @@ public class Address {
             postTown,
             joinNonNull(", ", county, country)
         );
-    }
-
-    @JsonIgnore
-    public static Address fromContactInformation(ContactInformation contactInformation) {
-        return Address.builder()
-            .addressLine1(contactInformation.getAddressLine1())
-            .addressLine2(contactInformation.getAddressLine2())
-            .addressLine3(contactInformation.getAddressLine3())
-            .postTown(contactInformation.getTownCity())
-            .county(contactInformation.getCounty())
-            .country(contactInformation.getCountry())
-            .postCode(contactInformation.getPostCode())
-            .build();
     }
 }
