@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +69,19 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        LocalDateTime dateTime = LocalDateTime.now();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .build();
+        List<String> errors = new ArrayList<>();
+        var responseDedline = caseData.getRespondent1ResponseDeadline();
+        if (dateTime.toLocalDate().isAfter(responseDedline.toLocalDate())) {
+            errors.add("Deadline to file Acknowledgement of Service has passed, option is not available.");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
