@@ -59,24 +59,42 @@ public class AcknowledgeClaimApplicantForSpecNotificationHandler extends Callbac
 
     private CallbackResponse notifyApplicantSolicitorForClaimAcknowledgement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getRespondentSolicitor1EmailAddress()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (isCcNotification(callbackParams)) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec(),
+                addPropertiesForRespondent(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else {
+            notificationService.sendMail(
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                 .getOrganisation().getOrganisationID(), caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+        );
+    }
+
+    public Map<String, String> addPropertiesForRespondent(CaseData caseData) {
+
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
         );
@@ -88,6 +106,7 @@ public class AcknowledgeClaimApplicantForSpecNotificationHandler extends Callbac
     }
 
     public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
