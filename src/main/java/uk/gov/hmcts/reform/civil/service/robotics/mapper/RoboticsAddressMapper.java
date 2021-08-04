@@ -28,7 +28,9 @@ public class RoboticsAddressMapper {
             try {
                 Address alteredAddress = tryToRollOverAddressLines(address);
                 return toNonDefaultRoboticsAddress(alteredAddress);
-            } catch (AddressLineExceedsLengthLimitException ignored) { }
+            } catch (AddressLineExceedsLengthLimitException ignored) {
+                return toDefaultRoboticsAddress(address);
+            }
         }
 
         return toDefaultRoboticsAddress(address);
@@ -77,8 +79,9 @@ public class RoboticsAddressMapper {
     private void tryToRollOverAddressLine(String[] addressLines, int addressLineIndex) {
         String[] addressSplit = addressLines[addressLineIndex].split(", ");
 
-        if (addressSplit.length == 1)
+        if (addressSplit.length == 1) {
             throw new AddressLineExceedsLengthLimitException();
+        }
 
         addressLines[addressLineIndex] = String.join(
             ", ",
@@ -88,7 +91,8 @@ public class RoboticsAddressMapper {
         if (addressLines[addressLineIndex + 1] == null) {
             addressLines[addressLineIndex + 1] = addressSplit[addressSplit.length - 1];
         } else {
-            addressLines[addressLineIndex + 1] = addressSplit[addressSplit.length - 1] + ", " + addressLines[addressLineIndex + 1];
+            addressLines[addressLineIndex + 1] = addressSplit[addressSplit.length - 1] + ", "
+                + addressLines[addressLineIndex + 1];
         }
     }
 
