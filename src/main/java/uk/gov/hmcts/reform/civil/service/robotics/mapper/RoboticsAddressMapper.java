@@ -23,7 +23,7 @@ public class RoboticsAddressMapper {
     public RoboticsAddress toRoboticsAddress(Address address) {
         requireNonNull(address);
 
-        if (address.getAddressLine1().length() > 35
+        if ((address.getAddressLine1() != null && address.getAddressLine1().length() > 35)
             || (address.getAddressLine2() != null && address.getAddressLine2().length() > 35)) {
             try {
                 Address alteredAddress = tryToRollOverAddressLines(address);
