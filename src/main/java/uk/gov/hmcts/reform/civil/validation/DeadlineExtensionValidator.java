@@ -30,4 +30,24 @@ public class DeadlineExtensionValidator {
 
         return emptyList();
     }
+
+    public List<String> specValidateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline, Boolean isAoSApplied) {
+        if (!dateToValidate.isAfter(now())) {
+            return List.of("The agreed extension date must be a date in the future");
+        }
+
+        if (!dateToValidate.isAfter(responseDeadline.toLocalDate())) {
+            return List.of("The agreed extension date must be after the current deadline");
+        }
+
+        if (!isAoSApplied && LocalDateTime.of(dateToValidate, END_OF_BUSINESS_DAY).isAfter(responseDeadline.plusDays(28))) {
+            return List.of("Date must be from claim issue date plus a maximum of 42 days.");
+        }
+
+        if (isAoSApplied && LocalDateTime.of(dateToValidate, END_OF_BUSINESS_DAY).isAfter(responseDeadline.plusDays(28))) {
+            return List.of("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
+        }
+
+        return emptyList();
+    }
 }

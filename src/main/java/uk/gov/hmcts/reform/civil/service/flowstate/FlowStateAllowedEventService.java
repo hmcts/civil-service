@@ -102,6 +102,7 @@ public class FlowStateAllowedEventService {
             CLAIM_NOTIFIED.fullName(),
             List.of(
                 ACKNOWLEDGEMENT_OF_SERVICE,
+                INFORM_AGREED_EXTENSION_DATE,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
