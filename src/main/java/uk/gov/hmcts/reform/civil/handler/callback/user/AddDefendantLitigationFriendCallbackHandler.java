@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::updateBusinessStatusToReady,
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -45,9 +46,10 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         return EVENTS;
     }
 
-    private CallbackResponse updateBusinessStatusToReady(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
+            .respondent1LitigationFriendDate(LocalDateTime.now())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
