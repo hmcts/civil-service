@@ -109,6 +109,7 @@ notifications:
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
   respondentSolicitorAcknowledgeClaimForSpec: "a33e1b0a-42d8-46b2-8773-6fd84a9b8b01"
+  claimantSolicitorAgreedExtensionDateForSpec: "74e33576-487f-4c63-bdef-fe12c4279faa"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
