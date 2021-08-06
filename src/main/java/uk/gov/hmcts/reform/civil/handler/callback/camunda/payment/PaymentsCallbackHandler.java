@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
-            .errors(errors)
+//            .errors(errors)
             .build();
     }
 
@@ -137,13 +137,14 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             } else {
                 errors.add(ERROR_MESSAGE);
             }
-        } catch (InvalidPaymentRequestException e){
-
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            errors = null;
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
-            .errors(errors)
+//            .errors(errors)
             .build();
     }
 

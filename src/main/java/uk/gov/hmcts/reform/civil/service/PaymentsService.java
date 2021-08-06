@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentsService {
@@ -22,7 +24,13 @@ public class PaymentsService {
     private final OrganisationService organisationService;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) {
-        return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
+        try {
+            var response = paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Payment client error " + e.getMessage(), e);
+            throw e;
+        }
     }
 
     private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
