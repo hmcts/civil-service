@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -53,6 +55,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final PostcodeValidator postcodeValidator;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -73,6 +76,26 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+            .build();
+    }
+
+    private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("ACKNOWLEDGEMENT_OF_SERVICE")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
+                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                    caseData.getSpecAoSApplicantCorrespondenceAddressdetails().getPostCode());
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
