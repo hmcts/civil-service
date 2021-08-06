@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
@@ -103,7 +104,11 @@ public class FlowStateAllowedEventService {
             List.of(
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
+<<<<<<< HEAD
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
+=======
+                DEFENDANT_RESPONSE_SPEC,
+>>>>>>> a112830def903405e44a9e737875775ff1be41fb
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
