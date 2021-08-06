@@ -2,6 +2,8 @@
 
 set -eu
 
+echo "${CIVIL_SERVICE_URL}"
+
 selected_service=${@}
 
 echo "params: ${selected_service}"
