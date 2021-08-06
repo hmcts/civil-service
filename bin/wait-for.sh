@@ -2,6 +2,8 @@
 
 set -eu
 
+echo "${CIVIL_SERVICE_URL}"
+
 selected_service=${@}
 
 service_base_urls=${CIVIL_SERVICE_URL}
