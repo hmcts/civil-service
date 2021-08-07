@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -51,21 +52,23 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId() != null
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if ((callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC"))
+            || (callbackParams.getCaseData().getSuperClaimType() != null
+            && callbackParams.getCaseData().getSuperClaimType().equals(SPEC_CLAIM))) {
             CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
                 .build();
             return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
-            .build();
+                .data(caseDataUpdated.toMap(objectMapper))
+                .build();
         } else {
             CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
                 .build();
             return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
-            .build();
+                .data(caseDataUpdated.toMap(objectMapper))
+                .build();
         }
     }
 
