@@ -48,11 +48,14 @@ public class AddressLinesMapper {
 
     private List<String> splitByCommaIfLongerThanLimit(String line) {
         requireNonNull(line);
-        return line.length() > LINE_LIMIT ?
-            Splitter.on(',')
-                .trimResults()
-                .omitEmptyStrings()
-                .splitToList(line) :
-            asList(line);
+        return line.length() > LINE_LIMIT ? splitByLastComma(line) : asList(line);
+    }
+
+    private List<String> splitByLastComma(String line) {
+        List<String> tokens = new ArrayList<>(Splitter.on(',')
+                                                  .omitEmptyStrings()
+                                                  .splitToList(line));
+        String lastToken = tokens.remove(tokens.size() - 1);
+        return asList(String.join(",", tokens), lastToken.trim());
     }
 }
