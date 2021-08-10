@@ -46,6 +46,7 @@ public class CaseData implements MappableObject {
     private final Party respondent1;
     private final Party respondent1Copy;
     private final Party respondent2;
+    private final Party respondent2Copy;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
@@ -88,7 +89,12 @@ public class CaseData implements MappableObject {
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final RespondentResponseType respondent1ClaimResponseType;
+    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
+
+    private final YesOrNo respondentResponseIsSame;
+    private final RespondentResponseType respondent2ClaimResponseType;
+    private final ResponseDocument respondent2ClaimResponseDocument;
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
@@ -144,6 +150,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
+    private final LocalDateTime respondent2ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime applicant1ResponseDate;
     private final LocalDateTime takenOfflineDate;

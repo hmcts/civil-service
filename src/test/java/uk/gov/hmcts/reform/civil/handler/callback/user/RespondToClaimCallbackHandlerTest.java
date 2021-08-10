@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -30,11 +31,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +50,8 @@ import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -52,6 +59,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -69,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
+    StateFlowEngine.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -84,8 +94,17 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CoreCaseUserService coreCaseUserService;
+
+    @Autowired
+    private UserService userService;
+
     @Nested
-    class AboutToStartCallback {
+    class AboutToStartCallbackV1 {
 
         @Test
         void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
@@ -97,6 +116,39 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+        }
+    }
+
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
+        }
+
+        @Test
+        void shouldNotError_WhenNoRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+            assertThat(response.getData().get("respondent2Copy")).isNull();
         }
     }
 
@@ -390,9 +442,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetApplicantResponseDeadline_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
@@ -404,13 +456,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(
-                V_1,
-                caseData,
-                ABOUT_TO_SUBMIT
-            ));
+            CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -457,12 +506,293 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
+                assertThat(response.getData())
+                    .extracting("respondent1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(name, role);
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackV1 {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+
+        @BeforeEach
+        void setup() {
+            when(time.now()).thenReturn(responseDate);
+            when(deadlinesCalculator.calculateApplicantResponseDeadline(
+                any(LocalDateTime.class),
+                any(AllocatedTrack.class)
+            )).thenReturn(deadline);
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        }
+
+        @Test
+        void shouldCopyRespondent1ResponseSetApplicantResponseAndSetBusinessProcess_whenOneRepGivingOneAnswer() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondentResponseIsSame(YES)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("respondent2ClaimResponseType", caseData.getRespondent1ClaimResponseType().toString())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneRepGivingSeparateAnswers() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent2Responds(FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when2ndRepAnsweringAfter1stAlreadyAnswered() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent2Responds(FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", caseData.getRespondent1ResponseDate().format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1stRepAnsweringAfter2ndAlreadyAnswered() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent2Responds(FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDate", caseData.getRespondent2ResponseDate().format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldNotSetApplicantResponseDeadlineAndSetBusinessProcess_when2ndRepAnsweringBefore1stResponds() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateClaimDetailsNotified()
+                .respondent2Responds(FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData()).extracting("respondent1ResponseDate").isNull();
+            assertThat(response.getData()).extracting("respondent2ResponseDate")
+                .isEqualTo(responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData()).extracting("businessProcess").isNull();
+        }
+
+        @Test
+        void shouldNotSetApplicantResponseDeadlineAndSetBusinessProcess_when1stRepAnsweringBefore2ndResponds() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData()).extracting("respondent1ResponseDate")
+                .isEqualTo(responseDate.format(ISO_DATE_TIME));
+            assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
+            assertThat(response.getData()).extracting("businessProcess").isNull();
+        }
+
+        @Test
+        void shouldCopyRespondentPrimaryAddresses_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+            String address = "test address";
+            var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
+            caseData = caseData.toBuilder()
+                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
+                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("respondent1Copy");
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
+        }
+
+        @Test
+        void shouldSetApplicantResponseDeadlineAndBusinessProcess_when1ResponseAndNotMultiparty() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneDefendantRepAnsweringToTwoApplicants() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoApplicants()
+                .atStateClaimDetailsNotified()
+                .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
+                .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when1V1() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                    .build()
+                    .toBuilder()
+                    .respondent1Copy(PartyBuilder.builder().individual().build())
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("respondent1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(name, role);
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
+
+            @Test
+            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when2V1SameRep() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                    .respondent2Responds(FULL_DEFENCE)
+                    .build()
+                    .toBuilder()
+                    .respondent1Copy(PartyBuilder.builder().individual().build())
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                 assertThat(response.getData())
                     .extracting("respondent1DQStatementOfTruth")
