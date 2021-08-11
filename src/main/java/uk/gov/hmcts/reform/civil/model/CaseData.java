@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -127,6 +128,12 @@ public class CaseData implements MappableObject {
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
+
+    private final String detailsOfWhyDoesYouDisputeTheClaim;
+
+    private final ResponseDocument respondent1SpecDefenceResponseDocument;
+
+    private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
 
     @Valid
     private final CloseClaim withdrawClaim;
