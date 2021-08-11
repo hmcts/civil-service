@@ -117,5 +117,16 @@ class AddressLinesMapperTest {
 
             assertThat(result).isEqualTo(address);
         }
+
+        @Test
+        void shouldReturnOriginalAddress_whenLineLongerThanLimitButNoComma() {
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890abcdefghijk12345678901234567890")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).isEqualTo(address);
+        }
     }
 }
