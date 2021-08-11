@@ -14,7 +14,6 @@ import java.util.Map;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -31,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyOneRespondentHasResponded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
@@ -39,7 +39,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
@@ -48,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineDate;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -72,11 +75,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_AP
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_RESPONDENT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 
@@ -134,6 +139,9 @@ public class StateFlowEngine {
                     .onlyIf(counterClaim.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
+                .transitionTo(PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf((respondent1OutOfTime.or(respondent2OutOfTime).and(onlyOneRespondentHasResponded))
+                                .and(not(notificationAcknowledged.or(respondent1TimeExtension))))
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(FULL_DEFENCE)
@@ -147,6 +155,8 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotifiedExtension)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotifiedExtension)
+                .transitionTo(PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf(respondent1OutOfTime.or(respondent2OutOfTime).and(onlyOneRespondentHasResponded))
             .state(NOTIFICATION_ACKNOWLEDGED)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                     .onlyIf(notificationAcknowledged.and(respondent1TimeExtension))
@@ -162,6 +172,9 @@ public class StateFlowEngine {
                     .onlyIf(takenOfflineByStaffAfterNotificationAcknowledged)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledged)
+                .transitionTo(PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf((respondent1OutOfTime.or(respondent2OutOfTime).and(onlyOneRespondentHasResponded))
+                        .and(not(notificationAcknowledged.and(respondent1TimeExtension))))
             .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                 .transitionTo(FULL_DEFENCE)
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullDefence))
@@ -175,6 +188,8 @@ public class StateFlowEngine {
                     .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
+                .transitionTo(PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf(respondent1OutOfTime.or(respondent2OutOfTime).and(onlyOneRespondentHasResponded))
             .state(FULL_DEFENCE)
                 .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
@@ -187,13 +202,15 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
             .state(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
-                    .onlyIf(applicantOutOfTimeProcessedByCamunda)
+                    .onlyIf(takenOfflineDate)
             .state(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
             .state(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(claimDismissedByCamunda)
+            .state(PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                .transitionTo(TAKEN_OFFLINE_PAST_RESPONDENT_RESPONSE_DEADLINE).onlyIf(takenOfflineDate)
             .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
             .state(FULL_ADMISSION)
             .state(PART_ADMISSION)
@@ -206,6 +223,7 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
+            .state(TAKEN_OFFLINE_PAST_RESPONDENT_RESPONSE_DEADLINE)
             .build();
     }
 

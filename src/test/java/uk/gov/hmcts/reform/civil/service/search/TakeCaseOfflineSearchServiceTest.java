@@ -7,8 +7,10 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -20,10 +22,21 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-            .must(boolQuery()
-                      .minimumShouldMatch(1)
-                      .should(matchQuery("state", "AWAITING_APPLICANT_INTENTION")));
+            .minimumShouldMatch(1)
+            .should(boolQuery()
+                        .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))))
+            .should(boolQuery()
+                        .must(termQuery("data.addRespondent2", "Yes"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .should(boolQuery()
+                                    .minimumShouldMatch(1)
+                                    .should(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                                    .should(rangeQuery("data.respondent2ResponseDeadline").lt("now")))
+                        .should(boolQuery()
+                                    .minimumShouldMatch(1)
+                                    .should(existsQuery("data.respondent1ResponseDate"))
+                                    .should(existsQuery("data.respondent2ResponseDate"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }

@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyOneRespondentHasResponded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
@@ -41,7 +42,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
@@ -49,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineDate;
 
 class FlowPredicateTest {
 
@@ -502,7 +506,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondentResponseIsSame(YesOrNo.YES)
+                        .respondentResponseIsSame(YES)
                         .build();
 
                     assertTrue(fullDefence.test(caseData));
@@ -892,13 +896,13 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateTakenOfflinePastApplicantResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
-            assertTrue(applicantOutOfTimeProcessedByCamunda.test(caseData));
+            assertTrue(takenOfflineDate.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefenceAndProceed() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            assertFalse(applicantOutOfTimeProcessedByCamunda.test(caseData));
+            assertFalse(takenOfflineDate.test(caseData));
         }
     }
 
@@ -951,6 +955,122 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtStateClaimPastClaimDetailsNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
             assertFalse(claimDismissedByCamunda.test(caseData));
+        }
+    }
+
+    @Nested
+    class Respondent1OutOfTime {
+
+        @Test
+        void shouldReturnTrue_whenRespondentIsOutOfTimeAndHasNotResponded() {
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertTrue(respondent1OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentIsOutOfTimeAndHasResponded() {
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(respondent1OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentIsNotOutOfTime() {
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDeadline(LocalDateTime.now().plusDays(5))
+                .build();
+            assertFalse(respondent1OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldNotError_whenNullValues() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(respondent1OutOfTime.test(caseData));
+        }
+    }
+
+    @Nested
+    class Respondent2OutOfTime {
+
+        @Test
+        void shouldReturnTrue_whenRespondentIsOutOfTimeAndHasNotResponded() {
+            CaseData caseData = CaseData.builder()
+                .respondent2ResponseDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertTrue(respondent2OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentIsOutOfTimeAndHasResponded() {
+            CaseData caseData = CaseData.builder()
+                .respondent2ResponseDeadline(LocalDateTime.now().minusDays(5))
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(respondent2OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentIsNotOutOfTime() {
+            CaseData caseData = CaseData.builder()
+                .respondent2ResponseDeadline(LocalDateTime.now().plusDays(5))
+                .build();
+            assertFalse(respondent2OutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldNotError_whenNullValues() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(respondent2OutOfTime.test(caseData));
+        }
+    }
+
+    @Nested
+    class OnlyOneRespondentHasResponded {
+
+        @Test
+        void shouldReturnTrue_whenRespondent1HasRespondedAnd2HasNot() {
+            CaseData caseData = CaseData.builder()
+                .addRespondent2(YES)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(onlyOneRespondentHasResponded.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondent2HasRespondedAnd1HasNot() {
+            CaseData caseData = CaseData.builder()
+                .addRespondent2(YES)
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(onlyOneRespondentHasResponded.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTwoResponses() {
+            CaseData caseData = CaseData.builder()
+                .addRespondent2(YES)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(onlyOneRespondentHasResponded.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoResponses() {
+            CaseData caseData = CaseData.builder()
+                .addRespondent2(YES)
+                .build();
+            assertFalse(onlyOneRespondentHasResponded.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoRespondent2() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(onlyOneRespondentHasResponded.test(caseData));
         }
     }
 }

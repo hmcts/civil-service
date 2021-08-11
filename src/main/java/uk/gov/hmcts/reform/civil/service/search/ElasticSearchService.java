@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.math.RoundingMode.UP;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 @RequiredArgsConstructor
 public abstract class ElasticSearchService {
@@ -37,5 +41,9 @@ public abstract class ElasticSearchService {
 
     private int calculatePages(SearchResult searchResult) {
         return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
+    }
+
+    public BoolQueryBuilder beState(CaseState state) {
+        return boolQuery().must(matchQuery("state", state.toString()));
     }
 }
