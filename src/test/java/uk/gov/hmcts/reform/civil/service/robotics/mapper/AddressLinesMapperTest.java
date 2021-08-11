@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,6 +103,15 @@ class AddressLinesMapperTest {
                 .addressLine1("12345678901234567890")
                 .addressLine2("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
                 .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).isEqualTo(address);
+        }
+
+        @Test
+        void shouldReturnOriginalAddress_whenNoNeedToSplit() {
+            Address address = AddressBuilder.maximal().build();
 
             Address result = mapper.splitLongerLines(address);
 

@@ -33,10 +33,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
-/**
- * This class is skeleton to be refined after we have final version of RPA Json structure
- * and it's mapping with CaseData.
- */
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapper {
