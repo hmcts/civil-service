@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
@@ -131,6 +132,7 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
+    protected  LitigationFriend respondent1LitigationFriend;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -151,6 +153,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
+    protected LocalDateTime respondent1LitigationFriendDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -937,6 +940,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addRespondentLitigationFriend() {
+        this.respondent1LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .primaryAddress(AddressBuilder.defaults().build())
+            .hasSameAddressAsLitigant(YES)
+            .certificateOfSuitability(List.of())
+            .build();
+        this.respondent1LitigationFriendDate = LocalDateTime.now();
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -998,7 +1012,8 @@ public class CaseDataBuilder {
             .addApplicant2(addApplicant2)
             .addRespondent2(addRespondent2)
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
-
+            .respondent1LitigationFriend(respondent1LitigationFriend)
+            .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)

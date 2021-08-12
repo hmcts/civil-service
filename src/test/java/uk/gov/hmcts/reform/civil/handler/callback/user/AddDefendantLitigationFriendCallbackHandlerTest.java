@@ -73,6 +73,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+
+            assertThat(response.getData())
+                .containsKey("respondent1LitigationFriendDate");
         }
     }
 
