@@ -309,25 +309,29 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        DISMISS_CLAIM
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        DISMISS_CLAIM
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        DISMISS_CLAIM
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE
                     }
                 )
             );
