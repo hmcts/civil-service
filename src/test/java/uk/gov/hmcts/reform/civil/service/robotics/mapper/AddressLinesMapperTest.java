@@ -79,6 +79,22 @@ class AddressLinesMapperTest {
             assertThat(result).extracting("addressLine3")
                 .isEqualTo("zxcvbnmzxcvbnm");
         }
+
+        @Test
+        void shouldSplitAndTrimExtraSpace_whenSpaceAroundComma() {
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890123456789012345 , 1234567890")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).extracting("addressLine1")
+                .isEqualTo("12345678901234567890123456789012345");
+            assertThat(result).extracting("addressLine2")
+                .isEqualTo("1234567890");
+            assertThat(result).extracting("addressLine3")
+                .isNull();
+        }
     }
 
     @Nested

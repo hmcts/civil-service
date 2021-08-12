@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -56,6 +57,7 @@ public class AddressLinesMapper {
                                                   .omitEmptyStrings()
                                                   .splitToList(line));
         String lastToken = tokens.remove(tokens.size() - 1);
-        return asList(String.join(",", tokens), lastToken.trim());
+        return asList(String.join(",", tokens), lastToken.trim())
+            .stream().map(String::trim).collect(Collectors.toList());
     }
 }
