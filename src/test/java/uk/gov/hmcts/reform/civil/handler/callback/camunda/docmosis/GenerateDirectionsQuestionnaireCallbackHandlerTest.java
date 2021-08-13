@@ -81,7 +81,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
 
