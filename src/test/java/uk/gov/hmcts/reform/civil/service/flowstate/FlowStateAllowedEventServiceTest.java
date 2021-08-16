@@ -315,13 +315,15 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        DISMISS_CLAIM
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        DISMISS_CLAIM
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(

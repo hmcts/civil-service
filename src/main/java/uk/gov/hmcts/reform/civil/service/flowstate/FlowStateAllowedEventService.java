@@ -88,7 +88,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE
-                )
+            )
         ),
 
         entry(
@@ -103,7 +103,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE
-                )
+            )
         ),
 
         entry(
@@ -259,15 +259,23 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(DISMISS_CLAIM)
+            List.of(
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
+            )
         ),
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(DISMISS_CLAIM)
+            List.of(
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE
+            )
         ),
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(DISMISS_CLAIM)
+            List.of(
+                DISMISS_CLAIM
+            )
         )
     );
 
