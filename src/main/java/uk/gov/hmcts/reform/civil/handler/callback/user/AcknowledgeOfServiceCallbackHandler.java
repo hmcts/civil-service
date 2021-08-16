@@ -40,7 +40,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGEMENT_OF_SERVICE);
 
     public static final String CONFIRMATION_SUMMARY = "<br />You need to respond to the claim before %s."
-        + "%n%n[Download the Acknowledgement of Claim form](%s)";
+        + "%n%n[Download the Acknowledgement of Service form](%s)";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
