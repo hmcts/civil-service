@@ -33,7 +33,7 @@ public class AcknowledgementOfClaimGeneratorForSpec implements TemplateDataGener
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N10);
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_CLAIM)
+            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_SERVICE)
         );
     }
 
