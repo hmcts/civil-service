@@ -88,9 +88,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateRespondedToClaim() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_APPLICANT_INTENTION.name();
         return this;

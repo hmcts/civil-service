@@ -54,9 +54,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE").build()).build();
 
@@ -72,9 +70,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC").build()).build();
 

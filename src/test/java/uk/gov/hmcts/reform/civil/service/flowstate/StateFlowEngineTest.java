@@ -411,9 +411,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnFullDefence_whenCaseDataAtStateRespondentFullDefence() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -436,9 +434,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnFullAdmission_whenCaseDataAtStateRespondentFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -461,9 +457,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnPartAdmission_whenCaseDataAtStateRespondentPartAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

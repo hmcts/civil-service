@@ -193,7 +193,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
+                .atStateRespondentPartAdmission()
                 .legacyCaseReference("000DC007")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
@@ -251,7 +251,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+                .atStateRespondentFullAdmission()
                 .legacyCaseReference("000DC010")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
