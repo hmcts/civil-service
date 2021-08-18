@@ -193,8 +193,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     //TODO: 2nd DQ for 2nd solicitor
     //TODO: how best to store DQ when one solicitor representing both
-
-    //TODO: 2 applicants
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
