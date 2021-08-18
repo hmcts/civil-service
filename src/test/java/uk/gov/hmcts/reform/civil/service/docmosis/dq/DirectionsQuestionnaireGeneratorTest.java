@@ -109,7 +109,9 @@ class DirectionsQuestionnaireGeneratorTest {
             BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
         ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+            .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
@@ -145,7 +147,10 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .build()
+                .toBuilder()
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                 .build();

@@ -427,11 +427,11 @@ public class CaseDataBuilder {
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
                 return atStateNotificationAcknowledgedTimeExtension();
             case FULL_DEFENCE:
-                return atStateRespondentFullDefence();
+                return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
             case FULL_ADMISSION:
-                return atStateRespondentFullAdmission();
+                return atStateRespondentFullAdmissionAfterNotificationAcknowledged();
             case PART_ADMISSION:
-                return atStateRespondentPartAdmission();
+                return atStateRespondentPartAdmissionAfterNotificationAcknowledgement();
             case COUNTER_CLAIM:
                 return atStateRespondentCounterClaim();
             case FULL_DEFENCE_PROCEED:
@@ -750,7 +750,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterDefendantResponse() {
-        atStateRespondentFullDefence();
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         takenOfflineByStaff();
         return this;
     }
@@ -770,7 +770,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentFullDefence() {
+    public CaseDataBuilder atStateRespondentFullDefenceAfterNotificationAcknowledgement() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
@@ -794,7 +794,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyDetails() {
+    public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyClaimDetails() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
@@ -808,7 +808,21 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentFullAdmission() {
+    public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullAdmissionAfterNotificationAcknowledged() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
         respondent1ResponseDate = LocalDateTime.now();
@@ -826,7 +840,20 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentPartAdmission() {
+    public CaseDataBuilder atStateRespondentFullAdmissionAfterAcknowledgementTimeExtension() {
+        atStateNotificationAcknowledgedTimeExtension();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentPartAdmissionAfterNotificationAcknowledgement() {
         atStateRespondentRespondToClaim(RespondentResponseType.PART_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
         respondent1ResponseDate = LocalDateTime.now();
@@ -840,6 +867,19 @@ public class CaseDataBuilder {
         respondent1ResponseDate = LocalDateTime.now();
         ccdState = AWAITING_APPLICANT_INTENTION;
         takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentPartAdmissionAfterAcknowledgementTimeExtension() {
+        atStateNotificationAcknowledgedTimeExtension();
+        respondent1ClaimResponseType = RespondentResponseType.PART_ADMISSION;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
         respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
@@ -862,6 +902,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentCounterClaimAfterAcknowledgementTimeExtension() {
+        atStateNotificationAcknowledgedTimeExtension();
+        respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseType = respondentResponseType;
@@ -872,7 +925,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineAdmissionOrCounterClaim() {
-        atStateRespondentFullDefence();
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
@@ -891,7 +944,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
-        atStateRespondentFullDefence();
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
@@ -903,7 +956,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
-        atStateRespondentFullDefence();
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
@@ -927,7 +980,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStatePastApplicantResponseDeadline() {
-        atStateRespondentFullDefence();
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ResponseDeadline = LocalDateTime.now().minusDays(1);
         return this;
     }
