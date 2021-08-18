@@ -59,7 +59,7 @@ class PaymentsServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(ResponseEntity.ok(PAYMENT_DTO));
+        given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
         given(paymentsConfiguration.getService()).willReturn(SERVICE);
         given(paymentsConfiguration.getSiteId()).willReturn(SITE_ID);
         given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));

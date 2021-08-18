@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.ArrayList;
@@ -77,32 +77,40 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessErrorBackwardsCompatible(caseData, e);
-            } else if (e.status() == 400) {
-                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
-                                        caseData.getCcdCaseReference(), e.contentUTF8()
-                ));
-                caseData = updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+        } catch (InvalidPaymentRequestException e) {
+            log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+                                    caseData.getCcdCaseReference(), e.getMessage()
+            ));
+            caseData = updateWithDuplicatePaymentErrorBackwardsCompatible(caseData, e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
-//            .errors(errors)
+            .errors(errors)
             .build();
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData, FeignException e) {
-        return caseData.toBuilder()
-            .paymentDetails(PaymentDetails.builder()
-                                .status(FAILED)
-                                .errorMessage(e.contentUTF8())
-                                .build())
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
+        var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .map(PaymentDetails::toBuilder)
+            .orElse(PaymentDetails.builder())
+            .status(FAILED)
+            .errorMessage(e.getMessage())
             .build();
+
+        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+    }
+
+    private CaseData updateWithDuplicatePaymentErrorBackwardsCompatible(CaseData caseData, InvalidPaymentRequestException e) {
+        var paymentDetails = PaymentDetails.builder()
+            .status(FAILED)
+            .errorMessage(e.getMessage())
+            .build();
+
+        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
     }
 
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
@@ -126,25 +134,21 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .build();
 
         } catch (FeignException e) {
-            log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessError(caseData, e);
-            } else if (e.status() == 400) {
-                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
-                                        caseData.getCcdCaseReference(), e.contentUTF8()
-                ));
-                caseData = updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            errors = null;
+        } catch (InvalidPaymentRequestException e) {
+            log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+                                    caseData.getCcdCaseReference(), e.getMessage()
+            ));
+            caseData = updateWithDuplicatePaymentError(caseData, e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
-//            .errors(errors)
+            .errors(errors)
             .build();
     }
 

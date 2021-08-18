@@ -94,9 +94,18 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(CaseDataBuilder.builder().atStateClaimDetailsNotified().build(), CLAIM_DETAILS_NOTIFIED),
                 of(CaseDataBuilder.builder().atStateNotificationAcknowledged().build(), NOTIFICATION_ACKNOWLEDGED),
-                of(CaseDataBuilder.builder().atStateRespondentFullDefence().build(), FULL_DEFENCE),
-                of(CaseDataBuilder.builder().atStateRespondentFullAdmission().build(), FULL_ADMISSION),
-                of(CaseDataBuilder.builder().atStateRespondentPartAdmission().build(), PART_ADMISSION),
+                of(
+                    CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotificationAcknowledgement().build(),
+                    FULL_DEFENCE
+                ),
+                of(
+                    CaseDataBuilder.builder().atStateRespondentFullAdmissionAfterNotificationAcknowledged().build(),
+                    FULL_ADMISSION
+                ),
+                of(
+                    CaseDataBuilder.builder().atStateRespondentPartAdmissionAfterNotificationAcknowledgement().build(),
+                    PART_ADMISSION
+                ),
                 of(CaseDataBuilder.builder().atStateRespondentCounterClaim().build(), COUNTER_CLAIM),
                 of(
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build(),

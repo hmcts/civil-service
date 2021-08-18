@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentsService {
@@ -24,13 +23,7 @@ public class PaymentsService {
     private final OrganisationService organisationService;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) {
-        try {
-            var response = paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
-            return response.getBody();
-        } catch (Exception e) {
-            log.error("Payment client error " + e.getMessage(), e);
-            throw e;
-        }
+        return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
     private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
