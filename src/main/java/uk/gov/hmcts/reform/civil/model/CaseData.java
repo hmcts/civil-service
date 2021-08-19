@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.search.SupportingDocuments;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -138,6 +139,9 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final String defenceRouteRequired;
+    private final String responseClaimTrack;
+    private final RespondToClaim respondToClaim;
 
     @Valid
     private final CloseClaim withdrawClaim;

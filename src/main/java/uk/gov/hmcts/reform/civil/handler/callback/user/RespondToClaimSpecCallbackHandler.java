@@ -12,15 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -74,6 +72,30 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+            .put(callbackKey(MID, "track"), this::selectClaimTrack)
+            .build();
+    }
+
+    private CallbackResponse selectClaimTrack(CallbackParams callbackParams) {
+        if (callbackParams.getRequest().getEventId().equals("DEFENDANT_RESPONSE_SPEC")) {
+            CaseData caseData = callbackParams.getCaseData();
+            if (caseData.getRespondToClaim() != null
+                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()
+                                                                                  .toString()) == 0) {
+                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.toString());
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(updatedData.build().toMap(objectMapper))
+                    .build();
+            } else {
+                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+                    .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString());
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(updatedData.build().toMap(objectMapper))
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 

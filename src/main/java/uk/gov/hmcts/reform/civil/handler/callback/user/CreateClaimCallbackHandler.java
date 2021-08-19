@@ -568,7 +568,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             + caseData.getTotalClaimAmount()
             + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
         caseDataBuilder.calculatedInterest(calculatedInterest);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
