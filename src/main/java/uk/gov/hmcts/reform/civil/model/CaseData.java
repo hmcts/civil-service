@@ -51,6 +51,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo respondent1OrgRegistered;
     private final YesOrNo respondent2OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
+    private final String respondentSolicitor2EmailAddress;
     private final YesOrNo uploadParticularsOfClaim;
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
