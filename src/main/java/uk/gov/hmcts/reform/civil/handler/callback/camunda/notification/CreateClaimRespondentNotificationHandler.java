@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationException;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE;
@@ -36,6 +36,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE
     );
 
+    public static final String TASK_ID = "NotifyDefendantSolicitor1";
+    public static final String TASK_ID_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyFirstDefendantSolicitor";
     public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifySecondDefendantSolicitor";
@@ -48,7 +50,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimIssue
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimIssue,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifyARespondentSolicitorForClaimIssue
         );
     }
 
@@ -63,13 +66,26 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE:
                 return TASK_ID_EMAIL_SECOND_SOL;
             default:
-                throw new CallbackException("Cannot find appropriate CCD Case event");
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        var recipient = isCcNotification(callbackParams)
+            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+            : caseData.getRespondentSolicitor1EmailAddress();
+
+        sendNotificationToSolicitor(caseData, recipient);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
     }
 
     //    Notify Claim Multiparty:
@@ -87,11 +103,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     //            1v2                  Offline             Solicitor 1 || Solicitor 2             -
     //            (Different Sol
     //            - Divergent)
-
-    private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
+    private CallbackResponse notifyARespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        String recipient = new String();
+        String recipient;
 
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         switch (caseEvent) {
@@ -108,19 +122,23 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
                 break;
             default:
-                throw new CallbackException("Cannot find appropriate CCD Case event");
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
+        sendNotificationToSolicitor(caseData, recipient);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,
             notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
     }
 
     private boolean shouldEmailRespondent2Solicitor(CaseData caseData) {
@@ -132,12 +150,15 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME,
-            getPartyNameBasedOnType(caseData.getRespondent1()),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
         );
+    }
+
+    private boolean isCcNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
     }
 }
