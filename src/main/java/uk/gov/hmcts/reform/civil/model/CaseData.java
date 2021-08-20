@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -142,6 +143,15 @@ public class CaseData implements MappableObject {
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
+    // Fields related to ROC-9453 & ROC-9455
+    private final YesOrNo responseClaimMediationSpecRequired;
+    private final YesOrNo responseClaimExpertSpecRequired;
+    private final String responseClaimWitnesses;
+    private final YesOrNo SmallClaimHearingInterpreterRequired;
+    private final String SmallClaimHearingInterpreterDescription;
+
+    @JsonUnwrapped
+    private final ExpertRequirements respondToClaim_experts;
 
     @Valid
     private final CloseClaim withdrawClaim;

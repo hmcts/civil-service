@@ -80,8 +80,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         if (callbackParams.getRequest().getEventId().equals("DEFENDANT_RESPONSE_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getRespondToClaim() != null
-                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()
-                                                                                  .toString()) == 0) {
+                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) == 0) {
                 CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
                     .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.toString());
                 return AboutToStartOrSubmitCallbackResponse.builder()
@@ -138,12 +137,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        // CaseData caseData = callbackParams.getCaseData();
-        // Hearing hearing = caseData.getRespondent1DQ().getHearing();
-        // List<String> errors = unavailableDateValidator.validate(hearing);
+        // UnavailableDates validation & field (model) needs to be created.
+        // This will be taken care via different story,
+        // because we don't have AC around this date field validation in ROC-9455
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-           // .errors(errors)
             .build();
     }
 
