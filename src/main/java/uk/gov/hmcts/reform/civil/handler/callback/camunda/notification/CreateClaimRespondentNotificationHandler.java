@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.NotificationException;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.List;
@@ -34,9 +36,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE
     );
 
-    public static final String TASK_ID = "NotifyDefendantSolicitor1";
-    public static final String TASK_ID_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyFirstDefendantSolicitor";
+    public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifySecondDefendantSolicitor";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
@@ -52,17 +53,17 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) throws Exception {
+    public String camundaActivityId(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         switch (caseEvent) {
-            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC:
-                return TASK_ID_CC;
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE:
                 return TASK_ID_EMAIL_FIRST_SOL;
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC:
+                return TASK_ID_EMAIL_APP_SOL_CC;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE:
                 return TASK_ID_EMAIL_SECOND_SOL;
             default:
-                throw new Exception();
+                throw new CallbackException("Cannot find appropriate CCD Case event");
         }
     }
 
@@ -71,20 +72,44 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         return EVENTS;
     }
 
+    //    Notify Claim Multiparty:
+    //
+    //            Scenario         Case Progresses       Callback Notify First Sol     Callback Notify Second Sol
+    //            1v1                  Online                    Solicitor 1                      -
+    //
+    //            1v2                  Online                    Solicitor 1                      -
+    //            (Same Sol)
+    //
+    //            1v2                  Online                    Solicitor 1                 Solicitor 2
+    //            (Different Sol
+    //            - Non Divergent)
+    //
+    //            1v2                  Offline             Solicitor 1 || Solicitor 2             -
+    //            (Different Sol
+    //            - Divergent)
+
     private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        /*
-            TODO: Implement following logic for determining recipient(s)
-                - if null / no value present - (Case is not multiparty + 1v1) send to sol 1
-                - if value is only sol 2 - send to sol 2
-                - if value is sol 1 - send to sol 1
-                - if value is both - send to so 1 then sol 2
-         */
+        String recipient = new String();
 
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-            : caseData.getRespondentSolicitor1EmailAddress();
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        switch (caseEvent) {
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE:
+                recipient = caseData.getRespondentSolicitor1EmailAddress();
+                if (shouldEmailRespondent2Solicitor(caseData)) {
+                    recipient = caseData.getRespondentSolicitor2EmailAddress();
+                }
+                break;
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC:
+                recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+                break;
+            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE:
+                recipient = caseData.getRespondentSolicitor2EmailAddress();
+                break;
+            default:
+                throw new CallbackException("Cannot find appropriate CCD Case event");
+        }
 
         notificationService.sendMail(
             recipient,
@@ -98,21 +123,21 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             .build();
     }
 
+    private boolean shouldEmailRespondent2Solicitor(CaseData caseData) {
+        return caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()
+            .startsWith("Respondent Two:");
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME,
+            getPartyNameBasedOnType(caseData.getRespondent1()),
+            CLAIM_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
         );
-    }
-
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
-    }
-
-    private boolean isEmailingBothRespondentSolicitors(CaseData caseData){
-        return caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel().equals("Both");
     }
 }

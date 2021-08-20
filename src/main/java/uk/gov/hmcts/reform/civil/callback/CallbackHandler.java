@@ -39,7 +39,7 @@ public abstract class CallbackHandler {
         return String.format("%s%s%s", formattedVersion, type.getValue(), formattedPageId);
     }
 
-    public String camundaActivityId(CallbackParams callbackParams) throws Exception {
+    public String camundaActivityId(CallbackParams callbackParams) {
         return DEFAULT;
     }
 
