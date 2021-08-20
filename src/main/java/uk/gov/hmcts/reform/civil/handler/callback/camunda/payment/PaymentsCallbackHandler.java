@@ -40,6 +40,8 @@ public class PaymentsCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "CreateClaimMakePayment";
+    public static final String DUPLICATE_PAYMENT_MESSAGE
+        = "You attempted to retry the payment to soon. Try again later.";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
@@ -74,14 +76,13 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .paymentSuccessfulDate(time.now())
                 .build();
         } catch (FeignException e) {
-            log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessErrorBackwardsCompatible(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
         } catch (InvalidPaymentRequestException e) {
-            log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+            log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.getMessage()
             ));
             caseData = updateWithDuplicatePaymentErrorBackwardsCompatible(caseData, e);
@@ -98,19 +99,22 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())
             .status(FAILED)
-            .errorMessage(e.getMessage())
+            .errorCode(null)
+            .errorMessage(DUPLICATE_PAYMENT_MESSAGE)
             .build();
 
         return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
     }
 
-    private CaseData updateWithDuplicatePaymentErrorBackwardsCompatible(CaseData caseData, InvalidPaymentRequestException e) {
+    private CaseData updateWithDuplicatePaymentErrorBackwardsCompatible(CaseData caseData,
+                                                                        InvalidPaymentRequestException e) {
         var paymentDetails = PaymentDetails.builder()
             .status(FAILED)
-            .errorMessage(e.getMessage())
+            .errorMessage(DUPLICATE_PAYMENT_MESSAGE)
+            .errorCode(null)
             .build();
 
-        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+        return caseData.toBuilder().paymentDetails(paymentDetails).build();
     }
 
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
@@ -140,7 +144,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 errors.add(ERROR_MESSAGE);
             }
         } catch (InvalidPaymentRequestException e) {
-            log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+            log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.getMessage()
             ));
             caseData = updateWithDuplicatePaymentError(caseData, e);
