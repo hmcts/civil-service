@@ -138,12 +138,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Hearing hearing = caseData.getRespondent1DQ().getHearing();
-        List<String> errors = unavailableDateValidator.validate(hearing);
+        // CaseData caseData = callbackParams.getCaseData();
+        // Hearing hearing = caseData.getRespondent1DQ().getHearing();
+        // List<String> errors = unavailableDateValidator.validate(hearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+           // .errors(errors)
             .build();
     }
 
