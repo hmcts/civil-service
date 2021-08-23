@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.matcher.IsValidJson.validateJson;
     EventHistoryMapper.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
     OrganisationService.class
 })
 class RpaConsumerTest extends BaseRpaTest {
@@ -193,7 +195,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithPartAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentPartAdmission()
+                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .legacyCaseReference("000DC007")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
@@ -251,7 +253,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenDefendantRespondedWithFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullAdmission()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .legacyCaseReference("000DC010")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
