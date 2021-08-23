@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class Address {
 
