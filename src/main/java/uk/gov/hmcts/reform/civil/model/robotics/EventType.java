@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public enum EventType {
@@ -31,7 +32,7 @@ public enum EventType {
         }
     }
 
-    public static EventType valueOfCode(String label) {
-        return BY_CODE.get(label);
+    public static Optional<EventType> valueOfCode(String label) {
+        return Optional.ofNullable(BY_CODE.get(label));
     }
 }

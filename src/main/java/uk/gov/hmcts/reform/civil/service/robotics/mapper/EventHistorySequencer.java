@@ -13,10 +13,13 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Component
 public class EventHistorySequencer {
 
     public EventHistory sortEvents(EventHistory eventHistory) {
+        requireNonNull(eventHistory);
         List<Event> events = flatEvents(eventHistory);
         events.sort(Comparator.comparing(Event::getDateReceived));
         return prepareEventHistory(prepareSequenceId(events));
@@ -25,7 +28,8 @@ public class EventHistorySequencer {
     private EventHistory prepareEventHistory(List<Event> events) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         events.forEach(event -> {
-            switch (EventType.valueOfCode(event.getEventCode())) {
+            EventType eventType = EventType.valueOfCode(event.getEventCode()).orElseThrow(IllegalStateException::new);
+            switch (eventType) {
                 case MISCELLANEOUS:
                     builder.miscellaneous(event);
                     break;
@@ -53,6 +57,8 @@ public class EventHistorySequencer {
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
                     builder.directionsQuestionnaire(event);
                     break;
+                default:
+                    throw new IllegalStateException("Un expected event type: " + eventType);
             }
         });
         return builder
