@@ -24,6 +24,15 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
 
@@ -124,7 +133,7 @@ public class EventHistoryMapper {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("999")
+                    .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getRespondent1LitigationFriendDate().format(ISO_DATE))
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
@@ -140,7 +149,7 @@ public class EventHistoryMapper {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("999")
+                    .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getClaimDetailsNotificationDate().format(ISO_DATE))
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
@@ -156,7 +165,7 @@ public class EventHistoryMapper {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("999")
+                    .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getIssueDate().format(ISO_DATE))
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
@@ -172,7 +181,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("999")
+                .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(caseData.getTakenOfflineDate().format(ISO_DATE))
                 .eventDetailsText(detailsText)
                 .eventDetails(EventDetails.builder()
@@ -186,7 +195,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("999")
+                .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(caseData.getClaimDismissedDate().format(ISO_DATE))
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
@@ -202,7 +211,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("999")
+                .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(caseData.getClaimDismissedDate().format(ISO_DATE))
                 .eventDetailsText(prepareClaimDismissedDetails(flowState))
                 .eventDetails(EventDetails.builder()
@@ -238,7 +247,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("999")
+                .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(caseData.getTakenOfflineByStaffDate().format(ISO_DATE))
                 .eventDetailsText(prepareTakenOfflineEventDetails(caseData))
                 .eventDetails(EventDetails.builder()
@@ -289,7 +298,7 @@ public class EventHistoryMapper {
         builder.miscellaneous(
             Event.builder()
                 .eventSequence((prepareEventSequence(builder.build())))
-                .eventCode("999")
+                .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(caseData.getClaimNotificationDate().format(ISO_DATE))
                 .eventDetailsText("Claimant has notified defendant.")
                 .eventDetails(EventDetails.builder()
@@ -302,14 +311,14 @@ public class EventHistoryMapper {
         builder.replyToDefence(List.of(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("66")
+                .eventCode(REPLY_TO_DEFENCE.getCode())
                 .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID(APPLICANT_ID)
                 .build())
         ).directionsQuestionnaire(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode("197")
+                .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
                 .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                 .litigiousPartyID(APPLICANT_ID)
                 .eventDetails(EventDetails.builder()
@@ -324,7 +333,7 @@ public class EventHistoryMapper {
                 .build()
         ).miscellaneous(Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode("999")
+                            .eventCode(MISCELLANEOUS.getCode())
                             .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                             .eventDetailsText("RPA Reason: Applicant proceeds.")
                             .eventDetails(EventDetails.builder()
@@ -356,7 +365,7 @@ public class EventHistoryMapper {
     private void buildFullDefenceNotProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(Event.builder()
                                   .eventSequence(prepareEventSequence(builder.build()))
-                                  .eventCode("999")
+                                  .eventCode(MISCELLANEOUS.getCode())
                                   .dateReceived(caseData.getApplicant1ResponseDate().format(ISO_DATE))
                                   .eventDetailsText("RPA Reason: Claimant intends not to proceed.")
                                   .eventDetails(EventDetails.builder()
@@ -371,7 +380,7 @@ public class EventHistoryMapper {
                 List.of(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode("50")
+                        .eventCode(DEFENCE_FILED.getCode())
                         .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                         .litigiousPartyID(RESPONDENT_ID)
                         .build()
@@ -380,7 +389,7 @@ public class EventHistoryMapper {
             .directionsQuestionnaire(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("197")
+                    .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                     .litigiousPartyID(RESPONDENT_ID)
                     .eventDetailsText(prepareEventDetailsText(
@@ -401,7 +410,7 @@ public class EventHistoryMapper {
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("999")
+                    .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
                     .eventDetailsText("RPA Reason: Unrepresented defendant.")
                     .eventDetails(EventDetails.builder()
@@ -416,7 +425,7 @@ public class EventHistoryMapper {
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("999")
+                    .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
                     .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm.")
                     .eventDetails(EventDetails.builder()
@@ -436,7 +445,7 @@ public class EventHistoryMapper {
                 List.of(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode("38")
+                        .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
                         .dateReceived(dateAcknowledge.format(ISO_DATE))
                         .litigiousPartyID("002")
                         .eventDetails(EventDetails.builder()
@@ -454,13 +463,13 @@ public class EventHistoryMapper {
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.receiptOfAdmission(List.of(Event.builder()
                                                .eventSequence(prepareEventSequence(builder.build()))
-                                               .eventCode("40")
+                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
                                                .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                                                .litigiousPartyID("002")
                                                .build())
         ).miscellaneous(Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode("999")
+                            .eventCode(MISCELLANEOUS.getCode())
                             .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                             .eventDetailsText("RPA Reason: Defendant fully admits.")
                             .eventDetails(EventDetails.builder()
@@ -474,14 +483,14 @@ public class EventHistoryMapper {
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("60")
+                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                     .litigiousPartyID("002")
                     .build()
             )
         ).miscellaneous(Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode("999")
+                            .eventCode(MISCELLANEOUS.getCode())
                             .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                             .eventDetailsText("RPA Reason: Defendant partial admission.")
                             .eventDetails(EventDetails.builder()
@@ -495,14 +504,14 @@ public class EventHistoryMapper {
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("52")
+                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                     .litigiousPartyID("002")
                     .build()
             )
         ).miscellaneous(Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode("999")
+                            .eventCode(MISCELLANEOUS.getCode())
                             .dateReceived(caseData.getRespondent1ResponseDate().format(ISO_DATE))
                             .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
                             .eventDetails(EventDetails.builder()
@@ -520,7 +529,7 @@ public class EventHistoryMapper {
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("45")
+                    .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
                     .dateReceived(dateReceived.format(ISO_DATE))
                     .litigiousPartyID("002")
                     .eventDetailsText(format("agreedExtensionDate: %s", caseData
