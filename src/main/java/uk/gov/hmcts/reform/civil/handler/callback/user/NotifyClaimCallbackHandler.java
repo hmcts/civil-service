@@ -29,6 +29,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
@@ -62,8 +63,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
+            callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimWithSolicitorOptions,
             callbackKey(SUBMITTED), this::buildConfirmation,
             callbackKey(V_1, SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
@@ -74,6 +75,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    //The field `defendantSolicitorNotifyClaimOptions` will only show when both defendants are representated
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -93,6 +95,21 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        ArrayList<String> warnings = new ArrayList<>();
+        if (! notifyBothRespondentSolicitors(caseData)) {
+            warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .warnings(warnings)
             .build();
     }
 
@@ -117,36 +134,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse submitClaimWithSolicitorOptions(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime claimNotificationDate = time.now();
-
-        ArrayList<String> warnings = new ArrayList<>();
-        if (! notifyBothRespondentSolicitors(caseData)) {
-            warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
-        }
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
-            .claimNotificationDate(claimNotificationDate);
-
-        LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
-        LocalDateTime claimNotificationDeadline = caseData.getClaimNotificationDeadline();
-
-        if (claimDetailsNotificationDeadline.isAfter(claimNotificationDeadline)) {
-            LocalDateTime notificationDeadlineAt4pm = claimNotificationDeadline.toLocalDate()
-                .atTime(END_OF_BUSINESS_DAY);
-            caseDataBuilder.claimDetailsNotificationDeadline(notificationDeadlineAt4pm);
-        } else {
-            caseDataBuilder.claimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .warnings(warnings)
             .build();
     }
 

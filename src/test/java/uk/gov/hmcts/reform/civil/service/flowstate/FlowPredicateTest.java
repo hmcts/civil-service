@@ -106,6 +106,26 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             assertFalse(claimNotified.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth(){
+            //1v2 - Both
+        }
+
+        @Test
+        void shouldReturnTrue_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor(){
+            //1v2 - One
+        }
+
+        @Test
+        void shouldReturnTrue_when1v2SameSolicitor_andNotifySolicitorOptions_isNull(){
+            //1v2 - Same Solicitor - null
+        }
+
+        @Test
+        void shouldReturnTrue_when1v1_andNotifySoliictorOptions_isNull(){
+            //1v1 - null
+        }
     }
 
     @Nested

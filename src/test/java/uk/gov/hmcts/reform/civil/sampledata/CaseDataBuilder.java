@@ -87,6 +87,7 @@ public class CaseDataBuilder {
     protected Party respondent1;
     protected YesOrNo respondent1Represented;
     protected String respondentSolicitor1EmailAddress;
+    protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
     protected ClaimType claimType;
     protected String claimTypeOther;
@@ -132,7 +133,7 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
-    protected  LitigationFriend respondent1LitigationFriend;
+    protected LitigationFriend respondent1LitigationFriend;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -615,6 +616,7 @@ public class CaseDataBuilder {
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
@@ -698,10 +700,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimNotified() {
         atStateClaimIssued();
-        defendantSolicitorNotifyClaimOptions("Both");
         claimNotificationDate = LocalDate.now().atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_withBothSolicitorOptionSelected() {
+        atStateClaimNotified();
+        defendantSolicitorNotifyClaimOptions("Both");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_withOneSolicitorOptionSelected() {
+        atStateClaimNotified();
+        defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor");
         return this;
     }
 
@@ -1040,6 +1053,7 @@ public class CaseDataBuilder {
             .respondent1OrgRegistered(respondent1OrgRegistered)
             .respondent2OrgRegistered(respondent2OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
+            .respondentSolicitor2EmailAddress(respondentSolicitor2EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)

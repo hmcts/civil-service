@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
@@ -69,7 +70,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
@@ -80,13 +83,30 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventValidateOptionsCallback {
+
+        private static final String PAGE_ID = "validateNotificationOption";
+        public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
+            "Your claim will progress offline if you only notify one Defendant of the claim details.";
+
+        @Test
+        void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+    }
+
+    @Nested
     class AboutToSubmit {
 
         @Nested
         class SubmittedAtCurrentTime {
-
-            public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
-                "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
             @BeforeEach
             void setup() {
@@ -147,23 +167,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
-            }
-
-            @Test
-            void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                    .defendantSolicitorNotifyClaimOptions("Solicitor One")
-                    .claimNotificationDeadline(deadline)
-                    .build();
-
-                CallbackParams params = CallbackParamsBuilder.builder()
-                    .version(V_1)
-                    .of(CallbackType.ABOUT_TO_SUBMIT, caseData)
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
-
             }
         }
 
@@ -246,11 +249,31 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
+            String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingOneParty_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
-                .defendantSolicitorNotifyClaimOptions("Solicitor One")
+                .atStateClaimNotified_withOneSolicitorOptionSelected()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
