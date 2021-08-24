@@ -22,6 +22,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
@@ -35,11 +36,17 @@ public class EventHistoryMapper {
     private final FeatureToggleService featureToggleService;
 
     public EventHistory buildEvents(CaseData caseData) {
+        List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-
-        List<State> stateHistory = stateFlowEngine.evaluate(caseData)
-            .getStateHistory();
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            states = stateFlowEngine.evaluateSpec(caseData)
+                .getStateHistory();
+        } else {
+            states = stateFlowEngine.evaluate(caseData)
+                .getStateHistory();
+        }
+        List<State> stateHistory = states;
         stateHistory
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
@@ -434,7 +441,20 @@ public class EventHistoryMapper {
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
-                    Event.builder()
+                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM) ?
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode("38")
+                            .dateReceived(dateAcknowledge.format(ISO_DATE))
+                            .litigiousPartyID("002")
+                            .eventDetails(EventDetails.builder()
+                                              .acknowledgeService("Acknowledgement of Service")
+                                              .build())
+                            .eventDetailsText(format(
+                                "Defendant LR Acknowledgement of Service "
+                            ))
+                            .build()
+                        : Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode("38")
                         .dateReceived(dateAcknowledge.format(ISO_DATE))

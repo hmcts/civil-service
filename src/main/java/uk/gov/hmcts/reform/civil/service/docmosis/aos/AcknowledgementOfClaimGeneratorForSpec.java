@@ -21,7 +21,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N10;
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgementOfClaimGeneratorForSpec implements TemplateDataGenerator<AcknowledgementOfClaimFormForSpec> {
+public class AcknowledgementOfClaimGeneratorForSpec
+    implements TemplateDataGenerator<AcknowledgementOfClaimFormForSpec> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;

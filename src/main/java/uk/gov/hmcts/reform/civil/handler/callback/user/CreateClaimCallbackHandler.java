@@ -151,8 +151,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
-            .put(callbackKey(MID, "specRespondentCorrespondenceAddress"),
-                 this::validateCorrespondenceRespondentAddress)
+            .put(
+                callbackKey(MID, "specRespondentCorrespondenceAddress"),
+                this::validateCorrespondenceRespondentAddress
+            )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .build();
     }
@@ -358,7 +360,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if (callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals(
+            "CREATE_CLAIM_SPEC")) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
         }

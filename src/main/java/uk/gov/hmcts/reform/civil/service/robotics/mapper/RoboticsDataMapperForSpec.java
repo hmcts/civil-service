@@ -130,7 +130,9 @@ public class RoboticsDataMapperForSpec {
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
-            );
+            )
+            .correspondenceAddresses(caseData.getRespondentSolicitor1ServiceAddress() != null
+                                         ? addressMapper.toRoboticsAddresses(caseData.getRespondentSolicitor1ServiceAddress()) : null);
 
         organisationId
             .flatMap(organisationService::findOrganisationById)
@@ -196,7 +198,9 @@ public class RoboticsDataMapperForSpec {
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
-            );
+            )
+            .correspondenceAddresses(caseData.getSpecApplicantCorrespondenceAddressdetails() != null
+                                         ? addressMapper.toRoboticsAddresses(caseData.getSpecApplicantCorrespondenceAddressdetails()) : null);
 
         organisationId
             .flatMap(organisationService::findOrganisationById)

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
@@ -49,6 +50,8 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private Time time;
 
     @Autowired
     private ClaimContinuingOnlineRespondentForSpecNotificationHandler handler;
@@ -71,6 +74,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                                                              .email("testorg@email.com")
                                                              .organisationName("test solicatior").build())
                 .claimDetailsNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")

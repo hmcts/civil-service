@@ -43,8 +43,7 @@ public class RoboticsNotificationService {
         try {
             if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                 roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-            }
-            else {
+            } else {
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
             }
             byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();

@@ -57,7 +57,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
-    public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE= "ACKNOWLEDGEMENT_OF_SERVICE";
+    public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -166,9 +166,10 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
-                formatLocalDateTime(responseDeadline, DATE_TIME_AT)) + exitSurveyContentService.respondentSurvey();
+                formatLocalDateTime(responseDeadline, DATE_TIME_AT)
+            ) + exitSurveyContentService.respondentSurvey();
         } else {
-             body = format(
+            body = format(
                 "<br />You must respond to the claimant by %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)
             ) + exitSurveyContentService.respondentSurvey();

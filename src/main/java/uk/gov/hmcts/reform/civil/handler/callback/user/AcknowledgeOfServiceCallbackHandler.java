@@ -126,6 +126,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
+            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -147,6 +151,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
             .respondent1(updatedRespondent1)
             .respondent1Copy(null)
+            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.postcode;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,8 +36,9 @@ class PostcodeLookupServiceTest {
         when(restTemplate.exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<?>> any(),
-            ArgumentMatchers.<Class<String>> any())).thenReturn(responseEntity);
+            ArgumentMatchers.<HttpEntity<?>>any(),
+            ArgumentMatchers.<Class<String>>any()
+        )).thenReturn(responseEntity);
 
         assertThat(postcodeLookupService.validatePostCodeForDefendant("IG11 7YL")).isFalse();
     }

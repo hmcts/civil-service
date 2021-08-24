@@ -28,7 +28,10 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -53,7 +56,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
-    public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE= "ACKNOWLEDGEMENT_OF_SERVICE";
+    public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -89,10 +92,10 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
 
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
-            var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
-                .build();
+        var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
+            .build();
     }
 
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
@@ -150,9 +153,10 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         String body;
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
-            body = format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
-                formatLocalDateTime(responseDeadline, DATE_TIME_AT)) + exitSurveyContentService.respondentSurvey();
+        body = format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
+            formatLocalDateTime(responseDeadline, DATE_TIME_AT)
+        ) + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Extension deadline submitted")

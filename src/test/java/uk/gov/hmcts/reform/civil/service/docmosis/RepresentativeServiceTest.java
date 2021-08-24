@@ -263,7 +263,7 @@ class RepresentativeServiceTest {
             );
         }
 
-       // @Test
+        //@Test
         void shouldReturnValidOrganisationDetails_whenApplicantHasNotProvidedServiceAddress() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)

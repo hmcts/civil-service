@@ -26,11 +26,13 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class AgreedExtensionDateApplicantForSpecNotificationHandler extends CallbackHandler implements NotificationData {
+public class AgreedExtensionDateApplicantForSpecNotificationHandler
+    extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC,
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC);
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC
+    );
 
     public static final String TASK_ID = "AgreedExtensionDateNotifyApplicantSolicitor1ForSpec";
     public static final String TASK_ID_CC = "AgreedExtensionDateNotifyRespondentSolicitor1CCForSpec";
@@ -43,7 +45,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler extends Call
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this:: notifyApplicantSolicitorForAgreedExtensionDateForSpec
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForAgreedExtensionDateForSpec
         );
     }
 
@@ -60,7 +62,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler extends Call
     private CallbackResponse notifyApplicantSolicitorForAgreedExtensionDateForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(isCcNotification(callbackParams))  {
+        if (isCcNotification(callbackParams)) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec(),
@@ -82,8 +84,11 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler extends Call
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                caseData.getApplicant1OrganisationPolicy()
+                    .getOrganisation().getOrganisationID(),
+                caseData
+            ),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
         );

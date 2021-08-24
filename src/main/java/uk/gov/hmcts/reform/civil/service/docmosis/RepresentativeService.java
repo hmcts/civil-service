@@ -52,8 +52,7 @@ public class RepresentativeService {
             .ifPresent(representativeBuilder::serviceAddress);
 
         return representativeBuilder
-            // .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
-            .emailAddress("civilmoneyclaimsdemo@gmail.com")
+            .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .build();
     }
 

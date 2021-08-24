@@ -14,6 +14,7 @@ public class Solicitor {
     private String organisationId;
     private String name;
     private RoboticsAddresses addresses;
+    private RoboticsAddresses correspondenceAddresses;
     private String contactDX;
     private String contactTelephoneNumber;
     private String contactFaxNumber;

@@ -17,8 +17,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -27,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantForSpecNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantForSpecNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -47,6 +48,7 @@ class AcknowledgeClaimApplicantForSpecNotificationHandlerTest extends BaseCallba
     private AcknowledgeClaimApplicantForSpecNotificationHandler handler;
     @MockBean
     private OrganisationService organisationService;
+    private final String legalOrgName = "legalOrgName";
 
     @Nested
     class AboutToSubmitCallback {
@@ -77,7 +79,9 @@ class AcknowledgeClaimApplicantForSpecNotificationHandlerTest extends BaseCallba
         void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_SPEC_CLAIM_ACKNOWLEDGEMENT_CC").build())
+                CallbackRequest.builder()
+                    .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_SPEC_CLAIM_ACKNOWLEDGEMENT_CC")
+                    .build())
                 .build();
 
             handler.handle(params);
@@ -94,10 +98,21 @@ class AcknowledgeClaimApplicantForSpecNotificationHandlerTest extends BaseCallba
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+                legalOrgName, getApplicantLegalOrganizationName(
+                    caseData.getApplicant1OrganisationPolicy()
+                        .getOrganisation().getOrganisationID(),
+                    caseData
+                ),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
             );
         }
+    }
+
+    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
     @Test

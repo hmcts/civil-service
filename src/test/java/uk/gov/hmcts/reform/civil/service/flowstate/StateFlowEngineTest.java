@@ -120,7 +120,7 @@ class StateFlowEngineTest {
         void shouldReturnSpecClaimSubmitted_whenCaseDataAtStateClaimSubmitted() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
 
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseData);
 
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
