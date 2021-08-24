@@ -322,6 +322,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String caseNote;
     private final List<Element<CaseNote>> caseNotes;
 
+    private final String caseNote;
+    private final List<Element<CaseNote>> caseNotes;
+
     @Valid
     private final CloseClaim withdrawClaim;
 
