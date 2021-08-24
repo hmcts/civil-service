@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
@@ -107,24 +108,33 @@ class FlowPredicateTest {
             assertFalse(claimNotified.test(caseData));
         }
 
-        @Test
-        void shouldReturnTrue_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth(){
-            //1v2 - Both
+        @Test //1v2 - Notify Both Sol
+        void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .build();
+
+            assertTrue(claimNotified.test(caseData));
         }
 
-        @Test
-        void shouldReturnTrue_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor(){
-            //1v2 - One
+        @Test //1v2 - Notify One Sol
+        void shouldHandOffline_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .build();
+
+            assertTrue(takenOfflineAfterClaimNotified.test(caseData));
+            assertFalse(claimNotified.test(caseData));
         }
 
-        @Test
-        void shouldReturnTrue_when1v2SameSolicitor_andNotifySolicitorOptions_isNull(){
-            //1v2 - Same Solicitor - null
-        }
+        @Test // 1v2 - Same Solicitor / 1v1 Case (Field is null)
+        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified()
+                .build();
 
-        @Test
-        void shouldReturnTrue_when1v1_andNotifySoliictorOptions_isNull(){
-            //1v1 - null
+            assertTrue(claimNotified.test(caseData));
+            assertFalse(takenOfflineAfterClaimNotified.test(caseData));
         }
     }
 
