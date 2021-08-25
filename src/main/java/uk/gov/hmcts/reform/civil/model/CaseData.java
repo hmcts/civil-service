@@ -28,11 +28,11 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.search.SupportingDocuments;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.Valid;
+
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
@@ -147,11 +147,11 @@ public class CaseData implements MappableObject {
     private final YesOrNo responseClaimMediationSpecRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
     private final String responseClaimWitnesses;
-    private final YesOrNo SmallClaimHearingInterpreterRequired;
-    private final String SmallClaimHearingInterpreterDescription;
+    private final YesOrNo smallClaimHearingInterpreterRequired;
+    private final String smallClaimHearingInterpreterDescription;
 
     @JsonUnwrapped
-    private final ExpertRequirements respondToClaim_experts;
+    private final ExpertRequirements respondToClaimExperts;
 
     @Valid
     private final CloseClaim withdrawClaim;

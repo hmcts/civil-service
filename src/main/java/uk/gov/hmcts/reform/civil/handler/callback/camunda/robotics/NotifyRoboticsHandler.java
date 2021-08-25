@@ -36,15 +36,14 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         try {
-            if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                 roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                errors = jsonSchemaValidationService.validateWithSpecSchema(roboticsCaseData.toJsonString());
             } else {
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 
-            if (errors.isEmpty()) {
+            if (errors == null || errors.isEmpty()) {
                 roboticsNotificationService.notifyRobotics(caseData);
             } else {
                 throw new JsonSchemaValidationException(

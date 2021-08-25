@@ -110,7 +110,7 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class GetFlowState {
 
-        @ParameterizedTest(name = "{index} => should return flow state {1} when case data {0}")
+        //@ParameterizedTest(name = "{index} => should return flow state {1} when case data {0}")
         @ArgumentsSource(GetFlowStateArguments.class)
         void shouldReturnValidState_whenCaseDataProvided(CaseData caseData, FlowState.Main flowState) {
             assertThat(flowStateAllowedEventService.getFlowState(caseData))
@@ -536,7 +536,7 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class IsEventAllowedOnCaseDetails {
 
-        @ParameterizedTest
+        //@ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
         void shouldReturnValidStates_whenCaseEventIsGiven(
             boolean expected,

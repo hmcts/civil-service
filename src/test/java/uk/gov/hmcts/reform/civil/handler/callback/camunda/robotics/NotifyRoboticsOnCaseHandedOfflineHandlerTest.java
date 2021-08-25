@@ -67,23 +67,6 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     @Nested
-    class ValidJsonPayload {
-
-        @Autowired
-        private NotifyRoboticsOnCaseHandedOfflineHandler handler;
-
-        @Test
-        void shouldNotifyRobotics_whenNoSchemaErrors() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(roboticsNotificationService).notifyRobotics(caseData);
-        }
-    }
-
-    @Nested
     class InValidJsonPayload {
 
         @MockBean

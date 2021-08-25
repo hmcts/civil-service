@@ -441,7 +441,8 @@ public class EventHistoryMapper {
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
-                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM) ?
+                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)
+                        ?
                         Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
                             .eventCode("38")

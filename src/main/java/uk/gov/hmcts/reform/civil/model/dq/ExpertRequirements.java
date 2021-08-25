@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.dq;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 
 import java.math.BigDecimal;
 

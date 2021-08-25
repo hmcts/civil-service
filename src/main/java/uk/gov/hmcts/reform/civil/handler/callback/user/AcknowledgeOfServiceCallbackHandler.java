@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -106,7 +109,8 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
         Party respondent = callbackParams.getCaseData().getRespondent1();
-        List<String> errors = dateOfBirthValidator.validate(respondent);CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = dateOfBirthValidator.validate(respondent);
+        CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired().equals(NO)) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getSpecAoSRespondentCorrespondenceAddressdetails().getPostCode());
@@ -168,7 +172,8 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
         String body = format(
             CONFIRMATION_SUMMARY,
             formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()))
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference())
+        )
             + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()

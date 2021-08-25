@@ -315,38 +315,6 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM
             )
         ),
-
-        entry(
-            CLAIM_DETAILS_NOTIFIED.fullName(),
-            List.of(
-                ACKNOWLEDGE_CLAIM,
-                DEFENDANT_RESPONSE,
-                INFORM_AGREED_EXTENSION_DATE,
-                ADD_DEFENDANT_LITIGATION_FRIEND,
-                WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM,
-                AMEND_PARTY_DETAILS,
-                CASE_PROCEEDS_IN_CASEMAN,
-                DISMISS_CLAIM
-            )
-        ),
-
-        entry(
-            CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-            List.of(
-                ACKNOWLEDGE_CLAIM,
-                ACKNOWLEDGEMENT_OF_SERVICE,
-                INFORM_AGREED_EXTENSION_DATE_SPEC,
-                DEFENDANT_RESPONSE,
-                ADD_DEFENDANT_LITIGATION_FRIEND,
-                WITHDRAW_CLAIM,
-                DISCONTINUE_CLAIM,
-                CASE_PROCEEDS_IN_CASEMAN,
-                AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
-            )
-        ),
-
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
