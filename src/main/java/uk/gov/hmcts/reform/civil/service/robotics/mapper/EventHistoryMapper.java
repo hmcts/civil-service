@@ -42,6 +42,7 @@ public class EventHistoryMapper {
 
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
+    private final EventHistorySequencer eventHistorySequencer;
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -123,7 +124,7 @@ public class EventHistoryMapper {
                 }
             });
         buildRespondent1LitigationFriendEvent(builder, caseData);
-        return builder.build();
+        return eventHistorySequencer.sortEvents(builder.build());
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

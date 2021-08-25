@@ -37,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    EventHistorySequencer.class,
+    EventHistorySequencer.class,
     EventHistoryMapper.class
 })
 class EventHistoryMapperTest {
@@ -1763,7 +1765,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -1777,7 +1779,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")

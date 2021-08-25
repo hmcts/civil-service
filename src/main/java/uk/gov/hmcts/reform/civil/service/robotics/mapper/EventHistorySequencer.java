@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Component
 public class EventHistorySequencer {
@@ -61,6 +62,9 @@ public class EventHistorySequencer {
                     throw new IllegalStateException("Un expected event type: " + eventType);
             }
         });
+        if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
+            builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
