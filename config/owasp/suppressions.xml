@@ -66,4 +66,10 @@
     <packageUrl regex="true">^pkg:maven/org\.hibernate\.validator/hibernate\-validator@.*$</packageUrl>
     <vulnerabilityName>CVE-2020-10693</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+            Related Nim-lang
+        ]]></notes>
+    <cve>CVE-2020-23171</cve>
+  </suppress>
 </suppressions>

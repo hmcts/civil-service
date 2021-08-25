@@ -43,14 +43,6 @@ class EventHistorySequencerTest {
     }
 
     @Test
-    void shouldNotSort_whenNoEventInEventHistory() {
-        EventHistory eventHistory = EventHistory.builder().build();
-        var result = eventHistorySequencer.sortEvents(eventHistory);
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(eventHistory);
-    }
-
-    @Test
     void shouldThrowException_whenPassedNullObject() {
         assertThrows(
             NullPointerException.class,
