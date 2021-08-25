@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.assertion.CustomAssertions.assertThat;
 
 class RoboticsAddressMapperTest {
 
-    RoboticsAddressMapper mapper = new RoboticsAddressMapper();
+    RoboticsAddressMapper mapper = new RoboticsAddressMapper(new AddressLinesMapper());
 
     @Nested
     class RoboticsAddressMapping {
@@ -47,6 +47,49 @@ class RoboticsAddressMapperTest {
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
             assertThat(roboticsAddress).isEqualTo(address);
+        }
+
+        @Test
+        void shouldMapToRoboticsAddress_whenAllAddressLinesAreEqualTo35Characters() {
+            Address address = AddressBuilder.maximal().build();
+
+            RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
+
+            assertThat(roboticsAddress).isEqualTo(address);
+        }
+
+        @Test
+        void shouldRollOverToAddressLine2_whenAddressLine1IsMoreThan35CharactersWithCommas() {
+            Address address = Address.builder()
+                .addressLine1("address line 1, address line 1, address line 2")
+                .postCode("SW1 1AA").build();
+
+            RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
+
+            assertThat(roboticsAddress)
+                .isEqualTo(RoboticsAddress.builder()
+                               .addressLine1("address line 1, address line 1")
+                               .addressLine2("address line 2")
+                               .postCode("SW1 1AA")
+                               .build());
+        }
+
+        @Test
+        void shouldRollOverToAddressLine3_whenAddressLine2IsMoreThan35CharactersWithCommas() {
+            Address address = Address.builder()
+                .addressLine1("address line 1, address line 1")
+                .addressLine2("address line 2, address line 2, address line 3")
+                .postCode("SW1 1AA").build();
+
+            RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
+
+            assertThat(roboticsAddress)
+                .isEqualTo(RoboticsAddress.builder()
+                               .addressLine1("address line 1, address line 1")
+                               .addressLine2("address line 2, address line 2")
+                               .addressLine3("address line 3")
+                               .postCode("SW1 1AA")
+                               .build());
         }
     }
 
