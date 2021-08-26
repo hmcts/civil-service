@@ -79,7 +79,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        List<String> dynamicListOptions = new ArrayList<String>();
+        List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Respondent One: " + caseData.getRespondent1().getPartyName());
 

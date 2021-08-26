@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
@@ -50,12 +51,13 @@ public class FlowPredicate {
         caseData.getClaimNotificationDate() != null
             && caseData.getDefendantSolicitorNotifyClaimOptions() == null
             || caseData.getClaimNotificationDate() != null
-            && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel() == "Both";
+            && Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
 
     public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
         caseData.getClaimNotificationDeadline() != null
-            && caseData.getDefendantSolicitorNotifyClaimOptions() != null                           //selection is made
-            && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel() != "Both";  //its sol 1 or sol 2
+            && caseData.getDefendantSolicitorNotifyClaimOptions() != null   //selection is made
+            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(),
+                           "Both");                                     //its sol 1 or sol 2
 
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
