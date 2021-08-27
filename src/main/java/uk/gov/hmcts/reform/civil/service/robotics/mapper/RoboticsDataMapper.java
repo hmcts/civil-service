@@ -172,7 +172,10 @@ public class RoboticsDataMapper {
                 .contactFaxNumber(organisationDetails.getFax())
                 .contactDX(organisationDetails.getDx())
                 .contactEmailAddress(organisationDetails.getEmail())
-                .addresses(addressMapper.toRoboticsAddresses(organisationDetails.getAddress()));
+                .addresses(ofNullable(organisationDetails.getAddress())
+                               .map(addressMapper::toRoboticsAddresses)
+                               .orElse(null)
+                );
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
