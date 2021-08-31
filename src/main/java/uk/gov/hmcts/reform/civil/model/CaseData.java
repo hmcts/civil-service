@@ -52,6 +52,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo respondent1OrgRegistered;
     private final YesOrNo respondent2OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
+    private final String respondentSolicitor2EmailAddress;
     private final YesOrNo uploadParticularsOfClaim;
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
@@ -74,6 +75,7 @@ public class CaseData implements MappableObject {
     private final OrganisationPolicy respondent1OrganisationPolicy;
     private final OrganisationPolicy respondent2OrganisationPolicy;
     private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    private final SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;

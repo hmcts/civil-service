@@ -70,7 +70,7 @@ class AcknowledgementOfClaimGeneratorTest {
 
     @BeforeEach
     void setup() {
-        when(representativeService.getRespondentRepresentative(any())).thenReturn(representative);
+        when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
     }
 
     @Test
@@ -101,7 +101,7 @@ class AcknowledgementOfClaimGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
-        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService)
@@ -119,7 +119,7 @@ class AcknowledgementOfClaimGeneratorTest {
 
             var templateData = generator.getTemplateData(caseData);
 
-            verify(representativeService).getRespondentRepresentative(caseData);
+            verify(representativeService).getRespondent1Representative(caseData);
             assertThatFieldsAreCorrect(templateData, caseData);
         }
 

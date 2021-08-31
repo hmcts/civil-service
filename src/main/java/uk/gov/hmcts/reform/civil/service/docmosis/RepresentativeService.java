@@ -22,7 +22,7 @@ public class RepresentativeService {
     private final StateFlowEngine stateFlowEngine;
     private final OrganisationService organisationService;
 
-    public Representative getRespondentRepresentative(CaseData caseData) {
+    public Representative getRespondent1Representative(CaseData caseData) {
         if (organisationPicked(caseData)) {
             var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
@@ -38,6 +38,26 @@ public class RepresentativeService {
                 .build();
         }
         return ofNullable(caseData.getRespondentSolicitor1OrganisationDetails())
+            .map(Representative::fromSolicitorOrganisationDetails)
+            .orElse(Representative.builder().build());
+    }
+
+    public Representative getRespondent2Representative(CaseData caseData) {
+        if (organisationPicked(caseData)) {
+            var organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
+                                                      .orElseThrow(RuntimeException::new));
+
+            var representativeBuilder = representative.toBuilder();
+
+            Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
+                .ifPresent(representativeBuilder::serviceAddress);
+
+            return representativeBuilder
+                .emailAddress(caseData.getRespondentSolicitor2EmailAddress())
+                .build();
+        }
+        return ofNullable(caseData.getRespondentSolicitor2OrganisationDetails())
             .map(Representative::fromSolicitorOrganisationDetails)
             .orElse(Representative.builder().build());
     }

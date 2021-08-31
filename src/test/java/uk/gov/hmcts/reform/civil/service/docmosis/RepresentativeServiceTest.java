@@ -102,7 +102,7 @@ class RepresentativeServiceTest {
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-            Representative representative = representativeService.getRespondentRepresentative(caseData);
+            Representative representative = representativeService.getRespondent1Representative(caseData);
 
             verify(organisationService).findOrganisationById(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
@@ -135,7 +135,7 @@ class RepresentativeServiceTest {
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)
                 .build();
 
-            Representative representative = representativeService.getRespondentRepresentative(caseData);
+            Representative representative = representativeService.getRespondent1Representative(caseData);
 
             verify(organisationService).findOrganisationById(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
@@ -167,7 +167,7 @@ class RepresentativeServiceTest {
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .build();
 
-            Representative representative = representativeService.getRespondentRepresentative(caseData);
+            Representative representative = representativeService.getRespondent1Representative(caseData);
 
             verify(organisationService).findOrganisationById(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
@@ -197,7 +197,7 @@ class RepresentativeServiceTest {
         void shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
 
-            Representative representative = representativeService.getRespondentRepresentative(caseData);
+            Representative representative = representativeService.getRespondent1Representative(caseData);
 
             verifyNoInteractions(organisationService);
             assertThat(representative).extracting(
@@ -215,7 +215,7 @@ class RepresentativeServiceTest {
         void shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRegisteredDefendant().build();
 
-            Representative representative = representativeService.getRespondentRepresentative(caseData);
+            Representative representative = representativeService.getRespondent1Representative(caseData);
 
             verifyNoInteractions(organisationService);
             assertThat(representative).extracting(

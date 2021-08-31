@@ -73,7 +73,7 @@ class SealedClaimFormGeneratorTest {
 
     @BeforeEach
     void setup() {
-        when(representativeService.getRespondentRepresentative(any())).thenReturn(representative);
+        when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
     }
 
@@ -90,7 +90,7 @@ class SealedClaimFormGeneratorTest {
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
-        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
     }
@@ -137,7 +137,7 @@ class SealedClaimFormGeneratorTest {
                         .orElse("")
                 ),
                 () -> assertEquals(
-                    templateData.getRespondentExternalReference(),
+                    templateData.getRespondent1ExternalReference(),
                     ofNullable(caseData.getSolicitorReferences())
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
                         .orElse("")
