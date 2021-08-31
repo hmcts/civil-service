@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-00727.docx", "sealed_claim_form_%s.pdf"),
+    N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-00762.docx", "sealed_claim_form_%s.pdf"),
     N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N181("CV-UNS-HRN-ENG-00651.docx", "%s_directions_questionnaire_form_%s.pdf");
 

@@ -168,6 +168,7 @@ public class CaseDataBuilder {
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
+    protected Address respondentSolicitor2ServiceAddress;
     protected YesOrNo isRespondent1;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
@@ -192,6 +193,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor1ServiceAddress(Address respondentSolicitor1ServiceAddress) {
         this.respondentSolicitor1ServiceAddress = respondentSolicitor1ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2ServiceAddress(Address respondentSolicitor2ServiceAddress) {
+        this.respondentSolicitor2ServiceAddress = respondentSolicitor2ServiceAddress;
         return this;
     }
 
@@ -745,7 +751,9 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
         respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
@@ -753,6 +761,9 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2Represented = NO;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
@@ -1227,6 +1238,7 @@ public class CaseDataBuilder {
             .claimDismissedDate(claimDismissedDate)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
+            .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .caseNotes(caseNotes)
