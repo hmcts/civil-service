@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -42,6 +43,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private CreateClaimRespondentNotificationHandler handler;
@@ -51,7 +54,11 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate())
+                .thenReturn("non-multiparty-template-id");
+
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
         }
 
         @Test
@@ -66,7 +73,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "template-id",
+                "non-multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -84,7 +91,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
-                "template-id",
+                "non-multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -115,7 +122,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "template-id",
+                "non-multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -138,11 +145,32 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
-                "template-id",
+                "non-multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE").build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "multiparty-template-id",
+                getNotificationDataMap(caseData),
+                "create-claim-respondent-notification-000DC001"
+            );
+        }
+
     }
 
     @Test

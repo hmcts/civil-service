@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -36,8 +37,6 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE
     );
 
-    public static final String TASK_ID = "NotifyDefendantSolicitor1";
-    public static final String TASK_ID_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyFirstDefendantSolicitor";
     public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifySecondDefendantSolicitor";
@@ -46,6 +45,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -135,7 +135,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,
-            notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
+            featureToggleService.isMultipartyEnabled()
+                ? notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate()
+                : notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );

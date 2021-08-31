@@ -90,8 +90,8 @@ reference:
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
-  #respondentSolicitorClaimIssueEmailTemplate: "aca69f2f-cfc7-4e16-ab7a-76a7e25d3d01"
-  respondentSolicitorClaimIssueEmailTemplate: "28f30511-e58d-4eac-b09c-e145ad42710a"
+  respondentSolicitorClaimIssueEmailTemplate: "aca69f2f-cfc7-4e16-ab7a-76a7e25d3d01"
+  respondentSolicitorClaimIssueMultipartyEmailTemplate: "28f30511-e58d-4eac-b09c-e145ad42710a"
   respondentSolicitorClaimDetailsEmailTemplate: "fcd7be87-5eae-4227-8bf5-c7c6962ec804"
   solicitorDefendantResponseCaseTakenOffline: "513af1f3-e2be-49db-a463-b6f12641d13d"
   claimantSolicitorDefendantResponseFullDefence: "063699f2-3647-4aa8-ad39-113ff4ecb8ec"
