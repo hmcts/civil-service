@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -57,6 +58,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -102,7 +104,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> warnings = new ArrayList<>();
-        if (! notifyBothRespondentSolicitors(caseData)) {
+        if (!notifyBothRespondentSolicitors(caseData)) {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
@@ -158,15 +160,20 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmationWithSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
-        String body;
 
-        if (notifyBothRespondentSolicitors(caseData)) {
-            body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
-        } else {
-            body = format(CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY, formattedDeadline)
-                + exitSurveyContentService.applicantSurvey();
+        if (!featureToggleService.isMultipartyEnabled()
+            || caseData.getDefendantSolicitorNotifyClaimOptions() == null) {
+            return buildConfirmation(callbackParams);
         }
+
+        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+
+        String confirmationText = notifyBothRespondentSolicitors(caseData)
+            ? CONFIRMATION_SUMMARY
+            : CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY;
+
+        String body = format(confirmationText, formattedDeadline)
+            + exitSurveyContentService.applicantSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
