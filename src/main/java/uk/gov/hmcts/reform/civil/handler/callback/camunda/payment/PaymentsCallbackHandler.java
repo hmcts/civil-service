@@ -190,6 +190,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .claimIssuedPaymentDetails(paymentDetails)
                 .build();
         } catch (JsonProcessingException jsonException) {
+            log.error(jsonException.getMessage());
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.contentUTF8()
             ));
