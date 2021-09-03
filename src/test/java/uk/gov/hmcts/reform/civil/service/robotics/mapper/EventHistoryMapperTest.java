@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -218,7 +216,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory)
                 .extracting("miscellaneous")
                 .asList()
-                .containsExactly(claimIssuedEvent, claimNotifiedEvent,  claimDetailsNotifiedEvent);
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, claimDetailsNotifiedEvent);
             assertEmptyEvents(
                 eventHistory,
                 "acknowledgementOfServiceReceived",
@@ -269,7 +267,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -284,7 +282,7 @@ class EventHistoryMapperTest {
                 .build();
 
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
@@ -410,7 +408,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -425,7 +423,7 @@ class EventHistoryMapperTest {
                 .build();
 
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
@@ -552,7 +550,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -566,7 +564,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
@@ -707,7 +705,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -721,7 +719,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
@@ -897,7 +895,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -911,7 +909,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
@@ -933,9 +931,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                 .asList().containsExactlyInAnyOrder(
-                expectedDirectionsQuestionnaireRespondent,
-                expectedDirectionsQuestionnaireApplicant
-            );
+                    expectedDirectionsQuestionnaireRespondent,
+                    expectedDirectionsQuestionnaireApplicant);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -1028,9 +1025,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                 .asList().containsExactlyInAnyOrder(
-                expectedDirectionsQuestionnaireRespondent,
-                expectedDirectionsQuestionnaireApplicant
-            );
+                    expectedDirectionsQuestionnaireRespondent,
+                    expectedDirectionsQuestionnaireApplicant);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
@@ -1084,11 +1080,7 @@ class EventHistoryMapperTest {
             );
         }
 
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class,
-            names = {"CLAIM_NOTIFIED", "CLAIM_DETAILS_NOTIFIED"},
-            mode = EnumSource.Mode.INCLUDE
-        )
+        @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimOrDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterClaimNotified()
@@ -1457,9 +1449,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
-                .claimDismissedDate(LocalDateTime.now())
-                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
+                .atDeadlinePassedAfterStateClaimDetailsNotified()
                 .build();
 
             String detailsText = "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
@@ -1507,9 +1497,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateClaimDetailsNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotifiedTimeExtension()
-                .claimDismissedDate(LocalDateTime.now())
-                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
+                .atDeadlinePassedAfterStateClaimDetailsNotifiedExtension()
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1570,9 +1558,8 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledged() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .claimDismissedDate(LocalDateTime.now())
-                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
+            CaseData caseData = CaseDataBuilder.builder()
+                .atDeadlinePassedAfterStateNotificationAcknowledged()
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1634,9 +1621,8 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
-                .claimDismissedDate(LocalDateTime.now())
-                .claimDismissedDeadline(LocalDateTime.now().minusDays(1))
+            CaseData caseData = CaseDataBuilder.builder()
+                .atDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension()
                 .build();
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1765,7 +1751,7 @@ class EventHistoryMapperTest {
                     .build()
             );
             Event expectedAcknowledgementOfServiceReceived = Event.builder()
-                .eventSequence(3)
+                .eventSequence(2)
                 .eventCode("38")
                 .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
                 .litigiousPartyID("002")
@@ -1779,7 +1765,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
             Event expectedConsentExtensionFilingDefence = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("45")
                 .dateReceived(caseData.getRespondent1TimeExtensionDate())
                 .litigiousPartyID("002")
