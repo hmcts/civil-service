@@ -119,6 +119,10 @@ os-postcode-lookup:
   key: ${OS_POSTCODE_LOOKUP_API_KEY:}
   offline-mode: false
 
+stitching:
+  api:
+    url: http://localhost:8084/api/stitch-ccd-bundles
+
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
   offline-mode: false

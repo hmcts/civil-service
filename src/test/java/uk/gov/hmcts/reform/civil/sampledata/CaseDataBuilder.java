@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -137,7 +139,7 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
-    protected  LitigationFriend respondent1LitigationFriend;
+    protected LitigationFriend respondent1LitigationFriend;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -172,6 +174,7 @@ public class CaseDataBuilder {
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected YesOrNo isRespondent1;
+    private List<IdValue<Bundle>> caseBundles;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -993,6 +996,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder caseBundles(List<IdValue<Bundle>> caseBundles) {
+        this.caseBundles = caseBundles;
+        return this;
+    }
+
     public CaseDataBuilder applicantSolicitor1UserDetails(IdamUserDetails applicantSolicitor1UserDetails) {
         this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
         return this;
@@ -1106,6 +1114,7 @@ public class CaseDataBuilder {
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(UNSPEC_CLAIM)
+            .caseBundles(caseBundles)
             .build();
     }
 }

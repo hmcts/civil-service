@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -25,14 +26,12 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.search.SupportingDocuments;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.Valid;
-
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
@@ -92,8 +91,8 @@ public class CaseData implements MappableObject {
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
-    private final SupportingDocuments specClaimTemplateDocumentFiles;
-    private final SupportingDocuments specClaimDetailsDocumentFiles;
+    private final Document specClaimTemplateDocumentFiles;
+    private final Document specClaimDetailsDocumentFiles;
     private final List<Evidence> speclistYourEvidenceList;
     private final YesOrNo specApplicantCorrespondenceAddressRequired;
     private final Address specApplicantCorrespondenceAddressdetails;
@@ -213,4 +212,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendDate;
 
     private final YesOrNo isRespondent1;
+
+    private final List<IdValue<Bundle>> caseBundles;
 }

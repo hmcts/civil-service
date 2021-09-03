@@ -60,6 +60,7 @@ java:
     LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
+    STITCHING_API_URL: http://em-ccdorc-aat.service.core-compute-aat.internal/api/stitch-ccd-bundles
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
