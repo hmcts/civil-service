@@ -47,12 +47,12 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
+            new PDF(getFileName(docmosisTemplate, caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
     }
 
-    private String getFileName(CaseData caseData) {
-        return String.format(N1.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(DocmosisTemplates docmosisTemplate, CaseData caseData) {
+        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
     @Override
@@ -90,13 +90,11 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_ONE:
+            case ONE_V_TWO_TWO_LEGAL_REP:
                 return N1;
             case TWO_V_ONE:
-                return N1_2v1;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return N1_1v2_SAME_SOL;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return N1_1v2_DIFF_SOL;
+                return N1_MULTIPARTY_SAME_SOL;
             default:
                 throw new IllegalArgumentException("Multiparty scenario doesn't exist");
         }
@@ -104,12 +102,12 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     private List<Party> getRespondents(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         var respondent = caseData.getRespondent1();
+        var respondent1Representative = representativeService.getRespondent1Representative(caseData);
         var respondentParties = new ArrayList<>(List.of(
             Party.builder()
                 .name(respondent.getPartyName())
                 .primaryAddress(respondent.getPrimaryAddress())
-                .representative(representativeService.getRespondent1Representative(
-                    caseData))
+                .representative(respondent1Representative)
                 .build()));
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
@@ -117,7 +115,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             respondentParties.add(Party.builder()
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
-                                      .representative(representativeService.getRespondent1Representative(caseData))
+                                      .representative(respondent1Representative)
                                       .build());
         } else if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
@@ -133,6 +131,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
 
     private List<Party> getApplicants(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         var applicant = caseData.getApplicant1();
+        var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
         var applicantParties = new ArrayList<>(List.of(
             Party.builder()
                 .name(applicant.getPartyName())
@@ -141,8 +140,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
                     ofNullable(caseData.getApplicant1LitigationFriend())
                         .map(LitigationFriend::getFullName)
                         .orElse(""))
-                .representative(representativeService.getApplicantRepresentative(
-                    caseData))
+                .representative(applicantRepresentative)
                 .build()));
 
         if (multiPartyScenario == TWO_V_ONE) {
@@ -154,7 +152,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
                                          ofNullable(caseData.getApplicant2LitigationFriend())
                                              .map(LitigationFriend::getFullName)
                                              .orElse(""))
-                                     .representative(representativeService.getApplicantRepresentative(caseData))
+                                     .representative(applicantRepresentative)
                                      .build());
         }
 
