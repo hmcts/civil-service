@@ -19,6 +19,7 @@ public class Respondent1DQ implements DQ {
     private final Experts respondent1DQExperts;
     private final Witnesses respondent1DQWitnesses;
     private final Hearing respondent1DQHearing;
+    private final SmallClaimHearing respondent1DQHearingSmallClaim;
     private final Document respondent1DQDraftDirections;
     private final RequestedCourt respondent1DQRequestedCourt;
     private final HearingSupport respondent1DQHearingSupport;
@@ -66,6 +67,12 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQHearing")
     public Hearing getHearing() {
         return getHearing(respondent1DQHearing);
+    }
+
+    @Override
+    @JsonProperty("respondent1DQHearingSmallClaim")
+    public SmallClaimHearing getSmallClaimHearing() {
+        return getSmallClaimHearing(respondent1DQHearingSmallClaim);
     }
 
     @Override

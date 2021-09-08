@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -144,8 +145,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // UnavailableDates validation & field (model) needs to be created.
         // This will be taken care via different story,
         // because we don't have AC around this date field validation in ROC-9455
+        CaseData caseData = callbackParams.getCaseData();
+        SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
+        List<String> errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 
