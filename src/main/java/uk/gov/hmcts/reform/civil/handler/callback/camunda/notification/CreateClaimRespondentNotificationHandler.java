@@ -37,9 +37,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE
     );
 
-    public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyFirstDefendantSolicitor";
+    public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyDefendantSolicitor1";
     public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
-    public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifySecondDefendantSolicitor";
+    public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifyDefendantSolicitor2";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
     private final NotificationService notificationService;
