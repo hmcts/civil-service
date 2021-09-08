@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -30,9 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -55,6 +54,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private NotifyClaimCallbackHandler handler;
@@ -231,6 +233,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             + "1 Defendant legal representative only.%n%n"
             + "You must notify the other defendant legal representative of the claim by %s";
 
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+        }
+
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
@@ -280,8 +287,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
-            String confirmationBody = String.format(CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY,
-                                                    formattedDeadline) + exitSurveyContentService.applicantSurvey();
+            String confirmationBody = String.format(
+                CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY,
+                formattedDeadline
+            ) + exitSurveyContentService.applicantSurvey();
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
