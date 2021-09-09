@@ -31,6 +31,9 @@ public class NotificationsProperties {
     private String respondentSolicitorAcknowledgeClaimForSpec;
 
     @NotEmpty
+    private String applicantSolicitorAcknowledgeClaimForSpec;
+
+    @NotEmpty
     private String failedPayment;
 
     @NotEmpty

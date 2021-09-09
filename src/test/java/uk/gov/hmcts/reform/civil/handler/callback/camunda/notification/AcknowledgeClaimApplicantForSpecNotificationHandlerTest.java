@@ -56,6 +56,7 @@ class AcknowledgeClaimApplicantForSpecNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec()).thenReturn("template-id");
+            when(notificationsProperties.getApplicantSolicitorAcknowledgeClaimForSpec()).thenReturn("template-id");
         }
 
         @Test

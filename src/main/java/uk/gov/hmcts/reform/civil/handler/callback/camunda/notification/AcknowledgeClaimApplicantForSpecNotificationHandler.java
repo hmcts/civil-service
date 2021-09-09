@@ -70,7 +70,7 @@ public class AcknowledgeClaimApplicantForSpecNotificationHandler extends Callbac
         } else {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec(),
+                notificationsProperties.getApplicantSolicitorAcknowledgeClaimForSpec(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
