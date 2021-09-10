@@ -122,6 +122,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
+            log.info("processing payment for case " + caseData.getCcdCaseReference());
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
@@ -138,6 +139,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
                 .build();
 
         } catch (FeignException e) {
+            log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
                 caseData = updateWithBusinessError(caseData, e);
             } else {
