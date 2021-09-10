@@ -165,6 +165,7 @@ public class CaseDataBuilder {
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
+    protected Address respondentSolicitor2ServiceAddress;
     protected YesOrNo isRespondent1;
 
     //workaround fields
@@ -193,6 +194,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor1ServiceAddress(Address respondentSolicitor1ServiceAddress) {
         this.respondentSolicitor1ServiceAddress = respondentSolicitor1ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2ServiceAddress(Address respondentSolicitor2ServiceAddress) {
+        this.respondentSolicitor2ServiceAddress = respondentSolicitor2ServiceAddress;
         return this;
     }
 
@@ -1165,6 +1171,7 @@ public class CaseDataBuilder {
             .claimDismissedDate(claimDismissedDate)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
+            .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
             .isRespondent1(isRespondent1)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
