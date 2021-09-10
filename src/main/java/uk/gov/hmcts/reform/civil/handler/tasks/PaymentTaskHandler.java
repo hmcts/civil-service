@@ -54,7 +54,7 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public int getMaxAttempts() {
-        return 0;
+        return 1;
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
