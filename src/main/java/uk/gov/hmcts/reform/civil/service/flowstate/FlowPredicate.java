@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
@@ -15,6 +18,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class FlowPredicate {
+
+    public static final Predicate<CaseData> hasNotifiedClaimDetailsToBoth = caseData ->
+        Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel)
+            .orElse("")
+            .equalsIgnoreCase("Both");
 
     public static final Predicate<CaseData> claimSubmittedOneRespondentRepresentative = caseData ->
         caseData.getSubmittedDate() != null
@@ -61,7 +71,14 @@ public class FlowPredicate {
         caseData.getClaimNotificationDeadline() != null;
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
-        caseData.getClaimDetailsNotificationDate() != null;
+        caseData.getClaimDetailsNotificationDate() != null
+            && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
+            || hasNotifiedClaimDetailsToBoth.test(caseData));
+
+    public static final Predicate<CaseData> takenOfflineAfterClaimDetailsNotified = caseData ->
+        caseData.getClaimDetailsNotificationDate() != null
+            && caseData.getDefendantSolicitorNotifyClaimDetailsOptions() != null
+            && hasNotifiedClaimDetailsToBoth.negate().test(caseData);
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         caseData.getRespondent1AcknowledgeNotificationDate() != null;

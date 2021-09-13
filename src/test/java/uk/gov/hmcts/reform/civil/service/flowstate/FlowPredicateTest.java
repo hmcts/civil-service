@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
@@ -118,6 +119,7 @@ class FlowPredicateTest {
         }
 
         @Test //1v2 - Notify Both Sol
+        @Test
         void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
@@ -133,6 +135,17 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineAfterClaimNotified.test(caseData));
+            assertFalse(claimNotified.test(caseData));
+        }
+
+        @Test // 1v2 - Same Solicitor / 1v1 Case (Field is null)
+        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified()
+                .build();
+
+            assertTrue(claimNotified.test(caseData));
+            assertFalse(takenOfflineAfterClaimNotified.test(caseData));
         }
     }
 
