@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
@@ -45,6 +46,7 @@ import static org.mockito.Mockito.verify;
         EventHistoryMapper.class,
         RoboticsDataMapper.class,
         RoboticsAddressMapper.class,
+        AddressLinesMapper.class,
         OrganisationService.class
     },
     properties = {
