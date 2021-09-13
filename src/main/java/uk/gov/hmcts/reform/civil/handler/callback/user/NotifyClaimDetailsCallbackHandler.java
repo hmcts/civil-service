@@ -106,7 +106,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
 
-        String confirmationText = isNotificationToBothSolicitors(caseData)
+        String confirmationText = isNotificationDetailsToBothSolicitors(caseData)
             ? CONFIRMATION_SUMMARY
             : NOTIFICATION_ONE_PARTY_SUMMARY;
 
@@ -163,7 +163,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> warnings = new ArrayList<>();
-        if (!isNotificationToBothSolicitors(caseData)) {
+        if (!isNotificationDetailsToBothSolicitors(caseData)) {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
@@ -174,7 +174,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    protected boolean isNotificationToBothSolicitors(CaseData caseData) {
+    protected boolean isNotificationDetailsToBothSolicitors(CaseData caseData) {
         return Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
