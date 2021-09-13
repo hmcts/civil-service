@@ -156,6 +156,7 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime respondent1LitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
+    protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -397,6 +398,15 @@ public class CaseDataBuilder {
             .value(DynamicListElement.builder()
                     .label(defaultValue)
                     .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
+        this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(defaultValue)
+                       .build())
             .build();
         return this;
     }
@@ -724,6 +734,18 @@ public class CaseDataBuilder {
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_withBothSolicitorOptionSelected() {
+        atStateClaimDetailsNotified();
+        defendantSolicitorNotifyClaimDetailsOptions("Both");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_withOneSolicitorOptionSelected() {
+        atStateClaimDetailsNotified();
+        defendantSolicitorNotifyClaimDetailsOptions("Defendant One: Solicitor");
         return this;
     }
 
@@ -1116,6 +1138,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
+            .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .build();
