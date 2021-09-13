@@ -68,6 +68,12 @@ withNightlyPipeline(type, product, component) {
     env.TESTS_FOR_ACCESSIBILITY = false
   }
 
+  //enableCrossBrowserTest()
+
+ // after('crossBrowserTest') {
+ //   steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+ // }
+
   after('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
