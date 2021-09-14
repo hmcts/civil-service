@@ -65,7 +65,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
         if (isCcNotification(callbackParams)) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec(),
+                notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec(),
                 addPropertiesForRespondent(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

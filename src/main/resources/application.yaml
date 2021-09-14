@@ -111,6 +111,7 @@ notifications:
   applicantSolicitorAcknowledgeClaimForSpec: "a33e1b0a-42d8-46b2-8773-6fd84a9b8b01"
   respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
   claimantSolicitorAgreedExtensionDateForSpec: "74e33576-487f-4c63-bdef-fe12c4279faa"
+  respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
