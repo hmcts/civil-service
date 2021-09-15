@@ -212,6 +212,7 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
+            .state(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)
             .build();
     }
 
