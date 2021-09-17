@@ -111,6 +111,9 @@ public class CaseData implements MappableObject {
     private final Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
+    private final Respondent1DQ respondent2DQ;
+
+    @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
