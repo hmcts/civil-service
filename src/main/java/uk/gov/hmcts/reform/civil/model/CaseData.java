@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -111,7 +112,7 @@ public class CaseData implements MappableObject {
     private final Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
-    private final Respondent1DQ respondent2DQ;
+    private final Respondent2DQ respondent2DQ;
 
     @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
