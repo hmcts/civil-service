@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 
@@ -50,6 +51,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
     private static final String PAYMENT_ERROR_CODE = "CA-E0004";
+    public static final String DUPLICATE_PAYMENT_MESSAGE
+        = "You attempted to retry the payment to soon. Try again later.";
 
     @MockBean
     private PaymentsService paymentsService;
@@ -112,12 +115,16 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
-            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+            doThrow(new InvalidPaymentRequestException("Duplicate Payment."))
+                .when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("errorMessage", "errorCode", "status", "customerReference")
+                .containsExactly(DUPLICATE_PAYMENT_MESSAGE, null, FAILED.toString(), "12345");
         }
 
         @ParameterizedTest
@@ -191,12 +198,16 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
-            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+            doThrow(new InvalidPaymentRequestException("Duplicate Payment."))
+                .when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).extracting("paymentDetails")
+                .extracting("errorMessage", "errorCode", "status", "customerReference")
+                .containsExactly(DUPLICATE_PAYMENT_MESSAGE, null, FAILED.toString(), null);
         }
 
         @ParameterizedTest
@@ -226,7 +237,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeignException buildFeignException(int status) {
         return buildFeignClientException(status, objectMapper.writeValueAsBytes(
             PaymentDto.builder()
-                .statusHistories(new StatusHistoryDto[] {
+                .statusHistories(new StatusHistoryDto[]{
                     StatusHistoryDto.builder()
                         .errorCode(PAYMENT_ERROR_CODE)
                         .errorMessage(PAYMENT_ERROR_MESSAGE)
@@ -244,7 +255,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         return new FeignException.FeignClientException(
             status,
             "exception message",
-            Request.create(GET, "", Map.of(), new byte[] {}, UTF_8, null),
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
             body
         );
     }
