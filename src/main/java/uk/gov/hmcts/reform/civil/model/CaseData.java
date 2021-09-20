@@ -100,6 +100,9 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
 
+    private final String caseNote;
+    private final List<Element<CaseNote>> caseNotes;
+
     @Valid
     private final CloseClaim withdrawClaim;
 
