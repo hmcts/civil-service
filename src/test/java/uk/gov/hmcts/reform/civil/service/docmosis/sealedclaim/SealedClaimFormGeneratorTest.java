@@ -205,7 +205,7 @@ class SealedClaimFormGeneratorTest {
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .build();
 
-            var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
+            final var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
 
             verify(representativeService).getApplicantRepresentative(caseData);
             verify(representativeService).getRespondent1Representative(caseData);
@@ -349,7 +349,10 @@ class SealedClaimFormGeneratorTest {
             );
         }
 
-        private void assertThatFieldsAreCorrect_For1V2DifferentSolicitor(SealedClaimForm templateData, CaseData caseData) {
+        private void assertThatFieldsAreCorrect_For1V2DifferentSolicitor(
+            SealedClaimForm templateData,
+            CaseData caseData
+        ) {
             Assertions.assertAll(
                 "SealedClaimForm data should be as expected",
                 () -> assertEquals(templateData.getCaseName(), toCaseName.apply(caseData)),
@@ -403,31 +406,35 @@ class SealedClaimFormGeneratorTest {
         private List<Party> getRespondentsSameSolicitor(CaseData caseData) {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
-            return List.of(Party.builder()
-                               .name(respondent1.getPartyName())
-                               .primaryAddress(respondent1.getPrimaryAddress())
-                               .representative(representative1)
-                               .build(),
-                           Party.builder()
-                               .name(respondent2.getPartyName())
-                               .primaryAddress(respondent2.getPrimaryAddress())
-                               .representative(representative1)
-                               .build());
+            return List.of(
+                Party.builder()
+                    .name(respondent1.getPartyName())
+                    .primaryAddress(respondent1.getPrimaryAddress())
+                    .representative(representative1)
+                    .build(),
+                Party.builder()
+                    .name(respondent2.getPartyName())
+                    .primaryAddress(respondent2.getPrimaryAddress())
+                    .representative(representative1)
+                    .build()
+            );
         }
 
         private List<Party> getRespondentsDifferentSolicitor(CaseData caseData) {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
-            return List.of(Party.builder()
-                               .name(respondent1.getPartyName())
-                               .primaryAddress(respondent1.getPrimaryAddress())
-                               .representative(representative1)
-                               .build(),
-                           Party.builder()
-                               .name(respondent2.getPartyName())
-                               .primaryAddress(respondent2.getPrimaryAddress())
-                               .representative(representative2)
-                               .build());
+            return List.of(
+                Party.builder()
+                    .name(respondent1.getPartyName())
+                    .primaryAddress(respondent1.getPrimaryAddress())
+                    .representative(representative1)
+                    .build(),
+                Party.builder()
+                    .name(respondent2.getPartyName())
+                    .primaryAddress(respondent2.getPrimaryAddress())
+                    .representative(representative2)
+                    .build()
+            );
         }
 
         private List<Party> getApplicant(CaseData caseData) {
@@ -443,18 +450,20 @@ class SealedClaimFormGeneratorTest {
         private List<Party> getApplicants(CaseData caseData) {
             var applicant = caseData.getApplicant1();
             var applicant2 = caseData.getApplicant2();
-            return List.of(Party.builder()
-                               .name(applicant.getPartyName())
-                               .primaryAddress(applicant.getPrimaryAddress())
-                               .litigationFriendName("applicant LF")
-                               .representative(getRepresentative())
-                               .build(),
-                           Party.builder()
-                               .name(applicant2.getPartyName())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .litigationFriendName("applicant2 LF")
-                               .representative(getRepresentative())
-                               .build());
+            return List.of(
+                Party.builder()
+                    .name(applicant.getPartyName())
+                    .primaryAddress(applicant.getPrimaryAddress())
+                    .litigationFriendName("applicant LF")
+                    .representative(getRepresentative())
+                    .build(),
+                Party.builder()
+                    .name(applicant2.getPartyName())
+                    .primaryAddress(applicant2.getPrimaryAddress())
+                    .litigationFriendName("applicant2 LF")
+                    .representative(getRepresentative())
+                    .build()
+            );
         }
     }
 }
