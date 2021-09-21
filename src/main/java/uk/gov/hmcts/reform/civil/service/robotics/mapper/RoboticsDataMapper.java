@@ -33,10 +33,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
-/**
- * This class is skeleton to be refined after we have final version of RPA Json structure
- * and it's mapping with CaseData.
- */
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapper {
@@ -176,7 +172,10 @@ public class RoboticsDataMapper {
                 .contactFaxNumber(organisationDetails.getFax())
                 .contactDX(organisationDetails.getDx())
                 .contactEmailAddress(organisationDetails.getEmail())
-                .addresses(addressMapper.toRoboticsAddresses(organisationDetails.getAddress()));
+                .addresses(ofNullable(organisationDetails.getAddress())
+                               .map(addressMapper::toRoboticsAddresses)
+                               .orElse(null)
+                );
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {

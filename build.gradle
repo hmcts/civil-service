@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.7'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "7.11.1"
+  id "org.flywaydb.flyway" version "7.14.0"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -318,7 +318,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.4.7'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.5.2'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.12.1'

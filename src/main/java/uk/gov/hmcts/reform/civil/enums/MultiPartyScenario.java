@@ -16,11 +16,10 @@ public enum MultiPartyScenario {
             return TWO_V_ONE;
         }
 
-        if (caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
-            return ONE_V_TWO_TWO_LEGAL_REP;
-        } else if (caseData.getRespondent2SameLegalRepresentative() != null) {
-            return ONE_V_TWO_ONE_LEGAL_REP;
+        if (caseData.getRespondent2SameLegalRepresentative() != null) {
+            return caseData.getRespondent2SameLegalRepresentative().equals(NO)
+                ? ONE_V_TWO_TWO_LEGAL_REP
+                : ONE_V_TWO_ONE_LEGAL_REP;
         }
 
         return ONE_V_ONE;

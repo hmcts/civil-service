@@ -40,6 +40,7 @@ import static org.mockito.BDDMockito.given;
     EventHistoryMapper.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
