@@ -181,7 +181,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            caseDataBuilder.respondent2OrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+
+            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
+                .organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyCaseAssignedRole("RESPONDENTSOLICITORTWO")
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
