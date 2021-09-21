@@ -156,6 +156,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime respondent1LitigationFriendDate;
+    protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -1027,6 +1028,7 @@ public class CaseDataBuilder {
             .certificateOfSuitability(List.of())
             .build();
         this.respondent1LitigationFriendDate = claimNotificationDate.plusDays(1);
+        this.respondent1LitigationFriendCreatedDate = claimNotificationDate.plusDays(1);
         return this;
     }
 
@@ -1093,6 +1095,7 @@ public class CaseDataBuilder {
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             .respondent1LitigationFriend(respondent1LitigationFriend)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
+            .respondent1LitigationFriendCreatedDate(respondent1LitigationFriendCreatedDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)

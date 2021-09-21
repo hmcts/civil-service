@@ -129,13 +129,13 @@ public class EventHistoryMapper {
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled()
-            && caseData.getRespondent1LitigationFriendDate() != null) {
+            && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
             String miscText = "Litigation friend added for respondent.";
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getRespondent1LitigationFriendDate())
+                    .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
                                       .miscText(miscText)
