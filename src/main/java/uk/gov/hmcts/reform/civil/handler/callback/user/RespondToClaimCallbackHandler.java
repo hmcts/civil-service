@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -191,8 +192,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-    //TODO: 2nd DQ for 2nd solicitor
-    //TODO: how best to store DQ when one solicitor representing both
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -220,11 +219,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         // same legal rep - will respond for both and set applicant 1 response deadline
         if (respondent2HasSameLegalRep(caseData)) {
-            // if responses are marked as same, copy respondent 1 values into respondent 2
-            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-                updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
-            }
-
             updatedData
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                 .respondent1ResponseDate(responseDate)
@@ -233,13 +227,19 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
                 .build();
 
-            updatedData.respondent1DQ(dq);
+            updatedData.respondent1DQ(respondent1DQ);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+
+            // if responses are marked as same, copy respondent 1 values into respondent 2
+            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
+                updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
+                updatedData.respondent2DQ(respondent1DQ.toRespondent2DQ());
+            }
 
             // only represents 2nd respondent - need to wait for respondent 1 before setting applicant response deadline
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
@@ -250,6 +250,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
             }
+
+            // add statement of truth to respondent 2 dq object
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ().toBuilder()
+                .respondent2DQStatementOfTruth(statementOfTruth)
+                .build();
+
+            updatedData.respondent2DQ(respondent2DQ);
+
+            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+
             // represents 1st respondent - need to set deadline if only 1 respondent, or wait for 2nd respondent
             // response before setting deadline
         } else {

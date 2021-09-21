@@ -103,4 +103,22 @@ public class Respondent1DQ implements DQ {
     public StatementOfTruth getStatementOfTruth() {
         return respondent1DQStatementOfTruth;
     }
+
+    public Respondent2DQ toRespondent2DQ() {
+        return Respondent2DQ.builder()
+            .respondent2DQFileDirectionsQuestionnaire(this.respondent1DQFileDirectionsQuestionnaire)
+            .respondent2DQDisclosureOfElectronicDocuments(this.respondent1DQDisclosureOfElectronicDocuments)
+            .respondent2DQDisclosureOfNonElectronicDocuments(this.respondent1DQDisclosureOfNonElectronicDocuments)
+            .respondent2DQDisclosureReport(this.respondent1DQDisclosureReport)
+            .respondent2DQDraftDirections(this.respondent1DQDraftDirections)
+            .respondent2DQExperts(this.respondent1DQExperts)
+            .respondent2DQFurtherInformation(this.respondent1DQFurtherInformation)
+            .respondent2DQHearing(this.respondent1DQHearing)
+            .respondent2DQHearingSupport(this.respondent1DQHearingSupport)
+            .respondent2DQLanguage(this.respondent1DQLanguage)
+            .respondent2DQRequestedCourt(this.respondent1DQRequestedCourt)
+            .respondent2DQWitnesses(this.respondent1DQWitnesses)
+            .respondent2DQStatementOfTruth(this.respondent1DQStatementOfTruth)
+            .build();
+    }
 }

@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 
 class Respondent1DQTest extends DQTest {
 
@@ -93,8 +98,8 @@ class Respondent1DQTest extends DQTest {
             Respondent1DQ dq = buildRespondent1Dq();
             dq = dq.toBuilder()
                 .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
-                                          .witnessesToAppear(NO)
-                                          .build())
+                                            .witnessesToAppear(NO)
+                                            .build())
                 .build();
 
             assertThat(dq.getWitnesses().getDetails()).isNull();
@@ -105,8 +110,8 @@ class Respondent1DQTest extends DQTest {
             Respondent1DQ dq = buildRespondent1Dq();
             dq = dq.toBuilder()
                 .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
-                                          .witnessesToAppear(YES)
-                                          .build())
+                                            .witnessesToAppear(YES)
+                                            .build())
                 .build();
 
             assertThat(dq.getWitnesses()).isEqualTo(witnesses());
@@ -131,8 +136,8 @@ class Respondent1DQTest extends DQTest {
             Respondent1DQ dq = buildRespondent1Dq();
             dq = dq.toBuilder()
                 .respondent1DQHearing(dq.getHearing().toBuilder()
-                                            .unavailableDatesRequired(NO)
-                                            .build())
+                                          .unavailableDatesRequired(NO)
+                                          .build())
                 .build();
 
             assertThat(dq.getHearing().getUnavailableDates()).isNull();
@@ -143,8 +148,8 @@ class Respondent1DQTest extends DQTest {
             Respondent1DQ dq = buildRespondent1Dq();
             dq = dq.toBuilder()
                 .respondent1DQHearing(dq.getHearing().toBuilder()
-                                            .unavailableDatesRequired(YES)
-                                            .build())
+                                          .unavailableDatesRequired(YES)
+                                          .build())
                 .build();
 
             assertThat(dq.getHearing().getUnavailableDates()).isEqualTo(hearing().getUnavailableDates());
@@ -159,5 +164,37 @@ class Respondent1DQTest extends DQTest {
 
             assertThat(dq.getHearing()).isNull();
         }
+    }
+
+    @Test
+    void shouldConvertToRespondent2DQ_whenRespondent1DQ() {
+        Respondent1DQ respondent1DQ = CaseDataBuilder.builder().respondent1DQ().build().getRespondent1DQ();
+        Respondent2DQ respondent2DQ = respondent1DQ.toRespondent2DQ();
+
+        assertThat(respondent2DQ)
+            .isEqualTo(Respondent2DQ.builder()
+                           .respondent2DQFileDirectionsQuestionnaire(
+                               FileDirectionsQuestionnaire.builder()
+                                   .explainedToClient(List.of("CONFIRM"))
+                                   .oneMonthStayRequested(YES)
+                                   .reactionProtocolCompliedWith(YES)
+                                   .build())
+                           .respondent2DQDisclosureOfElectronicDocuments(
+                               DisclosureOfElectronicDocuments.builder().reachedAgreement(YES).build())
+                           .respondent2DQDisclosureOfNonElectronicDocuments(
+                               DisclosureOfNonElectronicDocuments.builder().directionsForDisclosureProposed(NO).build())
+                           .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                           .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+                           .respondent2DQHearing(
+                               Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+                           .respondent2DQRequestedCourt(
+                               RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+                           .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+                           .respondent2DQFurtherInformation(
+                               FurtherInformation.builder().futureApplications(NO).build())
+                           .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
+                           .respondent2DQStatementOfTruth(
+                               StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+                           .build());
     }
 }

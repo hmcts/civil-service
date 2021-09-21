@@ -103,6 +103,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CaseDetailsConverter caseDetailsConverter;
+
     @Nested
     class AboutToStartCallbackV1 {
 
@@ -557,6 +560,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
 
+            //assert DQ is copied
+            CaseData convertedResponse = caseDetailsConverter.toCaseData(response.getData());
+            assertThat(convertedResponse.getRespondent2DQ())
+                .isEqualTo(convertedResponse.getRespondent1DQ().toRespondent2DQ());
+
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
@@ -648,6 +656,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Responds(FULL_DEFENCE)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2DQ()
+                .uiStatementOfTruth(StatementOfTruth.builder().name("John").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -656,6 +666,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("respondent1ResponseDate").isNull();
             assertThat(response.getData()).extracting("respondent2ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
+            assertThat(response.getData())
+                .extracting("respondent2DQStatementOfTruth")
+                .extracting("name")
+                .isEqualTo("John");
 
             assertThat(response.getData()).extracting("businessProcess").isNull();
         }
@@ -827,8 +841,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         "<br /> The Claimant legal representative will get a notification to confirm you have "
                             + "provided the Defendant defence. You will be CC'ed.%n"
                             + "The Claimant has until %s to discontinue or proceed with this claim",
-                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
-                        + exitSurveyContentService.respondentSurvey())
+                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE)
+                    )
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }
