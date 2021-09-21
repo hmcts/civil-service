@@ -185,7 +185,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
                 .organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyCaseAssignedRole("RESPONDENTSOLICITORTWO")
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
                 .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
                 .build();
 
