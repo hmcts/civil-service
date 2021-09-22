@@ -18,10 +18,13 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
@@ -35,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
 @RequiredArgsConstructor
@@ -124,7 +128,27 @@ public class EventHistoryMapper {
                 }
             });
         buildRespondent1LitigationFriendEvent(builder, caseData);
+        buildCaseNotesEvents(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
+    }
+
+    private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
+            List<Event> events = unwrapElements(caseData.getCaseNotes())
+                .stream()
+                .map(caseNote ->
+                         Event.builder()
+                             .eventSequence(prepareEventSequence(builder.build()))
+                             .eventCode("999")
+                             .dateReceived(caseNote.getCreatedOn().atStartOfDay())
+                             .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
+                             .eventDetails(EventDetails.builder()
+                                               .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
+                                               .build())
+                             .build())
+                .collect(Collectors.toList());
+            builder.miscellaneous(events);
+        }
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

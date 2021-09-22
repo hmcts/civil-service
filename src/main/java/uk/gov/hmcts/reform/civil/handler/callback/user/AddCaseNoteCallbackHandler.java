@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -21,6 +22,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 
 @Service
@@ -36,7 +38,8 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::moveNotesIntoList
+            callbackKey(ABOUT_TO_SUBMIT), this::moveNotesIntoList,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -58,6 +61,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
         CaseData updatedCaseData = caseData.toBuilder()
             .caseNotes(caseNotes)
             .caseNote(null)
+            .businessProcess(BusinessProcess.ready(ADD_CASE_NOTE))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
