@@ -107,7 +107,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
-            .put(callbackKey(MID, "same-legal-representative"), this::addOrgPolicy2ForSameLegalRepresentative)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -177,8 +176,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse addOrgPolicy2ForSameLegalRepresentative(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CallbackResponse addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
@@ -276,6 +274,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData);
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
