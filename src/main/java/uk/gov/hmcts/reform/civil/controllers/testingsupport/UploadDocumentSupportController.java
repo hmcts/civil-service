@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 
@@ -30,13 +30,13 @@ import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAI
 @ConditionalOnExpression("${testing.support.enabled:false}")
 public class UploadDocumentSupportController {
 
-    private final DocumentService documentService;
+    private final DocumentManagementService documentManagementService;
 
     @PostMapping(value = {"/upload/test-document"})
     @ApiOperation("Upload document")
     public Document uploadTestDocument(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
 
         PDF pdf = new PDF("mockFile.pdf", ResourceReader.readBytes("test_support/000LR003.pdf"), SEALED_CLAIM);
-        return documentService.uploadDocument(authorisation, pdf).getDocumentLink();
+        return documentManagementService.uploadDocument(authorisation, pdf).getDocumentLink();
     }
 }

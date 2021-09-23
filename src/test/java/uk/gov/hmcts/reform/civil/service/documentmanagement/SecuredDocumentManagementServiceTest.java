@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService.FILES_NAME;
+import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {

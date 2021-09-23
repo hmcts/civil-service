@@ -60,7 +60,7 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: false
+  secured: true
 
 bankHolidays:
   api:
@@ -168,6 +168,9 @@ idam:
 
 document_management:
   url: http://localhost:3453
+
+case_document_am:
+  url: http://localhost:4455
 
 docmosis:
   tornado:

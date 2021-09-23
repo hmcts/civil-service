@@ -44,15 +44,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService.FILES_NAME;
+import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
-    DocumentManagementService.class,
+    UnsecuredDocumentManagementService.class,
     JacksonAutoConfiguration.class,
     DocumentManagementConfiguration.class},
     properties = {"document_management.secured=false"})
-class DocumentManagementServiceTest {
+class UnsecuredDocumentManagementServiceTest {
 
     private static final List<String> USER_ROLES = List.of("caseworker-civil", "caseworker-civil-solicitor");
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
@@ -73,7 +73,7 @@ class DocumentManagementServiceTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private DocumentManagementService documentManagementService;
+    private UnsecuredDocumentManagementService documentManagementService;
 
     @Mock
     private ResponseEntity<Resource> responseEntity;

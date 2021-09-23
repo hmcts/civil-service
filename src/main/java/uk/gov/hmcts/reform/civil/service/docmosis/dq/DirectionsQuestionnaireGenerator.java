@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 @RequiredArgsConstructor
 public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<DirectionsQuestionnaireForm> {
 
-    private final DocumentService documentService;
+    private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
@@ -50,7 +50,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
-        return documentService.uploadDocument(
+        return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.DIRECTIONS_QUESTIONNAIRE)
         );
