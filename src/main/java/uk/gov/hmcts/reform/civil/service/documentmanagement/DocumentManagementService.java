@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "false")
 public class DocumentManagementService {
 
     public static final String CREATED_BY = "Civil";

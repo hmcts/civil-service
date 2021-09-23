@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
@@ -32,9 +31,11 @@ import java.util.Optional;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 @Slf4j
-@Service
+@Service("documentManagementService")
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
 public class SecuredDocumentManagementService {
+
     public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
@@ -102,7 +103,7 @@ public class SecuredDocumentManagementService {
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
-        } catch (HttpClientErrorException ex) {
+        } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
@@ -112,9 +113,13 @@ public class SecuredDocumentManagementService {
         log.info("Getting metadata for file {}", documentPath);
 
         try {
-            return caseDocumentClient.getMetadataForDocument(authorisation, authTokenGenerator.generate(), documentPath);
+            return caseDocumentClient.getMetadataForDocument(
+                authorisation,
+                authTokenGenerator.generate(),
+                documentPath
+            );
 
-        } catch (HttpClientErrorException ex) {
+        } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
