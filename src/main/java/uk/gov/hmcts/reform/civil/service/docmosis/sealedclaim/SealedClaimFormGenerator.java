@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 @RequiredArgsConstructor
 public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedClaimForm> {
 
-    private final DocumentManagementService documentManagementService;
+    private final DocumentService documentService;
     private final DocumentGeneratorService documentGeneratorService;
     private final RepresentativeService representativeService;
 
@@ -35,7 +35,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         SealedClaimForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N1);
-        return documentManagementService.uploadDocument(
+        return documentService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );

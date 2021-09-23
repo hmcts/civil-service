@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import static java.util.Optional.ofNullable;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9;
 @RequiredArgsConstructor
 public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<AcknowledgementOfClaimForm> {
 
-    private final DocumentManagementService documentManagementService;
+    private final DocumentService documentService;
     private final DocumentGeneratorService documentGeneratorService;
     private final RepresentativeService representativeService;
 
@@ -31,7 +31,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
         AcknowledgementOfClaimForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N9);
-        return documentManagementService.uploadDocument(
+        return documentService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_CLAIM)
         );

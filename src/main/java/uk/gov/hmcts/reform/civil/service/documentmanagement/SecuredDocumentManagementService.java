@@ -31,10 +31,10 @@ import java.util.Optional;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 @Slf4j
-@Service("documentManagementService")
+@Service("documentService")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
-public class SecuredDocumentManagementService {
+public class SecuredDocumentManagementService implements DocumentService {
 
     public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
@@ -46,6 +46,7 @@ public class SecuredDocumentManagementService {
     private final DocumentManagementConfiguration documentManagementConfiguration;
 
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
+    @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
         log.info("Uploading file {}", originalFileName);
@@ -84,6 +85,7 @@ public class SecuredDocumentManagementService {
     }
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
+    @Override
     public byte[] downloadDocument(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
         try {
