@@ -85,6 +85,7 @@ public class CaseDataBuilder {
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected Party respondent1;
+    protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
@@ -708,12 +709,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimNotified_withBothSolicitorOptionSelected() {
         atStateClaimNotified();
+        multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Both");
         return this;
     }
 
     public CaseDataBuilder atStateClaimNotified_withOneSolicitorOptionSelected() {
         atStateClaimNotified();
+        multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor");
         return this;
     }
@@ -1025,6 +1028,13 @@ public class CaseDataBuilder {
             .certificateOfSuitability(List.of())
             .build();
         this.respondent1LitigationFriendDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
         return this;
     }
 
