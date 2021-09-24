@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -135,6 +137,7 @@ public class CaseDataBuilder {
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
+    protected List<Element<CaseNote>> caseNotes;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -200,6 +203,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
         this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilder caseNotes(CaseNote caseNote) {
+        this.caseNotes = ElementUtils.wrapElements(caseNote);
         return this;
     }
 
@@ -1126,6 +1134,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
+            .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .build();

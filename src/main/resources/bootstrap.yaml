@@ -13,7 +13,7 @@ spring:
         prd-admin-user-password: CIVIL_PRD_ADMIN_PASSWORD
         prd-admin-user-username: CIVIL_PRD_ADMIN_USERNAME
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
-        cmc-db-password: CMC_DB_PASSWORD
+        cmc-db-password-v11: CMC_DB_PASSWORD
         docmosis-api-key: docmosis.tornado.key
         civil-idam-client-secret: idam.client.secret
         gov-notify-api-key: GOV_NOTIFY_API_KEY
