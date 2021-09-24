@@ -176,8 +176,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
 
@@ -189,9 +188,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
@@ -274,7 +270,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        addOrgPolicy2ForSameLegalRepresentative(caseData);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
