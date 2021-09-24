@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
+import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -27,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
@@ -36,15 +40,15 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
 public class SecuredDocumentManagementService implements DocumentManagementService {
 
+    private static final int DOC_UUID_LENGTH = 36;
     public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
-    private final CaseDocumentClient caseDocumentClient;
     private final DocumentDownloadClientApi documentDownloadClientApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
-
+    private final CaseDocumentClientApi caseDocumentClientApi;
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
@@ -54,12 +58,14 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             MultipartFile file
                 = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes());
 
-            UploadResponse response = caseDocumentClient.uploadDocuments(
+            DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(Classification.RESTRICTED.toString(),
+                                                                                    "CIVIL",
+                                                                                    "CIVIL",
+                                                                                     Collections.singletonList(file));
+            UploadResponse response = caseDocumentClientApi.uploadDocuments(
                 authorisation,
                 authTokenGenerator.generate(),
-                "CIVIL",
-                "CIVIL",
-                Collections.singletonList(file)
+                documentUploadRequest
             );
 
             Document document = response.getDocuments().stream()
@@ -115,16 +121,19 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Getting metadata for file {}", documentPath);
 
         try {
-            return caseDocumentClient.getMetadataForDocument(
+            return caseDocumentClientApi.getMetadataForDocument(
                 authorisation,
                 authTokenGenerator.generate(),
-                documentPath
+                getDocumentIdFromSelfHref(documentPath)
             );
 
         } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
+    }
+    private UUID getDocumentIdFromSelfHref(String selfHref) {
+        return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 
     private void logFiles(List<MultipartFile> files) {
