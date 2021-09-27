@@ -72,7 +72,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.7'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '30.1.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '31.0-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.5.21'
