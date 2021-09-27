@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.verify;
         JacksonAutoConfiguration.class,
         CaseDetailsConverter.class,
         StateFlowEngine.class,
+        EventHistorySequencer.class,
         EventHistoryMapper.class,
         RoboticsDataMapper.class,
         RoboticsAddressMapper.class,
