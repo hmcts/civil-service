@@ -33,10 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -82,20 +79,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse selectClaimTrack(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("DEFENDANT_RESPONSE_SPEC")) {
+        if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getRespondToClaim() != null
                 && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) == 0) {
-                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.toString());
+
+                AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+                if (List.of(AllocatedTrack.SMALL_CLAIM, AllocatedTrack.FAST_CLAIM)
+                    .contains(allocatedTrack)) {
+                    return AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(caseData.toBuilder()
+                                  .responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
+                        .build();
+                }
+            } else if (caseData.getRespondToClaim() != null
+                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.build().toMap(objectMapper))
-                    .build();
-            } else {
-                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-                    .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString());
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.build().toMap(objectMapper))
+                    .data(caseData.toBuilder().build().toMap(objectMapper))
                     .build();
             }
         }

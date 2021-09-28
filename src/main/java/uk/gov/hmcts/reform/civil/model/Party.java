@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +23,7 @@ public class Party {
     private final String individualFirstName;
     private final String individualLastName;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate individualDateOfBirth;
     private final String companyName;
@@ -30,6 +33,7 @@ public class Party {
     private final String soleTraderLastName;
     private final String soleTraderTradingAs;
 
+    @JsonSerialize(using = LocalDateSerializer.class)
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private final LocalDate soleTraderDateOfBirth;
     private final Address primaryAddress;
