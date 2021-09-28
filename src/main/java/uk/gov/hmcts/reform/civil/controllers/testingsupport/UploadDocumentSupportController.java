@@ -36,7 +36,7 @@ public class UploadDocumentSupportController {
     @ApiOperation("Upload document")
     public Document uploadTestDocument(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
 
-        PDF pdf = new PDF("mockFile.pdf", ResourceReader.readBytes("test_support/000LR003.pdf"), SEALED_CLAIM);
+        PDF pdf = new PDF("TestFile.pdf", ResourceReader.readBytes("/test_support/TEST_DOCUMENT_1.pdf"), SEALED_CLAIM);
         return documentManagementService.uploadDocument(authorisation, pdf).getDocumentLink();
     }
 }
