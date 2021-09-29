@@ -56,7 +56,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Uploading file {}", originalFileName);
         try {
             MultipartFile file
-                = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes());
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes()
+            );
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
                 Classification.RESTRICTED.toString(),"CIVIL",
