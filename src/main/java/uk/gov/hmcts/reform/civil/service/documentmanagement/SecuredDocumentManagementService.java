@@ -11,7 +11,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
@@ -49,6 +48,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
     private final CaseDocumentClientApi caseDocumentClientApi;
+
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
@@ -58,10 +58,12 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             MultipartFile file
                 = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes());
 
-            DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(Classification.RESTRICTED.toString(),
-                                                                                    "CIVIL",
-                                                                                    "CIVIL",
-                                                                                     Collections.singletonList(file));
+            DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
+                Classification.RESTRICTED.toString(),"CIVIL",
+                "CIVIL",
+                Collections.singletonList(file)
+            );
+
             UploadResponse response = caseDocumentClientApi.uploadDocuments(
                 authorisation,
                 authTokenGenerator.generate(),
@@ -132,6 +134,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
+
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
