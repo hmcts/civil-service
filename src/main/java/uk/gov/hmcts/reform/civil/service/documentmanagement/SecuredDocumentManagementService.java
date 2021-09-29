@@ -60,7 +60,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             );
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
-                Classification.RESTRICTED.toString(),"CIVIL",
+                Classification.RESTRICTED.toString(),
+                "CIVIL",
                 "CIVIL",
                 Collections.singletonList(file)
             );
