@@ -45,12 +45,12 @@ public class JsonSchemaValidationService {
         return true;
     }
 
-    public Set<ValidationMessage> validate(String payload) {
-        return validate(payload, jsonSchemaFile);
-    }
-
     public Set<ValidationMessage> validateWithSpecSchema(String payload) {
         return validate(payload, jsonSchemaFileForSpec);
+    }
+
+    public Set<ValidationMessage> validate(String payload) {
+        return validate(payload, jsonSchemaFile);
     }
 
     public Set<ValidationMessage> validate(String body, String jsonSchemaFileName) {

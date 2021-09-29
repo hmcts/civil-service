@@ -50,7 +50,7 @@ public interface DQ {
             .map(SmallClaimHearing::getUnavailableDatesRequired)
             .map(NO::equals).orElse(false)) {
             return smallClaimHearing.toBuilder()
-                .SmallClaimUnavailableDate(null).build();
+                .smallClaimUnavailableDate(null).build();
         }
         return smallClaimHearing;
     }

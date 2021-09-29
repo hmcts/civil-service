@@ -17,5 +17,5 @@ public class SmallClaimUnavailableDate {
     private final LocalDate date;
     private final LocalDate fromDate;
     private final LocalDate toDate;
-    private final SmallClaimUnavailableDateType SmallClaimUnavailableDateType;
+    private final SmallClaimUnavailableDateType smallClaimUnavailableDateType;
 }
