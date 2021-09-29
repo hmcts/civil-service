@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -50,6 +51,9 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
             .respondent1LitigationFriendDate(LocalDateTime.now())
+            .respondent1LitigationFriendCreatedDate(
+                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                    .orElse(LocalDateTime.now()))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
