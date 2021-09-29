@@ -55,8 +55,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).isNull();
         }
 
         @Test
