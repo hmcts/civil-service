@@ -66,7 +66,6 @@ public class CaseDataBuilder {
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
-    public static final BigDecimal EXCEEDS_ALLOWED_CLAIM_AMOUNT = BigDecimal.valueOf(25001.01);
 
     // Create Claim
     protected Long ccdCaseReference;
