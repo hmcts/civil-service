@@ -75,26 +75,6 @@ public abstract class BaseCallbackHandlerTest {
                                                                                   "BEARER_TOKEN"));
     }
 
-    public CallbackParams specCallbackParamsOf(CaseData caseData,
-                                           CallbackType type,
-                                           CallbackVersion version,
-                                           String pageId,
-                                           String eventId,
-                                           Map<Params, Object> params
-    ) {
-        return CallbackParams.builder()
-            .type(type)
-            .pageId(pageId)
-            .request(CallbackRequest.builder()
-                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
-                         .eventId(eventId)
-                         .build())
-            .caseData(caseData)
-            .version(version)
-            .params(params)
-            .build();
-    }
-
     public CallbackParams callbackParamsOf(CaseData caseData,
                                            CallbackType type,
                                            CallbackVersion version,
@@ -124,6 +104,26 @@ public abstract class BaseCallbackHandlerTest {
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
+            .version(version)
+            .params(params)
+            .build();
+    }
+
+    public CallbackParams specCallbackParamsOf(CaseData caseData,
+                                               CallbackType type,
+                                               CallbackVersion version,
+                                               String pageId,
+                                               String eventId,
+                                               Map<Params, Object> params
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .pageId(pageId)
+            .request(CallbackRequest.builder()
+                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                         .eventId(eventId)
+                         .build())
+            .caseData(caseData)
             .version(version)
             .params(params)
             .build();
