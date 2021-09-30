@@ -265,7 +265,7 @@ class UnsecuredDocumentManagementServiceTest {
             Document documentMetaData = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 
             assertEquals(72552L, documentMetaData.size);
-            assertEquals("000DC002.pdf", documentMetaData.originalDocumentName);
+            assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
 
             verify(documentMetadataDownloadClient)
                 .getDocumentMetadata(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentPath));
