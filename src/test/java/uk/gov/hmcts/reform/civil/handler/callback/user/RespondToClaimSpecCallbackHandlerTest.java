@@ -59,7 +59,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseSmallClaim() {
+        public void testSpecDefendantResponseEqualToClaim() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();
@@ -73,6 +73,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+        }
+
+        @Test
+        public void testSpecDefendantResponseLessThanClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceLessAmountPaid()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isNull();
         }
 
     }

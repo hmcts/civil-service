@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -836,6 +837,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullDefenceLessAmountPaid() {
+        atStateRespondentRespondToClaimLessAmount(RespondentResponseType.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefenceAfterAcknowledgementTimeExtension() {
         atStateNotificationAcknowledgedTimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -921,6 +932,18 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
         respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
+        totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimLessAmount(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT.
+                subtract(BigDecimal.ONE)).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
