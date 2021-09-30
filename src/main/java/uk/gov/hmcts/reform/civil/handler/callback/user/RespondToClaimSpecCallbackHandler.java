@@ -86,7 +86,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getRespondToClaim() != null) {
                 if (caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) == 0) {
-                    AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+                    AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                            null);
                     if (List.of(AllocatedTrack.SMALL_CLAIM, AllocatedTrack.FAST_CLAIM)
                         .contains(allocatedTrack)) {
                         return AboutToStartOrSubmitCallbackResponse.builder()
