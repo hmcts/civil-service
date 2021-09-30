@@ -53,7 +53,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -942,8 +941,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentRespondToClaimLessAmount(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
-        respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT.
-                subtract(BigDecimal.ONE)).build();
+        respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT
+                .subtract(BigDecimal.ONE)).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
