@@ -225,9 +225,9 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimNotified_andOneSolicitorIsToBeNotified() {
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimIssued_andOneSolicitorIsToBeNotified() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_divergence()
                 .build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -252,7 +252,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnClaimNotified_whenCaseDataAtStateClaimNotified_andBothSolicitorsAreToBeNotified() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_nonDivergence()
                 .build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -276,7 +276,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnAwaitingCaseNotification_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

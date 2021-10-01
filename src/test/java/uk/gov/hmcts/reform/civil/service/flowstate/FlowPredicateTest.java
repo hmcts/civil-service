@@ -98,7 +98,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtIssuedState() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             assertTrue(claimNotified.test(caseData));
         }
 
@@ -108,10 +108,19 @@ class FlowPredicateTest {
             assertFalse(claimNotified.test(caseData));
         }
 
+        @Test // 1v1 Case / 1v2 Same Solicitor (Field is null)
+        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v1()
+                .build();
+
+            assertTrue(claimNotified.test(caseData));
+        }
+
         @Test //1v2 - Notify Both Sol
         void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_nonDivergence()
                 .build();
 
             assertTrue(claimNotified.test(caseData));
@@ -120,21 +129,10 @@ class FlowPredicateTest {
         @Test //1v2 - Notify One Sol
         void shouldHandOffline_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_divergence()
                 .build();
 
             assertTrue(takenOfflineAfterClaimNotified.test(caseData));
-            assertFalse(claimNotified.test(caseData));
-        }
-
-        @Test // 1v2 - Same Solicitor / 1v1 Case (Field is null)
-        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
-                .build();
-
-            assertTrue(claimNotified.test(caseData));
-            assertFalse(takenOfflineAfterClaimNotified.test(caseData));
         }
     }
 
@@ -149,7 +147,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             assertFalse(claimDetailsNotified.test(caseData));
         }
     }
@@ -833,7 +831,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             assertFalse(pastClaimDetailsNotificationDeadline.test(caseData));
         }
     }

@@ -75,7 +75,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_nonDivergence()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
@@ -96,7 +96,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_divergence()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -121,7 +121,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldUpdateBusinessProcessAndAddNotificationDeadline_when14DaysIsBeforeThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -143,7 +143,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetClaimDetailsNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -160,7 +160,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsSameDayAs4MonthDeadline() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(deadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -192,7 +192,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 10, 0);
                 when(time.now()).thenReturn(notifyClaimDateTime);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -210,7 +210,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
                 when(time.now()).thenReturn(notifyClaimDateTime);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -242,7 +242,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -261,7 +261,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withBothSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_nonDivergence()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
@@ -282,7 +282,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingOneParty_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_withOneSolicitorOptionSelected()
+                .atStateClaimNotified_1v2_divergence()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);

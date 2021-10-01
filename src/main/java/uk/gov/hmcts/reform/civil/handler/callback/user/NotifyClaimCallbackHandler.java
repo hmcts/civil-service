@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -77,7 +76,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    //The field `defendantSolicitorNotifyClaimOptions` will only show when both defendants are representated
+    //The field `defendantSolicitorNotifyClaimOptions` will only show when both defendants are represented
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -91,9 +90,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        DynamicListElement defaultValue = DynamicListElement.dynamicElement("Both");
-
-        caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions, defaultValue));
+        caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -133,6 +130,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         } else {
             caseDataBuilder.claimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
         }
+
+        //logic to detect which solicitor has been selected + persist data (?)
+        //caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

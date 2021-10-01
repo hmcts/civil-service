@@ -707,7 +707,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified() {
+    private CaseDataBuilder atStateClaimNotified() {
         atStateClaimIssued();
         claimNotificationDate = LocalDate.now().atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
@@ -715,17 +715,23 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified_withBothSolicitorOptionSelected() {
+    public CaseDataBuilder atStateClaimNotified_1v1() {
+        atStateClaimNotified();
+        defendantSolicitorNotifyClaimOptions = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_1v2_nonDivergence() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Both");
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified_withOneSolicitorOptionSelected() {
+    public CaseDataBuilder atStateClaimNotified_1v2_divergence() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
-        defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor");
+        defendantSolicitorNotifyClaimOptions("Respondent One: Solicitor A");
         return this;
     }
 

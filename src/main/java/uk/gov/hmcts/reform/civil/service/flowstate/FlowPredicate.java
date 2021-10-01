@@ -49,15 +49,13 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimNotified = caseData ->
         caseData.getClaimNotificationDate() != null
-            && caseData.getDefendantSolicitorNotifyClaimOptions() == null
-            || caseData.getClaimNotificationDate() != null
-            && Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
+            && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
+            || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
 
     public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
-        caseData.getClaimNotificationDeadline() != null
-            && caseData.getDefendantSolicitorNotifyClaimOptions() != null   //selection is made
-            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(),
-                           "Both");                                     //its sol 1 or sol 2
+        caseData.getClaimNotificationDate() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
 
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
