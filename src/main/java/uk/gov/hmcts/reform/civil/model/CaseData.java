@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -192,46 +189,26 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
 
     // dates
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime submittedDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime paymentSuccessfulDate;
-    @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate issueDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimNotificationDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimNotificationDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimDetailsNotificationDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimDetailsNotificationDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent1ResponseDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent2ResponseDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimDismissedDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent1TimeExtensionDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent2TimeExtensionDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent1ResponseDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime applicant1ResponseDeadline;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime applicant1ResponseDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime takenOfflineDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime takenOfflineByStaffDate;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime respondent1LitigationFriendDate;
 
     private final YesOrNo isRespondent1;

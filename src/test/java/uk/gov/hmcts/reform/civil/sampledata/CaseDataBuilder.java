@@ -836,6 +836,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullDefenceFastTrack() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefenceLessAmountPaid() {
         atStateRespondentRespondToClaimLessAmount(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -929,6 +939,16 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+
+    public CaseDataBuilder atStateRespondentRespondToClaimFastTrack(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
         respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
@@ -1052,7 +1072,6 @@ public class CaseDataBuilder {
         return CaseData.builder()
             // Create Claim
             .legacyCaseReference(legacyCaseReference)
-            .respondToClaim(RespondToClaim.builder().build())
             .allocatedTrack(allocatedTrack)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)

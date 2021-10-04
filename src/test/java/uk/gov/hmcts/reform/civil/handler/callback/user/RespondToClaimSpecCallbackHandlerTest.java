@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper());
+        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
 
     @Nested
@@ -61,7 +64,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testSpecDefendantResponseEqualToClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
+                .atStateRespondentFullDefenceFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
