@@ -12,6 +12,7 @@ public class RespondToClaim {
 
     private final BigDecimal howMuchWasPaid;
     private final LocalDate whenWasThisAmountPaid;
-    private final String howWasThisAmountPaid;
+    private final PaymentMethod howWasThisAmountPaid;
+    private final String howWasThisAmountPaidOther;
 
 }
