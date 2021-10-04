@@ -154,6 +154,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
     private final LocalDateTime respondent1LitigationFriendDate;
+    private final LocalDateTime respondent1LitigationFriendCreatedDate;
 
     private final YesOrNo isRespondent1;
 }
