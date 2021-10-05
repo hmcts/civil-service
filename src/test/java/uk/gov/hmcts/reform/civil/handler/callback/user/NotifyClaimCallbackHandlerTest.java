@@ -94,7 +94,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
         @Test
-        void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
+        void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitorAndMultipartyToggleOn() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
@@ -103,6 +105,34 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+
+        @Test
+        void shouldNotThrowWarning_whenNotifyingOnlyOneRespondentSolicitorAndMultipartyToggleOff() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).isEmpty();
+        }
+
+        @Test
+        void shouldNotThrowWarning_whenNotifyingBothRespondentSolicitors() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).isEmpty();
         }
     }
 
