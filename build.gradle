@@ -4,7 +4,7 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.5.2'
-  id 'org.owasp.dependencycheck' version '6.2.2'
+  id 'org.owasp.dependencycheck' version '6.3.2'
   id 'com.github.ben-manes.versions' version '0.39.0'
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.7'
@@ -86,7 +86,7 @@ allprojects {
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
     }
     imports {
-      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.3'
+      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
     }
   }
 
@@ -252,7 +252,7 @@ jacocoTestReport.dependsOn {
 
 def versions = [
   junit              : '5.7.0',
-  junitPlatform      : '1.7.2',
+  junitPlatform      : '1.8.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.0.0.M2',
@@ -285,7 +285,7 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.24'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.20.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -340,7 +340,7 @@ dependencies {
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.14.0'
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.4'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.5'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
