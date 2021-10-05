@@ -13,34 +13,35 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
+import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
-import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
+import static uk.gov.hmcts.reform.civil.service.documentmanagement.SecuredDocumentManagementService.DOC_UUID_LENGTH;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
@@ -54,7 +55,7 @@ class SecuredDocumentManagementServiceTest {
     public static final String BEARER_TOKEN = "Bearer Token";
 
     @MockBean
-    private CaseDocumentClient caseDocumentClient;
+    private CaseDocumentClientApi caseDocumentClientApi;
     @MockBean
     private DocumentDownloadClientApi documentDownloadClient;
     @MockBean
@@ -91,26 +92,13 @@ class SecuredDocumentManagementServiceTest {
         void shouldUploadToDocumentManagement() throws JsonProcessingException {
             PDF document = new PDF("0000-claim.pdf", "test".getBytes(), SEALED_CLAIM);
 
-            List<MultipartFile> files = List.of(new InMemoryMultipartFile(
-                FILES_NAME,
-                document.getFileBaseName(),
-                APPLICATION_PDF_VALUE,
-                document.getBytes()
-            ));
-
             uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
                 readString("document-management/secured.response.success.json"),
                 uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
             );
 
-            when(caseDocumentClient.uploadDocuments(
-                     anyString(),
-                     anyString(),
-                     anyString(),
-                     anyString(),
-                     eq(files)
-                 )
-            ).thenReturn(uploadResponse);
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
 
             CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
             assertNotNull(caseDocument.getDocumentLink());
@@ -119,32 +107,20 @@ class SecuredDocumentManagementServiceTest {
                 caseDocument.getDocumentLink().getDocumentUrl()
             );
 
-            verify(caseDocumentClient)
-                .uploadDocuments(anyString(), anyString(), anyString(), anyString(), eq(files));
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
         }
 
         @Test
         void shouldThrow_whenUploadDocumentFails() throws JsonProcessingException {
             PDF document = new PDF("0000-failed-claim.pdf", "failed-test".getBytes(), SEALED_CLAIM);
 
-            List<MultipartFile> files = List.of(new InMemoryMultipartFile(
-                FILES_NAME,
-                document.getFileBaseName(),
-                APPLICATION_PDF_VALUE,
-                document.getBytes()
-            ));
+            UploadResponse uploadResponse = mapper.readValue(
+                readString("document-management/secured.response.failure.json"),
+                UploadResponse.class
+            );
 
-            when(caseDocumentClient.uploadDocuments(
-                     anyString(),
-                     anyString(),
-                     anyString(),
-                     anyString(),
-                     eq(files)
-                 )
-            ).thenReturn(mapper.readValue(
-                readString("document-management/response.failure.json"),
-                uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
-            ));
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
 
             DocumentUploadException documentManagementException = assertThrows(
                 DocumentUploadException.class,
@@ -156,8 +132,7 @@ class SecuredDocumentManagementServiceTest {
                 documentManagementException.getMessage()
             );
 
-            verify(caseDocumentClient)
-                .uploadDocuments(anyString(), anyString(), anyString(), anyString(), eq(files));
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
         }
     }
 
@@ -173,11 +148,12 @@ class SecuredDocumentManagementServiceTest {
             );
             String documentPath = URI.create(document.links.self.href).getPath();
             String documentBinary = URI.create(document.links.binary.href).getPath().replaceFirst("/", "");
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClient.getMetadataForDocument(
+            when(caseDocumentClientApi.getMetadataForDocument(
                      anyString(),
                      anyString(),
-                     eq(documentPath)
+                     eq(documentId)
                  )
             ).thenReturn(document);
 
@@ -197,7 +173,7 @@ class SecuredDocumentManagementServiceTest {
             assertNotNull(pdf);
             assertArrayEquals("test".getBytes(), pdf);
 
-            verify(caseDocumentClient).getMetadataForDocument(anyString(), anyString(), eq(documentPath));
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
 
             verify(documentDownloadClient)
                 .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
@@ -211,10 +187,12 @@ class SecuredDocumentManagementServiceTest {
             );
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             String documentBinary = "documents/85d97996-22a5-40d7-882e-3a382c8ae1b7/binary";
-            when(caseDocumentClient.getMetadataForDocument(
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(
                      anyString(),
                      anyString(),
-                     eq(documentPath)
+                     eq(documentId)
                  )
             ).thenReturn(document);
 
@@ -229,7 +207,7 @@ class SecuredDocumentManagementServiceTest {
 
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
 
-            verify(caseDocumentClient).getMetadataForDocument(anyString(), anyString(), eq(documentPath));
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
     }
 
@@ -238,11 +216,12 @@ class SecuredDocumentManagementServiceTest {
         @Test
         void getDocumentMetaData() throws JsonProcessingException {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b3";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClient.getMetadataForDocument(
+            when(caseDocumentClientApi.getMetadataForDocument(
                      anyString(),
                      anyString(),
-                     eq(documentPath)
+                     eq(documentId)
                  )
             ).thenReturn(mapper.readValue(
                 readString("document-management/metadata.success.json"), Document.class)
@@ -254,18 +233,18 @@ class SecuredDocumentManagementServiceTest {
                 = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 
             assertEquals(72552L, documentMetaData.size);
-            assertEquals("000DC002.pdf", documentMetaData.originalDocumentName);
+            assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
 
-            verify(caseDocumentClient)
-                .getMetadataForDocument(anyString(), anyString(), eq(documentPath));
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
 
         @Test
         void shouldThrow_whenMetadataDownloadFails() {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClient
-                     .getMetadataForDocument(anyString(), anyString(), eq(documentPath))
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
             ).thenThrow(new RuntimeException("Failed to access document metadata"));
 
             DocumentDownloadException documentManagementException = assertThrows(
@@ -278,8 +257,12 @@ class SecuredDocumentManagementServiceTest {
                 documentManagementException.getMessage()
             );
 
-            verify(caseDocumentClient)
-                .getMetadataForDocument(anyString(), anyString(), eq(documentPath));
+            verify(caseDocumentClientApi)
+                .getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+    }
+
+    private UUID getDocumentIdFromSelfHref(String selfHref) {
+        return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 }

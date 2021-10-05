@@ -39,7 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
 public class SecuredDocumentManagementService implements DocumentManagementService {
 
-    private static final int DOC_UUID_LENGTH = 36;
+    protected static final int DOC_UUID_LENGTH = 36;
     public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
