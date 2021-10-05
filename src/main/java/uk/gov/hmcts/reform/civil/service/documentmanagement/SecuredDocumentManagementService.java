@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -140,12 +139,4 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
-
-    private void logFiles(List<MultipartFile> files) {
-        files.forEach(file -> {
-            log.info("Name: {}", file.getName());
-            log.info("OriginalName {}", file.getOriginalFilename());
-        });
-    }
-
 }

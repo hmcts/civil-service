@@ -229,6 +229,7 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
+    property "sonar.cpd.exclusions", "**/documentanagement/SecuredDocumentManagementService.java, **/documentanagement/UnsecuredDocumentManagementService.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }
