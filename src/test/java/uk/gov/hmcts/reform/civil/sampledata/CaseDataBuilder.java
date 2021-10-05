@@ -433,6 +433,8 @@ public class CaseDataBuilder {
                 return atStateClaimIssued();
             case CLAIM_NOTIFIED:
                 return atStateClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimNotified();
             case CLAIM_DETAILS_NOTIFIED:
                 return atStateClaimDetailsNotified();
             case CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
@@ -724,17 +726,23 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified_1v2_nonDivergence() {
+    public CaseDataBuilder atStateClaimNotified_1v2_andNotifyBothSolicitors() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Both");
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified_1v2_divergence() {
+    public CaseDataBuilder atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Respondent One: Solicitor A");
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimNotified() {
+        atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
 

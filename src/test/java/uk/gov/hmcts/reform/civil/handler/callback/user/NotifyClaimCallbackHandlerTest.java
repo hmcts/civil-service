@@ -75,7 +75,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_1v2_nonDivergence()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
@@ -96,7 +96,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_1v2_divergence()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -261,7 +261,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_1v2_nonDivergence()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
@@ -282,7 +282,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingOneParty_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_1v2_divergence()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
