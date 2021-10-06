@@ -60,7 +60,7 @@ java:
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
     LAUNCH_DARKLY_ENV: service-staging
-
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
