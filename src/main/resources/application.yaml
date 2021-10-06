@@ -12,10 +12,14 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
-
+  health:
+    case-document-am-api:
+      enabled: true
 spring:
   application:
     name: civil-service
+  main:
+    allow-bean-definition-overriding: true
   cache:
     cache-names: userInfoCache
     caffeine:
@@ -60,6 +64,7 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
+  secured: true
 
 bankHolidays:
   api:
@@ -83,6 +88,8 @@ civil:
 core_case_data:
   api:
     url: http://localhost:4452
+case_document_am:
+  url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 reference:
   database:
     enabled: true
@@ -143,7 +150,12 @@ feign:
         url: http://localhost:9404/engine-rest/
       remoteExternalTaskService:
         url: http://localhost:9404/engine-rest/
-
+      idam-api:
+        loggerLevel: full
+      core-case-data-api:
+        loggerLevel: full
+      document-management-metadata-download-api:
+        loggerLevel: full
 fees:
   api:
     url: http://localhost:8765
