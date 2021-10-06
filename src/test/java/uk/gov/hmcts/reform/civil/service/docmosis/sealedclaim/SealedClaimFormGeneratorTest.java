@@ -385,10 +385,7 @@ class SealedClaimFormGeneratorTest {
                         .orElse("")
                 ),
                 () -> assertEquals(
-                    templateData.getRespondent2ExternalReference(),
-                    ofNullable(caseData.getSolicitorReferences())
-                        .map(SolicitorReferences::getRespondentSolicitor2Reference)
-                        .orElse("")
+                    templateData.getRespondent2ExternalReference(), caseData.getRespondentSolicitor2Reference()
                 ),
                 () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             );

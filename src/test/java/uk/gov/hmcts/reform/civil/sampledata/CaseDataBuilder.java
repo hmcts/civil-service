@@ -86,6 +86,7 @@ public class CaseDataBuilder {
     protected Party respondent1;
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
+    protected YesOrNo respondent2Represented;
     protected String respondentSolicitor1EmailAddress;
     protected ClaimValue claimValue;
     protected ClaimType claimType;
@@ -690,7 +691,9 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
         respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
@@ -698,6 +701,9 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2Represented = NO;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 

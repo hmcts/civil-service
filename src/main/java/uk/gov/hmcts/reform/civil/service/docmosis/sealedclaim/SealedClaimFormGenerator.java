@@ -84,8 +84,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .courtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            sealedClaimFormBuilder.respondent2ExternalReference(
-                solicitorReferences.map(SolicitorReferences::getRespondentSolicitor2Reference).orElse(""));
+            sealedClaimFormBuilder.respondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
         }
 
         return sealedClaimFormBuilder.build();
