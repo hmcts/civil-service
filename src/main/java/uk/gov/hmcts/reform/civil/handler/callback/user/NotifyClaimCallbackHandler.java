@@ -132,9 +132,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             caseDataBuilder.claimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
         }
 
-        //logic to detect which solicitor has been selected + persist data (?)
-        //caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
