@@ -45,24 +45,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
         }
 
         @Test
-        public void testSpecDefendantResponseDisputesAllOfClaim() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNull();
-        }
-
-        @Test
-        public void testSpecDefendantResponseEqualToClaim() {
+        public void testSpecDefendantResponseDefendsAllClaim() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .build();
@@ -77,23 +64,5 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
-
-        @Test
-        public void testSpecDefendantResponseLessThanClaim() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceLessAmountPaid()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isNull();
-        }
-
     }
 }
