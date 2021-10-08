@@ -13,6 +13,6 @@ import java.util.List;
 public class SmallClaimHearing {
 
     private final YesOrNo unavailableDatesRequired;
-    private final List<Element<SmallClaimUnavailableDate>> SmallClaimUnavailableDate;
+    private final List<Element<SmallClaimUnavailableDate>> smallClaimUnavailableDate;
 
 }

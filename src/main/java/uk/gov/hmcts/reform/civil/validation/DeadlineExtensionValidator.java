@@ -45,11 +45,10 @@ public class DeadlineExtensionValidator {
             return List.of("The agreed extension date must be after the current deadline");
         }
 
-        LocalDateTime newResponseDeadline = workingDayIndicator.isWorkingDay(responseDeadline.plusDays(28).toLocalDate())
-            ? responseDeadline.plusDays(28)
-            : LocalDateTime.of(
-            workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(28).toLocalDate()),
-            LocalDateTime.now().toLocalTime()
+        LocalDateTime newResponseDeadline = workingDayIndicator.isWorkingDay(responseDeadline.plusDays(28)
+                .toLocalDate()) ? responseDeadline.plusDays(28) : LocalDateTime.of(
+                        workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(28).toLocalDate()),
+                                LocalDateTime.now().toLocalTime()
         );
 
         if (!isAoSApplied && LocalDateTime.of(
@@ -58,7 +57,6 @@ public class DeadlineExtensionValidator {
         ).isAfter(newResponseDeadline)) {
             return List.of("Date must be from claim issue date plus a maximum of 42 days.");
         }
-
 
         if (isAoSApplied && LocalDateTime.of(
             dateToValidate,

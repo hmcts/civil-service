@@ -82,24 +82,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse selectClaimTrack(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("DEFENDANT_RESPONSE_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getRespondToClaim() != null
-                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) == 0) {
-                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.toString());
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.build().toMap(objectMapper))
-                    .build();
-            } else {
-                CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-                    .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString());
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.build().toMap(objectMapper))
-                    .build();
-            }
+        CaseData caseData = callbackParams.getCaseData();
+        if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
+            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                    null);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
+                .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
     }
 
