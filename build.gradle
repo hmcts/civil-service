@@ -351,8 +351,8 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.1'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.2'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.11.2'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.0.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
