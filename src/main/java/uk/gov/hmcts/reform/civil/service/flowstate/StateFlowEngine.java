@@ -100,8 +100,8 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
                     .set(flags -> flags.putAll(Map.of(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented)
-                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOnlyOneRespondentRepresented)
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented
+                                                          .or(claimSubmittedOnlyOneRespondentRepresented))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)

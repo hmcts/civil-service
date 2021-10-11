@@ -24,7 +24,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentatives = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getAddRespondent2() == YES
-            && (caseData.getRespondent2SameLegalRepresentative() == NO);
+            && caseData.getRespondent2SameLegalRepresentative() == NO
+            && caseData.getRespondent1Represented() != NO
+            && caseData.getRespondent2Represented() != NO;
 
     public static final Predicate<CaseData> claimSubmittedNoRespondentRepresented = caseData ->
         caseData.getSubmittedDate() != null
@@ -51,7 +53,7 @@ public class FlowPredicate {
         caseData.getIssueDate() != null && caseData.getRespondent1OrgRegistered() == NO;
 
     public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
-        caseData.getIssueDate() != null && caseData.getRespondent2Represented() != YES;
+        caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
 
     public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
@@ -71,7 +73,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pendingClaimIssued = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES;
+            && caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent2Represented() != NO
+            && caseData.getRespondent2OrgRegistered() != NO;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
         caseData.getClaimNotificationDate() != null;
