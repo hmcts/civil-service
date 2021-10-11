@@ -323,7 +323,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.5.2'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.12.1'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.16-preview.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -335,7 +335,7 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.0'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.60'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.61'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.15.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
