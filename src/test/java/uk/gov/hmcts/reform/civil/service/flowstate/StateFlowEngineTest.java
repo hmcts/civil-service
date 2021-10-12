@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -279,8 +280,58 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimIssued_andOneSolicitorIsToBeNotified() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                .build();
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName());
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(6)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()
+                );
+            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                        entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
+        void shouldReturnClaimNotified_whenCaseDataAtStateClaimNotified_andBothSolicitorsAreToBeNotified() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_NOTIFIED.fullName());
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(6)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName()
+                );
+            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                        entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
         void shouldReturnAwaitingCaseNotification_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

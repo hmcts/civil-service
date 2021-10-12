@@ -13,6 +13,9 @@ public class NotificationsProperties {
     private String govNotifyApiKey;
 
     @NotEmpty
+    private String respondentSolicitorClaimIssueMultipartyEmailTemplate;
+
+    @NotEmpty
     private String respondentSolicitorClaimIssueEmailTemplate;
 
     @NotEmpty

@@ -44,15 +44,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService.FILES_NAME;
+import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
-    DocumentManagementService.class,
+    UnsecuredDocumentManagementService.class,
     JacksonAutoConfiguration.class,
-    DocumentManagementConfiguration.class
-})
-class DocumentManagementServiceTest {
+    DocumentManagementConfiguration.class},
+    properties = {"document_management.secured=false"})
+class UnsecuredDocumentManagementServiceTest {
 
     private static final List<String> USER_ROLES = List.of("caseworker-civil", "caseworker-civil-solicitor");
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
@@ -73,7 +73,7 @@ class DocumentManagementServiceTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private DocumentManagementService documentManagementService;
+    private UnsecuredDocumentManagementService documentManagementService;
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
@@ -109,12 +109,12 @@ class DocumentManagementServiceTest {
                 readString("document-management/response.success.json"), UploadResponse.class);
 
             when(documentUploadClient.upload(
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(USER_ROLES),
-                any(Classification.class),
-                eq(files)
+                     anyString(),
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES),
+                     any(Classification.class),
+                     eq(files)
                  )
             ).thenReturn(uploadResponse);
 
@@ -141,12 +141,12 @@ class DocumentManagementServiceTest {
             ));
 
             when(documentUploadClient.upload(
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(USER_ROLES),
-                any(Classification.class),
-                eq(files)
+                     anyString(),
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES),
+                     any(Classification.class),
+                     eq(files)
                  )
             ).thenReturn(mapper.readValue(
                 readString("document-management/response.failure.json"), UploadResponse.class));
@@ -183,22 +183,22 @@ class DocumentManagementServiceTest {
             String documentBinary = URI.create(document.links.binary.href).getPath();
 
             when(documentMetadataDownloadClient.getDocumentMetadata(
-                anyString(),
-                anyString(),
-                eq(USER_ROLES_JOINED),
-                anyString(),
-                eq(documentPath)
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentPath)
                  )
             ).thenReturn(document);
 
             when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
 
             when(documentDownloadClient.downloadBinary(
-                anyString(),
-                anyString(),
-                eq(USER_ROLES_JOINED),
-                anyString(),
-                eq(documentBinary)
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentBinary)
                  )
             ).thenReturn(responseEntity);
 
@@ -219,11 +219,11 @@ class DocumentManagementServiceTest {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             String documentBinary = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7/binary";
             when(documentMetadataDownloadClient.getDocumentMetadata(
-                anyString(),
-                anyString(),
-                eq(USER_ROLES_JOINED),
-                anyString(),
-                eq(documentPath)
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentPath)
                  )
             ).thenReturn(documentMetaData);
 
@@ -250,11 +250,11 @@ class DocumentManagementServiceTest {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b3";
 
             when(documentMetadataDownloadClient.getDocumentMetadata(
-                anyString(),
-                anyString(),
-                eq(USER_ROLES_JOINED),
-                anyString(),
-                eq(documentPath)
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentPath)
                  )
             ).thenReturn(mapper.readValue(
                 readString("document-management/metadata.success.json"), Document.class)
@@ -265,7 +265,7 @@ class DocumentManagementServiceTest {
             Document documentMetaData = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 
             assertEquals(72552L, documentMetaData.size);
-            assertEquals("000DC002.pdf", documentMetaData.originalDocumentName);
+            assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
 
             verify(documentMetadataDownloadClient)
                 .getDocumentMetadata(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentPath));

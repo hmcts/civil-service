@@ -35,6 +35,7 @@ public class CaseData implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
+    private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
     private final Party applicant2;
@@ -51,6 +52,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo respondent1OrgRegistered;
     private final YesOrNo respondent2OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
+    private final String respondentSolicitor2EmailAddress;
     private final YesOrNo uploadParticularsOfClaim;
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
@@ -119,12 +121,12 @@ public class CaseData implements MappableObject {
     private final LitigationFriend respondent1LitigationFriend;
 
     private final YesOrNo applicant1LitigationFriendRequired;
-
     private final LitigationFriend applicant1LitigationFriend;
 
     private final YesOrNo applicant2LitigationFriendRequired;
-
     private final LitigationFriend applicant2LitigationFriend;
+
+    private final DynamicList defendantSolicitorNotifyClaimOptions;
 
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
