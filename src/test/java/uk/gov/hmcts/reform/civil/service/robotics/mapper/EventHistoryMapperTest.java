@@ -1813,7 +1813,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -1865,7 +1865,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenRespondent1LitigationFriend() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
+                .atStateClaimNotified_1v1()
                 .addRespondentLitigationFriend()
                 .build();
             Event claimIssuedEvent = Event.builder()
@@ -1928,7 +1928,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
+                .atStateClaimNotified_1v1()
                 .caseNotes(CaseNote.builder()
                                .createdOn(LocalDate.now().plusDays(3))
                                .createdBy("createdBy")
