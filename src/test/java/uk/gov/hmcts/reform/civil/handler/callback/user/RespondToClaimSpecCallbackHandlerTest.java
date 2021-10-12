@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -56,6 +57,24 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).isNotNull();
+        }
+
+        @Test
+        public void testSpecDefendantResponseValidationError() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            when(validator.validate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getData()).isNull();
+            assertThat(response.getErrors()).isNotNull();
+            assertEquals(1, response.getErrors().size());
+            assertEquals("Validation error", response.getErrors().get(0));
         }
 
         @Test
