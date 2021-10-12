@@ -37,7 +37,7 @@ class DispatchBusinessProcessEventHandlerTest {
 
         handler.dispatchBusinessProcess(event);
 
-        verify(coreCaseDataService).triggerEvent(event.getCaseId(), CaseEvent.DISPATCH_BUSINESS_PROCESS);
+        verify(coreCaseDataService).triggerEvent(event.getCaseId(), CaseEvent.DISPATCH_BUSINESS_PROCESS, null);
     }
 
     @ParameterizedTest
