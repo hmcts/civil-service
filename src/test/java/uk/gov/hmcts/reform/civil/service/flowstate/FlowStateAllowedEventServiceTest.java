@@ -90,7 +90,7 @@ class FlowStateAllowedEventServiceTest {
                 of(CaseDataBuilder.builder().atStatePaymentFailed().build(), CLAIM_ISSUED_PAYMENT_FAILED),
                 of(CaseDataBuilder.builder().atStatePendingClaimIssued().build(), PENDING_CLAIM_ISSUED),
                 of(
-                    CaseDataBuilder.builder().atStateClaimNotified().build(),
+                    CaseDataBuilder.builder().atStateClaimNotified_1v1().build(),
                     CLAIM_NOTIFIED
                 ),
                 of(CaseDataBuilder.builder().atStateClaimDetailsNotified().build(), CLAIM_DETAILS_NOTIFIED),

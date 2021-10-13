@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -49,7 +50,14 @@ public class FlowPredicate {
             && caseData.getRespondent1OrgRegistered() == YES;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null;
+        caseData.getClaimNotificationDate() != null
+            && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
+            || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
+
+    public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
+        caseData.getClaimNotificationDate() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
 
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;

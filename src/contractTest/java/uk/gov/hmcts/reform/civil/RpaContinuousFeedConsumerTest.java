@@ -466,7 +466,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenAddCaseNoteAndContinuousFeedEnabled() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
+                .atStateClaimNotified_1v1()
                 .legacyCaseReference("100DC019")
                 .caseNotes(CaseNote.builder()
                                .createdOn(LocalDate.now())
