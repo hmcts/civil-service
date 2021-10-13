@@ -36,7 +36,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_D
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
@@ -66,6 +68,13 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
+            CLAIM_SUBMITTED.fullName(),
+            List.of(
+                ADD_CASE_NOTE
+            )
+        ),
+
+        entry(
             CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
             List.of(
                 RESUBMIT_CLAIM,
@@ -74,6 +83,11 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE
             )
+        ),
+
+        entry(
+            CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+            List.of(ADD_CASE_NOTE)
         ),
 
         entry(
