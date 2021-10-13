@@ -44,27 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -139,6 +119,13 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_CLAIM
                     }
                 ),
+
+                of(
+                    CLAIM_SUBMITTED,
+                    new CaseEvent[]{
+                        ADD_CASE_NOTE
+                    }
+                ),
                 of(
                     CLAIM_ISSUED_PAYMENT_FAILED,
                     new CaseEvent[]{
@@ -146,6 +133,12 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
                         AMEND_PARTY_DETAILS,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
+                    new CaseEvent[]{
                         ADD_CASE_NOTE
                     }
                 ),
