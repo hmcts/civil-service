@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -24,14 +25,43 @@ public class FlowPredicate {
             || caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES);
 
     public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentatives = caseData ->
-        caseData.getSubmittedDate() != null && caseData.getAddRespondent2() == YES
-            && caseData.getRespondent2SameLegalRepresentative() == NO;
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == NO
+            && caseData.getRespondent1Represented() != NO
+            && caseData.getRespondent2Represented() != NO;
+
+    public static final Predicate<CaseData> claimSubmittedNoRespondentRepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent1Represented() == NO
+            && caseData.getRespondent2Represented() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedOnlyOneRespondentRepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && (
+            (caseData.getRespondent1Represented() == YES
+                && caseData.getAddRespondent2() == YES
+                && caseData.getRespondent2Represented() == NO)
+                ||
+                (caseData.getRespondent1Represented() == NO
+                    && caseData.getAddRespondent2() == YES
+                    && caseData.getRespondent2Represented() == YES)
+        );
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
 
     public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1OrgRegistered() == NO;
+
+    public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
+        caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
+
+    public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
+        caseData.getIssueDate() != null
+            && caseData.getRespondent2Represented() == YES
+            && caseData.getRespondent2OrgRegistered() != YES;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         caseData.getPaymentSuccessfulDate() == null
@@ -46,10 +76,19 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pendingClaimIssued = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES;
+            && caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent2Represented() != NO
+            && caseData.getRespondent2OrgRegistered() != NO;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null;
+        caseData.getClaimNotificationDate() != null
+            && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
+            || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
+
+    public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
+        caseData.getClaimNotificationDate() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
 
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;

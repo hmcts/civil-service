@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +57,7 @@ class AcknowledgementOfClaimGeneratorTest {
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
     @MockBean
-    private DocumentManagementService documentManagementService;
+    private UnsecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
