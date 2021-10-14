@@ -38,7 +38,7 @@ public class TakeCaseOfflineEventHandler {
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
                        .id(startEventResponse.getEventId())
-                       .summary("System moved case offline as claimant do not wish to proceed further.")
+                       .summary("RPA Reason: Claim dismissed after no response from applicant past response deadline.")
                        .build())
             .data(new HashMap<>(startEventResponse.getCaseDetails().getData()))
             .build();

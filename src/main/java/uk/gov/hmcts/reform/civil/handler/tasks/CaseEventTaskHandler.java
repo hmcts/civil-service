@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.Map;
@@ -69,19 +70,26 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             .build();
     }
 
-    private String getSummary(String eventId, String flowState) {
+    private String getSummary(String eventId, String state) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
+            FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             switch (flowState) {
-                case "MAIN.FULL_ADMISSION":
-                case "MAIN.PART_ADMISSION":
-                case "MAIN.COUNTER_CLAIM":
-                    return "Proceeding offline due to other defence responses";
-                case "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT":
-                    return "Proceeding offline due to unrepresented defendant";
-                case "MAIN.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT":
-                    return "Proceeding offline due to unregistered defendant";
+                case FULL_ADMISSION:
+                    return "RPA Reason: Defendant fully admits.";
+                case PART_ADMISSION:
+                    return "RPA Reason: Defendant partial admission.";
+                case COUNTER_CLAIM:
+                    return "RPA Reason: Defendant rejects and counter claims.";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                    return "RPA Reason: Unrepresented defendant.";
+                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                    return "RPA Reason: Unregistered defendant solicitor firm.";
+                case FULL_DEFENCE_PROCEED:
+                    return "RPA Reason: Applicant proceeds.";
+                case FULL_DEFENCE_NOT_PROCEED:
+                    return "RPA Reason: Claimant intends not to proceed.";
                 default:
-                    return "Proceeding offline after claimant intention completion";
+                    throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }
         }
         return null;

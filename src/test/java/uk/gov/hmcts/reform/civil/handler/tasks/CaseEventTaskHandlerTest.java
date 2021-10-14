@@ -9,6 +9,7 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -72,115 +73,119 @@ class CaseEventTaskHandlerTest {
     @Autowired
     private CaseEventTaskHandler caseEventTaskHandler;
 
-    @BeforeEach
-    void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
+    @Nested
+    class NotifyRespondent {
 
-        Map<String, Object> variables = Map.of(
-            "caseId", CASE_ID,
-            "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
-        );
+        @BeforeEach
+        void init() {
+            when(mockTask.getTopicName()).thenReturn("test");
+            when(mockTask.getWorkerId()).thenReturn("worker");
+            when(mockTask.getActivityId()).thenReturn("activityId");
 
-        when(mockTask.getAllVariables()).thenReturn(variables);
-    }
+            Map<String, Object> variables = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+            );
 
-    @Test
-    void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .build();
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, "MAIN.DRAFT");
-        variables.putValue(FLOW_FLAGS, Map.of());
+            when(mockTask.getAllVariables()).thenReturn(variables);
+        }
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
 
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
-        verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-        verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockTask, variables);
-    }
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-    @Test
-    void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
-        String errorMessage = "there was an error";
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
 
-        when(mockTask.getRetries()).thenReturn(null);
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenAnswer(invocation -> {
-                throw new Exception(errorMessage);
-            });
+        @Test
+        void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
+            String errorMessage = "there was an error";
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            when(mockTask.getRetries()).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenAnswer(invocation -> {
+                    throw new Exception(errorMessage);
+                });
 
-        verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
-            eq(mockTask),
-            eq(errorMessage),
-            anyString(),
-            eq(2),
-            eq(500L)
-        );
-    }
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-    @Test
-    void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
-        String errorMessage = "there was an error";
-        int status = 422;
-        Request.HttpMethod requestType = Request.HttpMethod.POST;
-        String exampleUrl = "example url";
+            verify(externalTaskService, never()).complete(mockTask);
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq(errorMessage),
+                anyString(),
+                eq(2),
+                eq(500L)
+            );
+        }
 
-        when(mockTask.getRetries()).thenReturn(null);
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenAnswer(invocation -> {
-                throw FeignException.errorStatus(errorMessage, Response.builder()
-                    .request(
-                        Request.create(
-                            requestType,
-                            exampleUrl,
-                            new HashMap<>(), //this field is required for construtor//
-                            null,
-                            null,
-                            null
-                        ))
-                    .status(status)
-                    .build());
-            });
+        @Test
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+            String errorMessage = "there was an error";
+            int status = 422;
+            Request.HttpMethod requestType = Request.HttpMethod.POST;
+            String exampleUrl = "example url";
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            when(mockTask.getRetries()).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenAnswer(invocation -> {
+                    throw FeignException.errorStatus(errorMessage, Response.builder()
+                        .request(
+                            Request.create(
+                                requestType,
+                                exampleUrl,
+                                new HashMap<>(), //this field is required for construtor//
+                                null,
+                                null,
+                                null
+                            ))
+                        .status(status)
+                        .build());
+                });
 
-        verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
-            eq(mockTask),
-            eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
-            anyString(),
-            eq(2),
-            eq(500L)
-        );
-    }
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-    @Test
-    void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-        String errorMessage = "there was an error";
+            verify(externalTaskService, never()).complete(mockTask);
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
+                anyString(),
+                eq(2),
+                eq(500L)
+            );
+        }
 
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+        @Test
+        void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
+            String errorMessage = "there was an error";
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
 
-        verify(externalTaskService, never()).handleFailure(
-            any(ExternalTask.class),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyLong()
-        );
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
     }
 }
