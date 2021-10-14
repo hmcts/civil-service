@@ -48,6 +48,19 @@ class MultiPartyScenarioTest {
     }
 
     @Test
+    void shouldReturnOneVTwoWhenRespondent1IsRepresentedAndRespondent2NotRepresented() {
+        // When respondent 2 is not represented there is no screen to for to choose respondent2SameLegalRepresentative,
+        // therefore respondent2SameLegalRepresentative is null
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().build())
+            .respondent2(PartyBuilder.builder().build())
+            .applicant1(PartyBuilder.builder().build())
+            .build();
+
+        assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+    }
+
+    @Test
     void shouldReturnOneVTwoOneRepWhenTwoRespondentsRepresentedBySameReps() {
         CaseData caseData = CaseData.builder()
             .respondent1(PartyBuilder.builder().build())
