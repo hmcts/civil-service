@@ -89,8 +89,11 @@ public class CaseDataBuilder {
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected Party respondent1;
+    protected Party respondent2;
     protected YesOrNo respondent1Represented;
+    protected YesOrNo respondent2Represented;
     protected String respondentSolicitor1EmailAddress;
+    protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
     protected ClaimType claimType;
     protected String claimTypeOther;
@@ -159,6 +162,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime respondent1LitigationFriendDate;
+    protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
@@ -401,6 +405,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder defendantSolicitorNotifyClaimOptions(String defaultValue) {
+        this.defendantSolicitorNotifyClaimOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                    .label(defaultValue)
+                    .build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atState(FlowState.Main flowState) {
         switch (flowState) {
             case DRAFT:
@@ -421,6 +434,8 @@ public class CaseDataBuilder {
                 return atStateClaimIssued();
             case CLAIM_NOTIFIED:
                 return atStateClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimNotified();
             case CLAIM_DETAILS_NOTIFIED:
                 return atStateClaimDetailsNotified();
             case CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
@@ -616,6 +631,7 @@ public class CaseDataBuilder {
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
@@ -643,6 +659,35 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedNoRespondentRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2AndSecondRespondentIsRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
         return this;
     }
 
@@ -697,11 +742,37 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified() {
+    private CaseDataBuilder atStateClaimNotified() {
         atStateClaimIssued();
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_1v1() {
+        atStateClaimNotified();
+        defendantSolicitorNotifyClaimOptions = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_1v2_andNotifyBothSolicitors() {
+        atStateClaimNotified();
+        multiPartyClaimTwoDefendantSolicitors();
+        defendantSolicitorNotifyClaimOptions("Both");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor() {
+        atStateClaimNotified();
+        multiPartyClaimTwoDefendantSolicitors();
+        defendantSolicitorNotifyClaimOptions("Respondent One: Solicitor A");
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimNotified() {
+        atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
 
@@ -1040,6 +1111,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -1062,9 +1140,11 @@ public class CaseDataBuilder {
             .applicant2(applicant2)
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
+            .respondent2Represented(respondent2Represented)
             .respondent1OrgRegistered(respondent1OrgRegistered)
             .respondent2OrgRegistered(respondent2OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
+            .respondentSolicitor2EmailAddress(respondentSolicitor2EmailAddress)
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
@@ -1127,6 +1207,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .isRespondent1(isRespondent1)
+            .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)

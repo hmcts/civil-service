@@ -23,7 +23,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedNoRespondentRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOnlyOneRespondentRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
@@ -40,6 +42,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
@@ -75,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -96,6 +102,8 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
                     .set(flags -> flags.putAll(Map.of(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
+                .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented
+                                                          .or(claimSubmittedOnlyOneRespondentRepresented))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
@@ -103,8 +111,10 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
                 .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented)
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented
+                                                                                       .or(respondent2NotRepresented))
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered
+                                                                                      .or(respondent2OrgNotRegistered))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -114,6 +124,7 @@ public class StateFlowEngine {
             .state(CLAIM_ISSUED)
                 .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
+                .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
                 .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
             .state(CLAIM_NOTIFIED)
                 .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
@@ -206,6 +217,7 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
+            .state(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .build();
     }
 
