@@ -856,9 +856,10 @@ class FlowPredicateTest {
     }
 
     @Test
-    void shouldReturnFalse_whenRespondent2OrgNotRegistered() {
+    void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v2AndSameRepresentative().build();
-        assertFalse(respondent2OrgNotRegistered.test(caseData));
+            .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
+            .build();
+        assertTrue(respondent2OrgNotRegistered.test(caseData));
     }
 }
