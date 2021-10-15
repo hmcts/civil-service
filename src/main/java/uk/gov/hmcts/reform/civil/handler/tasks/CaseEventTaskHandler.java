@@ -88,6 +88,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Applicant proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
                     return "RPA Reason: Claimant intends not to proceed.";
+                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                    return "RPA Reason: Only one of the respondent is notified.";
                 default:
                     throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }
