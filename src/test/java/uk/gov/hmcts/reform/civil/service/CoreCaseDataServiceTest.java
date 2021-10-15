@@ -116,7 +116,7 @@ class CoreCaseDataServiceTest {
 
         @Test
         void shouldStartAndSubmitEvent_WhenCalled() {
-            service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID), null);
+            service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
                                                             JURISDICTION, CASE_TYPE, CASE_ID, EVENT_ID

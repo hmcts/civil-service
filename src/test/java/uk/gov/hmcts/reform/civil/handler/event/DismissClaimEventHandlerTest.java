@@ -26,7 +26,7 @@ class DismissClaimEventHandlerTest {
 
         handler.moveCaseToStruckOut(event);
 
-        verify(coreCaseDataService).triggerEvent(event.getCaseId(), DISMISS_CLAIM, null);
+        verify(coreCaseDataService).triggerEvent(event.getCaseId(), DISMISS_CLAIM);
     }
 
 }
