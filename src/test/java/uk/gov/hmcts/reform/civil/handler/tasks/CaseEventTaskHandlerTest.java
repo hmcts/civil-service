@@ -8,10 +8,13 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -29,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.HashMap;
@@ -44,8 +48,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 
 @SpringBootTest(classes = {
     CaseEventTaskHandler.class,
@@ -73,15 +79,18 @@ class CaseEventTaskHandlerTest {
     @Autowired
     private CaseEventTaskHandler caseEventTaskHandler;
 
+    @BeforeEach
+    void init() {
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getWorkerId()).thenReturn("worker");
+        when(mockTask.getActivityId()).thenReturn("activityId");
+    }
+
     @Nested
     class NotifyRespondent {
 
         @BeforeEach
         void init() {
-            when(mockTask.getTopicName()).thenReturn("test");
-            when(mockTask.getWorkerId()).thenReturn("worker");
-            when(mockTask.getActivityId()).thenReturn("activityId");
-
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
                 "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
@@ -186,6 +195,95 @@ class CaseEventTaskHandlerTest {
                 anyInt(),
                 anyLong()
             );
+        }
+    }
+
+    @Nested
+    class TakeOfflineEvent {
+
+        @BeforeEach
+        void init() {
+            Map<String, Object> variables = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", PROCEEDS_IN_HERITAGE_SYSTEM.name()
+            );
+
+            when(mockTask.getAllVariables()).thenReturn(variables);
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = FlowState.Main.class,
+            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
+                "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED"})
+        void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, state.fullName());
+            variables.putValue(
+                FLOW_FLAGS,
+                getFlowFlags(state)
+            );
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+
+            CaseData caseData = getCaseData(state);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            
+            when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
+
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @NotNull
+        private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
+            return state == TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED
+                ? Map.of("TWO_RESPONDENT_REPRESENTATIVES", true, "RPA_CONTINUOUS_FEED", false)
+                : Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
+        }
+
+        private CaseData getCaseData(FlowState.Main state) {
+            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
+            switch (state) {
+                case FULL_ADMISSION:
+                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails();
+                    break;
+                case PART_ADMISSION:
+                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails();
+                    break;
+                case COUNTER_CLAIM:
+                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails();
+                    break;
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                    caseDataBuilder.atStatePendingClaimIssuedUnRepresentedDefendant();
+                    break;
+                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                    caseDataBuilder.atStatePendingClaimIssuedUnRegisteredDefendant();
+                    break;
+                case FULL_DEFENCE_PROCEED:
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed();
+                    break;
+                case FULL_DEFENCE_NOT_PROCEED:
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed();
+                    break;
+                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected flow state " + state.fullName());
+
+            }
+            return caseDataBuilder.build();
         }
     }
 }
