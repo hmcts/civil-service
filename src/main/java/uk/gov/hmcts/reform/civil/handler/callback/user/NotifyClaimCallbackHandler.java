@@ -92,7 +92,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         DynamicListElement defaultValue = DynamicListElement.dynamicElement("Both");
-
         caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions, defaultValue));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -104,7 +103,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> warnings = new ArrayList<>();
-        if (!notifyBothRespondentSolicitors(caseData)) {
+        if (featureToggleService.isMultipartyEnabled()
+            && !notifyBothRespondentSolicitors(caseData)) {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 

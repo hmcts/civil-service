@@ -35,6 +35,7 @@ public class CaseData implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
+    private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
     private final Party applicant2;
@@ -155,6 +156,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
     private final LocalDateTime respondent1LitigationFriendDate;
+    private final LocalDateTime respondent1LitigationFriendCreatedDate;
 
     private final YesOrNo isRespondent1;
 }

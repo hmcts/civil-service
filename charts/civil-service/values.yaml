@@ -26,8 +26,8 @@ java:
     CORE_CASE_DATA_API_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     SPRING_SECURITY_ENABLED: true
-    CMC_DB_USERNAME: 'cmc@cmc-{{ .Values.global.environment }}'
-    CMC_DB_HOST: cmc-{{ .Values.global.environment }}.postgres.database.azure.com
+    CMC_DB_USERNAME: 'cmc@cmc-db-v11-{{ .Values.global.environment }}'
+    CMC_DB_HOST: cmc-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=require&gssEncMode=disable'
     CMC_DB_NAME: cmc
     CMC_DB_PORT: 5432
@@ -41,12 +41,14 @@ java:
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCMOSIS_TORNADO_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
+    DOCUMENT_MANAGEMENT_SECURED: false
 
   keyVaults:
     civil:
@@ -62,7 +64,7 @@ java:
         - prd-admin-user-password
         - AppInsightsInstrumentationKey
         - docmosis-api-key
-        - cmc-db-password
+        - cmc-db-password-v11
         - gov-notify-api-key
         - sendgrid-api-key
         - robotics-notification-sender
