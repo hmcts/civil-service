@@ -119,7 +119,6 @@ class FlowPredicateTest {
         }
 
         @Test //1v2 - Notify Both Sol
-        @Test
         void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
@@ -137,16 +136,6 @@ class FlowPredicateTest {
             assertTrue(takenOfflineAfterClaimNotified.test(caseData));
             assertFalse(claimNotified.test(caseData));
         }
-
-        @Test // 1v2 - Same Solicitor / 1v1 Case (Field is null)
-        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified()
-                .build();
-
-            assertTrue(claimNotified.test(caseData));
-            assertFalse(takenOfflineAfterClaimNotified.test(caseData));
-        }
     }
 
     @Nested
@@ -162,6 +151,35 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             assertFalse(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldBeClaimDetailsNotified_when1v2DifferentSolicitor_andNotifySolicitor_isBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                .build();
+
+            assertTrue(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldHandOffline_when1v2DifferentSolicitor_andNotifyDetailsSolicitor_isOneSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                .build();
+
+            assertTrue(takenOfflineAfterClaimDetailsNotified.test(caseData));
+            assertFalse(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+
+            assertTrue(claimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
         }
     }
 

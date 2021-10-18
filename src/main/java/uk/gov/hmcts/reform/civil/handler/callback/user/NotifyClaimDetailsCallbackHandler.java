@@ -148,11 +148,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        DynamicListElement defaultValue = DynamicListElement.dynamicElement("Both");
-
-        caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(
-            DynamicList.fromList(dynamicListOptions, defaultValue)
-        );
+        caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
