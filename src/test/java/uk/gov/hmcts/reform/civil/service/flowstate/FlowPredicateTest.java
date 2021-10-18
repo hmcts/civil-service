@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -134,7 +135,6 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineAfterClaimNotified.test(caseData));
-            assertFalse(claimNotified.test(caseData));
         }
     }
 
@@ -883,5 +883,13 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
             assertFalse(claimDismissedByCamunda.test(caseData));
         }
+    }
+
+    @Test
+    void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
+            .build();
+        assertTrue(respondent2OrgNotRegistered.test(caseData));
     }
 }

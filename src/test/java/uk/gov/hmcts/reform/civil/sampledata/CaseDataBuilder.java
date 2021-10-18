@@ -91,6 +91,7 @@ public class CaseDataBuilder {
     protected Party respondent1;
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
+    protected YesOrNo respondent2Represented;
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
@@ -671,6 +672,56 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedNoRespondentRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2AndSecondRespondentIsRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndSameRepresentative() {
+        atStatePaymentSuccessful();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2SameLegalRepresentative = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+        atStateClaimIssued();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStatePaymentFailed() {
         atStateClaimSubmitted();
 
@@ -1133,6 +1184,7 @@ public class CaseDataBuilder {
             .applicant2(applicant2)
             .respondent1(respondent1)
             .respondent1Represented(respondent1Represented)
+            .respondent2Represented(respondent2Represented)
             .respondent1OrgRegistered(respondent1OrgRegistered)
             .respondent2OrgRegistered(respondent2OrgRegistered)
             .respondentSolicitor1EmailAddress(respondentSolicitor1EmailAddress)
