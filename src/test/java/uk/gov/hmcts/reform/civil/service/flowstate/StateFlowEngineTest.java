@@ -238,6 +238,27 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnPaymentSuccessful_whenCaseDataAtStatePaymentSuccessful1v2SameRepresentative() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndSameRepresentative().build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(3)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                                                                        entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
         void shouldReturnPaymentFailed_whenCaseDataAtStatePaymentFailed() {
             CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
 

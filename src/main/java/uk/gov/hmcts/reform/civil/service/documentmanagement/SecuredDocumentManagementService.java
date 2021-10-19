@@ -80,6 +80,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                                   .documentUrl(document.links.self.href)
                                   .documentBinaryUrl(document.links.binary.href)
                                   .documentFileName(originalFileName)
+                                  .documentHash(document.hashToken)
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())

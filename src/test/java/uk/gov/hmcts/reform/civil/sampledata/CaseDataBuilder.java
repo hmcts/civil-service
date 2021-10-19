@@ -707,6 +707,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssued1v2AndSameRepresentative() {
+        atStatePaymentSuccessful();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2SameLegalRepresentative = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+        atStateClaimIssued();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStatePaymentFailed() {
         atStateClaimSubmitted();
 
