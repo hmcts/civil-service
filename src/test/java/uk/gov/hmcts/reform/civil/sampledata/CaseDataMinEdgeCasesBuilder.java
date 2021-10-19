@@ -101,6 +101,18 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMinEdgeCasesBuilder atStateAddSecondDefendantMinimumData() {
+        addRespondent2 = NO;
+        respondent2SameLegalRepresentative = NO;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .build();
+        respondent2 = PartyBuilder.builder().companyWithMinimalData().build();
+        respondent2Represented = NO;
+        respondentSolicitor2EmailAddress = "respondent2solicitor@example.com";
+        return this;
+    }
+
     public CaseDataMinEdgeCasesBuilder atStateClaimIssuedWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
         issueDate = CLAIM_ISSUED_DATE;
@@ -266,6 +278,65 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         respondent1TimeExtensionDate = LocalDateTime.now();
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1MinimumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant1MinimumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant1MinimumData() {
+        atStatePaymentSuccessfulMinimumData();
+        atStateAddSecondDefendantMinimumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        addRespondent2 = YES;
+        respondent1Represented = NO;
+        respondent2Represented = YES;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant2MinimumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant2MinimumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant2MinimumData() {
+        atStatePaymentSuccessfulMinimumData();
+        atStateAddSecondDefendantMinimumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        addRespondent2 = YES;
+        respondent1Represented = YES;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1And2MinimumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant1And2MinimumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant1And2MinimumData() {
+        atStatePaymentSuccessfulMinimumData();
+        atStateAddSecondDefendantMinimumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        addRespondent2 = YES;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         return this;
     }
 }

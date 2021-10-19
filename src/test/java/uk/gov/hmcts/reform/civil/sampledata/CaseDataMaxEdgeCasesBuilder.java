@@ -80,6 +80,18 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    public CaseDataMaxEdgeCasesBuilder atStateAddSecondDefendantMaximumData() {
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .build();
+        respondent2 = PartyBuilder.builder().companyWithMinimalData().build();
+        respondent2Represented = NO;
+        respondentSolicitor2EmailAddress = "respondent2solicitor@example.com";
+        return this;
+    }
+
     public CaseDataMaxEdgeCasesBuilder atStateClaimSubmittedMaximumData() {
         atStateClaimDraftWithMaximumData();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -259,6 +271,65 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         respondent1TimeExtensionDate = LocalDateTime.now();
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1MaximumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant1MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant1MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        addRespondent2 = YES;
+        respondent1Represented = NO;
+        respondent2Represented = YES;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant2MaximumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant2MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant2MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        addRespondent2 = YES;
+        respondent1Represented = YES;
+        respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1And2MaximumData() {
+        atStatePendingClaimIssuedUnRepresentedDefendant1And2MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRepresentedDefendant1And2MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        addRespondent2 = YES;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         return this;
     }
 }

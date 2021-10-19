@@ -166,6 +166,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected YesOrNo isRespondent1;
