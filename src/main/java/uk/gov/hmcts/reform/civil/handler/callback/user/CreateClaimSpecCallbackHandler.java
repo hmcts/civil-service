@@ -60,9 +60,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -72,15 +70,14 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
+public class CreateClaimSpecCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
     private static final List<CaseEvent> EVENTS = Arrays.asList(
-       // CaseEvent.CREATE_CLAIM_SPEC,
-        //CaseEvent.CREATE_CLAIM
+        CaseEvent.CREATE_CLAIM_SPEC
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the Defendant legal "
+        + "receive an email. The email will also include the date when you eed to notify the Defendant legal "
         + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
@@ -178,8 +175,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         Party applicant = caseData.getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
         caseDataBuilder.superClaimType(UNSPEC_CLAIM);
-        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getApplicant1().getPrimaryAddress().getPostCode());
             caseDataBuilder.superClaimType(SPEC_CLAIM);
@@ -241,24 +237,24 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = new ArrayList<String>();
-            if (caseData.getTimelineOfEvents() != null) {
-                List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
-                timelineOfEvent.forEach(timelineOfEvents -> {
-                    if (timelineOfEvents.getValue().getTimelineDate().isAfter(LocalDate.now())) {
-                        errors.add("Correct the date. You can’t use a future date.");
-                    }
-                });
-            }
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<String>();
+        if (caseData.getTimelineOfEvents() != null) {
+            List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
+            timelineOfEvent.forEach(timelineOfEvents -> {
+                if (timelineOfEvents.getValue().getTimelineDate().isAfter(LocalDate.now())) {
+                    errors.add("Correct the date. You can’t use a future date.");
+                }
+            });
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
+        //}
+        //return AboutToStartOrSubmitCallbackResponse.builder()
+        //    .build();
     }
 
     private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
@@ -360,9 +356,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
-        if (callbackParams.getRequest().getEventId() != null
-            && callbackParams.getRequest().getEventId().equals(
-            "CREATE_CLAIM_SPEC")) {
+        if (callbackParams.getRequest().getEventId() != null   ) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
         }
@@ -390,15 +384,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
-        if (null != callbackParams.getRequest().getEventId()
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if (null != callbackParams.getRequest().getEventId()) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
-        } else {
-            dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
         }
+        //else {
+        //  dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        // dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+        //dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+        //}
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
@@ -407,7 +401,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
@@ -447,69 +440,69 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getRespondent1().getPrimaryAddress().getPostCode());
+        // if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+            caseData.getRespondent1().getPrimaryAddress().getPostCode());
 
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
+        //}
+        // return AboutToStartOrSubmitCallbackResponse.builder()
+        //  .build();
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
+        // if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+            caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+        //}
+        //return AboutToStartOrSubmitCallbackResponse.builder()
+        //  .build();
+    }
+
+    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
+        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
             List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+                caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
-    }
-
-    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
-                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                    caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
-
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .build();
-            }
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+        // }
+        //return AboutToStartOrSubmitCallbackResponse.builder()
+        //.build();
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
-                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                    caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
+        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
+            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+                caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
 
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .build();
-            }
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+        //}
+        // return AboutToStartOrSubmitCallbackResponse.builder()
+        //  .build();
     }
 
     //calculate total amount for specified claim by adding up the claim break up amounts
@@ -560,7 +553,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     //calculate interest for specified claim
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -578,7 +570,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
