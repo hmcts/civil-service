@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @SpringBootTest(classes = {
     CaseEventTaskHandler.class,
@@ -216,7 +217,7 @@ class CaseEventTaskHandlerTest {
             value = FlowState.Main.class,
             names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
-                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED"})
+                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED","TAKEN_OFFLINE_BY_STAFF"})
         void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, state.fullName());
@@ -229,7 +230,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-            
+
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
                                 .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
@@ -279,6 +280,9 @@ class CaseEventTaskHandlerTest {
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                     caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
                     break;
+                case TAKEN_OFFLINE_BY_STAFF:
+                     caseDataBuilder.atStateTakenOfflineByStaff();
+                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
 
