@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,13 +17,15 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.*;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.*;
-
+import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
+import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
+import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
 
 @RequiredArgsConstructor
 @Component
@@ -113,14 +114,14 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 String[] claimArray = claimString.split(",");
                 for (String value : claimArray) {
                     System.out.println(value);
-                    if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
-                        return "Defendant does not consent.";
-                    } else if (value.contains(APPLICATION.name())) {
+                    if (value.contains(APPLICATION.name())) {
                         return "Application.";
-                    } else if (value.contains(JUDGEMENT_REQUEST.name())) {
-                        return "Judgement request.";
                     } else if (value.contains(CASE_SETTLED.name())) {
                         return "Case settled.";
+                    } else if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
+                        return "Defendant does not consent.";
+                    } else if (value.contains(JUDGEMENT_REQUEST.name())) {
+                        return "Judgement request.";
                     } else if (value.contains(OTHER.name())) {
                         return "Other.";
                     }

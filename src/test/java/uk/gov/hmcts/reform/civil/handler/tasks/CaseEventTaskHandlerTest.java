@@ -217,7 +217,8 @@ class CaseEventTaskHandlerTest {
             value = FlowState.Main.class,
             names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
-                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED","TAKEN_OFFLINE_BY_STAFF"})
+                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
+                "TAKEN_OFFLINE_BY_STAFF"})
         void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, state.fullName());
@@ -281,8 +282,8 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
-                     caseDataBuilder.atStateTakenOfflineByStaff();
-                     break;
+                    caseDataBuilder.atStateTakenOfflineByStaff();
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
 
