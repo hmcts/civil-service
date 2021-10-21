@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.0.1"
+  id "org.flywaydb.flyway" version "8.0.2"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -286,7 +286,7 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.24'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.23.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -320,7 +320,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.5.2'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.5.3'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.16-preview.1'
@@ -333,9 +333,9 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.50'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
 
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.0'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.1'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.61'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.62'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
