@@ -335,7 +335,7 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.1'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.62'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.63'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
