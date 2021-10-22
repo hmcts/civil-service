@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import java.util.Map;
 import java.util.Objects;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
@@ -124,7 +125,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     } else if (value.contains(OTHER.name())) {
                         for (String description : claimArray) {
                             if (description.contains("other=")) {
-                                return "Other: " + description.substring(description.indexOf("=")+1);
+                                return format("Other: %s", description.substring(description.indexOf("=") + 1));
                             }
                         }
                     }
