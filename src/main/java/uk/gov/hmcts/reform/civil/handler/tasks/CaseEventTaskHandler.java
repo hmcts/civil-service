@@ -113,17 +113,20 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 String claimString = claimProceedsInCaseman.toString();
                 String[] claimArray = claimString.split(",");
                 for (String value : claimArray) {
-                    System.out.println(value);
                     if (value.contains(APPLICATION.name())) {
                         return "Application.";
                     } else if (value.contains(CASE_SETTLED.name())) {
                         return "Case settled.";
                     } else if (value.contains(DEFENDANT_DOES_NOT_CONSENT.name())) {
-                        return "Defendant does not consent.";
+                        return "Defendant does not consent to accept service.";
                     } else if (value.contains(JUDGEMENT_REQUEST.name())) {
                         return "Judgement request.";
                     } else if (value.contains(OTHER.name())) {
-                        return "Other.";
+                        for (String description : claimArray) {
+                            if (description.contains("other=")) {
+                                return "Other: " + description.substring(description.indexOf("=")+1);
+                            }
+                        }
                     }
                 }
             }
