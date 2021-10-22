@@ -221,7 +221,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
-        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<String>();
         if (caseData.getTimelineOfEvents() != null) {
@@ -236,10 +235,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-        //}
-        //return AboutToStartOrSubmitCallbackResponse.builder()
-        //    .build();
-    }
+       }
 
     private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -368,18 +364,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
-        if (null != callbackParams.getRequest().getEventId()
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+        if (null != callbackParams.getRequest().getEventId()) {
             System.out.println(" inside if condition ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }
-        else {
-            System.out.println(" else condition ");
-          dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-          //dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-          //dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
-         }
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
@@ -427,7 +416,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        // if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = postcodeValidator.validatePostCodeForDefendant(
             caseData.getRespondent1().getPrimaryAddress().getPostCode());
@@ -435,13 +423,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-        //}
-        // return AboutToStartOrSubmitCallbackResponse.builder()
-        //  .build();
+
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
-        // if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = postcodeValidator.validatePostCodeForDefendant(
             caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
@@ -449,13 +434,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-        //}
-        //return AboutToStartOrSubmitCallbackResponse.builder()
-        //  .build();
-    }
+     }
 
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
-        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
             List<String> errors = postcodeValidator.validatePostCodeForDefendant(
@@ -468,13 +449,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
-        // }
-        //return AboutToStartOrSubmitCallbackResponse.builder()
-        //.build();
-    }
+     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        //if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
             List<String> errors = postcodeValidator.validatePostCodeForDefendant(
@@ -487,10 +464,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
-        //}
-        // return AboutToStartOrSubmitCallbackResponse.builder()
-        //  .build();
-    }
+     }
 
     //calculate total amount for specified claim by adding up the claim break up amounts
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
