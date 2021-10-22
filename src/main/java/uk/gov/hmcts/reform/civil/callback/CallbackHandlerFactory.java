@@ -34,7 +34,7 @@ public class CallbackHandlerFactory {
     @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
         String eventId = callbackParams.getRequest().getEventId();
-          return ofNullable(eventHandlers.get(eventId))
+        return ofNullable(eventHandlers.get(eventId))
             .map(h -> processEvent(h, callbackParams, eventId))
             .orElseThrow(() -> new CallbackException("Could not handle callback for event " + eventId));
     }

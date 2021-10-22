@@ -75,8 +75,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
     private static final List<CaseEvent> EVENTS = Arrays.asList(
-       // CaseEvent.CREATE_CLAIM_SPEC,
-        //CaseEvent.CREATE_CLAIM
+          CaseEvent.CREATE_CLAIM
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
