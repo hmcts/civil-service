@@ -572,6 +572,7 @@ async function updateCaseDataWithPlaceholders(data) {
     TEST_DOCUMENT_HASH: document.document_hash
   };
 
+  console.log('document.document_hash>>> ' , document.document_hash);
   data = lodash.template(JSON.stringify(data))(placeholders);
 
   return JSON.parse(data);
