@@ -446,7 +446,11 @@ const validateEventPages = async (data) => {
   //transform the data
   console.log('validateEventPages');
   for (let pageId of Object.keys(data.valid)) {
-    data = await updateCaseDataWithPlaceholders(data);
+    if (pageId === 'Upload') {
+      const document = await testingSupport.uploadDocument();
+      data = await updateCaseDataWithPlaceholders(data, document);
+    }
+   // data = await updateCaseDataWithPlaceholders(data);
     await assertValidData(data, pageId);
   }
 };
@@ -562,20 +566,21 @@ function removeUuidsFromDynamicList(data, dynamicListField) {
   return dynamicElements.map(({code, ...item}) => item);
 }
 
-async function updateCaseDataWithPlaceholders(data) {
-  const document = await testingSupport.uploadDocument();
+async function updateCaseDataWithPlaceholders(data, document) {
+  //const document = await testingSupport.uploadDocument();
 
   const placeholders = {
     TEST_DOCUMENT_URL: document.document_url,
     TEST_DOCUMENT_BINARY_URL: document.document_binary_url,
-    TEST_DOCUMENT_FILENAME: document.document_filename,
-    TEST_DOCUMENT_HASH: document.document_hash
+    TEST_DOCUMENT_FILENAME: document.document_filename
+    //,
+   // TEST_DOCUMENT_HASH: document.document_hash
   };
 
   console.log('document.document_url>>> ' , document.document_url);
   console.log('document.document_binary_url>>> ' , document.document_binary_url);
   console.log('document.document_filename>>> ' , document.document_filename);
-  console.log('document.document_hash>>> ' , document.document_hash);
+  //console.log('document.document_hash>>> ' , document.document_hash);
   data = lodash.template(JSON.stringify(data))(placeholders);
 
   return JSON.parse(data);
