@@ -70,7 +70,7 @@ module.exports = {
       url += `/${caseId}/events`;
     }
 
-    console.log('data>>> ' + caseData);
+    console.log('data>>> ' + JSON.stringify(caseData));
     console.log('eventName>>> ' + eventName);
     console.log('event_token>>> ' + tokens.ccdEvent);
     return restHelper.retriedRequest(url, getRequestHeaders(tokens.userAuth),
