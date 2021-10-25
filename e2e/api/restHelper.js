@@ -11,6 +11,7 @@ const request = (url, headers, body, method = 'POST') => fetch(url, {
 const retriedRequest = async (url, headers, body, method = 'POST', expectedStatus = 200) => {
   return retry(() => {
     return request(url, headers, body, method).then(response => {
+      console.log('body>>> ' + JSON.stringify(body));
       if (response.status !== expectedStatus) {
         console.log('response>>>> ' + JSON.stringify(response));
         throw new Error(`Expected status: ${expectedStatus}, actual status: ${response.status}, `
