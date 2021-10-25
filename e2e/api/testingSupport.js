@@ -65,7 +65,20 @@ module.exports =  {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authToken}`,
       }, caseData, 'PUT');
-  }
+  },
 
+  uploadDocument: async () => {
+    const authToken = await idamHelper.accessToken(config.applicantSolicitorUser);
+    let response = await restHelper.request(
+      `${config.url.civilService}/testing-support/upload/test-document`,
+      {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      {},
+      'POST');
+
+    return await response.json();
+  }
 
 };

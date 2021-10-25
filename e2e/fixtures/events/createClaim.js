@@ -128,7 +128,17 @@ const createClaimData = (legalRepresentation, useValidPba) => {
     },
     Upload: {
       servedDocumentFiles: {
-        particularsOfClaimDocument: [element(document('particularsOfClaim.pdf'))]
+        particularsOfClaimDocument: [
+          {
+            id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
+            value: {
+              document_url: "${TEST_DOCUMENT_URL}",
+              document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
+              document_filename: "${TEST_DOCUMENT_FILENAME}",
+              document_hash: "${TEST_DOCUMENT_HASH}"
+            }
+          }
+        ]
       }
     },
     ClaimValue: {

@@ -17,7 +17,7 @@ module.exports = {
     return getDateTimeISOString(days);
   },
 
-  document: filename => {
+  document: async (filename) => {
     const documentId = uuid.v1();
     return {
       document_url: `${config.url.dmStore}/documents/${documentId}`,

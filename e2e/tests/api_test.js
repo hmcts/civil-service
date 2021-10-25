@@ -1,10 +1,20 @@
 /* eslint-disable no-unused-vars */
 
 const config = require('../config.js');
+const testingSupport = require("../api/testingSupport");
+let document;
 
 Feature('CCD API tests @api-tests');
 
+// Before(async ({ I }) => { // or Background
+// console.log('before');
+//   document = await testingSupport.uploadDocument();
+//   console.log('document>>>> ', document );
+// });
+
+
 Scenario('Create claim', async ({I, api}) => {
+  console.log('start createClaimWithRepresentedRespondent');
   await api.createClaimWithRepresentedRespondent(config.applicantSolicitorUser);
 });
 
