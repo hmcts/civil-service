@@ -818,12 +818,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimDetailsNotified_withBothSolicitorOptionSelected() {
         atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Both");
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotified_withOneSolicitorOptionSelected() {
         atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Defendant One: Solicitor");
         return this;
     }

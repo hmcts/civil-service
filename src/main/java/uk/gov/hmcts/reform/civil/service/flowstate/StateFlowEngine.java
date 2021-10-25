@@ -99,11 +99,14 @@ public class StateFlowEngine {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(DRAFT)
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
-                    .set(flags -> flags.putAll(Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
+                    .set(flags -> flags.putAll(
+                        Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
+                               FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
-                    .set(flags -> flags.putAll(Map.of(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
+                    .set(flags -> flags.putAll(
+                        Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
+                               FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                               FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled())))
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented
                                                           .or(claimSubmittedOnlyOneRespondentRepresented))
             .state(CLAIM_SUBMITTED)
