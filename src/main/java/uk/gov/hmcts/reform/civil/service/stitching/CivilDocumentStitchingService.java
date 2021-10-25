@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService.CREATED_BY;
+import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.CREATED_BY;
 
 @Service
 @RequiredArgsConstructor

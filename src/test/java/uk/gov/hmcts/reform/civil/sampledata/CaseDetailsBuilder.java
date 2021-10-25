@@ -60,7 +60,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateAwaitingCaseDetailsNotification() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_CASE_DETAILS_NOTIFICATION.name();
         return this;

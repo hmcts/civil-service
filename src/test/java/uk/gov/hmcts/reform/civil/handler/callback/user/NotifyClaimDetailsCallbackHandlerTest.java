@@ -146,7 +146,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldUpdateBusinessProcess_whenInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

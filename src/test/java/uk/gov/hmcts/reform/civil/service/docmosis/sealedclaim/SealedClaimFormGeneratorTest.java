@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import java.util.List;
@@ -63,7 +63,7 @@ class SealedClaimFormGeneratorTest {
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
     @MockBean
-    private DocumentManagementService documentManagementService;
+    private UnsecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
@@ -118,6 +118,7 @@ class SealedClaimFormGeneratorTest {
                 () -> assertEquals(templateData.getApplicants(), getApplicants(caseData)),
                 () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
                 () -> assertEquals(templateData.getClaimValue(), caseData.getClaimValue().formData()),
+                () -> assertEquals(templateData.getCourtFee(), caseData.getClaimFee().formData()),
                 () -> assertEquals(
                     templateData.getStatementOfTruth(),
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()

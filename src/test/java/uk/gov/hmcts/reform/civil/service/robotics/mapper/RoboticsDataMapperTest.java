@@ -37,9 +37,11 @@ import static org.mockito.BDDMockito.given;
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    EventHistorySequencer.class,
     EventHistoryMapper.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
