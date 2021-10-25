@@ -12,7 +12,7 @@ const retriedRequest = async (url, headers, body, method = 'POST', expectedStatu
   return retry(() => {
     return request(url, headers, body, method).then(response => {
       if (response.status !== expectedStatus) {
-        console.log('response>>>> ' + response.stringify());
+        console.log('response>>>> ' + JSON.stringify(response));
         throw new Error(`Expected status: ${expectedStatus}, actual status: ${response.status}, `
           + `message: ${response.statusText}, url: ${response.url}`);
       }
