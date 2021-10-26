@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -500,7 +499,9 @@ public class FlowStateAllowedEventService {
 
     }
 
-    public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
+    //Method changed in long lasting branch. commented out and kept existing method from master until we figure out
+    //the reason for the change
+    /*public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
         if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
@@ -512,6 +513,11 @@ public class FlowStateAllowedEventService {
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
         }
 
+    }*/
+
+    public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
+        return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
     }
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {

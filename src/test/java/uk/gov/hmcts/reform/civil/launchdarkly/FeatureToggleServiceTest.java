@@ -85,7 +85,7 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
     }
 
-    // @Test
+    @Test
     void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
         var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
         givenToggle(organisationOnboardedFeatureKey, true);
