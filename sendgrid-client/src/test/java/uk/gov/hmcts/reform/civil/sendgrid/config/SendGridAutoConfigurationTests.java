@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sendgrid.config;
 import com.sendgrid.SendGrid;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class SendGridAutoConfigurationTests {
 
@@ -32,12 +34,12 @@ class SendGridAutoConfigurationTests {
         assertThat(sendGrid.getRequestHeaders()).containsEntry("Authorization", "Bearer " + API_KEY);
     }
 
-    /*@Test
+    @Test
     void shouldNotFiredAutoConfigure_whenApiKeyIsNotConfigured() {
         loadContext();
         assertThatExceptionOfType(NoSuchBeanDefinitionException.class)
             .isThrownBy(() -> this.context.getBean(SendGrid.class));
-    }*/
+    }
 
     @Test
     void shouldNotFiredAutoConfigure_whenBeanAlreadyCreatedManually() {
