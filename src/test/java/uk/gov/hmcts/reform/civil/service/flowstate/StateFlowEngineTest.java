@@ -168,7 +168,6 @@ class StateFlowEngineTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly(
-
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
@@ -373,7 +372,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
@@ -396,7 +395,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDetailsNotifiedTimeExtension_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
 
@@ -419,7 +418,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimAcknowledge_whenCaseDataAtStateClaimAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
 
@@ -442,7 +441,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnNotificationAcknowledgedTimeExtension_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
 
@@ -466,7 +465,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
@@ -495,7 +494,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnExtensionRequested_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
 
@@ -518,9 +517,11 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnFullDefence_whenCaseDataAtStateRespondentFullDefence() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -541,9 +542,11 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnFullAdmission_whenCaseDataAtStateRespondentFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmission().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+                .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -564,9 +567,11 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnPartAdmission_whenCaseDataAtStateRespondentPartAdmission() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
+                .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -610,7 +615,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimDismissed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed()
                 .build();
@@ -871,7 +876,7 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        //@Test
+        @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified().build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -1040,7 +1045,7 @@ class StateFlowEngineTest {
     @Nested
     class ClaimDismissedPastClaimDismissedDeadline {
 
-        //@Test
+        @Test
         void shouldReturnAwaitingCamundaState_whenDeadlinePassedAfterStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStatePastClaimDismissedDeadline().build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -1058,7 +1063,7 @@ class StateFlowEngineTest {
                 );
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDismissedState_whenDeadlinePassedAfterStateClaimDetailsNotifiedAndIsProcessedByCamunda() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -1227,7 +1232,7 @@ class StateFlowEngineTest {
                 );
         }
 
-        //@Test
+        @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimDismissed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
 
