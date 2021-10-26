@@ -80,7 +80,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testSpecDefendantResponseFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
+                .atStateRespondentFullDefenceFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 

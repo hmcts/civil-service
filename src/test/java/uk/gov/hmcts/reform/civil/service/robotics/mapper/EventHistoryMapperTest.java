@@ -240,7 +240,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtension()
-                .atStateRespondentFullAdmission()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(5)
@@ -322,7 +322,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithoutOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullAdmission()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
@@ -380,7 +380,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtension()
-                .atStateRespondentPartAdmission()
+                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             Event expectedReceiptOfPartAdmission = Event.builder()
@@ -463,7 +463,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithoutOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentPartAdmission()
+                .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1AcknowledgeNotificationDate(null)
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
