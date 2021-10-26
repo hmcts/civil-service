@@ -61,7 +61,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent2OrgRegistered() != YES;
+            && caseData.getRespondent2OrgRegistered() != YES
+            && caseData.getRespondent2SameLegalRepresentative() != YES;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         caseData.getPaymentSuccessfulDate() == null
