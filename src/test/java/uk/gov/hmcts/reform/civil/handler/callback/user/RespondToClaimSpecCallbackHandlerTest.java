@@ -62,7 +62,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testSpecDefendantResponseValidationError() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
+                .atStateRespondentFullDefenceFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
             when(validator.validate(any())).thenReturn(List.of("Validation error"));

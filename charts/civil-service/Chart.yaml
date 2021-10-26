@@ -11,7 +11,7 @@ dependencies:
     version: 3.6.0
     repository: '@hmctspublic'
   - name: ccd
-    version: 5.0.2
+    version: 5.0.6
     repository: '@hmctspublic'
     tags:
       - civil-ccd-stack
@@ -24,7 +24,7 @@ dependencies:
     repository: '@hmctspublic'
     condition: idam-pr.enabled
   - name: postgresql
-    version: 8.9.8
+    version: ~8.9.8
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
   - name: camunda-bpm
