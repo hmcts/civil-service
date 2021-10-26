@@ -48,7 +48,6 @@ java:
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
-    STITCHING_API_URL: http://em-ccdorc-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/api/stitch-ccd-bundles
     DOCUMENT_MANAGEMENT_SECURED: false
 
   keyVaults:
@@ -71,4 +70,3 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
-        - os-postcode-lookup-api-key
