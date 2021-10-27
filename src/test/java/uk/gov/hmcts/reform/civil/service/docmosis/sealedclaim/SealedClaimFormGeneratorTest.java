@@ -360,6 +360,7 @@ class SealedClaimFormGeneratorTest {
                 () -> assertEquals(templateData.getApplicants(), getApplicant(caseData)),
                 () -> assertEquals(templateData.getRespondents(), getRespondentsDifferentSolicitor(caseData)),
                 () -> assertEquals(templateData.getClaimValue(), caseData.getClaimValue().formData()),
+                () -> assertEquals(templateData.getCourtFee(), caseData.getClaimFee().formData()),
                 () -> assertEquals(
                     templateData.getStatementOfTruth(),
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
