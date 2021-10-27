@@ -32,8 +32,6 @@ module.exports = {
   fetchCaseForDisplay: async(user, caseId, response = 200) => {
     let eventUserAuth = await idamHelper.accessToken(user);
     let eventUserId = await idamHelper.userId(eventUserAuth);
-    console.log('user>>>', user);
-    console.log('eventUserId>>>', eventUserId);
 
     let url = getCcdCaseUrl(eventUserId, caseId);
 

@@ -186,7 +186,10 @@ module.exports = {
 
     await validateEventPages(data[eventName]);
 
-    await assertError('Upload', data[eventName].invalid.Upload.duplicateError,
+    const document = await testingSupport.uploadDocument();
+    let errorData = await updateCaseDataWithPlaceholders(data[eventName], document);
+
+    await assertError('Upload', errorData.invalid.Upload.duplicateError,
       'You need to either upload 1 Particulars of claim only or enter the Particulars of claim text in the field provided. You cannot do both.');
 
     await assertSubmittedEvent('CASE_ISSUED', {
@@ -446,7 +449,7 @@ const validateEventPages = async (data) => {
   //transform the data
   console.log('validateEventPages');
   for (let pageId of Object.keys(data.valid)) {
-    if (pageId === 'Upload') {
+    if (pageId === 'Upload' || pageId === 'DraftDirections'|| pageId === 'ApplicantDefenceResponseDocument' || pageId === 'DraftDirections') {
       const document = await testingSupport.uploadDocument();
       data = await updateCaseDataWithPlaceholders(data, document);
     }
@@ -577,10 +580,6 @@ async function updateCaseDataWithPlaceholders(data, document) {
    // TEST_DOCUMENT_HASH: document.document_hash
   };
 
-  console.log('document.document_url>>> ' , document.document_url);
-  console.log('document.document_binary_url>>> ' , document.document_binary_url);
-  console.log('document.document_filename>>> ' , document.document_filename);
-  //console.log('document.document_hash>>> ' , document.document_hash);
   data = lodash.template(JSON.stringify(data))(placeholders);
 
   return JSON.parse(data);

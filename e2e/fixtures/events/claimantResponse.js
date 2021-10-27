@@ -7,7 +7,11 @@ module.exports = {
     },
     ApplicantDefenceResponseDocument: {
       applicant1DefenceResponseDocument: {
-        file: document('defenceResponse.pdf')
+        file: {
+          document_url: "${TEST_DOCUMENT_URL}",
+          document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
+          document_filename: "${TEST_DOCUMENT_FILENAME}"
+        }
       }
     },
     FileDirectionsQuestionnaire: {
@@ -70,7 +74,11 @@ module.exports = {
       }
     },
     DraftDirections: {
-      applicant1DQDraftDirections: document('draftDirections.pdf')
+      applicant1DQDraftDirections: {
+        document_url: "${TEST_DOCUMENT_URL}",
+        document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
+        document_filename: "${TEST_DOCUMENT_FILENAME}"
+      }
     },
     HearingSupport: {},
     FurtherInformation: {
