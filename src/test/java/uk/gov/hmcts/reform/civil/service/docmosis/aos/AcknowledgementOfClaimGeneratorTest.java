@@ -25,7 +25,11 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,12 +94,16 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(Party.builder()
-                            .name(caseData.getRespondent1().getPartyName())
-                            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                            .representative(representative)
-                            .litigationFriendName("")
-                            .build())
+            .respondent(new ArrayList<>(List.of(
+                Party.builder()
+                    .name(caseData.getRespondent1().getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent1LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build())))
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -137,12 +145,12 @@ class AcknowledgementOfClaimGeneratorTest {
                     templateData.getResponseDeadline(),
                     caseData.getRespondent1ResponseDeadline().toLocalDate()
                 ),
-                () -> assertEquals(templateData.getRespondent(), Party.builder()
+                () -> assertEquals(templateData.getRespondent(), new ArrayList<>(List.of(Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
                     .representative(representative)
                     .litigationFriendName(caseData.getRespondent1LitigationFriend().getFullName())
                     .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .build()
+                    .build()))
                 )
             );
         }
