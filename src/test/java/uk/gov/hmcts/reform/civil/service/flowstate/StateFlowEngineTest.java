@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -76,7 +75,6 @@ class StateFlowEngineTest {
     }
 
     @Nested
-    @DirtiesContext
     class EvaluateStateFlowEngine {
 
         @Test
@@ -118,9 +116,9 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
             verify(featureToggleService).isRpaContinuousFeedEnabled();
 
-            assertThat(stateFlow.getFlags()).hasSize(3).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -328,9 +326,9 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(3).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -354,10 +352,9 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     CLAIM_NOTIFIED.fullName()
                 );
-
-            assertThat(stateFlow.getFlags()).hasSize(3).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -427,9 +424,9 @@ class StateFlowEngineTest {
                 );
             verify(featureToggleService).isRpaContinuousFeedEnabled();
 
-            assertThat(stateFlow.getFlags()).hasSize(3).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
