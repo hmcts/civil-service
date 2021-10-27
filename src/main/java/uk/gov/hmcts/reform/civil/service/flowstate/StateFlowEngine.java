@@ -115,20 +115,20 @@ public class StateFlowEngine {
                 .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
                 //Unrepresented
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(
-                    respondent1NotRepresented.and(respondent2NotRepresented)
+                (respondent1NotRepresented.and(respondent2NotRepresented))
                     .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                    .or(respondent1OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                    .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
                 //Unregistered
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
-                    respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
-                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                    .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
+                ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                    .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                    .or(respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate())
+                    .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))))
                 //Unrepresented and Unregistered
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
-                    respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                    (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
                     .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
                             .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
