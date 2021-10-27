@@ -111,6 +111,7 @@ public class RoboticsDataMapper {
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
         Optional<String> organisationId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
+
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor1OrganisationDetails()
         );
@@ -185,11 +186,12 @@ public class RoboticsDataMapper {
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
-        var providedServiceAddress = caseData.getApplicantSolicitor1ServiceAddress();
+
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder()
             .id(id)
             .isPayee(true)
             .organisationId(organisationId.orElse(null))
+            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
