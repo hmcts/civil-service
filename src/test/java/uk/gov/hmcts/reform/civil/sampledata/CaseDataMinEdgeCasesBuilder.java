@@ -75,6 +75,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
             .build();
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
+        addRespondent2 = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
@@ -109,6 +110,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
             .build();
         respondent2 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
         respondentSolicitor2EmailAddress = "respondent2solicitor@example.com";
         return this;
     }
@@ -297,6 +299,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         addRespondent2 = YES;
         respondent1Represented = NO;
         respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
         return this;
     }
 
@@ -316,6 +319,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         addRespondent2 = YES;
         respondent1Represented = YES;
         respondent2Represented = NO;
+        respondent2OrgRegistered = YES;
         return this;
     }
 
@@ -337,6 +341,136 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         addRespondent2 = YES;
         respondent1Represented = NO;
         respondent2Represented = NO;
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant1WithMinimalData() {
+        atStatePaymentSuccessfulWithMinimalData();
+        atStateAddSecondDefendantMinimumData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        takenOfflineDate = LocalDateTime.now();
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        respondent1OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant2WithMinimalData() {
+        atStatePaymentSuccessfulWithMinimalData();
+        atStateAddSecondDefendantMinimumData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        takenOfflineDate = LocalDateTime.now();
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org 2 name")
+            .fax("123123123")
+            .dx("test org 2 dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant1And2WithMinimalData() {
+        atStatePaymentSuccessfulWithMinimalData();
+        atStateAddSecondDefendantMinimumData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        takenOfflineDate = LocalDateTime.now();
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org 2 name")
+            .fax("123123123")
+            .dx("test org 2 dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder
+        atStateProceedsOfflineUnrepresentedDefendant1AndUnregisteredDefendant2WithMinimalData() {
+        atStateProceedsOfflineUnrepresentedDefendant1MinimumData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+
+        takenOfflineDate = LocalDateTime.now();
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org 2 name")
+            .fax("123123123")
+            .dx("test org 2 dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMinEdgeCasesBuilder
+        atStateProceedsOfflineUnregisteredDefendant1AndUnrepresentedDefendant2WithMinimalData() {
+        atStateProceedsOfflineUnrepresentedDefendant2MinimumData();
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
         return this;
     }
 }

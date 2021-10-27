@@ -81,7 +81,7 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
     }
 
     public CaseDataMaxEdgeCasesBuilder atStateAddSecondDefendantMaximumData() {
-        addRespondent2 = YES;
+        addRespondent2 = NO;
         respondent2SameLegalRepresentative = NO;
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
@@ -274,6 +274,7 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
+    // UnRepresented
     public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1MaximumData() {
         atStatePendingClaimIssuedUnRepresentedDefendant1MaximumData();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -290,6 +291,7 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         addRespondent2 = YES;
         respondent1Represented = NO;
         respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
         return this;
     }
 
@@ -330,6 +332,103 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         respondent2Represented = NO;
+        return this;
+    }
+
+    // Unregistered
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant1MaximumData() {
+        atStatePendingClaimIssuedUnRegisteredDefendant1MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName(repeat("o", MAX_ALLOWED))
+            .fax("123123123")
+            .dx(repeat("d", AddressBuilder.MAX_ALLOWED))
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.maximal().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRegisteredDefendant1MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant2MaximumData() {
+        atStatePendingClaimIssuedUnRegisteredDefendant2MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName(repeat("o", MAX_ALLOWED))
+            .fax("123123123")
+            .dx(repeat("d", AddressBuilder.MAX_ALLOWED))
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.maximal().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRegisteredDefendant2MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnregisteredDefendant1And2MaximumData() {
+        atStatePendingClaimIssuedUnRegisteredDefendant1And2MaximumData();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName(repeat("o", MAX_ALLOWED))
+            .fax("123123123")
+            .dx(repeat("d", AddressBuilder.MAX_ALLOWED))
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.maximal().build())
+            .build();
+
+        respondent2OrganisationPolicy = null;
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName(repeat("o", MAX_ALLOWED))
+            .fax("123123123")
+            .dx(repeat("d", AddressBuilder.MAX_ALLOWED))
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.maximal().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataMaxEdgeCasesBuilder atStatePendingClaimIssuedUnRegisteredDefendant1And2MaximumData() {
+        atStatePaymentSuccessfulMaximumData();
+        atStateAddSecondDefendantMaximumData();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        addRespondent2 = YES;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
         return this;
     }
 }

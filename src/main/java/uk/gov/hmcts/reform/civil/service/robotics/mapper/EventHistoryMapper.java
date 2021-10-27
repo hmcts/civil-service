@@ -64,6 +64,9 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
+                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                        buildUnrepresentedUnregisteredDefendant(builder, caseData);
+                        break;
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
@@ -455,6 +458,22 @@ public class EventHistoryMapper {
                     .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm.")
                     .eventDetails(EventDetails.builder()
                                       .miscText("RPA Reason: Unregistered defendant solicitor firm.")
+                                      .build())
+                    .build()
+            ));
+    }
+
+    private void buildUnrepresentedUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Unrepresented defendant and "
+                                                + "unregistered defendant solicitor firm.")
                                       .build())
                     .build()
             ));
