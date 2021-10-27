@@ -59,22 +59,9 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
             .respondent(prepareRespondentMultiParty(caseData,multiPartyScenario))
-            //.respondent(prepareRespondent(caseData))
             .build();
     }
 
-    private Party prepareRespondent(CaseData caseData) {
-        var respondent = caseData.getRespondent1();
-        return Party.builder()
-            .name(respondent.getPartyName())
-            .primaryAddress(respondent.getPrimaryAddress())
-            .representative(representativeService.getRespondentRepresentative(caseData))
-            .litigationFriendName(
-                ofNullable(caseData.getRespondent1LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
-    }
     private List<Party> prepareRespondentMultiParty(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         {
             var respondent = caseData.getRespondent1();
@@ -117,4 +104,4 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             return respondentParties;
         }
     }
-    }
+}
