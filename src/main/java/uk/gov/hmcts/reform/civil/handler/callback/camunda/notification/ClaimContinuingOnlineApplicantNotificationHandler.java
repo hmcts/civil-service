@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -32,6 +34,8 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
+    Logger log = LoggerFactory.getLogger(ClaimContinuingOnlineApplicantNotificationHandler.class);
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -51,7 +55,8 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        System.out.println(caseData.getApplicantSolicitor1UserDetails().getEmail());
+        log.info("Email '{}' ", caseData.getApplicantSolicitor1UserDetails().getEmail());
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
