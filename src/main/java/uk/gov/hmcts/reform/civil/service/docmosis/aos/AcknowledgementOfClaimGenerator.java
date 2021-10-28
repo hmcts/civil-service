@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9_MULTIPARTY_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +38,18 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         AcknowledgementOfClaimForm templateData = getTemplateData(caseData);
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        DocmosisTemplates docmosisTemplate = multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N9;
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+        DocmosisTemplates docmosisTemplate =
+            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N9;
+        DocmosisDocument docmosisDocument =
+            documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData, docmosisTemplate), docmosisDocument.getBytes(), DocumentType.ACKNOWLEDGEMENT_OF_CLAIM)
+            new PDF(
+                getFileName(caseData, docmosisTemplate),
+                docmosisDocument.getBytes(),
+                DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
+            )
         );
     }
 
@@ -58,7 +66,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(prepareRespondentMultiParty(caseData,multiPartyScenario))
+            .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
             .build();
     }
 

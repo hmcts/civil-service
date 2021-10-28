@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.enums;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public enum MultiPartyScenario {
 
