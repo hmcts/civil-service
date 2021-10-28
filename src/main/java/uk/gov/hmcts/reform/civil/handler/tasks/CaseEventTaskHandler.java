@@ -89,6 +89,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case COUNTER_CLAIM:
                     return "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT: //RPA need to confirm the reason on this
                     return "RPA Reason: Unrepresented defendant.";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return "RPA Reason: Unregistered defendant solicitor firm.";

@@ -464,6 +464,7 @@ public class EventHistoryMapper {
     }
 
     private void buildUnrepresentedUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        //RPA need to confirm the reason on this
         builder.miscellaneous(
             List.of(
                 Event.builder()

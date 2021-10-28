@@ -271,7 +271,6 @@ public class RoboticsDataMapper {
             .build();
     }
 
-    //////////
     private Optional<String> getOrganisation2Id(OrganisationPolicy respondent2OrganisationPolicy) {
         return ofNullable(respondent2OrganisationPolicy)
             .map(OrganisationPolicy::getOrganisation)
