@@ -51,7 +51,7 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        System.out.println(caseData.getApplicantSolicitor1UserDetails().getEmail());
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
