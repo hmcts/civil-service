@@ -91,7 +91,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     public String getRespondentLegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         String respondentLegalOrganizationName = null;
-        if(organisation.isPresent()) {
+        if (organisation.isPresent()) {
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;

@@ -77,7 +77,7 @@ public class BundleRequestExecutor {
             }
 
         } catch (RestClientResponseException e) {
-            e.printStackTrace();
+            log.debug(e.getMessage(), e);
         }
         return caseData;
     }

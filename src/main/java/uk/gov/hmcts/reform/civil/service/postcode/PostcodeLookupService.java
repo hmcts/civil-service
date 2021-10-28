@@ -37,12 +37,9 @@ public class PostcodeLookupService {
 
     public boolean validatePostCodeForDefendant(String postcode) {
         String countryName = fetchCountryFromPostCode(postcode.toUpperCase());
-        if (countryName != null
+        return (countryName != null
             && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase())
-            || CountriesAllowed.WALES.name().equals(countryName.toUpperCase()))) {
-            return true;
-        }
-        return false;
+            || CountriesAllowed.WALES.name().equals(countryName.toUpperCase())));
     }
 
     private String fetchCountryFromPostCode(String postcode) {
@@ -82,7 +79,7 @@ public class PostcodeLookupService {
             HttpStatus responseStatus = ((ResponseEntity) response).getStatusCode();
 
             if (responseStatus.value() == org.apache.http.HttpStatus.SC_OK) {
-                JSONObject jsonObj = new JSONObject(response.getBody().toString());
+                JSONObject jsonObj = new JSONObject(response.getBody());
 
                 if (jsonObj.has("results")) {
                     JSONObject gazeteerEntry = new JSONObject(new JSONObject(((JSONArray) jsonObj

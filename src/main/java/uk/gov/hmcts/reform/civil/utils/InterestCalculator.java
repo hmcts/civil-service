@@ -29,17 +29,17 @@ public class InterestCalculator {
     public BigDecimal calculateInterest(CaseData caseData) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            if (caseData.getInterestClaimOptions().name() == "SAME_RATE_INTEREST") {
+            if (caseData.getInterestClaimOptions().name().equals("SAME_RATE_INTEREST")) {
                 if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
-                    == "SAME_RATE_INTEREST_8_PC") {
+                    .equals("SAME_RATE_INTEREST_8_PC")) {
                     interestAmount = calculateInterestAmount(caseData, valueOf(8));
                 }
                 if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
-                    == "SAME_RATE_INTEREST_DIFFERENT_RATE") {
+                    .equals("SAME_RATE_INTEREST_DIFFERENT_RATE")) {
                     interestAmount = calculateInterestAmount(caseData,
                                                    caseData.getSameRateInterestSelection().getDifferentRate());
                 }
-            } else if (caseData.getInterestClaimOptions().name() == "BREAK_DOWN_INTEREST") {
+            } else if (caseData.getInterestClaimOptions().name().equals("BREAK_DOWN_INTEREST")) {
                 interestAmount =  caseData.getBreakDownInterestTotal();
             }
         }
@@ -47,13 +47,13 @@ public class InterestCalculator {
     }
 
     public BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
-        if (caseData.getInterestClaimFrom().name() == FROM_CLAIM_SUBMIT_DATE) {
+        if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
             LocalDate claimIssueDate = isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) :
                 localDateTime.toLocalDate();
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, claimIssueDate);
-        } else if (caseData.getInterestClaimFrom().name() == FROM_SPECIFIC_DATE) {
-            if (caseData.getInterestClaimUntil().name() == UNTIL_CLAIM_SUBMIT_DATE
-                || caseData.getInterestClaimUntil().name() == UNTIL_SETTLED_OR_JUDGEMENT_MADE) {
+        } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
+            if (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)
+                || caseData.getInterestClaimUntil().name().equals(UNTIL_SETTLED_OR_JUDGEMENT_MADE)) {
                 LocalDate claimIssueDate = isAfterFourPM()
                     ? caseData.getInterestFromSpecificDate().minusDays(1) :
                     caseData.getInterestFromSpecificDate();
