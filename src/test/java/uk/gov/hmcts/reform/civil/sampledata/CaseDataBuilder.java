@@ -533,6 +533,26 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
+        atStatePendingClaimIssuedUnRepresentedDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org name 2")
+            .fax("123123123")
+            .dx("test org dx 2")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDiscontinued() {
         atStateClaimDetailsNotified();
         return discontinueClaim();
