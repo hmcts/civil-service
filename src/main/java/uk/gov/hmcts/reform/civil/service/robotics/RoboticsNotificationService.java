@@ -39,12 +39,12 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailData(CaseData caseData) {
-        RoboticsCaseData roboticsCaseData = null;
+        RoboticsCaseData roboticsCaseData;
         try {
-            if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-                roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+            if (null !=caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+               roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
             } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+               roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
             }
             byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
