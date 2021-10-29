@@ -173,7 +173,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

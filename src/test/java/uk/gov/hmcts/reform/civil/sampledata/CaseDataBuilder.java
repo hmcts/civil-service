@@ -173,6 +173,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected Address respondentSolicitor2ServiceAddress;
@@ -357,6 +358,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
+        this.respondent2Represented = isRepresented;
+        return this;
+    }
+
     public CaseDataBuilder respondent1OrgRegistered(YesOrNo respondent1OrgRegistered) {
         this.respondent1OrgRegistered = respondent1OrgRegistered;
         return this;
@@ -479,7 +485,7 @@ public class CaseDataBuilder {
             case FULL_DEFENCE_NOT_PROCEED:
                 return atStateApplicantRespondToDefenceAndNotProceed();
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
-                return atStateProceedsOfflineUnrepresentedDefendant();
+                return atStateProceedsOfflineUnrepresentedDefendants();
             case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                 return atStateProceedsOfflineUnregisteredDefendant();
             case TAKEN_OFFLINE_BY_STAFF:
@@ -526,12 +532,27 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant() {
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnRepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1() {
+        atStatePendingClaimIssuedUnRepresentedDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor1OrganisationDetails = null;
+        respondent1OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .build();
         respondentSolicitor1OrganisationDetails = null;
         return this;
     }
