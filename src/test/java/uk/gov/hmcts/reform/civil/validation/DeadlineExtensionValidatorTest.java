@@ -171,7 +171,7 @@ class DeadlineExtensionValidatorTest {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
             LocalDate agreedExtension = NOW.with(DayOfWeek.SUNDAY).plusDays(7);
-            LocalDateTime currentResponseDeadline = NOW.plusDays(10).atTime(16, 0);
+            LocalDateTime currentResponseDeadline = NOW.plusDays(6).atTime(16, 0);
             when(workingDayIndicator.getNextWorkingDay(any()))
                 .thenReturn(currentResponseDeadline.toLocalDate().plusDays(10));
 
