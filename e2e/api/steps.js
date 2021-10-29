@@ -570,14 +570,10 @@ function removeUuidsFromDynamicList(data, dynamicListField) {
 }
 
 async function updateCaseDataWithPlaceholders(data, document) {
-  //const document = await testingSupport.uploadDocument();
-
   const placeholders = {
     TEST_DOCUMENT_URL: document.document_url,
     TEST_DOCUMENT_BINARY_URL: document.document_binary_url,
     TEST_DOCUMENT_FILENAME: document.document_filename
-    //,
-   // TEST_DOCUMENT_HASH: document.document_hash
   };
 
   data = lodash.template(JSON.stringify(data))(placeholders);

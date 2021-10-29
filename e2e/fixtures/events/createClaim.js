@@ -1,5 +1,6 @@
 const { document, element, listElement, buildAddress } = require('../../api/dataHelper');
 const config = require('../../config.js');
+const uuid = require('uuid');
 
 const respondent1 = {
   type: 'INDIVIDUAL',
@@ -130,7 +131,7 @@ const createClaimData = (legalRepresentation, useValidPba) => {
       servedDocumentFiles: {
         particularsOfClaimDocument: [
           {
-            id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
+            id: uuid.v1(),
             value: {
               document_url: "${TEST_DOCUMENT_URL}",
               document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
