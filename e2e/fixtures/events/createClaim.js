@@ -240,7 +240,25 @@ module.exports = {
     invalid:{
       Upload:{
         servedDocumentFiles: {
-          particularsOfClaimDocument: [element(document('particularsOfClaim.pdf')),element(document('particularsOfClaim.pdf'))]
+          particularsOfClaimDocument: [
+            {
+              id: uuid.v1(),
+              value: {
+                document_url: "${TEST_DOCUMENT_URL}",
+                document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
+                document_filename: "${TEST_DOCUMENT_FILENAME}"
+              }
+            },
+            {
+              id: uuid.v1(),
+              value: {
+                document_url: "${TEST_DOCUMENT_URL}",
+                document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
+                document_filename: "${TEST_DOCUMENT_FILENAME}"
+              }
+            }
+          ]
+            //[element(document('particularsOfClaim.pdf')),element(document('particularsOfClaim.pdf'))]
         }
       },
       Court: {
