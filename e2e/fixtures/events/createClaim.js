@@ -131,7 +131,7 @@ const createClaimData = (legalRepresentation, useValidPba) => {
       servedDocumentFiles: {
         particularsOfClaimDocument: [
           {
-            id: uuid.v1(),
+            id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
             value: {
               document_url: "${TEST_DOCUMENT_URL}",
               document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
@@ -242,7 +242,7 @@ module.exports = {
         servedDocumentFiles: {
           particularsOfClaimDocument: [
             {
-              id: uuid.v1(),
+              id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
               value: {
                 document_url: "${TEST_DOCUMENT_URL}",
                 document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
@@ -250,7 +250,7 @@ module.exports = {
               }
             },
             {
-              id: uuid.v1(),
+              id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
               value: {
                 document_url: "${TEST_DOCUMENT_URL}",
                 document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
@@ -258,7 +258,6 @@ module.exports = {
               }
             }
           ]
-            //[element(document('particularsOfClaim.pdf')),element(document('particularsOfClaim.pdf'))]
         }
       },
       Court: {
