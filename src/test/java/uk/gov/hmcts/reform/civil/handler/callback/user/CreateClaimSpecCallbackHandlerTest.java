@@ -1015,6 +1015,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class Respondent1SolicitorOrgNotRegisteredInMyHmcts {
 
+
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
