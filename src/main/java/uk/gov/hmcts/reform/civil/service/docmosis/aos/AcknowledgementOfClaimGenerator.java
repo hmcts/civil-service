@@ -71,45 +71,32 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     }
 
     private List<Party> prepareRespondentMultiParty(CaseData caseData, MultiPartyScenario multiPartyScenario) {
-        {
-            var respondent = caseData.getRespondent1();
 
-            var respondentParties = new ArrayList<>(List.of(
-                Party.builder()
-                    .name(respondent.getPartyName())
-                    .primaryAddress(respondent.getPrimaryAddress())
-                    .representative(representativeService.getRespondentRepresentative(caseData))
-                    .litigationFriendName(
-                        ofNullable(caseData.getRespondent1LitigationFriend())
-                            .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build()));
+        var respondent = caseData.getRespondent1();
 
-            if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
-                var respondent2 = caseData.getRespondent2();
-                respondentParties.add(Party.builder()
-                                          .name(respondent2.getPartyName())
-                                          .primaryAddress(respondent2.getPrimaryAddress())
-                                          .representative(representativeService.getRespondentRepresentative(caseData))
-                                          .litigationFriendName(
-                                              ofNullable(caseData.getRespondent1LitigationFriend())
-                                                  .map(LitigationFriend::getFullName)
-                                                  .orElse(""))
-                                          .build());
-            } else if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-                var respondent2 = caseData.getRespondent2();
-                respondentParties.add(Party.builder()
-                                          .name(respondent2.getPartyName())
-                                          .primaryAddress(respondent2.getPrimaryAddress())
-                                          .representative(representativeService.getRespondentRepresentative(caseData))
-                                          .litigationFriendName(
-                                              ofNullable(caseData.getRespondent1LitigationFriend())
-                                                  .map(LitigationFriend::getFullName)
-                                                  .orElse(""))
-                                          .build());
-            }
+        var respondentParties = new ArrayList<>(List.of(
+            Party.builder()
+                .name(respondent.getPartyName())
+                .primaryAddress(respondent.getPrimaryAddress())
+                .representative(representativeService.getRespondentRepresentative(caseData))
+                .litigationFriendName(
+                    ofNullable(caseData.getRespondent1LitigationFriend())
+                        .map(LitigationFriend::getFullName)
+                        .orElse(""))
+                .build()));
 
-            return respondentParties;
+        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP || multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            var respondent2 = caseData.getRespondent2();
+            respondentParties.add(Party.builder()
+                                      .name(respondent2.getPartyName())
+                                      .primaryAddress(respondent2.getPrimaryAddress())
+                                      .representative(representativeService.getRespondentRepresentative(caseData))
+                                      .litigationFriendName(
+                                          ofNullable(caseData.getRespondent1LitigationFriend())
+                                              .map(LitigationFriend::getFullName)
+                                              .orElse(""))
+                                      .build());
         }
+        return respondentParties;
     }
 }
