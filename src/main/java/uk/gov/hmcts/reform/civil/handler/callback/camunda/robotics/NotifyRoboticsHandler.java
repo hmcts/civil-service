@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -30,14 +31,15 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-        RoboticsCaseData roboticsCaseData = null;
+        RoboticsCaseData roboticsCaseData;
+        RoboticsCaseDataSpec roboticsCaseDataSpec;
         Set<ValidationMessage> errors = null;
 
         CaseData caseData = callbackParams.getCaseData();
 
         try {
             if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-                roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
             } else {
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());

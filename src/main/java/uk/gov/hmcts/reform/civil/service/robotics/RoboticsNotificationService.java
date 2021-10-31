@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
@@ -40,13 +41,18 @@ public class RoboticsNotificationService {
 
     private EmailData prepareEmailData(CaseData caseData) {
         RoboticsCaseData roboticsCaseData;
+        RoboticsCaseDataSpec roboticsCaseDataSpec;
+        byte[] roboticsJsonData;
         try {
             if (null !=caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-               roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+               //roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
             } else {
                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
-            byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
 
             return EmailData.builder()
