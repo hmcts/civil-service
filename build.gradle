@@ -228,8 +228,8 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/*ForSpec*.java, **/*ClaimSpec*.java, **/*Spec.java, **/CivilDocumentStitchingService.java, **/CountriesAllowed.java, **/FeesService.java, **/UnavailableDateValidator.java, **/AcknowledgeOfServiceCallbackHandler.java, **/FlowPredicate.java, **/CreateClaimCallbackHandler.java, **/CaseProceedsInCasemanRespondentNotificationHandler.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*ForSpec*.java, **/*ClaimSpec*.java, **/*Spec.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }
