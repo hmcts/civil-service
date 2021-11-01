@@ -44,12 +44,11 @@ public class RoboticsNotificationService {
         RoboticsCaseDataSpec roboticsCaseDataSpec;
         byte[] roboticsJsonData;
         try {
-            if (null !=caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-               //roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+            if (null != caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
             } else {
-               roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
 

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
-import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.SolicitorSpec;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -62,7 +61,6 @@ public class RoboticsDataMapperForSpec {
             .events(eventHistoryMapper.buildEvents(caseData))
             .build();
     }
-
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
         BigDecimal claimInterest = caseData.getTotalInterest() != null
