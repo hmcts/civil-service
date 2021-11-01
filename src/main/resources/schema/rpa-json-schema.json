@@ -235,11 +235,6 @@
             "$ref": "#/definitions/addressesType",
             "description": ""
           },
-          "correspondenceAddresses": {
-            "$id": "#/properties/solicitors/items/properties/correspondenceAddresses",
-            "$ref": "#/definitions/addressesType",
-            "description": ""
-          },
           "contactDX": {
             "$id": "#/properties/solicitors/items/properties/contactDX",
             "$ref": "#/definitions/contactDXType",
