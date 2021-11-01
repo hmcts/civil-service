@@ -313,7 +313,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         );
     }
 
-    private boolean areRespondentsRepresentedAndRegistered(CaseData caseData){
+    private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
         return !(caseData.getRespondent1Represented() == NO
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
