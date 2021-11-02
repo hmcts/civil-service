@@ -312,11 +312,11 @@ public class EventHistoryMapper {
     }
 
     public String prepareTakenOfflineEventDetails(CaseData caseData) {
-        return format(
+        return left(format(
             "RPA Reason: Manually moved offline for reason %s on date %s.",
             prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCaseman()),
             caseData.getClaimProceedsInCaseman().getDate().format(ISO_DATE)
-        );
+        ), 250); // Max chars allowed by Caseman
     }
 
     private String prepareTakenOfflineByStaffReason(ClaimProceedsInCaseman claimProceedsInCaseman) {
