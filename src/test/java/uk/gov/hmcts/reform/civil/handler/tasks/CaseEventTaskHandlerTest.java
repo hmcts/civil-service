@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
@@ -218,7 +219,7 @@ class CaseEventTaskHandlerTest {
             names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
-                "TAKEN_OFFLINE_BY_STAFF"})
+                "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED", "TAKEN_OFFLINE_BY_STAFF"})
         void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, state.fullName());
@@ -248,11 +249,14 @@ class CaseEventTaskHandlerTest {
 
         @NotNull
         private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
-            return state == TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED
-                ? Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
-                         "ONE_RESPONDENT_REPRESENTATIVE", false,
-                         "RPA_CONTINUOUS_FEED", false)
-                : Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
+            if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
+                || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
+                return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
+                              "ONE_RESPONDENT_REPRESENTATIVE", false,
+                              "RPA_CONTINUOUS_FEED", false
+                );
+            }
+            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {
@@ -282,6 +286,9 @@ class CaseEventTaskHandlerTest {
                     break;
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                     caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+                    break;
+                case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
                     caseDataBuilder.atStateTakenOfflineByStaff();

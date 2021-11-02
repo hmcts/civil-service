@@ -97,11 +97,13 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case FULL_DEFENCE_NOT_PROCEED:
                     return "RPA Reason: Claimant intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
                     return "RPA Reason: Only one of the respondent is notified.";
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
                 default:
-                    throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
+                    throw new IllegalStateException("Cannot resolve flow state " + flowState.fullName()
+                                                        + " to populate Hand Offline Summary");
             }
         }
         return null;

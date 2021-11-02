@@ -816,14 +816,14 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimDetailsNotified_withBothSolicitorOptionSelected() {
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Both");
         return this;
     }
 
-    public CaseDataBuilder atStateClaimDetailsNotified_withOneSolicitorOptionSelected() {
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Defendant One: Solicitor");
