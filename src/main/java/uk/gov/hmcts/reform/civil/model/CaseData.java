@@ -127,6 +127,7 @@ public class CaseData implements MappableObject {
     private final LitigationFriend applicant2LitigationFriend;
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
+    private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
 
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
