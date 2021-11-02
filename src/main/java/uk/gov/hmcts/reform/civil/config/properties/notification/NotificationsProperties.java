@@ -19,6 +19,9 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimDetailsEmailTemplate;
 
     @NotEmpty
+    private String respondentSolicitorClaimDetailsEmailTemplateMultiParty;
+
+    @NotEmpty
     private String solicitorDefendantResponseCaseTakenOffline;
 
     @NotEmpty
