@@ -170,4 +170,11 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-openfeign\-core@.*$</packageUrl>
     <cve>CVE-2021-22044</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-cloud-starter-openfeign-3.0.4.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-starter\-openfeign@.*$</packageUrl>
+    <cve>CVE-2021-22044</cve>
+  </suppress>
 </suppressions>
