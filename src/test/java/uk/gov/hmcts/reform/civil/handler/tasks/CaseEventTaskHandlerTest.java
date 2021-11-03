@@ -8,9 +8,13 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -28,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.HashMap;
@@ -43,8 +48,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @SpringBootTest(classes = {
     CaseEventTaskHandler.class,
@@ -77,110 +85,212 @@ class CaseEventTaskHandlerTest {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");
-
-        Map<String, Object> variables = Map.of(
-            "caseId", CASE_ID,
-            "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
-        );
-
-        when(mockTask.getAllVariables()).thenReturn(variables);
     }
 
-    @Test
-    void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .build();
-        VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_STATE, "MAIN.DRAFT");
-        variables.putValue(FLOW_FLAGS, Map.of());
+    @Nested
+    class NotifyRespondent {
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        @BeforeEach
+        void init() {
+            Map<String, Object> variables = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+            );
 
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            when(mockTask.getAllVariables()).thenReturn(variables);
+        }
 
-        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-        verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockTask, variables);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
+            String errorMessage = "there was an error";
+
+            when(mockTask.getRetries()).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenAnswer(invocation -> {
+                    throw new Exception(errorMessage);
+                });
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(externalTaskService, never()).complete(mockTask);
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq(errorMessage),
+                anyString(),
+                eq(2),
+                eq(500L)
+            );
+        }
+
+        @Test
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+            String errorMessage = "there was an error";
+            int status = 422;
+            Request.HttpMethod requestType = Request.HttpMethod.POST;
+            String exampleUrl = "example url";
+
+            when(mockTask.getRetries()).thenReturn(null);
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenAnswer(invocation -> {
+                    throw FeignException.errorStatus(errorMessage, Response.builder()
+                        .request(
+                            Request.create(
+                                requestType,
+                                exampleUrl,
+                                new HashMap<>(), //this field is required for construtor//
+                                null,
+                                null,
+                                null
+                            ))
+                        .status(status)
+                        .build());
+                });
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(externalTaskService, never()).complete(mockTask);
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
+                anyString(),
+                eq(2),
+                eq(500L)
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
+            String errorMessage = "there was an error";
+
+            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
     }
 
-    @Test
-    void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
-        String errorMessage = "there was an error";
+    @Nested
+    class TakeOfflineEvent {
 
-        when(mockTask.getRetries()).thenReturn(null);
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenAnswer(invocation -> {
-                throw new Exception(errorMessage);
-            });
+        @BeforeEach
+        void init() {
+            Map<String, Object> variables = Map.of(
+                "caseId", CASE_ID,
+                "caseEvent", PROCEEDS_IN_HERITAGE_SYSTEM.name()
+            );
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            when(mockTask.getAllVariables()).thenReturn(variables);
+        }
 
-        verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
-            eq(mockTask),
-            eq(errorMessage),
-            anyString(),
-            eq(2),
-            eq(500L)
-        );
-    }
+        @ParameterizedTest
+        @EnumSource(
+            value = FlowState.Main.class,
+            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
+                "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+                "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
+                "TAKEN_OFFLINE_BY_STAFF"})
+        void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, state.fullName());
+            variables.putValue(
+                FLOW_FLAGS,
+                getFlowFlags(state)
+            );
 
-    @Test
-    void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
-        String errorMessage = "there was an error";
-        int status = 422;
-        Request.HttpMethod requestType = Request.HttpMethod.POST;
-        String exampleUrl = "example url";
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
-        when(mockTask.getRetries()).thenReturn(null);
-        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
-            .thenAnswer(invocation -> {
-                throw FeignException.errorStatus(errorMessage, Response.builder()
-                    .request(
-                        Request.create(
-                            requestType,
-                            exampleUrl,
-                            new HashMap<>(), //this field is required for construtor//
-                            null,
-                            null,
-                            null
-                        ))
-                    .status(status)
-                    .build());
-            });
+            CaseData caseData = getCaseData(state);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
 
-        verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
-            eq(mockTask),
-            eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
-            anyString(),
-            eq(2),
-            eq(500L)
-        );
-    }
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
-    @Test
-    void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-        String errorMessage = "there was an error";
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+            verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
 
-        caseEventTaskHandler.execute(mockTask, externalTaskService);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
 
-        verify(externalTaskService, never()).handleFailure(
-            any(ExternalTask.class),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyLong()
-        );
+        @NotNull
+        private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
+            return state == TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED
+                ? Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
+                         "ONE_RESPONDENT_REPRESENTATIVE", false,
+                         "RPA_CONTINUOUS_FEED", false)
+                : Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
+        }
+
+        private CaseData getCaseData(FlowState.Main state) {
+            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
+            switch (state) {
+                case FULL_ADMISSION:
+                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails();
+                    break;
+                case PART_ADMISSION:
+                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails();
+                    break;
+                case COUNTER_CLAIM:
+                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails();
+                    break;
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                    caseDataBuilder.atStatePendingClaimIssuedUnRepresentedDefendant();
+                    break;
+                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                    caseDataBuilder.atStatePendingClaimIssuedUnRegisteredDefendant();
+                    break;
+                case FULL_DEFENCE_PROCEED:
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed();
+                    break;
+                case FULL_DEFENCE_NOT_PROCEED:
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed();
+                    break;
+                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+                    break;
+                case TAKEN_OFFLINE_BY_STAFF:
+                    caseDataBuilder.atStateTakenOfflineByStaff();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected flow state " + state.fullName());
+
+            }
+            return caseDataBuilder.build();
+        }
     }
 }
