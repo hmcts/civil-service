@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
@@ -98,7 +99,9 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRespondentRepresentatives() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedTwoRespondentRepresentatives()
+                .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -112,8 +115,10 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
             verify(featureToggleService).isRpaContinuousFeedEnabled();
-            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -321,8 +326,9 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -346,8 +352,9 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                                                        entry("RPA_CONTINUOUS_FEED", true));
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
         }
 
         @Test
@@ -393,6 +400,56 @@ class StateFlowEngineTest {
             verify(featureToggleService).isRpaContinuousFeedEnabled();
             assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                                                         entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
+        void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedBothSolicitors1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DETAILS_NOTIFIED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(7)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                                                                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                                                                 entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
+        void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedSingleSolicitorIn1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(7)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
         }
 
         @Test
