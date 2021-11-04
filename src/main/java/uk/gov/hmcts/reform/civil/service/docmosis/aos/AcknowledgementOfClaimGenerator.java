@@ -78,7 +78,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             Party.builder()
                 .name(respondent.getPartyName())
                 .primaryAddress(respondent.getPrimaryAddress())
-                .representative(representativeService.getRespondentRepresentative(caseData))
+                .representative(representativeService.getRespondent1Representative(caseData))
                 .litigationFriendName(
                     ofNullable(caseData.getRespondent1LitigationFriend())
                         .map(LitigationFriend::getFullName)
@@ -90,7 +90,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             respondentParties.add(Party.builder()
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
-                                      .representative(representativeService.getRespondentRepresentative(caseData))
+                                      .representative(representativeService.getRespondent2Representative(caseData))
                                       .litigationFriendName(
                                           ofNullable(caseData.getRespondent1LitigationFriend())
                                               .map(LitigationFriend::getFullName)
