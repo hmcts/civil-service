@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -242,7 +243,36 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
 
+        @ParameterizedTest
+        @EnumSource(
+            value = ReasonForProceedingOnPaper.class,
+            names = {"APPLICATION", "JUDGEMENT_REQUEST", "DEFENDANT_DOES_NOT_CONSENT", "CASE_SETTLED", "OTHER"})
+        void shouldTriggerCCDEventWithDescription_whenClaimIsHandedOffline(ReasonForProceedingOnPaper reason) {
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName());
+            variables.putValue(
+                FLOW_FLAGS,
+                getFlowFlags(TAKEN_OFFLINE_BY_STAFF)
+            );
+
+            when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
+
+            CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
+            caseData.getClaimProceedsInCaseman().setReason(reason);
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
@@ -294,8 +324,8 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateTakenOfflineByStaff();
                     break;
                 default:
-                    throw new IllegalStateException("Unexpected flow state " + state.fullName());
-
+                    throw new IllegalStateException("Cannot resolve flow state " + state.fullName()
+                                                        + " to populate Hand Offline Summary");
             }
             return caseDataBuilder.build();
         }
