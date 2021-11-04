@@ -294,8 +294,8 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateTakenOfflineByStaff();
                     break;
                 default:
-                    throw new IllegalStateException("Unexpected flow state " + state.fullName());
-
+                    throw new IllegalStateException("Unexpected flow state " + state.fullName()
+                                                        + " to populate Hand Offline Summary");
             }
             return caseDataBuilder.build();
         }
