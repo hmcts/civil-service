@@ -83,7 +83,7 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -171,7 +171,7 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant()
+        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants()
             .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);

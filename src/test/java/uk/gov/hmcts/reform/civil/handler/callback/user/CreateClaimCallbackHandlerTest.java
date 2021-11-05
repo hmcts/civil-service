@@ -93,15 +93,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
 
-    public static final String LIP_CONFIRMATION_SCREEN = "<br />Your claim will not be issued"
-        + " until payment is confirmed."
-        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
-        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
-        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
-        + "the defendant within 4 months. "
-        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
-        + " Court Claims Centre.";
-
     @MockBean
     private Time time;
 
@@ -963,11 +954,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Nested
-        class Respondent1DoesNotHaveLegalRepresentation {
+        class RespondentsDoNotHaveLegalRepresentation {
 
             @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1DoesNotHaveRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -992,23 +983,27 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class Respondent1HasLegalRepresentation {
+        class Respondent1DoesNotHaveLegalRepresentation {
 
             @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
                 String body = format(
-                    CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                    LIP_CONFIRMATION_BODY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
                 ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
+                            "# Your claim has been received and will progress offline%n## Claim number: %s",
                             REFERENCE_NUMBER
                         ))
                         .confirmationBody(body)
@@ -1033,10 +1028,114 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
                                                        + "Claim number: %s", REFERENCE_NUMBER))
                         .confirmationBody(format(
-                            LIP_CONFIRMATION_SCREEN,
+                            LIP_CONFIRMATION_BODY,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+        }
+
+        @Nested
+        class Respondent2DoesNotHaveLegalRepresentation {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2DoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                    LIP_CONFIRMATION_BODY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received and will progress offline%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+        }
+
+        @Nested
+        class Respondent2SolicitorOrgNotRegisteredInMyHmcts {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
+                                                       + "Claim number: %s", REFERENCE_NUMBER))
+                        .confirmationBody(format(
+                            LIP_CONFIRMATION_BODY,
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+        }
+
+        @Nested
+        class RespondentHasLegalRepresentation1v1 {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+        }
+
+        @Nested
+        class BothRespondentsHasLegalRepresentation {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
                         .build());
             }
         }
