@@ -1,4 +1,4 @@
-const {date, document, element} = require('../../api/dataHelper');
+const {date, element} = require('../../api/dataHelper');
 
 module.exports = {
   valid: {

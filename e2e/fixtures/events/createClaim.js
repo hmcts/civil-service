@@ -1,4 +1,4 @@
-const { document, element, listElement, buildAddress } = require('../../api/dataHelper');
+const {listElement, buildAddress } = require('../../api/dataHelper');
 const config = require('../../config.js');
 const uuid = require('uuid');
 

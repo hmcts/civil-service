@@ -1,4 +1,5 @@
-const {document, element} = require('../../api/dataHelper');
+const uuid = require('uuid');
+const docUuid = uuid.v1();
 
 module.exports = {
   valid: {
@@ -6,7 +7,7 @@ module.exports = {
       servedDocumentFiles: {
         particularsOfClaimDocument: [
           {
-            id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
+            id: docUuid,
             value: {
               document_url: "${TEST_DOCUMENT_URL}",
               document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
@@ -23,7 +24,7 @@ module.exports = {
         servedDocumentFiles: {
           particularsOfClaimDocument: [
             {
-              id: "65c881cd-cbd4-4dd8-8a7f-0419d390c83d",
+              id: docUuid,
               value: {
                 document_url: "${TEST_DOCUMENT_URL}",
                 document_binary_url: "${TEST_DOCUMENT_BINARY_URL}",
