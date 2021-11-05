@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
@@ -245,6 +247,23 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        //Using an invalid flow state `PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA`
+        void shouldThrowErrorMessage_whenInAnInvalidFlowStatePopulatingSummary() {
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName());
+            variables.putValue(FLOW_FLAGS,
+                getFlowFlags(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
+            );
+
+            when(mockTask.getVariable(FLOW_STATE))
+                .thenReturn(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName());
+
+            assertThrows(IllegalStateException.class, () -> {
+                getCaseData(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA);
+            });
         }
 
         @ParameterizedTest
