@@ -238,9 +238,9 @@ class CaseEventTaskHandlerTest {
                 IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
                     getCaseData(state);
                 });
-                assertEquals("Unexpected flow state " +
-                                 "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA" +
-                                 " to populate Hand Offline Summary", exception.getMessage());
+                assertEquals("Unexpected flow state "
+                                 + "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA"
+                                 + " to populate Hand Offline Summary", exception.getMessage());
             } else {
 
                 CaseData caseData = getCaseData(state);
