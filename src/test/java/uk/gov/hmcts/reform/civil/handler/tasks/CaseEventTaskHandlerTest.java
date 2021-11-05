@@ -239,7 +239,7 @@ class CaseEventTaskHandlerTest {
                     getCaseData(state);
                 });
                 assertEquals("Unexpected flow state "
-                                 + "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA"
+                                 + "MAIN.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA"
                                  + " to populate Hand Offline Summary", exception.getMessage());
             } else {
 
