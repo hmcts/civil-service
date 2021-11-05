@@ -177,4 +177,18 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-starter\-openfeign@.*$</packageUrl>
     <cve>CVE-2021-22044</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: ansi-regex:4.1.0
+   ]]></notes>
+    <packageUrl regex="true">^pkg:npm/ansi\-regex@.*$</packageUrl>
+    <vulnerabilityName>1002401</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: validator:10.11.0
+   ]]></notes>
+    <packageUrl regex="true">^pkg:npm/validator@.*$</packageUrl>
+    <vulnerabilityName>1004784</vulnerabilityName>
+  </suppress>
 </suppressions>
