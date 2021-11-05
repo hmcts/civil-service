@@ -76,6 +76,7 @@ public class CaseData implements MappableObject {
     private final OrganisationPolicy respondent1OrganisationPolicy;
     private final OrganisationPolicy respondent2OrganisationPolicy;
     private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    private final SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;
@@ -90,12 +91,11 @@ public class CaseData implements MappableObject {
     private final ResponseIntention respondent1ClaimResponseIntentionType;
     private final ServedDocumentFiles servedDocumentFiles;
 
+    private final YesOrNo respondentResponseIsSame;
     private final RespondentResponseType respondent1ClaimResponseType;
+    private final RespondentResponseType respondent2ClaimResponseType;
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
-
-    private final YesOrNo respondentResponseIsSame;
-    private final RespondentResponseType respondent2ClaimResponseType;
     private final ResponseDocument respondent2ClaimResponseDocument;
 
     private final YesOrNo applicant1ProceedWithClaim;
@@ -133,6 +133,7 @@ public class CaseData implements MappableObject {
     private final LitigationFriend applicant2LitigationFriend;
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
+    private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
 
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;

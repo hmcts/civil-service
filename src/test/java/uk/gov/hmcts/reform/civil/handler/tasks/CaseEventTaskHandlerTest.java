@@ -249,7 +249,9 @@ class CaseEventTaskHandlerTest {
         @NotNull
         private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
             return state == TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED
-                ? Map.of("TWO_RESPONDENT_REPRESENTATIVES", true, "RPA_CONTINUOUS_FEED", false)
+                ? Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
+                         "ONE_RESPONDENT_REPRESENTATIVE", false,
+                         "RPA_CONTINUOUS_FEED", false)
                 : Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
         }
 
