@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -237,6 +238,9 @@ class CaseEventTaskHandlerTest {
                 IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
                     getCaseData(state);
                 });
+                assertEquals("Unexpected flow state " +
+                                 "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA" +
+                                 " to populate Hand Offline Summary", exception.getMessage());
             } else {
 
                 CaseData caseData = getCaseData(state);
