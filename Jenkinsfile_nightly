@@ -79,7 +79,6 @@ withNightlyPipeline(type, product, component) {
 //  after('crossBrowserTest') {
 //    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
 //  }
->>>>>>> master
 
   after('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
