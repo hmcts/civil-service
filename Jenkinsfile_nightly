@@ -57,7 +57,7 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
-  //enableFortifyScan()
+  enableFortifyScan()
   enableSecurityScan()
 
   enableFullFunctionalTest(200)
