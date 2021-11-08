@@ -141,6 +141,7 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent1ClaimResponsePaymentAdmissionForSpec;
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;

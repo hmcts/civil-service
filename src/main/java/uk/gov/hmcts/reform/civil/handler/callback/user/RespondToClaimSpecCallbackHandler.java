@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -95,6 +96,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
+
+            if (caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount())<0){
+                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
+            } else if (caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount())==0) {
+                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
+            }
+
             AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                              null);
             return AboutToStartOrSubmitCallbackResponse.builder()
