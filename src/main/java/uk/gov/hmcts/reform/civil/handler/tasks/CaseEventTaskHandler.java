@@ -102,8 +102,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
                 default:
-                    throw new IllegalStateException("Cannot resolve flow state " + flowState.fullName()
-                                                        + " to populate Hand Offline Summary");
+                    throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }
         }
         return null;
