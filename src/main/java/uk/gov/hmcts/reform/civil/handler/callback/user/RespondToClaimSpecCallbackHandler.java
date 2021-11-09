@@ -88,7 +88,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private CallbackResponse specValidateLRConfirmedExplainedToClient(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<String>();
-        if (caseData.getRespondent1DQ().getFileDirectionQuestionnaire().getExplainedToClient() == null) {
+        if (caseData.getRespondent1DQ().getFileDirectionQuestionnaire() == null || caseData.getRespondent1DQ().getFileDirectionQuestionnaire().getExplainedToClient() == null) {
             errors.add("Confirmation box must be selected to continue");
         }
 
