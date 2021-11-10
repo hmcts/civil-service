@@ -405,7 +405,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedBothSolicitors1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -432,7 +432,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedSingleSolicitorIn1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
