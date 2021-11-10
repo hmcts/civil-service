@@ -194,13 +194,15 @@ public class FlowPredicate {
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseIntentionType() == null;
+            && caseData.getRespondent1ClaimResponseIntentionType() == null
+            && caseData.getRespondent2ClaimResponseIntentionType() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotifiedExtension = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getRespondent1ClaimResponseIntentionType() == null;
+            && caseData.getRespondent1ClaimResponseIntentionType() == null
+            && caseData.getRespondent2ClaimResponseIntentionType() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledged = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
