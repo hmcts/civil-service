@@ -77,10 +77,9 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData);
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
         }
     }
 

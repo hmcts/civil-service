@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
@@ -28,12 +29,12 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
             Set<ValidationMessage> errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             if (errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData);
+                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -184,6 +186,28 @@ class RoboticsDataMapperTest {
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(applicantSolicitor.getAddresses().getContactAddress());
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndClaimantIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .applicant2(PartyBuilder.builder().individual().build())
+            .addApplicant2(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
     }
 
     @Test

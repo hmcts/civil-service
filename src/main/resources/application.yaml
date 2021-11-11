@@ -204,6 +204,11 @@ robotics:
   notification:
     sender: hmcts.civil@gmail.com
     recipient: hmcts.civil+robotics@gmail.com
+
+multiparty:
+  notification:
+    sender: hmcts.civil@gmail.com
+    recipient: damagesmultiparty@justice.gov.uk
 ---
 
 spring:

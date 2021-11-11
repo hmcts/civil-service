@@ -7,12 +7,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 
+import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
@@ -29,9 +32,10 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
 
-    public void notifyRobotics(@NotNull CaseData caseData) {
+    public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
         requireNonNull(caseData);
-        EmailData emailData = prepareEmailData(caseData);
+        EmailData emailData = !multiPartyScenario
+            ? prepareEmailData(caseData) : prepareEmailDataMultiParty(caseData);
         sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
     }
 
@@ -50,5 +54,50 @@ public class RoboticsNotificationService {
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
+    }
+
+    private EmailData prepareEmailDataMultiParty(CaseData caseData) {
+        try {
+            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+            byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
+            String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+
+            return EmailData.builder()
+                .message(String.format(
+                    "Mulitparty claim data JSON is attached for %s",
+                    caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
+                .subject(String.format("Mulitparty claim data for %s", caseData.getLegacyCaseReference()
+                    + " - " + caseData.getCcdState() + " - " + triggerEvent))
+                .to(roboticsEmailConfiguration.getMultipartyrecipient())
+                .attachments(of(json(roboticsJsonData, fileName)))
+                .build();
+        } catch (JsonProcessingException e) {
+            throw new RoboticsDataException(e.getMessage(), e);
+        }
+    }
+
+    public static String findLatestEventTriggerReason(EventHistory eventHistory) {
+        
+        List<Event> event = eventHistory.getMiscellaneous();
+        String triggerReason = event.get(event.size() - 1).getEventDetailsText();
+
+        triggerReason = updateTriggerReason(eventHistory.getAcknowledgementOfServiceReceived(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getConsentExtensionFilingDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceFiled(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceAndCounterClaim(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReceiptOfPartAdmission(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
+
+        return triggerReason;
+    }
+
+    public static String updateTriggerReason(List<Event> event, String triggerReason) {
+        if (event.get(event.size() - 1).getEventDetailsText() != null) {
+            triggerReason = event.get(event.size() - 1).getEventDetailsText();
+        }
+        return triggerReason;
     }
 }
