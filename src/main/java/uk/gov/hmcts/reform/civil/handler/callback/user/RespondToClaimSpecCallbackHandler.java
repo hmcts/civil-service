@@ -97,12 +97,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
 
-            if (caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount())<0){
-                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
-            } else if (caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount())==0) {
-                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
-            }
-
             AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                              null);
             return AboutToStartOrSubmitCallbackResponse.builder()
