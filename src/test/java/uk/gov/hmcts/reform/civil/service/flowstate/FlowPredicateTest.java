@@ -156,7 +156,7 @@ class FlowPredicateTest {
         @Test
         void shouldBeClaimDetailsNotified_when1v2DifferentSolicitor_andNotifySolicitor_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
             assertTrue(claimDetailsNotified.test(caseData));
@@ -165,7 +165,7 @@ class FlowPredicateTest {
         @Test
         void shouldHandOffline_when1v2DifferentSolicitor_andNotifyDetailsSolicitor_isOneSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
             assertTrue(takenOfflineAfterClaimDetailsNotified.test(caseData));

@@ -145,7 +145,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         return List.of(SpecifiedParty.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
-                           .representative(representativeService.getRespondentRepresentative(caseData))
+                           .representative(representativeService.getRespondent1Representative(caseData))
                            .build());
     }
 

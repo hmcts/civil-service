@@ -97,7 +97,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
     @BeforeEach
     void setup() {
-        when(representativeService.getRespondentRepresentative(any())).thenReturn(representative);
+        when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
     }
 
     @Test
@@ -114,7 +114,7 @@ class DirectionsQuestionnaireGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
-        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
         verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
@@ -134,7 +134,7 @@ class DirectionsQuestionnaireGeneratorTest {
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
-        verify(representativeService).getRespondentRepresentative(caseData);
+        verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
         verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
@@ -151,7 +151,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .build();
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-            verify(representativeService).getRespondentRepresentative(caseData);
+            verify(representativeService).getRespondent1Representative(caseData);
             assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
         }
 
@@ -167,7 +167,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-            verify(representativeService).getRespondentRepresentative(caseData);
+            verify(representativeService).getRespondent1Representative(caseData);
             assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
         }
 
