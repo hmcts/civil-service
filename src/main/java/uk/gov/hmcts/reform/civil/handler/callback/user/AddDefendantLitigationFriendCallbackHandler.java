@@ -74,7 +74,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.addDefendantLitigationFriendOptions(DynamicList.fromList(dynamicListOptions));
+        caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -106,7 +106,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
 
         if (!featureToggleService.isMultipartyEnabled()
-            || caseData.getAddDefendantLitigationFriendOptions() == null) {
+            || caseData.getSelectLitigationFriend() == null) {
             return buildConfirmation(callbackParams);
         }
 
@@ -129,7 +129,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
 
     protected boolean isLitigationFriendForToBothParty(CaseData caseData) {
-        return Optional.ofNullable(caseData.getAddDefendantLitigationFriendOptions())
+        return Optional.ofNullable(caseData.getSelectLitigationFriend())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("")
