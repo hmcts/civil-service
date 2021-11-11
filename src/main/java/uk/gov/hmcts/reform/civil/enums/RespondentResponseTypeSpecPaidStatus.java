@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RespondentResponseTypeSpecPaidLess {
+public enum RespondentResponseTypeSpecPaidStatus {
 
     PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT(" "),
     PAID_LESS_THAN_CLAIMED_AMOUNT(" ");
