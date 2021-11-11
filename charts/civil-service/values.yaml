@@ -70,5 +70,5 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
-        - multiparty-notification-sender
-        - multiparty-notification-recipient
+        - robotics-notification-multipartyrecipient
+
