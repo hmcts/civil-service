@@ -68,6 +68,15 @@ const welshLanguageRequirementsPage = require('./fragments/dq/language.page');
 
 const address = require('./fixtures/address.js');
 
+const deepEqualInAnyOrder = require('deep-equal-in-any-order');
+const chai = require('chai');
+
+chai.use(deepEqualInAnyOrder);
+chai.config.truncateThreshold = 0;
+const {expect, assert} = chai;
+const expectedEvents = require('./fixtures/ccd/expectedEvents.js');
+const apiRequest = require("./api/apiRequest.js");
+
 const SIGNED_IN_SELECTOR = 'exui-header';
 const SIGNED_OUT_SELECTOR = '#global-header';
 const CASE_HEADER = 'ccd-case-header > h1';
@@ -307,7 +316,7 @@ module.exports = function () {
       await this.takeScreenshot();
     },
 
-    async caseProceedsInCaseman() {
+    async caseProceedsInCaseman(caseId = caseId) {
       eventName = 'Case proceeds in Caseman';
 
       await this.triggerStepsWithScreenshot([
@@ -320,6 +329,20 @@ module.exports = function () {
 
     async assertNoEventsAvailable() {
       await caseViewPage.assertNoEventsAvailable();
+    },
+
+    async assertCorrectEventsAreAvailableToUser( caseId = caseId, user, state) {
+      const caseForDisplay = await apiRequest.fetchCaseForDisplay(user, caseId);
+      let events = [];
+
+      for (const event of caseForDisplay.triggers) {
+        events.push(event.name);
+      }
+
+      this.waitForElement('#next-step');
+      let allowedEvents = await this.grabTextFromAll('#next-step');
+
+      expect(allowedEvents).to.deep.equalInAnyOrder(events);
     },
 
     async clickContinue() {
