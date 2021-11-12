@@ -110,13 +110,12 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             return buildConfirmation(callbackParams);
         }
 
-        String formattedDeadline = formatLocalDateTime(caseData.getAddLitigationFriendDeadLine(), DATE_TIME_AT);
 
         String confirmationText = isLitigationFriendForToBothParty(caseData)
             ? CONFIRMATION_SUMMARY
             : NOTIFICATION_ONE_PARTY_SUMMARY;
 
-        String body = format(confirmationText, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+        String body = format(confirmationText) + exitSurveyContentService.applicantSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
