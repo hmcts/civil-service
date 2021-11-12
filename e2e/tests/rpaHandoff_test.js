@@ -16,15 +16,14 @@ Scenario('Take claim offline', async ({I, api}) => {
   await I.signOut();
 });
 
-Scenario.skip('Defendant - Litigant In Person', async ({I}) => {
-  await I.login(config.applicantSolicitorUser);
-  await I.createCase(true);
-  caseNumber = await I.grabCaseNumber();
+Scenario('Defendant - Litigant In Person', async ({I, api}) => {
+  const caseId = await api.createClaimWithRespondentLitigantInPerson(config.applicantSolicitorUser)
 
-  await waitForFinishedBusinessProcess(caseId());
-  await I.navigateToCaseDetails(caseNumber);
-  await I.assertNoEventsAvailable();
-  await I.signOut();
+   await waitForFinishedBusinessProcess(caseId);
+   await I.login(config.applicantSolicitorUser);
+   await I.navigateToCaseDetails(caseId);
+   await I.assertNoEventsAvailable();
+   await I.signOut();
 });
 
 Scenario.skip('Defendant - Defend part of Claim', async ({I}) => {

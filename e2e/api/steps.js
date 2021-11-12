@@ -111,6 +111,7 @@ module.exports = {
     await waitForFinishedBusinessProcess(caseId);
     await assertCorrectEventsAreAvailableToUser(config.applicantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
+    return caseId;
   },
 
   createClaimWithRespondentSolicitorFirmNotInMyHmcts: async (user) => {

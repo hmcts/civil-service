@@ -6,57 +6,57 @@ let document, caseId;
 
 Feature('CCD API tests @api-tests');
 
-Scenario('Create claim', async ({I, api}) => {
+Scenario.skip('Create claim', async ({I, api}) => {
   console.log('start createClaimWithRepresentedRespondent');
   caseId = await api.createClaimWithRepresentedRespondent(config.applicantSolicitorUser);
 });
 
-Scenario('HMCTS admin adds a case note to case', async ({I, api}) => {
+Scenario.skip('HMCTS admin adds a case note to case', async ({I, api}) => {
   await api.addCaseNote(config.adminUser, caseId);
 });
 
-Scenario('Amend claim documents', async ({I, api}) => {
+Scenario.skip('Amend claim documents', async ({I, api}) => {
   await api.amendClaimDocuments(config.applicantSolicitorUser, caseId);
 });
 
-Scenario('Notify claim', async ({I, api}) => {
+Scenario.skip('Notify claim', async ({I, api}) => {
   await api.notifyClaim(config.applicantSolicitorUser, caseId);
 });
 
-Scenario('Notify claim details', async ({I, api}) => {
+Scenario.skip('Notify claim details', async ({I, api}) => {
   await api.notifyClaimDetails(config.applicantSolicitorUser, caseId);
 });
 
-Scenario('Amend party details', async ({I, api}) => {
+Scenario.skip('Amend party details', async ({I, api}) => {
   await api.amendPartyDetails(config.adminUser, caseId);
 });
 
-Scenario('Acknowledge claim', async ({I, api}) => {
+Scenario.skip('Acknowledge claim', async ({I, api}) => {
   await api.acknowledgeClaim(config.defendantSolicitorUser, caseId);
 });
 
-Scenario('Inform agreed extension date', async ({I, api}) => {
+Scenario.skip('Inform agreed extension date', async ({I, api}) => {
   await api.informAgreedExtension(config.defendantSolicitorUser, caseId);
 });
 
-Scenario('Defendant response', async ({I, api}) => {
+Scenario.skip('Defendant response', async ({I, api}) => {
   await api.defendantResponse(config.defendantSolicitorUser, caseId);
 });
 
-Scenario('Claimant response', async ({I, api}) => {
+Scenario.skip('Claimant response', async ({I, api}) => {
   await api.claimantResponse(config.applicantSolicitorUser, caseId);
 });
 
 Scenario('Create claim where respondent is litigant in person', async ({I, api}) => {
-  await api.createClaimWithRespondentLitigantInPerson(config.applicantSolicitorUser, caseId);
+  caseId = await api.createClaimWithRespondentLitigantInPerson(config.applicantSolicitorUser);
 });
 
-Scenario('Create claim where respondent solicitor is not registered in my hmcts', async ({I, api}) => {
-  await api.createClaimWithRespondentSolicitorFirmNotInMyHmcts(config.applicantSolicitorUser, caseId);
+Scenario.skip('Create claim where respondent solicitor is not registered in my hmcts', async ({I, api}) => {
+  await api.createClaimWithRespondentSolicitorFirmNotInMyHmcts(config.applicantSolicitorUser);
 });
 
-Scenario('Create claim and move it to caseman', async ({I, api}) => {
-  caseId = await api.createClaimWithRepresentedRespondent(config.applicantSolicitorUser, caseId);
+Scenario.skip('Create claim and move it to caseman', async ({I, api}) => {
+  caseId = await api.createClaimWithRepresentedRespondent(config.applicantSolicitorUser);
   await api.moveCaseToCaseman(config.adminUser, caseId);
 });
 
