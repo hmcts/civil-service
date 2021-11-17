@@ -326,6 +326,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2(Party party) {
+        this.respondent2 = party;
+        return this;
+    }
+
     public CaseDataBuilder legacyCaseReference(String legacyCaseReference) {
         this.legacyCaseReference = legacyCaseReference;
         return this;

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 
 import java.time.LocalDate;
@@ -38,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -52,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
+    StateFlowEngine.class,
 })
 class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -60,6 +64,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private AcknowledgeClaimCallbackHandler handler;
@@ -83,6 +90,23 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class AboutToStartCallbackV2 {
+
+        @Test
+        void shouldPopulateRespondents_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
+        }
+
+    }
+
+    @Nested
     class MidEventConfirmDetailsCallback {
 
         private static final String PAGE_ID = "confirm-details";
@@ -93,8 +117,11 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
+                .respondent2(PartyBuilder.builder().individual()
+                                 .individualDateOfBirth(LocalDate.now().plusDays(1))
+                                 .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -107,8 +134,11 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().soleTrader()
                                  .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
+                .respondent2(PartyBuilder.builder().soleTrader()
+                                 .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
+                                 .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -121,8 +151,11 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().individual()
                                  .individualDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
+                .respondent2(PartyBuilder.builder().individual()
+                                 .individualDateOfBirth(LocalDate.now().minusYears(1))
+                                 .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -135,8 +168,11 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().soleTrader()
                                  .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
                                  .build())
+                .respondent2(PartyBuilder.builder().soleTrader()
+                                 .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
+                                 .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
