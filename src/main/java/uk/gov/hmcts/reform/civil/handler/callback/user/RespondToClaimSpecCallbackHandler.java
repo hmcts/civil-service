@@ -105,7 +105,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 caseData = caseData.toBuilder()
                     .respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
-            } else if (ResponseJourneyConstantsLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            } else if (ResponseJourneyConstantsLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+                .equals(caseData.getDefenceRouteRequired())
                 && caseData.getRespondToClaim().getHowMuchWasPaid() != null
                 && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
                 caseData = caseData.toBuilder()
