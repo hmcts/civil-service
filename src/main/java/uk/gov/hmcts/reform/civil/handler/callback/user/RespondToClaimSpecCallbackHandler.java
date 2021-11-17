@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -31,10 +32,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -165,8 +163,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // This will be taken care via different story,
         // because we don't have AC around this date field validation in ROC-9455
         CaseData caseData = callbackParams.getCaseData();
-        SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
-        List<String> errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+        List<String> errors;
+        if ("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
+            SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
+            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+        } else {
+            Hearing hearing = caseData.getRespondent1DQ().getRespondent1DQHearing();
+            errors = unavailableDateValidator.validate(hearing);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
