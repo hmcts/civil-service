@@ -57,28 +57,21 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailDataMultiParty(CaseData caseData) {
-        try {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
-            String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
-            String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+        RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+        String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
 
-            return EmailData.builder()
-                .message(String.format(
-                    "Mulitparty claim data JSON is attached for %s",
-                    caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
-                .subject(String.format("Mulitparty claim data for %s", caseData.getLegacyCaseReference()
-                    + " - " + caseData.getCcdState() + " - " + triggerEvent))
-                .to(roboticsEmailConfiguration.getMultipartyrecipient())
-                .attachments(of(json(roboticsJsonData, fileName)))
-                .build();
-        } catch (JsonProcessingException e) {
-            throw new RoboticsDataException(e.getMessage(), e);
-        }
+        return EmailData.builder()
+            .message(String.format(
+                "Mulitparty claim data JSON is attached for %s",
+                caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
+            .subject(String.format("Mulitparty claim data for %s", caseData.getLegacyCaseReference()
+                + " - " + caseData.getCcdState() + " - " + triggerEvent))
+            .to(roboticsEmailConfiguration.getMultipartyrecipient())
+            .build();
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
-        
+
         List<Event> event = eventHistory.getMiscellaneous();
         String triggerReason = event.get(event.size() - 1).getEventDetailsText();
 

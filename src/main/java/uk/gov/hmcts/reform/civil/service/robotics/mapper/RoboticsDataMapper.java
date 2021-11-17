@@ -42,11 +42,6 @@ public class RoboticsDataMapper {
     public static final String APPLICANT_ID = "001";
     public static final String RESPONDENT_ID = "002";
 
-    public static final String APPLICANT2_SOLICITOR_ID = "003";
-    public static final String RESPONDENT2_SOLICITOR_ID = "004";
-    public static final String APPLICANT2_ID = "003";
-    public static final String RESPONDENT2_ID = "004";
-
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
@@ -205,8 +200,7 @@ public class RoboticsDataMapper {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
-
-        var respondentParties = new ArrayList<>(List.of(
+        return List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
@@ -223,30 +217,7 @@ public class RoboticsDataMapper {
                 RESPONDENT_ID,
                 RESPONDENT_SOLICITOR_ID
             )
-        ));
-
-        if (caseData.getApplicant2() != null) {
-            respondentParties.add(buildLitigiousParty(
-                caseData.getApplicant2(),
-                caseData.getApplicant2LitigationFriend(),
-                caseData.getApplicant2OrganisationPolicy(),
-                "Claimant",
-                APPLICANT2_ID,
-                APPLICANT2_SOLICITOR_ID
-            ));
-        }
-
-        if (caseData.getRespondent2() != null) {
-            respondentParties.add(buildLitigiousParty(
-                caseData.getRespondent2(),
-                caseData.getRespondent1LitigationFriend(),
-                caseData.getRespondent2OrganisationPolicy(),
-                "Defendant",
-                RESPONDENT2_ID,
-                RESPONDENT2_SOLICITOR_ID
-            ));
-        }
-        return respondentParties;
+        );
     }
 
     private LitigiousParty buildLitigiousParty(
