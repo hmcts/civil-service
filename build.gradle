@@ -3,13 +3,13 @@ plugins {
   id 'checkstyle'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-  id 'org.springframework.boot' version '2.5.5'
-  id 'org.owasp.dependencycheck' version '6.4.1.1'
+  id 'org.springframework.boot' version '2.5.6'
+  id 'org.owasp.dependencycheck' version '6.5.0.1'
   id 'com.github.ben-manes.versions' version '0.39.0'
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.0.2"
+  id "org.flywaydb.flyway" version "8.0.4"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -75,11 +75,11 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.5.21'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.5.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.5.21'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.5.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.5.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
       // CVE-2020-29582
 
       // CVE-2021-29425
@@ -286,9 +286,9 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.0'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.23.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.24.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -299,7 +299,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.6'
@@ -333,9 +333,9 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.54'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
 
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.1'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.62'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.64'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'

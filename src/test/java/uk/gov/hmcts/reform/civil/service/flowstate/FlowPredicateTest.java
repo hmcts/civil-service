@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
@@ -150,6 +151,35 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             assertFalse(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldBeClaimDetailsNotified_when1v2DifferentSolicitor_andNotifySolicitor_isBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            assertTrue(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldHandOffline_when1v2DifferentSolicitor_andNotifyDetailsSolicitor_isOneSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
+                .build();
+
+            assertTrue(takenOfflineAfterClaimDetailsNotified.test(caseData));
+            assertFalse(claimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+
+            assertTrue(claimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
         }
     }
 

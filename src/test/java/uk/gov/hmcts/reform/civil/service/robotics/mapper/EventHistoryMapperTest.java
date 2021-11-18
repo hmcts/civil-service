@@ -61,7 +61,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
