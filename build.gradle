@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.0.4"
+  id "org.flywaydb.flyway" version "8.0.5"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -78,7 +78,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.5.20'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.5.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
       // CVE-2020-29582
 
@@ -288,14 +288,14 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.24.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.24.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
@@ -320,7 +320,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.5.3'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.16-preview.1'
@@ -331,7 +331,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.54'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.12'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.13'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 
