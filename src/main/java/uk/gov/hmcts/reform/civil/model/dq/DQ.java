@@ -66,4 +66,6 @@ public interface DQ {
     WelshLanguageRequirements getWelshLanguageRequirements();
 
     StatementOfTruth getStatementOfTruth();
+
+    FutureApplications getFutureApplications();
 }

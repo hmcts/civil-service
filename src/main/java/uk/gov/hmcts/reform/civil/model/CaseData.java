@@ -159,6 +159,8 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
 
+    private final String additionalInformationForJudge;
+
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 
