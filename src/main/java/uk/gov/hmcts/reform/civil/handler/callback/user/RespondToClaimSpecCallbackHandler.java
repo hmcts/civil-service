@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.constants.ResponseJourneyConstantsLRSpec;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -97,15 +97,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
-        if (ResponseJourneyConstantsLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
 
-            if (ResponseJourneyConstantsLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
                 && caseData.getRespondToClaim().getHowMuchWasPaid() != null
                 && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
                 caseData = caseData.toBuilder()
                     .respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
-            } else if (ResponseJourneyConstantsLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
                 .equals(caseData.getDefenceRouteRequired())
                 && caseData.getRespondToClaim().getHowMuchWasPaid() != null
                 && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
@@ -126,7 +126,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals(ResponseJourneyConstantsLRSpec.DEFENDANT_RESPONSE_SPEC)) {
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
                 List<String> errors = postcodeValidator.validatePostCodeForDefendant(
@@ -169,7 +169,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // because we don't have AC around this date field validation in ROC-9455
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors;
-        if (ResponseJourneyConstantsLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
         } else {
