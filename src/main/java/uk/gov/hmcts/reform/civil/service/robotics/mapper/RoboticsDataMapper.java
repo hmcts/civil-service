@@ -31,8 +31,8 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
 @Service
 @RequiredArgsConstructor
