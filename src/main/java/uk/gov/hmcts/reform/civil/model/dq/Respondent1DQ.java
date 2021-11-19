@@ -112,7 +112,6 @@ public class Respondent1DQ implements DQ {
         return respondent1DQStatementOfTruth;
     }
 
-    @Override
     @JsonProperty("respondent1DQFutureApplications")
     public FutureApplications getFutureApplications() {
         return respondent1DQFutureApplications;
