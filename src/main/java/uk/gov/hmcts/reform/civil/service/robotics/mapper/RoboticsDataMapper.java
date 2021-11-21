@@ -40,9 +40,9 @@ public class RoboticsDataMapper {
 
     public static final String APPLICANT_SOLICITOR_ID = "001";
     public static final String RESPONDENT_SOLICITOR_ID = "002";
+    public static final String RESPONDENT2_SOLICITOR_ID = "003";
     public static final String APPLICANT_ID = "001";
     public static final String RESPONDENT_ID = "002";
-    public static final String RESPONDENT2_SOLICITOR_ID = "003";
     public static final String RESPONDENT2_ID = "003";
 
     private final RoboticsAddressMapper addressMapper;
@@ -205,6 +205,8 @@ public class RoboticsDataMapper {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
+        // try to fix this
+
 
         return (caseData.getAddRespondent2() == YesOrNo.YES) ? List.of(
             buildLitigiousParty(

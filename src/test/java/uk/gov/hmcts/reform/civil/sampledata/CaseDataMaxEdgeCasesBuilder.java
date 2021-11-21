@@ -274,7 +274,7 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         return this;
     }
 
-    // UnRepresented
+    // Unrepresented
     public CaseDataMaxEdgeCasesBuilder atStateProceedsOfflineUnrepresentedDefendant1MaximumData() {
         atStatePendingClaimIssuedUnRepresentedDefendant1MaximumData();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;

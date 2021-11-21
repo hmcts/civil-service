@@ -497,7 +497,7 @@ public class CaseDataBuilder {
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                 return atStateProceedsOfflineUnrepresentedDefendants();
             case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
-                return atStateProceedsOfflineUnregisteredDefendant();
+                return atStateProceedsOfflineUnregisteredDefendants();
             case TAKEN_OFFLINE_BY_STAFF:
                 return atStateTakenOfflineByStaff();
             case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
@@ -552,6 +552,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOffline1v1UnrepresentedDefendant() {
+        atStateProceedsOfflineUnrepresentedDefendants();
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1() {
         atStatePendingClaimIssuedUnRepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -567,12 +575,58 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant() {
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant2() {
+        atStatePendingClaimIssuedUnRepresentedDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor2OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .build();
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnRegisteredDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        respondent1Represented = YES;
+        respondent2Represented = YES;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1() {
+        atStatePendingClaimIssuedUnRegisteredDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -585,16 +639,64 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant2() {
+        atStatePendingClaimIssuedUnRegisteredDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOffline1v1UnregisteredDefendant() {
+        atStateProceedsOfflineUnregisteredDefendants();
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnRepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org name 2")
+            .fax("123123123")
+            .dx("test org dx 2")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
+        atStatePendingClaimIssuedUnRepresentedDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
             .organisationName("test org name 2")
             .fax("123123123")
