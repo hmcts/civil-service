@@ -32,7 +32,6 @@ module.exports = {
   fetchCaseForDisplay: async(user, caseId, response = 200) => {
     let eventUserAuth = await idamHelper.accessToken(user);
     let eventUserId = await idamHelper.userId(eventUserAuth);
-
     let url = getCcdCaseUrl(eventUserId, caseId);
 
     return await restHelper.retriedRequest(url, getRequestHeaders(eventUserAuth), null, 'GET', response)

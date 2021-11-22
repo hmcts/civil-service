@@ -11,7 +11,7 @@ const {waitForFinishedBusinessProcess, assignCaseToDefendant} = require('../api/
 const apiRequest = require('./apiRequest.js');
 const claimData = require('../fixtures/events/createClaim.js');
 const expectedEvents = require('../fixtures/ccd/expectedEvents.js');
-const testingSupport = require("./testingSupport");
+const testingSupport = require('./testingSupport');
 
 const data = {
   CREATE_CLAIM: claimData.createClaim,
@@ -55,7 +55,7 @@ const midEventFieldForPage = {
   }
 };
 
-let caseId, eventName, document;
+let caseId, eventName;
 let caseData = {};
 
 
@@ -92,7 +92,6 @@ module.exports = {
 
     //field is deleted in about to submit callback
     deleteCaseFields('applicantSolicitor1CheckEmail');
-    return caseId;
   },
 
   createClaimWithRespondentLitigantInPerson: async (user) => {
@@ -111,7 +110,6 @@ module.exports = {
     await waitForFinishedBusinessProcess(caseId);
     await assertCorrectEventsAreAvailableToUser(config.applicantSolicitorUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
-    return caseId;
   },
 
   createClaimWithRespondentSolicitorFirmNotInMyHmcts: async (user) => {
@@ -169,7 +167,7 @@ module.exports = {
     // await assertCaseNotAvailableToUser(config.defendantSolicitorUser);
   },
 
-  amendClaimDocuments: async (user, caseId = caseId) => {
+  amendClaimDocuments: async (user) => {
     // Temporary work around from CMC-1497 - statement of truth field is removed due to callback code in service repo.
     // Currently the mid event sets uiStatementOfTruth to null. When EXUI is involved this has the appearance of
     // resetting the field in the UI, most likely due to some caching mechanism, but the data is still available for the
@@ -205,7 +203,7 @@ module.exports = {
     // await assertCaseNotAvailableToUser(config.defendantSolicitorUser);
   },
 
-  notifyClaim: async (user, caseId = caseId) => {
+  notifyClaim: async (user) => {
     await apiRequest.setupTokens(user);
 
     eventName = 'NOTIFY_DEFENDANT_OF_CLAIM';
@@ -223,7 +221,7 @@ module.exports = {
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'AWAITING_CASE_DETAILS_NOTIFICATION');
   },
 
-  notifyClaimDetails: async (user, caseId = caseId) => {
+  notifyClaimDetails: async (user) => {
     await apiRequest.setupTokens(user);
 
     eventName = 'NOTIFY_DEFENDANT_OF_CLAIM_DETAILS';
@@ -393,7 +391,7 @@ module.exports = {
     });
   },
 
-  moveCaseToCaseman: async (user, caseId = caseId) => {
+  moveCaseToCaseman: async (user) => {
     // workaround
     deleteCaseFields('applicantSolicitor1ClaimStatementOfTruth');
 
@@ -421,7 +419,7 @@ module.exports = {
     await assertCorrectEventsAreAvailableToUser(config.adminUser, 'PROCEEDS_IN_HERITAGE_SYSTEM');
   },
 
-  addCaseNote: async (user, caseId = caseId) => {
+  addCaseNote: async (user) => {
     deleteCaseFields('applicantSolicitor1ClaimStatementOfTruth');
 
     await apiRequest.setupTokens(user);
@@ -582,4 +580,4 @@ async function updateCaseDataWithPlaceholders(data, document) {
 
   return JSON.parse(data);
 
-};
+}
