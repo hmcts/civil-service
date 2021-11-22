@@ -118,18 +118,18 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
             .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-//               Unrepresented
-//               1. Both def1 and def2 unrepresented
-//               2. Def1 unrepresented, Def2 registered
-//               3. Def1 registered, Def 2 unrepresented
+            // Unrepresented
+            // 1. Both def1 and def2 unrepresented
+            // 2. Def1 unrepresented, Def2 registered
+            // 3. Def1 registered, Def 2 unrepresented
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(
                 (respondent1NotRepresented.and(respondent2NotRepresented))
                     .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
                     .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-//               Unregistered
-//               1. Both def1 and def2 unregistered
-//               2. Def1 unregistered, Def2 registered
-//               3. Def1 registered, Def 2 unregistered
+            // Unregistered
+            // 1. Both def1 and def2 unregistered
+            // 2. Def1 unregistered, Def2 registered
+            // 3. Def1 registered, Def 2 unregistered
             .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
                 ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                     .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
@@ -137,9 +137,9 @@ public class StateFlowEngine {
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))))
-//               Unrepresented and Unregistered
-//               1. Def1 unrepresented, Def2 unregistered
-//               2. Def1 unregistered, Def 2 unrepresented
+            // Unrepresented and Unregistered
+            // 1. Def1 unrepresented, Def2 unregistered
+            // 2. Def1 unregistered, Def 2 unrepresented
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
                 (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
                     .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())

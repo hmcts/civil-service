@@ -178,10 +178,9 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
-//          1v1
-//          Unrepresented
+        // 1v1 Unrepresented
         @Test
-        void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndRespondentNotRepresented() {
+        void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnrepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnrepresentedDefendant().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -203,9 +202,9 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//          1v1 Unregistered
+        // 1v1 Unregistered
         @Test
-        void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndRespondentNotRegistered() {
+        void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnregistered() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -227,9 +226,9 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         1v2
-//         Unrepresented
-//          1. Both def1 and def2 unrepresented
+        // 1v2
+        // Unrepresented
+        // 1. Both def1 and def2 unrepresented
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondentsNotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
@@ -253,8 +252,8 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unrepresented
-//         2. Def1 unrepresented, Def2 registered
+        // Unrepresented
+        // 2. Def1 unrepresented, Def2 registered
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
@@ -278,8 +277,8 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unrepresented
-//         3. Def1 registered, Def 2 unrepresented
+        // Unrepresented
+        // 3. Def1 registered, Def 2 unrepresented
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant2().build();
@@ -303,8 +302,8 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unregistered
-//          1. Both def1 and def2 unregistered
+        // Unregistered
+        // 1. Both def1 and def2 unregistered
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondentsNotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build();
@@ -328,8 +327,8 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unregistered
-//         2. Def1 unregistered, Def2 registered
+        // Unregistered
+        // 2. Def1 unregistered, Def2 registered
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant1().build();
@@ -353,8 +352,8 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unregistered
-//         3. Def1 registered, Def 2 unregistered
+        // Unregistered
+        // 3. Def1 registered, Def 2 unregistered
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant2().build();
@@ -378,11 +377,9 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unrepresented and Unregistered
-//         1. Def1 unrepresented, Def2 unregistered
+        // Def1 unrepresented, Def2 unregistered
         @Test
-        void
-        shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnrepresentedRes2Unregistered() {
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnrepRes2Unregis() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
 
@@ -405,11 +402,10 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-//         Unrepresented and Unregistered
-//         2. Def1 unregistered, Def 2 unrepresented
+        // Unrepresented and Unregistered
+        // 2. Def1 unregistered, Def 2 unrepresented
         @Test
-        void
-        shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnregisteredRes2Unrepresented() {
+        void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnregisRes2Unrep() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
 
