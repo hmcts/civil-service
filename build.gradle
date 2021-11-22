@@ -76,7 +76,7 @@ allprojects {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.5.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
@@ -350,9 +350,9 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.0.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.1.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
