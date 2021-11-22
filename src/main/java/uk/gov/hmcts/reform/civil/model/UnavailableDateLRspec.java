@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @IsPresentOrEqualToOrLessThanOneYearInTheFuture(groups = UnavailableDateGroup.class)
-public class SmallClaimUnavailableDate {
+public class UnavailableDateLRspec {
 
     private final String who;
     private final LocalDate date;
