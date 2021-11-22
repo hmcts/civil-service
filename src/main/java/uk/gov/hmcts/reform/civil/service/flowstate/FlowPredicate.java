@@ -39,6 +39,7 @@ public class FlowPredicate {
             && caseData.getRespondent1Represented() != NO
             && caseData.getRespondent2Represented() != NO;
 
+
     public static final Predicate<CaseData> claimSubmittedNoRespondentRepresented = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getAddRespondent2() == YES
