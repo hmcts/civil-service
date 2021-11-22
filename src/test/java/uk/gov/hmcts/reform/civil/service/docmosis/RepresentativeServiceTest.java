@@ -217,7 +217,7 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
 
             Representative representative = representativeService.getRespondent1Representative(caseData);
 
@@ -235,7 +235,7 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRegisteredDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
 
             Representative representative = representativeService.getRespondent1Representative(caseData);
 
@@ -355,7 +355,7 @@ class RepresentativeServiceTest {
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssuedUnRepresentedDefendant()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
                 .multiPartyClaimTwoDefendantSolicitors().build();
 
             Representative representative = representativeService.getRespondent2Representative(caseData);
@@ -375,7 +375,7 @@ class RepresentativeServiceTest {
         @Test
         void shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssuedUnRegisteredDefendant()
+                .atStatePendingClaimIssuedUnregisteredDefendant()
                 .multiPartyClaimTwoDefendantSolicitors().build();
 
             Representative representative = representativeService.getRespondent2Representative(caseData);
