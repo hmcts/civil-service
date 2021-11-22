@@ -88,11 +88,11 @@ public class UnavailableDateValidator implements
 
     public List<String> validateSmallClaimsHearing(SmallClaimHearing smallClaimHearing) {
         List<String> errors = new ArrayList<>();
-        if (isSmallClaimHearingNullOrEmpty(smallClaimHearing) && smallClaimHearing.getUnavailableDatesRequired() == YES) {
+        if (smallClaimHearing.getUnavailableDatesRequired() == YES && isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
             errors.add("Details of unavailable date required");
         }
 
-        if (!isSmallClaimHearingNullOrEmpty(smallClaimHearing) && smallClaimHearing.getUnavailableDatesRequired() == YES) {
+        if (smallClaimHearing.getUnavailableDatesRequired() == YES && !isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
             List<Element<UnavailableDateLRspec>> smallUnavailableDates
                 = smallClaimHearing.getSmallClaimUnavailableDate();
             smallUnavailableDates.forEach(element -> {
