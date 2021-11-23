@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -198,6 +199,8 @@ public class CaseDataBuilder {
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
+    private RespondToClaim respondToAdmittedClaim;
+    private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1036,6 +1039,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullDefenceFastTrackPartAdmit() {
+        atStateRespondentRespondToClaimPartAdmitFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefenceAfterAcknowledgementTimeExtension() {
         atStateNotificationAcknowledgedTimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -1222,6 +1236,18 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentRespondToClaimFastTrack(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
         respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
+        totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
+        respondent1ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = LocalDateTime.now();
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimPartAdmitFastTrack(
+        RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondToAdmittedClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
@@ -1511,6 +1537,9 @@ public class CaseDataBuilder {
             .superClaimType(UNSPEC_CLAIM)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
+            //spec route
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondToAdmittedClaim(respondToAdmittedClaim)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)

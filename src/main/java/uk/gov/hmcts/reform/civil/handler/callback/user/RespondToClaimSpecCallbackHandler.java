@@ -85,6 +85,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
+            .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .build();
     }
 
@@ -114,6 +115,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
 
+            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                                                                             null);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
+                .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .build();
+    }
+
+    //TODO Duplication Check for the methods to see if it can have a generic ways in the future
+    private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                                                                .orElseGet(() -> RespondToClaim.builder().build()));
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                              null);
             return AboutToStartOrSubmitCallbackResponse.builder()
