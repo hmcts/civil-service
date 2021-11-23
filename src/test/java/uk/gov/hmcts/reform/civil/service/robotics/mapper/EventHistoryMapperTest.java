@@ -219,6 +219,7 @@ class EventHistoryMapperTest {
             );
         }
     }
+
     @Nested
     class NotifyClaimDetailsRpaContinuousFeed {
 
@@ -981,8 +982,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                 .asList().containsExactlyInAnyOrder(
                     expectedDirectionsQuestionnaireRespondent,
-                    expectedDirectionsQuestionnaireApplicant
-                );
+                    expectedDirectionsQuestionnaireApplicant);
+
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -1076,8 +1077,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                 .asList().containsExactlyInAnyOrder(
                     expectedDirectionsQuestionnaireRespondent,
-                    expectedDirectionsQuestionnaireApplicant
-                );
+                    expectedDirectionsQuestionnaireApplicant);
+
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
