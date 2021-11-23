@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
@@ -228,5 +229,31 @@ class RoboticsDataMapperTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2OrgRegistered(NO)
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsNotRepresented() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(NO)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 }
