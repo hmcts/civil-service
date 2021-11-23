@@ -72,7 +72,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     @Override
     protected Map<String, Callback> callbacks() {
-       return new ImmutableMap.Builder<String, Callback>()
+        return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
@@ -168,7 +168,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // UnavailableDates validation & field (model) needs to be created.
         // This will be taken care via different story,
         // because we don't have AC around this date field validation in ROC-9455
-        System.out.println("unavailable date");
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors;
         if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
