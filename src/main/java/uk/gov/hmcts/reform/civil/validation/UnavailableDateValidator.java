@@ -61,17 +61,15 @@ public class UnavailableDateValidator implements
             List<Element<UnavailableDateLRspec>> unavailabeDate
                 = hearingLRspec.getUnavailableDatesLRspec();
             unavailabeDate.forEach(element -> {
-              UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-               if(unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
-                   && unavailableDateLRspecElement.getDate() == null)
-                {
+                UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
+                if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
+                    && unavailableDateLRspecElement.getDate() == null) {
                     errors.add("Details of unavailable date required");
                 }
-               if(unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE"))
-                {
-                  if(unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
-                     errors.add("Details of unavailable date required");
-                  }
+                if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
+                    if (unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
+                        errors.add("Details of unavailable date required");
+                    }
                 }
                 if (checkOneYearValidation(unavailableDateLRspecElement.getDate())
                     || checkOneYearValidation(unavailableDateLRspecElement.getFromDate())
