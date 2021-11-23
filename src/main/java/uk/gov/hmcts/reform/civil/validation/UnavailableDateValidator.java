@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.FastClaimUnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -54,31 +55,40 @@ public class UnavailableDateValidator implements
     public List<String> validateFastClaimHearing(HearingLRspec hearingLRspec) {
         List<String> errors = new ArrayList<>();
         if (hearingLRspec.getUnavailableDatesRequired() == YES && isFastClaimHearingNullOrEmpty(hearingLRspec)) {
-            System.out.println("validate fast claim yes");
             errors.add("Details of unavailable date required");
         }
 
        if (hearingLRspec.getUnavailableDatesRequired() == YES && !isFastClaimHearingNullOrEmpty(hearingLRspec) ) {
-           System.out.println("validate fast claim no ");
-           List<Element<UnavailableDateLRspec>> unavailableDatesLRspec
+           List<Element<FastClaimUnavailableDateLRspec>> fastTrackUnavailabeDate
                 = hearingLRspec.getUnavailableDatesLRspec();
-           unavailableDatesLRspec.forEach(element -> {
-                UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-                if (checkOneYearValidation(unavailableDateLRspecElement.getDate())
-                    || checkOneYearValidation(unavailableDateLRspecElement.getFromDate())
-                    || checkOneYearValidation(unavailableDateLRspecElement.getToDate())
+           fastTrackUnavailabeDate.forEach(element -> {
+                //UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
+               FastClaimUnavailableDateLRspec fastClaimUnavailableDateLRspecElement = element.getValue();
+               if(fastClaimUnavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE") && fastClaimUnavailableDateLRspecElement.getDate() == null )
+                {
+                    errors.add("Details of unavailable date required");
+                }
+               if(fastClaimUnavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE"))
+                {
+                 if(fastClaimUnavailableDateLRspecElement.getFromDate() == null || fastClaimUnavailableDateLRspecElement.getToDate() == null) {
+                     errors.add("Details of unavailable date required");
+                 }
+                }
+                if (checkOneYearValidation(fastClaimUnavailableDateLRspecElement.getDate())
+                    || checkOneYearValidation(fastClaimUnavailableDateLRspecElement.getFromDate())
+                    || checkOneYearValidation(fastClaimUnavailableDateLRspecElement.getToDate())
                 ) {
                     errors.add("Dates must be within the next 12 months.");
-                } else if (checkPastDateValidation(unavailableDateLRspecElement.getDate())
+                } else if (checkPastDateValidation(fastClaimUnavailableDateLRspecElement.getDate())
                     ||
-                    checkPastDateValidation(unavailableDateLRspecElement.getToDate())
+                    checkPastDateValidation(fastClaimUnavailableDateLRspecElement.getToDate())
                     ||
-                    checkPastDateValidation(unavailableDateLRspecElement.getFromDate())) {
+                    checkPastDateValidation(fastClaimUnavailableDateLRspecElement.getFromDate())) {
                     errors.add("Unavailable Date cannot be past date");
-                } else if (unavailableDateLRspecElement.getFromDate() != null
-                    && unavailableDateLRspecElement.getToDate() != null
-                    && unavailableDateLRspecElement.getFromDate()
-                    .isAfter(unavailableDateLRspecElement.getToDate())) {
+                } else if (fastClaimUnavailableDateLRspecElement.getFromDate() != null
+                    && fastClaimUnavailableDateLRspecElement.getToDate() != null
+                    && fastClaimUnavailableDateLRspecElement.getFromDate()
+                    .isAfter(fastClaimUnavailableDateLRspecElement.getToDate())) {
                     errors.add("From Date should be less than To Date");
                 }
             });
@@ -140,7 +150,7 @@ public class UnavailableDateValidator implements
     }
 
     private boolean isFastClaimHearingNullOrEmpty(HearingLRspec hearingLRspec) {
-        List<Element<UnavailableDateLRspec>> unavailableDates = ofNullable(hearingLRspec.getUnavailableDatesLRspec()).orElse(emptyList());
+        List<Element<FastClaimUnavailableDateLRspec>> unavailableDates = ofNullable(hearingLRspec.getUnavailableDatesLRspec()).orElse(emptyList());
         return unavailableDates.isEmpty();
     }
 

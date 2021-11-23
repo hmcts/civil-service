@@ -12,11 +12,12 @@ import java.time.LocalDate;
 @Builder
 @IsPresentOrEqualToOrLessThanOneYearInTheFuture(groups = UnavailableDateGroup.class)
 
-public class FastClaimUnavailableDate {
+public class FastClaimUnavailableDateLRspec {
 
     private final String who;
     private final LocalDate date;
     private final LocalDate fromDate;
     private final LocalDate toDate;
+    private final String unavailableDateType;
     private final SmallClaimUnavailableDateType smallClaimUnavailableDateType;
 }
