@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.civil.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.FastClaimUnavailableDateLRspec;
-import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
@@ -58,20 +57,21 @@ public class UnavailableDateValidator implements
             errors.add("Details of unavailable date required");
         }
 
-       if (hearingLRspec.getUnavailableDatesRequired() == YES && !isFastClaimHearingNullOrEmpty(hearingLRspec) ) {
-           List<Element<UnavailableDateLRspec>> unavailabeDate
+        if (hearingLRspec.getUnavailableDatesRequired() == YES && !isFastClaimHearingNullOrEmpty(hearingLRspec)) {
+            List<Element<UnavailableDateLRspec>> unavailabeDate
                 = hearingLRspec.getUnavailableDatesLRspec();
-           unavailabeDate.forEach(element -> {
-               UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-               if(unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE") && unavailableDateLRspecElement.getDate() == null )
+            unavailabeDate.forEach(element -> {
+              UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
+               if(unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
+                   && unavailableDateLRspecElement.getDate() == null)
                 {
                     errors.add("Details of unavailable date required");
                 }
                if(unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE"))
                 {
-                 if(unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
+                  if(unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
                      errors.add("Details of unavailable date required");
-                 }
+                  }
                 }
                 if (checkOneYearValidation(unavailableDateLRspecElement.getDate())
                     || checkOneYearValidation(unavailableDateLRspecElement.getFromDate())
@@ -149,7 +149,8 @@ public class UnavailableDateValidator implements
     }
 
     private boolean isFastClaimHearingNullOrEmpty(HearingLRspec hearingLRspec) {
-        List<Element<UnavailableDateLRspec>> unavailableDates = ofNullable(hearingLRspec.getUnavailableDatesLRspec()).orElse(emptyList());
+        List<Element<UnavailableDateLRspec>> unavailableDates
+            = ofNullable(hearingLRspec.getUnavailableDatesLRspec()).orElse(emptyList());
         return unavailableDates.isEmpty();
     }
 
