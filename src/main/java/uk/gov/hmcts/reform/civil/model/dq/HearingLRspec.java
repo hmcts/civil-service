@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.HearingLength;
-import uk.gov.hmcts.reform.civil.model.FastClaimUnavailableDateLRspec;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class HearingLRspec {
     private final String hearingLengthHours;
     private final String hearingLengthDays;
     private final YesOrNo unavailableDatesRequired;
-    private final List<Element<FastClaimUnavailableDateLRspec>> unavailableDatesLRspec;
+    private final List<Element<UnavailableDateLRspec>> unavailableDatesLRspec;
 
 
 }

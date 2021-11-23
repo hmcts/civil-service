@@ -18,6 +18,5 @@ public class FastClaimUnavailableDateLRspec {
     private final LocalDate date;
     private final LocalDate fromDate;
     private final LocalDate toDate;
-    private final String unavailableDateType;
     private final SmallClaimUnavailableDateType smallClaimUnavailableDateType;
 }

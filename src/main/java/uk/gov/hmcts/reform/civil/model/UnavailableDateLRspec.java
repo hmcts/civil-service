@@ -17,5 +17,6 @@ public class UnavailableDateLRspec {
     private final LocalDate date;
     private final LocalDate fromDate;
     private final LocalDate toDate;
-    private final SmallClaimUnavailableDateType smallClaimUnavailableDateType;
+    private final String unavailableDateType;
+
 }
