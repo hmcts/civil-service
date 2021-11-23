@@ -177,7 +177,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenNotifyClaimDetailsRpaHandedOffline() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimDetailsNotified().build();
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")

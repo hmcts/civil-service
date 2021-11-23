@@ -855,6 +855,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimDetailsNotified(){
+        atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        return this;
+    }
     public CaseDataBuilder atStateClaimDetailsNotified() {
         atStateClaimNotified();
         claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
