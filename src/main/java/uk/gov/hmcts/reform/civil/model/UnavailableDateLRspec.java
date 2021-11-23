@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.model;
 
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.civil.enums.dq.SmallClaimUnavailableDateType;
 import uk.gov.hmcts.reform.civil.validation.groups.UnavailableDateGroup;
 import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessThanOneYearInTheFuture;
 

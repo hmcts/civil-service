@@ -67,7 +67,8 @@ public class UnavailableDateValidator implements
                     errors.add("Details of unavailable date required");
                 }
                 if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
-                    if (unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
+                    if (unavailableDateLRspecElement.getFromDate() == null
+                        || unavailableDateLRspecElement.getToDate() == null) {
                         errors.add("Details of unavailable date required");
                     }
                 }
@@ -95,11 +96,13 @@ public class UnavailableDateValidator implements
 
     public List<String> validateSmallClaimsHearing(SmallClaimHearing smallClaimHearing) {
         List<String> errors = new ArrayList<>();
-        if (smallClaimHearing.getUnavailableDatesRequired() == YES && isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
+        if (smallClaimHearing.getUnavailableDatesRequired() == YES
+            && isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
             errors.add("Details of unavailable date required");
         }
 
-        if (smallClaimHearing.getUnavailableDatesRequired() == YES && !isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
+        if (smallClaimHearing.getUnavailableDatesRequired() == YES
+            && !isSmallClaimHearingNullOrEmpty(smallClaimHearing)) {
             List<Element<UnavailableDateLRspec>> smallUnavailableDates
                 = smallClaimHearing.getSmallClaimUnavailableDate();
             smallUnavailableDates.forEach(element -> {
