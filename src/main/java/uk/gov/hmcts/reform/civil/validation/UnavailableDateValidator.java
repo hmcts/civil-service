@@ -61,7 +61,6 @@ public class UnavailableDateValidator implements
                 = hearingLRspec.getUnavailableDatesLRspec();
             errors = dateValidationErrorCheck(unavailabeDate);
         }
-
         return errors;
     }
 
@@ -70,12 +69,13 @@ public class UnavailableDateValidator implements
 
         unavailabeDate.forEach(element -> {
             UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-            if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE") && unavailableDateLRspecElement.getDate() == null) {
-                System.out.println("if condition ");
+            if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
+                && unavailableDateLRspecElement.getDate() == null) {
                 errors.add("Details of unavailable date required");
             }
             if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
-                if (unavailableDateLRspecElement.getFromDate() == null || unavailableDateLRspecElement.getToDate() == null) {
+                if (unavailableDateLRspecElement.getFromDate() == null
+                    || unavailableDateLRspecElement.getToDate() == null) {
                     errors.add("Details of unavailable date required");
                 }
             }
@@ -97,9 +97,7 @@ public class UnavailableDateValidator implements
                 errors.add("From Date should be less than To Date");
             }
         });
-
         return errors;
-
     }
 
     public List<String> validateSmallClaimsHearing(SmallClaimHearing smallClaimHearing) {
@@ -115,7 +113,6 @@ public class UnavailableDateValidator implements
 
             errors = dateValidationErrorCheck(smallUnavailableDates);
         }
-
         return errors;
     }
 
