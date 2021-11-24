@@ -131,7 +131,7 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String message = format(
-            "Mulitparty claim data JSON is attached for %s",
+            "Mulitparty claim data for %s",
             reference + " - " + caseData.getCcdState());
         String subject = format("Mulitparty claim data for %s", reference
             + " - " + caseData.getCcdState() + " - " + "Claimant has notified defendant.");

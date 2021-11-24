@@ -62,7 +62,7 @@ public class RoboticsNotificationService {
 
         return EmailData.builder()
             .message(String.format(
-                "Mulitparty claim data JSON is attached for %s",
+                "Mulitparty claim data for %s",
                 caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
             .subject(String.format("Mulitparty claim data for %s", caseData.getLegacyCaseReference()
                 + " - " + caseData.getCcdState() + " - " + triggerEvent))
