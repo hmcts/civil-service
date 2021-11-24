@@ -64,42 +64,6 @@ public class UnavailableDateValidator implements
         return errors;
     }
 
-    public List<String> dateValidationErrorCheck(List<Element<UnavailableDateLRspec>> unavailabeDate) {
-        List<String> errors = new ArrayList<>();
-
-        unavailabeDate.forEach(element -> {
-            UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-            if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
-                && unavailableDateLRspecElement.getDate() == null) {
-                errors.add("Details of unavailable date required");
-            }
-            if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
-                if (unavailableDateLRspecElement.getFromDate() == null
-                    || unavailableDateLRspecElement.getToDate() == null) {
-                    errors.add("Details of unavailable date required");
-                }
-            }
-            if (checkOneYearValidation(unavailableDateLRspecElement.getDate())
-                || checkOneYearValidation(unavailableDateLRspecElement.getFromDate())
-                || checkOneYearValidation(unavailableDateLRspecElement.getToDate())
-            ) {
-                errors.add("Dates must be within the next 12 months.");
-            } else if (checkPastDateValidation(unavailableDateLRspecElement.getDate())
-                ||
-                checkPastDateValidation(unavailableDateLRspecElement.getToDate())
-                ||
-                checkPastDateValidation(unavailableDateLRspecElement.getFromDate())) {
-                errors.add("Unavailable Date cannot be past date");
-            } else if (unavailableDateLRspecElement.getFromDate() != null
-                && unavailableDateLRspecElement.getToDate() != null
-                && unavailableDateLRspecElement.getFromDate()
-                .isAfter(unavailableDateLRspecElement.getToDate())) {
-                errors.add("From Date should be less than To Date");
-            }
-        });
-        return errors;
-    }
-
     public List<String> validateSmallClaimsHearing(SmallClaimHearing smallClaimHearing) {
         List<String> errors = new ArrayList<>();
         if (smallClaimHearing.getUnavailableDatesRequired() == YES
@@ -147,4 +111,40 @@ public class UnavailableDateValidator implements
             emptyList());
         return smallClaimUnavailableDates.isEmpty();
     }
+    private List<String> dateValidationErrorCheck(List<Element<UnavailableDateLRspec>> unavailabeDate) {
+        List<String> errors = new ArrayList<>();
+
+        unavailabeDate.forEach(element -> {
+            UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
+            if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
+                && unavailableDateLRspecElement.getDate() == null) {
+                errors.add("Details of unavailable date required");
+            }
+            if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
+                if (unavailableDateLRspecElement.getFromDate() == null
+                    || unavailableDateLRspecElement.getToDate() == null) {
+                    errors.add("Details of unavailable date required");
+                }
+            }
+            if (checkOneYearValidation(unavailableDateLRspecElement.getDate())
+                || checkOneYearValidation(unavailableDateLRspecElement.getFromDate())
+                || checkOneYearValidation(unavailableDateLRspecElement.getToDate())
+            ) {
+                errors.add("Dates must be within the next 12 months.");
+            } else if (checkPastDateValidation(unavailableDateLRspecElement.getDate())
+                ||
+                checkPastDateValidation(unavailableDateLRspecElement.getToDate())
+                ||
+                checkPastDateValidation(unavailableDateLRspecElement.getFromDate())) {
+                errors.add("Unavailable Date cannot be past date");
+            } else if (unavailableDateLRspecElement.getFromDate() != null
+                && unavailableDateLRspecElement.getToDate() != null
+                && unavailableDateLRspecElement.getFromDate()
+                .isAfter(unavailableDateLRspecElement.getToDate())) {
+                errors.add("From Date should be less than To Date");
+            }
+        });
+        return errors;
+    }
+
 }
