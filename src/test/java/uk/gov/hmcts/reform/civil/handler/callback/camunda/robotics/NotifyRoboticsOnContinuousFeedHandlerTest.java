@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -34,7 +35,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -82,6 +82,8 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             verify(roboticsNotificationService).notifyRobotics(caseData, false);
         }
     }
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     @Nested
     class InValidJsonPayload {

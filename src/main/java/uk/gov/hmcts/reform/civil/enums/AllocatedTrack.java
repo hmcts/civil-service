@@ -8,7 +8,7 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType) {
-        if (claimType.isLowerFeeType()) {
+        if (claimType != null && claimType.isLowerFeeType()) {
             if (isValueSmallerThan(statementOfValueInPounds, 1000)) {
                 return SMALL_CLAIM;
             } else if (isValueWithinRange(statementOfValueInPounds, 1000, 25000)) {

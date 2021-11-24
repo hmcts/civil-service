@@ -8,7 +8,7 @@ import static java.util.Objects.requireNonNull;
 
 public class MonetaryConversions {
 
-    private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+    public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
     private MonetaryConversions() {
         // Utilities class, no instances

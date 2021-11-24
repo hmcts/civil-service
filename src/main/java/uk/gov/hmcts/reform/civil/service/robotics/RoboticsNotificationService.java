@@ -10,16 +10,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Slf4j
@@ -31,6 +34,7 @@ public class RoboticsNotificationService {
     private final SendGridClient sendGridClient;
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
         requireNonNull(caseData);
@@ -40,9 +44,18 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailData(CaseData caseData) {
+        RoboticsCaseData roboticsCaseData;
+        RoboticsCaseDataSpec roboticsCaseDataSpec;
+        byte[] roboticsJsonData;
         try {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            byte[] roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            if (null != caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
+            } else {
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            }
+
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
 
             return EmailData.builder()
