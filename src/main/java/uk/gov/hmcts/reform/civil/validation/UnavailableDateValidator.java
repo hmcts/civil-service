@@ -58,9 +58,7 @@ public class UnavailableDateValidator implements
             if (!isFastClaimHearingNullOrEmpty(hearingLRspec)) {
                 List<Element<UnavailableDateLRspec>> unavailabeDate = hearingLRspec.getUnavailableDatesLRspec();
                 errors = dateValidation(unavailabeDate);
-            }
-            else
-            {
+            } else {
                 errors.add("Details of unavailable date required");
             }
         }
