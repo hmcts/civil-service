@@ -472,6 +472,8 @@ public class CaseDataBuilder {
                 return atStateClaimIssued();
             case CLAIM_NOTIFIED:
                 return atStateClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimDetailsNotified();
             case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 return atStateProceedsOfflineAfterClaimNotified();
             case CLAIM_DETAILS_NOTIFIED:
