@@ -55,6 +55,7 @@ public class CallbackController {
         log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
                  callback.getEventId(), callbackType, pageId, version
         );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
