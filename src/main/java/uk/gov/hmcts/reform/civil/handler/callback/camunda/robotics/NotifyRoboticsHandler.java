@@ -39,10 +39,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            Set<ValidationMessage> errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
-            if (errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
+
             if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
             } else {
@@ -51,7 +48,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             }
 
             if (errors == null || errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData);
+                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),
