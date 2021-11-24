@@ -54,11 +54,15 @@ public class UnavailableDateValidator implements
 
     public List<String> validateFastClaimHearing(HearingLRspec hearingLRspec) {
         List<String> errors = new ArrayList<>();
-        if (isFastClaimHearingNullOrEmpty(hearingLRspec) && hearingLRspec.getUnavailableDatesRequired() == YES) {
-            errors.add("Details of unavailable date required");
+        if ((hearingLRspec != null && !isFastClaimHearingNullOrEmpty(hearingLRspec))) {
+            if (hearingLRspec.getUnavailableDatesRequired() == YES) {
+                List<Element<UnavailableDateLRspec>> unavailabeDate = hearingLRspec.getUnavailableDatesLRspec();
+                errors = dateValidation(unavailabeDate);
+            }
         } else {
-            List<Element<UnavailableDateLRspec>> unavailabeDate = hearingLRspec.getUnavailableDatesLRspec();
-            errors = dateValidation(unavailabeDate);
+            if (hearingLRspec.getUnavailableDatesRequired() == YES) {
+                errors.add("Details of unavailable date required");
+            }
         }
         return errors;
     }
@@ -113,7 +117,7 @@ public class UnavailableDateValidator implements
 
     private List<String> dateValidation(List<Element<UnavailableDateLRspec>> unavailabeDate) {
         List<String> errors = new ArrayList<>();
-
+        System.out.println("inside date validation ");
         unavailabeDate.forEach(element -> {
             UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
             if (SpecJourneyConstantLRSpec.SINGLE_DATE.equals(unavailableDateLRspecElement.getUnavailableDateType())
