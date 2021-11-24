@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 
-public class Hearing extends HearingSuper {
+public class Hearing extends BaseHearing {
 
     private final List<Element<UnavailableDate>> unavailableDates;
 

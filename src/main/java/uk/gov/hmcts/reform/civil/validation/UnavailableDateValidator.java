@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -53,13 +54,11 @@ public class UnavailableDateValidator implements
 
     public List<String> validateFastClaimHearing(HearingLRspec hearingLRspec) {
         List<String> errors = new ArrayList<>();
-        if (hearingLRspec.getUnavailableDatesRequired() == YES && isFastClaimHearingNullOrEmpty(hearingLRspec)) {
+        if (isFastClaimHearingNullOrEmpty(hearingLRspec) && hearingLRspec.getUnavailableDatesRequired() == YES) {
             errors.add("Details of unavailable date required");
-        }
-        if (hearingLRspec.getUnavailableDatesRequired() == YES && !isFastClaimHearingNullOrEmpty(hearingLRspec)) {
-            List<Element<UnavailableDateLRspec>> unavailabeDate
-                = hearingLRspec.getUnavailableDatesLRspec();
-            errors = dateValidationErrorCheck(unavailabeDate);
+        } else {
+            List<Element<UnavailableDateLRspec>> unavailabeDate = hearingLRspec.getUnavailableDatesLRspec();
+            errors = dateValidation(unavailabeDate);
         }
         return errors;
     }
@@ -75,7 +74,7 @@ public class UnavailableDateValidator implements
             List<Element<UnavailableDateLRspec>> smallUnavailableDates
                 = smallClaimHearing.getSmallClaimUnavailableDate();
 
-            errors = dateValidationErrorCheck(smallUnavailableDates);
+            errors = dateValidation(smallUnavailableDates);
         }
         return errors;
     }
@@ -111,16 +110,17 @@ public class UnavailableDateValidator implements
             emptyList());
         return smallClaimUnavailableDates.isEmpty();
     }
-    private List<String> dateValidationErrorCheck(List<Element<UnavailableDateLRspec>> unavailabeDate) {
+
+    private List<String> dateValidation(List<Element<UnavailableDateLRspec>> unavailabeDate) {
         List<String> errors = new ArrayList<>();
 
         unavailabeDate.forEach(element -> {
             UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
-            if (unavailableDateLRspecElement.getUnavailableDateType().equals("SINGLE_DATE")
+            if (SpecJourneyConstantLRSpec.SINGLE_DATE.equals(unavailableDateLRspecElement.getUnavailableDateType())
                 && unavailableDateLRspecElement.getDate() == null) {
                 errors.add("Details of unavailable date required");
             }
-            if (unavailableDateLRspecElement.getUnavailableDateType().equals("DATE_RANGE")) {
+            if (SpecJourneyConstantLRSpec.DATE_RANGE.equals(unavailableDateLRspecElement.getUnavailableDateType())) {
                 if (unavailableDateLRspecElement.getFromDate() == null
                     || unavailableDateLRspecElement.getToDate() == null) {
                     errors.add("Details of unavailable date required");

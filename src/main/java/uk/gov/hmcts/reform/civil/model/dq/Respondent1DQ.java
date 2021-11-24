@@ -28,11 +28,6 @@ public class Respondent1DQ implements DQ {
     private final WelshLanguageRequirements respondent1DQLanguage;
     private final StatementOfTruth respondent1DQStatementOfTruth;
 
-    @JsonProperty("respondent1DQHearingFastClaim")
-    public HearingLRspec getRespondent1DQHearingFastClaim() {
-        return respondent1DQHearingFastClaim;
-    }
-
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
