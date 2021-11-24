@@ -51,6 +51,9 @@ public interface NotificationData {
     String PIN = "pin";
     String FRONTEND_URL = "frontendBaseUrl";
 
+    String CLAIM_LEGAL_ORG_NAME_SPEC = "legalOrgName";
+    String CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC = "defendantLegalRep";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
