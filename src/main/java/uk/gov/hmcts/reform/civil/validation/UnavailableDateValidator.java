@@ -54,13 +54,13 @@ public class UnavailableDateValidator implements
 
     public List<String> validateFastClaimHearing(HearingLRspec hearingLRspec) {
         List<String> errors = new ArrayList<>();
-        if ((hearingLRspec != null && !isFastClaimHearingNullOrEmpty(hearingLRspec))) {
-            if (hearingLRspec.getUnavailableDatesRequired() == YES) {
+        if ((hearingLRspec != null && hearingLRspec.getUnavailableDatesRequired() == YES)) {
+            if (!isFastClaimHearingNullOrEmpty(hearingLRspec)) {
                 List<Element<UnavailableDateLRspec>> unavailabeDate = hearingLRspec.getUnavailableDatesLRspec();
                 errors = dateValidation(unavailabeDate);
             }
-        } else {
-            if (hearingLRspec.getUnavailableDatesRequired() == YES) {
+            else
+            {
                 errors.add("Details of unavailable date required");
             }
         }
