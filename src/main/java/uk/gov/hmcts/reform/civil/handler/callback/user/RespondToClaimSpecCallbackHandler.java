@@ -136,7 +136,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
-        if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                              null);
             return AboutToStartOrSubmitCallbackResponse.builder()
