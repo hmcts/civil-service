@@ -132,9 +132,10 @@ public class FlowPredicate {
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
     public static boolean checkIfRespondentsResponseIsNotSame(CaseData caseDate, RespondentResponseType responseType) {
-        return responseType != FULL_DEFENCE &&
-            Arrays.asList(caseDate.getRespondent2ClaimResponseType(), caseDate.getRespondent1ClaimResponseType()).contains(responseType) &&
-            caseDate.getRespondent1ClaimResponseType() != caseDate.getRespondent2ClaimResponseType();
+        return responseType != FULL_DEFENCE
+            && Arrays.asList(caseDate.getRespondent2ClaimResponseType(),
+                             caseDate.getRespondent1ClaimResponseType()).contains(responseType)
+            && caseDate.getRespondent1ClaimResponseType() != caseDate.getRespondent2ClaimResponseType();
     }
 
     private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
