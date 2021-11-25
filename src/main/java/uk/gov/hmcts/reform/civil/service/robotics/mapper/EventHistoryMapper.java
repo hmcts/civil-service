@@ -25,6 +25,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
@@ -49,11 +50,17 @@ public class EventHistoryMapper {
     private final EventHistorySequencer eventHistorySequencer;
 
     public EventHistory buildEvents(CaseData caseData) {
+        List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-
-        List<State> stateHistory = stateFlowEngine.evaluate(caseData)
-            .getStateHistory();
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            states = stateFlowEngine.evaluateSpec(caseData)
+                .getStateHistory();
+        } else {
+            states = stateFlowEngine.evaluate(caseData)
+                .getStateHistory();
+        }
+        List<State> stateHistory = states;
         stateHistory
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
@@ -469,7 +476,21 @@ public class EventHistoryMapper {
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
-                    Event.builder()
+                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)
+                        ?
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode("38")
+                            .dateReceived(dateAcknowledge)
+                            .litigiousPartyID("002")
+                            .eventDetails(EventDetails.builder()
+                                              .acknowledgeService("Acknowledgement of Service")
+                                              .build())
+                            .eventDetailsText(format(
+                                "Defendant LR Acknowledgement of Service "
+                            ))
+                            .build()
+                        : Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
                         .dateReceived(dateAcknowledge)

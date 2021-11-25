@@ -388,9 +388,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetApplicantResponseDeadline_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -402,9 +400,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(
                 V_1,
@@ -425,9 +421,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyRespondent1PrimaryAddress_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             var expectedAddress = AddressBuilder.defaults().addressLine1("test address").build();
             caseData = caseData.toBuilder()
                 .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
@@ -450,9 +444,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
 
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .build()
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build()
                     .toBuilder()
                     .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
@@ -482,9 +474,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
