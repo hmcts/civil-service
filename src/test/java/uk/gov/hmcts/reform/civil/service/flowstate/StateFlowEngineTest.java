@@ -1367,4 +1367,28 @@ class StateFlowEngineTest {
             assertThat(stateFlowEngine.hasTransitionedTo(caseDetails, state)).isEqualTo(expected);
         }
     }
+
+    @Nested
+    class HasSpecTransitionedTo {
+
+        @ParameterizedTest
+        @CsvSource({
+            "true,CLAIM_ISSUED",
+            "true,CLAIM_ISSUED_PAYMENT_SUCCESSFUL",
+            "true,PENDING_CLAIM_ISSUED",
+            "true,SPEC_DRAFT",
+            "false,FULL_DEFENCE",
+            "false,FULL_DEFENCE_PROCEED",
+            "false,FULL_DEFENCE_NOT_PROCEED",
+            "false,NOTIFICATION_ACKNOWLEDGED",
+        })
+        void shouldReturnValidResult_whenCaseDataAtStateAwaitingRespondentAcknowledgement(boolean expected,
+                                                                                          FlowState.Main state) {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder()
+                .atStateAwaitingRespondentAcknowledgement()
+                .build();
+
+            assertThat(stateFlowEngine.hasSpecTransitionedTo(caseDetails, state)).isEqualTo(expected);
+        }
+    }
 }
