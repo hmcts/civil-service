@@ -71,16 +71,22 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState, data))
                        .description(getDescription(startEventResponse.getEventId(), data))
                        .build())
             .data(data)
             .build();
     }
 
-    private String getSummary(String eventId, String state) {
+    private String getSummary(String eventId, String state, Map data) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+
+            if (data.get("addRespondent2").equals("Yes")
+                && data.get("respondent1ClaimResponseType") != data.get("respondent2ClaimResponseType")) {
+                return "RPA Reason: Divergent response";
+            }
+
             switch (flowState) {
                 case FULL_ADMISSION:
                     return "RPA Reason: Defendant fully admits.";
