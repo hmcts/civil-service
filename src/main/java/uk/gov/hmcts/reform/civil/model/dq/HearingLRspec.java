@@ -14,7 +14,8 @@ public class HearingLRspec extends BaseHearing {
 
     @Builder
     public HearingLRspec(HearingLength hearingLength, String hearingLengthHours, String hearingLengthDays,
-                         YesOrNo unavailableDatesRequired, List<Element<UnavailableDateLRspec>> unavailableDatesLRspec) {
+                         YesOrNo unavailableDatesRequired, List<Element<UnavailableDateLRspec>>
+                             unavailableDatesLRspec) {
         super(hearingLength, hearingLengthHours, hearingLengthDays, unavailableDatesRequired);
         this.unavailableDatesLRspec = unavailableDatesLRspec;
     }
