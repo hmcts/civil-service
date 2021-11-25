@@ -78,7 +78,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseValidationPartAdmitError() {
+        public void testSpecDefendantResponseAdmitPartClaimValidationError() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmitClaimFastTrack()
                 .build();
@@ -114,7 +114,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrackPartAdmit() {
+        public void testSpecDefendantResponseAdmitPartClaimFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmitClaimFastTrack()
                 .build();
