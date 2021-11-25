@@ -199,7 +199,6 @@ public class CaseDataBuilder {
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
-    private RespondToClaim respondToAdmittedClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -1039,8 +1038,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentFullDefenceFastTrackPartAdmit() {
-        atStateRespondentRespondToClaimPartAdmitFastTrack(RespondentResponseType.PART_ADMISSION);
+    public CaseDataBuilder atStateRespondentPartAdmitClaimFastTrack() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
@@ -1236,18 +1235,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentRespondToClaimFastTrack(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
         respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
-        totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
-        respondent1ClaimResponseType = respondentResponseType;
-        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
-        respondent1ResponseDate = LocalDateTime.now();
-        ccdState = AWAITING_APPLICANT_INTENTION;
-        return this;
-    }
-
-    public CaseDataBuilder atStateRespondentRespondToClaimPartAdmitFastTrack(
-        RespondentResponseType respondentResponseType) {
-        atStateNotificationAcknowledged();
-        respondToAdmittedClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
@@ -1539,7 +1526,7 @@ public class CaseDataBuilder {
             .respondToClaim(respondToClaim)
             //spec route
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
-            .respondToAdmittedClaim(respondToAdmittedClaim)
+            .respondToAdmittedClaim(respondToClaim)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)

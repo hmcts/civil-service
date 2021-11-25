@@ -80,7 +80,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testSpecDefendantResponseValidationPartAdmitError() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceFastTrackPartAdmit()
+                .atStateRespondentPartAdmitClaimFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
@@ -116,7 +116,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testSpecDefendantResponseFastTrackPartAdmit() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceFastTrackPartAdmit()
+                .atStateRespondentPartAdmitClaimFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");

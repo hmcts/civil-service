@@ -99,7 +99,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            populateRespondentResponseTypeSpecPaidStatus(caseData);
+            caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
             return populateTotalClaimAmount(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -107,7 +107,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    //TODO Duplication Check for the methods to see if it can have a generic ways in the future
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
@@ -125,7 +124,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
+    private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null
             && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
@@ -140,7 +139,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .respondent1ClaimResponsePaymentAdmissionForSpec(
                     RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
         }
-
+        return caseData;
     }
 
     private CallbackResponse populateTotalClaimAmount(CaseData caseData) {
@@ -150,6 +149,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
     }
+
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             CaseData caseData = callbackParams.getCaseData();
