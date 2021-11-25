@@ -983,7 +983,6 @@ class EventHistoryMapperTest {
                 .asList().containsExactlyInAnyOrder(
                     expectedDirectionsQuestionnaireRespondent,
                     expectedDirectionsQuestionnaireApplicant);
-
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -1078,7 +1077,6 @@ class EventHistoryMapperTest {
                 .asList().containsExactlyInAnyOrder(
                     expectedDirectionsQuestionnaireRespondent,
                     expectedDirectionsQuestionnaireApplicant);
-
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
