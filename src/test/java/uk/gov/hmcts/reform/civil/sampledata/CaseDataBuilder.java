@@ -1038,7 +1038,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentPartAdmitClaimFastTrack() {
+    public CaseDataBuilder atStateRespondentAdmitPartOfClaimFastTrack() {
         atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
