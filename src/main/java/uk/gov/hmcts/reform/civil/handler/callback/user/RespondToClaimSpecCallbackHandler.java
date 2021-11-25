@@ -99,27 +99,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-
-            if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-                && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
-            } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-                .equals(caseData.getDefenceRouteRequired())
-                && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-                && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
-            }
-
-            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                             null);
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
-                .build();
+            populateRespondentResponseTypeSpecPaidStatus(caseData);
+            return populateTotalClaimAmount(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
@@ -137,17 +118,38 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                             null);
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
-                .build();
+            return populateTotalClaimAmount(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
     }
 
+    private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
+        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
+            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+        } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(caseData.getDefenceRouteRequired())
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
+            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+        }
+
+    }
+
+    private CallbackResponse populateTotalClaimAmount(CaseData caseData) {
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                                                                         null);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
+            .build();
+    }
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             CaseData caseData = callbackParams.getCaseData();
