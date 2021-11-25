@@ -8,13 +8,13 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 
-
 public class Hearing extends BaseHearing {
 
     private final List<Element<UnavailableDate>> unavailableDates;
 
     @Builder(toBuilder = true)
-    public Hearing(HearingLength hearingLength, String hearingLengthHours, String hearingLengthDays, YesOrNo unavailableDatesRequired, List<Element<UnavailableDate>> unavailableDates) {
+    public Hearing(HearingLength hearingLength, String hearingLengthHours, String hearingLengthDays,
+                   YesOrNo unavailableDatesRequired, List<Element<UnavailableDate>> unavailableDates) {
         super(hearingLength, hearingLengthHours, hearingLengthDays, unavailableDatesRequired);
         this.unavailableDates = unavailableDates;
     }
