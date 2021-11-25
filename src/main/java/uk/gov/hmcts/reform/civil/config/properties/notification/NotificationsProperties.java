@@ -34,7 +34,16 @@ public class NotificationsProperties {
     private String respondentSolicitorAcknowledgeClaim;
 
     @NotEmpty
+    private String respondentSolicitorAcknowledgeClaimForSpec;
+
+    @NotEmpty
+    private String applicantSolicitorAcknowledgeClaimForSpec;
+
+    @NotEmpty
     private String failedPayment;
+
+    @NotEmpty
+    private String failedPaymentForSpec;
 
     @NotEmpty
     private String solicitorClaimDismissed;
@@ -46,6 +55,12 @@ public class NotificationsProperties {
     private String claimantSolicitorAgreedExtensionDate;
 
     @NotEmpty
+    private String claimantSolicitorAgreedExtensionDateForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorAgreedExtensionDateForSpec;
+
+    @NotEmpty
     private String claimantSolicitorConfirmsToProceed;
 
     @NotEmpty
@@ -55,7 +70,16 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnline;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
     private String solicitorCaseTakenOffline;
+
+    @NotEmpty
+    private String solicitorCaseTakenOfflineForSpec;
 
     @NotEmpty
     private String solicitorLitigationFriendAdded;

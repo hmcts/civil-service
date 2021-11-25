@@ -69,7 +69,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
@@ -90,7 +90,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -243,7 +243,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_withBothSolicitorOptionSelected()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                     .build();
 
                 CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
@@ -264,7 +264,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingOneParty_whenInvoked() {
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_withOneSolicitorOptionSelected()
+                    .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                     .build();
 
                 CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
