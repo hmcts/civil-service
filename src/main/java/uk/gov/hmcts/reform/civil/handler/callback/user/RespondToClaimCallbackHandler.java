@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -37,19 +36,14 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Service
 @RequiredArgsConstructor
@@ -182,19 +176,19 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .respondent2ResponseDate(responseDate);
             // only represents 2nd respondent - need to wait for respondent 1 before setting applicant response deadline
         }
-            updatedData.respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        updatedData.respondent1ResponseDate(responseDate)
+            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
+            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .build();
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQStatementOfTruth(statementOfTruth)
+            .build();
 
-            updatedData.respondent1DQ(dq);
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        updatedData.respondent1DQ(dq);
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

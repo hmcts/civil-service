@@ -663,8 +663,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         "<br /> The Claimant legal representative will get a notification to confirm you have "
                             + "provided the Defendant defence. You will be CC'ed.%n"
                             + "The Claimant has until %s to discontinue or proceed with this claim",
-                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
-                        + exitSurveyContentService.respondentSurvey())
+                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE)
+                    )
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }
