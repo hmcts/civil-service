@@ -100,7 +100,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
-            return populateTotalClaimAmount(caseData);
+            return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
@@ -117,7 +117,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            return populateTotalClaimAmount(caseData);
+            return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
@@ -142,7 +142,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return caseData;
     }
 
-    private CallbackResponse populateTotalClaimAmount(CaseData caseData) {
+    private CallbackResponse populateAllocatedTrack(CaseData caseData) {
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
                                                                          null);
         return AboutToStartOrSubmitCallbackResponse.builder()
