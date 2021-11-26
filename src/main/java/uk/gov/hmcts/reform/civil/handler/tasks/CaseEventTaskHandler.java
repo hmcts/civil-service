@@ -80,30 +80,41 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             .build();
     }
 
+    private boolean checkIsMultipartyAndIfRespondentsResponseIsNotSame(Map data) {
+        if (featureToggleService.isMultipartyEnabled()) {
+            System.out.println("Inside Multiparty");
+            try {
+                if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))
+                    && Objects.nonNull(data.get("respondent1ClaimResponseType"))
+                    != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
+                    return true;
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException("Invalid data " + e);
+            }
+        }
+        return false;
+    }
+
     private String getSummary(String eventId, String state, Map data) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
 
-            if (featureToggleService.isMultipartyEnabled()) {
-                try {
-                    if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))) {
-                        if (Objects.nonNull(data.get("respondent1ClaimResponseType"))
-                            != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
-                            return "RPA Reason: Divergent response";
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new IllegalStateException("Invalid data " + e);
-                }
-            }
+
 
             switch (flowState) {
                 case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Divergent response.";
                 case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant.";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
