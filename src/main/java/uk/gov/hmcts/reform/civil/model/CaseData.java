@@ -10,15 +10,24 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,6 +70,7 @@ public class CaseData implements MappableObject {
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
+    private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
     private final String personalInjuryTypeOther;
@@ -85,6 +95,13 @@ public class CaseData implements MappableObject {
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    private final Document specClaimTemplateDocumentFiles;
+    private final Document specClaimDetailsDocumentFiles;
+    private final List<Evidence> speclistYourEvidenceList;
+    private final YesOrNo specApplicantCorrespondenceAddressRequired;
+    private final Address specApplicantCorrespondenceAddressdetails;
+    private final YesOrNo specRespondentCorrespondenceAddressRequired;
+    private final Address specRespondentCorrespondenceAddressdetails;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
@@ -100,6 +117,48 @@ public class CaseData implements MappableObject {
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
+    private final List<ClaimAmountBreakup> claimAmountBreakup;
+    private final List<TimelineOfEvents> timelineOfEvents;
+    private BigDecimal totalClaimAmount;
+    private BigDecimal totalInterest;
+    private final YesOrNo claimInterest;
+    private final InterestClaimOptions interestClaimOptions;
+    private final SameRateInterestSelection sameRateInterestSelection;
+    private final BigDecimal breakDownInterestTotal;
+    private final String breakDownInterestDescription;
+    private final InterestClaimFromType interestClaimFrom;
+    private final InterestClaimUntilType interestClaimUntil;
+    private final LocalDate interestFromSpecificDate;
+    private final String interestFromSpecificDateDescription;
+    private final String calculatedInterest;
+    private final String specRespondentSolicitor1EmailAddress;
+    private final YesOrNo specAoSApplicantCorrespondenceAddressRequired;
+    private final Address specAoSApplicantCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
+    private final Address specAoSRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specRespondent1Represented;
+    private final List<TimelineOfEvents> specResponseTimelineOfEvents;
+    private final String specClaimResponseTimelineList;
+    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final List<Evidence> specResponselistYourEvidenceList;
+
+    private final String detailsOfWhyDoesYouDisputeTheClaim;
+
+    private final ResponseDocument respondent1SpecDefenceResponseDocument;
+
+    private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final String defenceRouteRequired;
+    private final String responseClaimTrack;
+    private final RespondToClaim respondToClaim;
+    // Fields related to ROC-9453 & ROC-9455
+    private final YesOrNo responseClaimMediationSpecRequired;
+    private final YesOrNo responseClaimExpertSpecRequired;
+    private final String responseClaimWitnesses;
+    private final YesOrNo smallClaimHearingInterpreterRequired;
+    private final String smallClaimHearingInterpreterDescription;
+
+    @JsonUnwrapped
+    private final ExpertRequirements respondToClaimExperts;
 
     private final String caseNote;
     private final List<Element<CaseNote>> caseNotes;
@@ -125,6 +184,7 @@ public class CaseData implements MappableObject {
     }
 
     private final LitigationFriend respondent1LitigationFriend;
+    private final LitigationFriend respondent2LitigationFriend;
 
     private final YesOrNo applicant1LitigationFriendRequired;
     private final LitigationFriend applicant1LitigationFriend;
@@ -162,8 +222,11 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
+    private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
 
     private final YesOrNo isRespondent1;
+
+    private final List<IdValue<Bundle>> caseBundles;
 }

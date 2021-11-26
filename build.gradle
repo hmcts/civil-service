@@ -76,7 +76,7 @@ allprojects {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.5.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
@@ -228,8 +228,8 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/CivilDocumentStitchingService.java, **/CountriesAllowed.java, **/FeesService.java, **/UnavailableDateValidator.java, **/AcknowledgeOfServiceCallbackHandler.java, **/FlowPredicate.java, **/CreateClaimCallbackHandler.java, **/CaseProceedsInCasemanRespondentNotificationHandler.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java, **/*Spec*.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }
@@ -350,9 +350,9 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.0.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.0.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.1.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

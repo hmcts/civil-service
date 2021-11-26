@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -79,6 +80,8 @@ class RoboticsNotificationServiceTest {
     IdamClient idamClient;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     @Test
     @SneakyThrows
