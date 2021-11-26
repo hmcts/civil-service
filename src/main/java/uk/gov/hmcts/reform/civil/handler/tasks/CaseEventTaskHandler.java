@@ -87,7 +87,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             if (featureToggleService.isMultipartyEnabled()) {
                 try {
                     if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))) {
-                        if (Objects.nonNull(data.get("respondent1ClaimResponseType")) != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
+                        if (Objects.nonNull(data.get("respondent1ClaimResponseType"))
+                            != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
                             return "RPA Reason: Divergent response";
                         }
                     }
@@ -95,7 +96,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     throw new IllegalStateException("Invalid data " + e);
                 }
             }
-
 
             switch (flowState) {
                 case FULL_ADMISSION:
