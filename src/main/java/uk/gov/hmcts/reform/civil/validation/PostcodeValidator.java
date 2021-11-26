@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.service.postcode.PostcodeLookupService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class PostcodeValidator {
@@ -26,7 +27,8 @@ public class PostcodeValidator {
             then this check needs to be modified accordingly.
             For more details, refer to https://tools.hmcts.net/jira/browse/ROC-9113
             */
-            if (postcode.toUpperCase().trim().startsWith("BT") || !(postcodeLookupService.validatePostCodeForDefendant(
+            if (postcode.toUpperCase(Locale.UK).trim().startsWith("BT")
+                || !(postcodeLookupService.validatePostCodeForDefendant(
                 postcode))) {
                 errors.add("Postcode must be in England or Wales");
             }
