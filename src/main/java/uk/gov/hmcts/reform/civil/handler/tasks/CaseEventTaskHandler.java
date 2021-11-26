@@ -99,9 +99,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private String getSummary(String eventId, String state, Map data) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
-
-
-
             switch (flowState) {
                 case FULL_ADMISSION:
                     return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
