@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -36,6 +37,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
 
     private CaseData data;
 
@@ -82,10 +84,18 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
 
-            if (data.get("addRespondent2").equals("Yes")
-                && data.get("respondent1ClaimResponseType") != data.get("respondent2ClaimResponseType")) {
-                return "RPA Reason: Divergent response";
+            if (featureToggleService.isMultipartyEnabled()) {
+                try {
+                    if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))) {
+                        if (Objects.nonNull(data.get("respondent1ClaimResponseType")) != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
+                            return "RPA Reason: Divergent response";
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new IllegalStateException("Invalid data " + e);
+                }
             }
+
 
             switch (flowState) {
                 case FULL_ADMISSION:
