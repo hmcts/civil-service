@@ -14,11 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
@@ -80,6 +76,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -282,6 +279,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .confirmationHeader(
                 format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
+            .build();
+    }
+
+    private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                                                                .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 }
