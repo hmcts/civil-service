@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -37,7 +36,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
 
     private CaseData data;
 
@@ -73,45 +71,23 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState, data))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState))
                        .description(getDescription(startEventResponse.getEventId(), data))
                        .build())
             .data(data)
             .build();
     }
 
-    private boolean checkIsMultipartyAndIfRespondentsResponseIsNotSame(Map data) {
-        if (featureToggleService.isMultipartyEnabled()) {
-            System.out.println("Inside Multiparty");
-            try {
-                if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))
-                    && Objects.nonNull(data.get("respondent1ClaimResponseType"))
-                    != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
-                    return true;
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException("Invalid data " + e);
-            }
-        }
-        return false;
-    }
-
-    private String getSummary(String eventId, String state, Map data) {
+    private String getSummary(String eventId, String state) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             switch (flowState) {
                 case FULL_ADMISSION:
-                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
-                        ? "RPA Reason: Defendant fully admits."
-                        : "RPA Reason: Divergent response.";
+                    return "RPA Reason: Defendant fully admits.";
                 case PART_ADMISSION:
-                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
-                        ? "RPA Reason: Defendant fully admits."
-                        : "RPA Reason: Defendant partial admission.";
+                    return "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
-                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
-                        ? "RPA Reason: Defendant fully admits."
-                        : "RPA Reason: Defendant rejects and counter claims.";
+                    return "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant.";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
