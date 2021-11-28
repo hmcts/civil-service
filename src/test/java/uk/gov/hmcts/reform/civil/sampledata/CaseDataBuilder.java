@@ -540,6 +540,8 @@ public class CaseDataBuilder {
                 return atStateClaimNotified();
             case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 return atStateProceedsOfflineAfterClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimDetailsNotified();
             case CLAIM_DETAILS_NOTIFIED:
                 return atStateClaimDetailsNotified();
             case CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
@@ -835,6 +837,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimDismissedDeadline(LocalDateTime date) {
         this.claimDismissedDeadline = date;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimDetailsNotified() {
+        atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
 

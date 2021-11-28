@@ -128,6 +128,12 @@ public class EventHistoryMapper {
                                 + "claim details within the allowed 2 weeks."
                         );
                         break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                        buildOfflineAfterClaimsDetailsNotified(
+                            builder,
+                            caseData
+                        );
+                        break;
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
                         break;
@@ -452,6 +458,21 @@ public class EventHistoryMapper {
                     .build()
             ));
     }
+    private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
+    }
+
 
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
