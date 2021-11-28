@@ -458,6 +458,7 @@ public class EventHistoryMapper {
                     .build()
             ));
     }
+
     private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
             List.of(
@@ -472,7 +473,6 @@ public class EventHistoryMapper {
                     .build()
             ));
     }
-
 
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
