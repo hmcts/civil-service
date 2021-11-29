@@ -14,10 +14,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -311,8 +316,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         CaseData caseData = callbackParams.getCaseData();
 
-        List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-                                                                .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+        List<String> errors = paymentDateValidator
+            .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                          .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 import java.time.LocalDate;
 import javax.validation.constraints.FutureOrPresent;
 
-
 @Data
 @Builder
 public class RespondToClaimAdmitPartLRspec {
