@@ -31,6 +31,7 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
@@ -211,6 +212,9 @@ public class RoboticsDataMapper {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
+        String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
+            ? RESPONDENT_SOLICITOR_ID : null;
+
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -226,7 +230,7 @@ public class RoboticsDataMapper {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                RESPONDENT_SOLICITOR_ID
+                respondent1SolicitorId
             )
         ));
 
@@ -242,9 +246,14 @@ public class RoboticsDataMapper {
         }
 
         if (caseData.getRespondent2() != null) {
-
-            String respondent2SolicitorId = caseData.getRespondent2SameLegalRepresentative() == YES
-                ? RESPONDENT_SOLICITOR_ID : RESPONDENT2_SOLICITOR_ID;
+            String respondent2SolicitorId = null;
+            if (caseData.getRespondent2Represented() == YES
+                && caseData.getRespondent2SameLegalRepresentative() == YES) {
+                respondent2SolicitorId = RESPONDENT_SOLICITOR_ID;
+            } else if (caseData.getRespondent2Represented() == YES
+                && caseData.getRespondent2SameLegalRepresentative() == NO) {
+                respondent2SolicitorId = RESPONDENT2_SOLICITOR_ID;
+            }
             respondentParties.add(buildLitigiousParty(
                 caseData.getRespondent2(),
                 caseData.getRespondent1LitigationFriend(),
