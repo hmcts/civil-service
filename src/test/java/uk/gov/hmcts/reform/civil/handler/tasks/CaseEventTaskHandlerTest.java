@@ -322,10 +322,10 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnRepresentedDefendant();
+                    caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnRegisteredDefendant();
+                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant();
                     break;
                 case FULL_DEFENCE_PROCEED:
                     caseDataBuilder.atStateApplicantRespondToDefenceAndProceed();
