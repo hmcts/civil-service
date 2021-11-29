@@ -53,13 +53,25 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
     private CallbackResponse notifyRespondentSolicitorForCaseProceedsInCaseman(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
-            notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
-                notificationsProperties.getSolicitorCaseTakenOffline(),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
+        if (callbackParams.getRequest().getEventId() != null
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            if (stateFlowEngine.hasSpecTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                    notificationsProperties.getSolicitorCaseTakenOffline(),
+                    addProperties(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
+        } else {
+            if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                    notificationsProperties.getSolicitorCaseTakenOffline(),
+                    addProperties(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

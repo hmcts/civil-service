@@ -61,7 +61,9 @@ public class FlowPredicate {
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
 
     public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
-        caseData.getIssueDate() != null && caseData.getRespondent1OrgRegistered() == NO;
+        caseData.getIssueDate() != null
+            && caseData.getRespondent1OrgRegistered() == NO
+            && caseData.getRespondent1Represented() == YES;
 
     public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
@@ -69,8 +71,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent2OrgRegistered() != YES
-            && caseData.getRespondent2SameLegalRepresentative() != YES;
+            && caseData.getRespondent2OrgRegistered() != YES;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         caseData.getPaymentSuccessfulDate() == null
@@ -102,6 +103,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
+    public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
+        caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null;
+
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
         caseData.getClaimDetailsNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
@@ -114,24 +119,71 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         caseData.getRespondent1AcknowledgeNotificationDate() != null;
-
     public static final Predicate<CaseData> respondent1TimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null;
 
+    public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
+        caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null;
+
     public static final Predicate<CaseData> fullDefence = caseData ->
         caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
+
+    public static final Predicate<CaseData> fullDefenceAfterNotifyDetails = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
+
+    public static final Predicate<CaseData> fullDefenceAfterAcknowledge = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
 
     public static final Predicate<CaseData> fullAdmission = caseData ->
         caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
 
+    public static final Predicate<CaseData> fullAdmissionAfterNotifyDetails = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
+
+    public static final Predicate<CaseData> fullAdmissionAfterAcknowledge = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
+
     public static final Predicate<CaseData> partAdmission = caseData ->
         caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
 
+    public static final Predicate<CaseData> partAdmissionAfterNotifyDetails = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
+
+    public static final Predicate<CaseData> partAdmissionAfterAcknowledge = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
+
     public static final Predicate<CaseData> counterClaim = caseData ->
         caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
+
+    public static final Predicate<CaseData> counterClaimAfterNotifyDetails = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
+
+    public static final Predicate<CaseData> counterClaimAfterAcknowledge = caseData ->
+        caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
 
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
