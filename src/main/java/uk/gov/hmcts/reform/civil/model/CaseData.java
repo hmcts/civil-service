@@ -187,6 +187,7 @@ public class CaseData implements MappableObject {
     }
 
     private final LitigationFriend respondent1LitigationFriend;
+    private final LitigationFriend respondent2LitigationFriend;
 
     private final YesOrNo applicant1LitigationFriendRequired;
     private final LitigationFriend applicant1LitigationFriend;

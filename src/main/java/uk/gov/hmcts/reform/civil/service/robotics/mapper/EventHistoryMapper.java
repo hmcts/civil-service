@@ -66,6 +66,7 @@ public class EventHistoryMapper {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
                 switch (flowState) {
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
+                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
                         break;
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
