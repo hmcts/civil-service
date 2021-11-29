@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.config.PostcodeLookupConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CountriesAllowed;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -36,10 +37,10 @@ public class PostcodeLookupService {
     }
 
     public boolean validatePostCodeForDefendant(String postcode) {
-        String countryName = fetchCountryFromPostCode(postcode.toUpperCase());
+        String countryName = fetchCountryFromPostCode(postcode.toUpperCase(Locale.UK));
         return (countryName != null
-            && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase())
-            || CountriesAllowed.WALES.name().equals(countryName.toUpperCase())));
+            && (CountriesAllowed.ENGLAND.name().equals(countryName.toUpperCase(Locale.UK))
+            || CountriesAllowed.WALES.name().equals(countryName.toUpperCase(Locale.UK))));
     }
 
     private String fetchCountryFromPostCode(String postcode) {
