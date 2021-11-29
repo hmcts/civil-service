@@ -75,9 +75,9 @@ public class RoboticsNotificationService {
 
         return EmailData.builder()
             .message(String.format(
-                "Mulitparty claim data for %s",
+                "Multiparty claim data for %s",
                 caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
-            .subject(String.format("Mulitparty claim data for %s", caseData.getLegacyCaseReference()
+            .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
                 + " - " + caseData.getCcdState() + " - " + triggerEvent))
             .to(roboticsEmailConfiguration.getMultipartyrecipient())
             .build();
