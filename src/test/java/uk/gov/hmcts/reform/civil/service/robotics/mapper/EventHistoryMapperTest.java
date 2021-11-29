@@ -173,6 +173,54 @@ class EventHistoryMapperTest {
     }
 
     @Nested
+    class NotifyClaimDetailsRpaHandedOffline {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenPastApplicantResponseDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimDetailsNotified().build();
+            List<Event> expectedEvent = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(expectedEvent.get(0), expectedEvent.get(1));
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
     class NotifyClaimDetailsRpaContinuousFeed {
 
         @BeforeEach
