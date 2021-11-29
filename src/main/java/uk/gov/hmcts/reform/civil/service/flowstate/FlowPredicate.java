@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
