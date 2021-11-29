@@ -253,7 +253,7 @@ jacocoTestReport.dependsOn {
 
 def versions = [
   junit              : '5.7.0',
-  junitPlatform      : '1.8.1',
+  junitPlatform      : '1.8.2',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.0.0.M2',
