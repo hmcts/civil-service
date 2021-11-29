@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -131,14 +132,12 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
-    public static boolean checkIfRespondentsResponseIsNotSame(CaseData caseDate, RespondentResponseType responseType) {
-        return responseType != FULL_DEFENCE
-            && Arrays.asList(
-            caseDate.getRespondent2ClaimResponseType(),
-            caseDate.getRespondent1ClaimResponseType()
-        ).contains(responseType)
-            && caseDate.getRespondent1ClaimResponseType() != caseDate.getRespondent2ClaimResponseType();
-    }
+    public static final Predicate<CaseData> divergentRespond = caseData ->
+        getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
+        && caseData.getRespondent1ResponseDate() != null
+        && caseData.getRespondent2ResponseDate() != null
+        && caseData.getRespondentResponseIsSame() == NO
+        && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
 
     private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
@@ -148,10 +147,6 @@ public class FlowPredicate {
             case ONE_V_TWO_ONE_LEGAL_REP:
                 predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
                     || caseData.getRespondent2ClaimResponseType() == responseType);
-
-                if (predicate == false) {
-                    predicate = checkIfRespondentsResponseIsNotSame(caseData, responseType);
-                }
                 break;
             case ONE_V_ONE:
                 predicate = basePredicate;
