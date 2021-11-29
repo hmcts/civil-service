@@ -1380,6 +1380,21 @@ public class EventHistoryMapper {
             ));
     }
 
+    private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
+    }
+
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<String> unregisteredDefendantsNames;
 
