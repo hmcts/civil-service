@@ -26,6 +26,7 @@ public class Respondent1DQ implements DQ {
     private final FurtherInformation respondent1DQFurtherInformation;
     private final WelshLanguageRequirements respondent1DQLanguage;
     private final StatementOfTruth respondent1DQStatementOfTruth;
+    private final FutureApplications respondent1DQFutureApplications;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -109,5 +110,10 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return respondent1DQStatementOfTruth;
+    }
+
+    @JsonProperty("respondent1DQFutureApplications")
+    public FutureApplications getFutureApplications() {
+        return respondent1DQFutureApplications;
     }
 }
