@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -71,23 +72,46 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState, data))
                        .description(getDescription(startEventResponse.getEventId(), data))
                        .build())
             .data(data)
             .build();
     }
 
-    private String getSummary(String eventId, String state) {
+    private final FeatureToggleService featureToggleService;
+
+    private boolean checkIsMultipartyAndIfRespondentsResponseIsNotSame(Map data) {
+        if (featureToggleService.isMultipartyEnabled()) {
+            try {
+                if (Objects.nonNull(data.get("addRespondent2").equals("Yes"))
+                    && Objects.nonNull(data.get("respondent1ClaimResponseType"))
+                    != Objects.nonNull(data.get("respondent2ClaimResponseType"))) {
+                    return true;
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException("Invalid data " + e);
+            }
+        }
+        return false;
+    }
+
+    private String getSummary(String eventId, String state, Map data) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             switch (flowState) {
                 case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Divergent response.";
                 case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
+                    return checkIsMultipartyAndIfRespondentsResponseIsNotSame(data)
+                        ? "RPA Reason: Defendant fully admits."
+                        : "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant.";
