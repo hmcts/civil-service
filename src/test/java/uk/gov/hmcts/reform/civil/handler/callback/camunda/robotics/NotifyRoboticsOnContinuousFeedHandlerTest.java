@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -66,6 +67,8 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     @Nested
     class ValidJsonPayload {
@@ -77,10 +80,9 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData);
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
         }
     }
 

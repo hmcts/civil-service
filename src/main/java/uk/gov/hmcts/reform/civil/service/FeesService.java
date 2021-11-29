@@ -34,6 +34,8 @@ public class FeesService {
         );
     }
 
+    // WARNING! the following function buildFeeDto is being used by both damages and specified claims,
+    // any changes to the below code may break the code, please check with respective teams before making changes
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
             .multiply(PENCE_PER_POUND)
@@ -45,4 +47,21 @@ public class FeesService {
             .version(feeLookupResponseDto.getVersion().toString())
             .build();
     }
+
+    //calculate fee for specified claim total amount
+    public Fee getFeeDataByTotalClaimAmount(BigDecimal totalClaimAmount) {
+        FeeLookupResponseDto feeLookupResponseDto = specLookupFee(totalClaimAmount);
+
+        return buildFeeDto(feeLookupResponseDto);
+    }
+
+    //lookup fee for specified claim total amount
+    private FeeLookupResponseDto specLookupFee(BigDecimal totalClaimAmount) {
+        return feesClient.lookupFee(
+            feesConfiguration.getChannel(),
+            feesConfiguration.getEvent(),
+            totalClaimAmount.setScale(2)
+        );
+    }
+
 }

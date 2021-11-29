@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +24,10 @@ public class NotifyRoboticsOnContinuousFeedHandler extends NotifyRoboticsHandler
     public NotifyRoboticsOnContinuousFeedHandler(
         RoboticsNotificationService roboticsNotificationService,
         JsonSchemaValidationService jsonSchemaValidationService,
-        RoboticsDataMapper roboticsDataMapper
+        RoboticsDataMapper roboticsDataMapper,
+        RoboticsDataMapperForSpec roboticsDataMapperForSpec
     ) {
-        super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper);
+        super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec);
     }
 
     @Override

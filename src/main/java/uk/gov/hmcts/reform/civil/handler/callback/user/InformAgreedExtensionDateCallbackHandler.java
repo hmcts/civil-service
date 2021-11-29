@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -56,6 +57,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
+    public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -94,10 +96,16 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
         //TODO: update to get correct deadline as a part of CMC-1346
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
-            .build();
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
+            var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
+                .build();
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
+                .build();
+        }
     }
 
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
@@ -152,12 +160,20 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String body;
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
-        String body = format(
-            "<br />You must respond to the claimant by %s",
-            formatLocalDateTime(responseDeadline, DATE_TIME_AT)
-        ) + exitSurveyContentService.respondentSurvey();
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
+            body = format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
+                formatLocalDateTime(responseDeadline, DATE_TIME_AT)
+            ) + exitSurveyContentService.respondentSurvey();
+        } else {
+            body = format(
+                "<br />You must respond to the claimant by %s",
+                formatLocalDateTime(responseDeadline, DATE_TIME_AT)
+            ) + exitSurveyContentService.respondentSurvey();
+        }
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Extension deadline submitted")
             .confirmationBody(body)
