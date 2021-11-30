@@ -3,9 +3,15 @@ package uk.gov.hmcts.reform.civil.model.dq;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Data
@@ -28,6 +34,8 @@ public class Respondent1DQ implements DQ {
     private final WelshLanguageRequirements respondent1DQLanguage;
     private final StatementOfTruth respondent1DQStatementOfTruth;
     private final FutureApplications respondent1DQFutureApplications;
+    @Getter(onMethod_ = @JsonProperty("respondent1BankAccountList"))
+    private final List<Element<AccountSimple>> bankAccountList = new ArrayList<>();
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
