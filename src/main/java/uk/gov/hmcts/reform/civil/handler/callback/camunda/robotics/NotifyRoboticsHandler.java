@@ -9,15 +9,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
@@ -25,15 +29,26 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final RoboticsNotificationService roboticsNotificationService;
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        RoboticsCaseData roboticsCaseData = null;
+        RoboticsCaseDataSpec roboticsCaseDataSpec = null;
+        Set<ValidationMessage> errors = null;
 
+        CaseData caseData = callbackParams.getCaseData();
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            Set<ValidationMessage> errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
-            if (errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData);
+
+            if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+            } else {
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
+            }
+
+            if (errors == null || errors.isEmpty()) {
+                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),

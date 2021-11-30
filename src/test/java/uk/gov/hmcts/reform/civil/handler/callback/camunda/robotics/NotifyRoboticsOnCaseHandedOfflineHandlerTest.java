@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 @SpringBootTest(classes = {
     NotifyRoboticsOnCaseHandedOfflineHandler.class,
@@ -77,12 +79,15 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
+            boolean multiPartyScenario = isMultiPartyScenario(caseData);
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData);
+            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario);
         }
     }
+
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     @Nested
     class InValidJsonPayload {

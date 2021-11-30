@@ -78,21 +78,6 @@ data "azurerm_key_vault" "cmc_vault" {
   resource_group_name = "cmc-${var.env}"
 }
 
-data "azurerm_key_vault_secret" "db_password_secret" {
-  key_vault_id = "${data.azurerm_key_vault.cmc_vault.id}"
-  name = "cmc-db-password"
-}
-
-resource "azurerm_key_vault_secret" "civil_db_password_secret" {
-  name         = "cmc-db-password"
-  value        = data.azurerm_key_vault_secret.db_password_secret.value
-  key_vault_id = module.key-vault.key_vault_id
-
-  depends_on = [
-    module.key-vault
-  ]
-}
-
 data "azurerm_key_vault_secret" "db_password_v11_secret" {
   key_vault_id = "${data.azurerm_key_vault.cmc_vault.id}"
   name = "cmc-db-password-v11"

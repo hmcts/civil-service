@@ -24,6 +24,9 @@ public class OrganisationService {
     private final IdamClient idamClient;
     private final PrdAdminUserConfiguration userConfig;
 
+    //WARNING! below function findOrganisation is being used by both damages and specified claims,
+    // changes to this code may break one of the claim journeys, check with respective teams before changing it
+
     public Optional<Organisation> findOrganisation(String authToken) {
         try {
             return ofNullable(organisationApi.findUserOrganisation(authToken, authTokenGenerator.generate()));
@@ -34,6 +37,8 @@ public class OrganisationService {
         }
     }
 
+    //WARNING! below function findOrganisationById is being used by both damages and specified claims,
+    // changes to this code may break one of the claim journeys, check with respective teams before changing it
     public Optional<Organisation> findOrganisationById(String id) {
         String authToken = idamClient.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
         try {

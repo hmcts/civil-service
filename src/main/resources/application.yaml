@@ -113,9 +113,26 @@ notifications:
   claimantSolicitorClaimContinuingOnline: "eacc12e2-c4b9-470c-bf49-23441bcd8386"
   solicitorCaseTakenOffline: "976d4b4a-43e0-498a-8c1e-8a0dc48e7fe8"
   solicitorLitigationFriendAdded: "b659b48e-2585-4162-911e-4166b51c3d0e"
+  claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
+  respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
+  failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
+  solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
+  applicantSolicitorAcknowledgeClaimForSpec: "a33e1b0a-42d8-46b2-8773-6fd84a9b8b01"
+  respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
+  claimantSolicitorAgreedExtensionDateForSpec: "74e33576-487f-4c63-bdef-fe12c4279faa"
+  respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
+
+os-postcode-lookup:
+  url: https://api.os.uk/search/names/v1/find
+  key: ${OS_POSTCODE_LOOKUP_API_KEY:}
+  offline-mode: false
+
+stitching:
+  api:
+    url: http://localhost:8084/api/stitch-ccd-bundles
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
@@ -204,6 +221,7 @@ robotics:
   notification:
     sender: hmcts.civil@gmail.com
     recipient: hmcts.civil+robotics@gmail.com
+    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
 ---
 
 spring:
