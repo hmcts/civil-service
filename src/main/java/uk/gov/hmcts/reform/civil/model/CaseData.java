@@ -182,7 +182,7 @@ public class CaseData implements MappableObject {
             || businessProcess.getStatus() == null
             || businessProcess.getStatus() == FINISHED;
     }
-
+    private final LitigationFriend genericLitigationFriend;
     private final LitigationFriend respondent1LitigationFriend;
     private final LitigationFriend respondent2LitigationFriend;
 

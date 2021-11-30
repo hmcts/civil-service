@@ -56,7 +56,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
-       //     callbackKey(V_1,ABOUT_TO_SUBMIT), this:: checkField,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation,
             callbackKey(V_1, SUBMITTED), this::buildConfirmationWithSolicitorOptions
@@ -74,7 +73,15 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         if (caseDataUpdated.getSelectLitigationFriend().getValue().getLabel().contains("Both")
             || caseDataUpdated.getSelectLitigationFriend().getValue().getLabel().contains("Respondent One:")
         ) {
-            //respondent1LitigationFriend + add the date (as we do already)
+            System.out.println(caseDataUpdated
+                                   .toBuilder()
+                                   .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
+                                   .respondent1LitigationFriendDate(LocalDateTime.now())
+                                   .respondent1LitigationFriendCreatedDate(
+                                       ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                                           .orElse(LocalDateTime.now()))
+                                   + "Both or respondent one -----------------------------"
+            );
             caseDataUpdated
                 .toBuilder()
                 .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
@@ -84,7 +91,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                         .orElse(LocalDateTime.now()))
                 .build();
 
-        }else{
+        } else {
             //respondent2LitigationFriend + add the date it was added
             caseDataUpdated
                 .toBuilder()
@@ -93,29 +100,13 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                 .respondent2LitigationFriendCreatedDate(
                     ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
                         .orElse(LocalDateTime.now()))
+                .respondent2LitigationFriend(caseDataUpdated.getRespondent1LitigationFriend())
+                .respondent1LitigationFriend(null)
                 .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse checkField(CallbackParams callbackParams){
-        CaseData caseData = callbackParams.getCaseData();
-        if(nonNull(caseData.getApplicant1().getPartyName())){
-            caseData.getApplicant1().getPartyName();
-        }else if(nonNull(caseData.getApplicant1().getPartyName())){
-            caseData.getApplicant2().getPartyName();
-        }else{
-            caseData.getApplicant1().getPartyName();
-            caseData.getApplicant2().getPartyName();
-        }
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

@@ -188,6 +188,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
+    protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
@@ -509,6 +510,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
         this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(defaultValue)
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder defendantSolicitorSelectLitigationFriend(String defaultValue) {
+        this.selectLitigationFriend = DynamicList.builder()
             .value(DynamicListElement.builder()
                        .label(defaultValue)
                        .build())
@@ -939,6 +949,13 @@ public class CaseDataBuilder {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Defendant One: Solicitor");
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        defendantSolicitorSelectLitigationFriend("Both");
         return this;
     }
 
