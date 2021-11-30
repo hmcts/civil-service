@@ -175,6 +175,43 @@ class EventHistoryMapperTest {
     }
 
     @Nested
+    class NotifyClaimRpaHandedOffline {
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenNotifyClaimRpaHandedOffline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimNotified().build();
+            Event expectedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getSubmittedDate())
+                .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Only one of the respondent is notified.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(expectedEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
     class NotifyClaimDetailsRpaHandedOffline {
 
         @Test
