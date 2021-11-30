@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -215,9 +215,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+
         } else {
-            Hearing hearing = caseData.getRespondent1DQ().getRespondent1DQHearing();
-            errors = unavailableDateValidator.validate(hearing);
+            HearingLRspec hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
+            errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
