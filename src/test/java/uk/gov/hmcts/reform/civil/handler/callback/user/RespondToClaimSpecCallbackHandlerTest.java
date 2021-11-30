@@ -218,6 +218,25 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+            when(validator.validate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getData()).isNull();
+            assertThat(response.getErrors()).isNotNull();
+            assertEquals(1, response.getErrors().size());
+            assertEquals("Validation error", response.getErrors().get(0));
+        }
+
+        @Test
         public void testSpecDefendantResponseFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
@@ -1055,6 +1074,24 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .doesNotHaveToString("sameSolicitorSameResponse");
+        }
+
+        @Test
+        public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
     }
 }
