@@ -66,6 +66,7 @@ public class EventHistoryMapper {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
                 switch (flowState) {
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
+                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
                         break;
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
@@ -76,6 +77,9 @@ public class EventHistoryMapper {
                         break;
                     case CLAIM_NOTIFIED:
                         buildClaimantHasNotifiedDefendant(builder, caseData);
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                        buildTakenOfflineAfterClaimNotified(builder, caseData);
                         break;
                     case CLAIM_DETAILS_NOTIFIED:
                         buildClaimDetailsNotified(builder, caseData);
@@ -125,6 +129,12 @@ public class EventHistoryMapper {
                             caseData,
                             "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
                                 + "claim details within the allowed 2 weeks."
+                        );
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                        buildOfflineAfterClaimsDetailsNotified(
+                            builder,
+                            caseData
                         );
                         break;
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
@@ -339,6 +349,21 @@ public class EventHistoryMapper {
                 .build());
     }
 
+    private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
+    }
+
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.replyToDefence(List.of(
             Event.builder()
@@ -447,6 +472,21 @@ public class EventHistoryMapper {
                     .eventDetailsText("RPA Reason: Unrepresented defendant.")
                     .eventDetails(EventDetails.builder()
                                       .miscText("RPA Reason: Unrepresented defendant.")
+                                      .build())
+                    .build()
+            ));
+    }
+
+    private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
                                       .build())
                     .build()
             ));
