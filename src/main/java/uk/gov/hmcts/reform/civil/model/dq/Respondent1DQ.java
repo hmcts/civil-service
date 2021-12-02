@@ -28,7 +28,6 @@ public class Respondent1DQ implements DQ {
     private final WelshLanguageRequirements respondent1DQLanguage;
     private final StatementOfTruth respondent1DQStatementOfTruth;
     private final FutureApplications respondent1DQFutureApplications;
-    private final EmploymentTypeComplexTypeDQLRspec respondToClaimAdmitPartEmploymentTypeLRspec;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -117,10 +116,5 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQFutureApplications")
     public FutureApplications getFutureApplications() {
         return respondent1DQFutureApplications;
-    }
-
-    @JsonProperty("respondToClaimAdmitPartEmploymentTypeLRspec")
-    public EmploymentTypeComplexTypeDQLRspec getRespondToClaimAdmitPartEmploymentTypeLRspec() {
-        return respondToClaimAdmitPartEmploymentTypeLRspec;
     }
 }
