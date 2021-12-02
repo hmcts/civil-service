@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -165,7 +166,7 @@ public class CaseData implements MappableObject {
     private final String responseClaimWitnesses;
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
-    private final List<String> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped
