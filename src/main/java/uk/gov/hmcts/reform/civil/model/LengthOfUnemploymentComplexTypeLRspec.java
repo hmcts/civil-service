@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class LengthOfUnemploymentComplexTypeLRspec {
 
-private final String numberOfYearsInUnemployment;
-private final String numberOfMonthsInUnemployment;
+    private final String numberOfYearsInUnemployment;
+    private final String numberOfMonthsInUnemployment;
 }
