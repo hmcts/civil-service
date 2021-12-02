@@ -189,6 +189,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
+    protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
@@ -511,6 +512,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
         this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(defaultValue)
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder selectLitigationFriend(String defaultValue) {
+        this.selectLitigationFriend = DynamicList.builder()
             .value(DynamicListElement.builder()
                        .label(defaultValue)
                        .build())
@@ -935,6 +945,20 @@ public class CaseDataBuilder {
         respondent1Represented = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend("Both");
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentTwo() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend("Respondent Two:");
         return this;
     }
 
@@ -1662,6 +1686,7 @@ public class CaseDataBuilder {
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
+            .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)

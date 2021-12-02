@@ -162,7 +162,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
 
-    private final String additionalInformationForJudge;
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 
@@ -189,6 +188,7 @@ public class CaseData implements MappableObject {
             || businessProcess.getStatus() == FINISHED;
     }
 
+    private final LitigationFriend genericLitigationFriend;
     private final LitigationFriend respondent1LitigationFriend;
     private final LitigationFriend respondent2LitigationFriend;
 
@@ -200,7 +200,7 @@ public class CaseData implements MappableObject {
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
     private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
-
+    private final DynamicList selectLitigationFriend;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
 
@@ -230,8 +230,10 @@ public class CaseData implements MappableObject {
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
-    private final LocalDateTime respondent1LitigationFriendCreatedDate;
+    private final LocalDateTime respondent2LitigationFriendDate;
 
+    private final LocalDateTime respondent1LitigationFriendCreatedDate;
+    private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
 
     private final List<IdValue<Bundle>> caseBundles;

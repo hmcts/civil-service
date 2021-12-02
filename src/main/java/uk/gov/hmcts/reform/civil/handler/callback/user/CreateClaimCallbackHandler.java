@@ -118,6 +118,22 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return EVENTS;
     }
 
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+
+        OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
+            .organisation(respondent1OrganisationPolicy.getOrganisation())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+            .build();
+
+        caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
+
+        // Predicate: Def1 registered, Def 2 unregistered.
+        // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+        caseDataBuilder.respondent2OrgRegistered(YES);
+    }
+
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
         String userBearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = onboardingOrganisationControlService.validateOrganisation(userBearerToken);
@@ -256,6 +272,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
+        }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
