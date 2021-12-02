@@ -74,7 +74,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateClaimAcknowledge() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePrepareDefendantSolicitorOptions().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         return this;

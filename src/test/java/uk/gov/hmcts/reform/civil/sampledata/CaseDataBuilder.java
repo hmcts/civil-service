@@ -517,7 +517,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder defendantSolicitorSelectLitigationFriend(String defaultValue) {
+    public CaseDataBuilder selectLitigationFriend(String defaultValue) {
         this.selectLitigationFriend = DynamicList.builder()
             .value(DynamicListElement.builder()
                        .label(defaultValue)
@@ -955,7 +955,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        defendantSolicitorSelectLitigationFriend("Both");
+        selectLitigationFriend("Both");
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentOne() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend("Respondent One:");
         return this;
     }
 
@@ -1288,6 +1295,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePrepareDefendantSolicitorOptions(){
+      //  atStateNotificationAcknowledged();
+
+        atStateAddLitigationFriend_1v2_andAndAddForBoth();
+        return this;
+    }
     public CaseDataBuilder atDeadlinePassedAfterStateNotificationAcknowledged() {
         atStateNotificationAcknowledged();
         this.claimDismissedDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1522,6 +1535,7 @@ public class CaseDataBuilder {
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
+            .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)

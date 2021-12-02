@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -13,13 +15,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDateTime;
+
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -34,6 +42,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
     ExitSurveyContentService.class
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private Time time;
 
     @Autowired
     private AddDefendantLitigationFriendCallbackHandler handler;
@@ -71,23 +82,32 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @Nested
     class AboutToSubmit {
+        private LocalDateTime localDateTime;
+        private LocalDateTime newDate;
+
+        @BeforeEach
+        void setup() {
+            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            newDate = LocalDateTime.of(2020, 1, 15, 16, 0, 0);
+            when(time.now()).thenReturn(localDateTime);
+
+        }
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateAddLitigationFriend_1v2_andAndAddForBoth().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(ADD_DEFENDANT_LITIGATION_FRIEND.name());
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
             assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("status")
-                .isEqualTo("READY");
+                .containsEntry("respondent1LitigationFriendDate", localDateTime.format(ISO_DATE_TIME))
+                .containsEntry("respondent1LitigationFriendCreatedDate", newDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
                 .containsKey("respondent1LitigationFriendDate");
