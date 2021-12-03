@@ -99,9 +99,9 @@ public class StateFlowEngine {
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
 
-    public StateFlow build() {
+    public StateFlow build(FlowState.Main state) {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
-            .initial(DRAFT)
+            .initial(state)
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
                     .set(flags -> flags.putAll(
                         Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
@@ -368,27 +368,13 @@ public class StateFlowEngine {
 
     public StateFlow evaluate(CaseData caseData) {
         if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            return buildSpec().evaluate(caseData);
+            return build(SPEC_DRAFT).evaluate(caseData);
         }
-        return build().evaluate(caseData);
-    }
-
-    public StateFlow evaluateSpec(CaseDetails caseDetails) {
-        return evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
-    }
-
-    public StateFlow evaluateSpec(CaseData caseData) {
-        return buildSpec().evaluate(caseData);
+        return build(DRAFT).evaluate(caseData);
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(name -> name.equals(state.fullName()));
-    }
-
-    public boolean hasSpecTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
-        return evaluateSpec(caseDetails).getStateHistory().stream()
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
     }

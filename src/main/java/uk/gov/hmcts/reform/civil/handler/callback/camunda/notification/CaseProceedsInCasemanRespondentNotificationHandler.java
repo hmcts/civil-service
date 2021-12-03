@@ -55,7 +55,7 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
 
         if (callbackParams.getRequest().getEventId() != null
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            if (stateFlowEngine.hasSpecTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
+            if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
                 notificationService.sendMail(
                     caseData.getRespondentSolicitor1EmailAddress(),
                     notificationsProperties.getSolicitorCaseTakenOffline(),

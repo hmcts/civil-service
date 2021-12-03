@@ -53,13 +53,8 @@ public class EventHistoryMapper {
         List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            states = stateFlowEngine.evaluateSpec(caseData)
-                .getStateHistory();
-        } else {
-            states = stateFlowEngine.evaluate(caseData)
-                .getStateHistory();
-        }
+            states = stateFlowEngine.evaluate(caseData).getStateHistory();
+
         List<State> stateHistory = states;
         stateHistory
             .forEach(state -> {
