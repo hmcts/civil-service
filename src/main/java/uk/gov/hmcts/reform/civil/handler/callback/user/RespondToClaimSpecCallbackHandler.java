@@ -34,10 +34,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -88,6 +85,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
+            .put(callbackKey(MID, "validate-whole-number"), this::validateWholeNumber)
             .build();
     }
 
@@ -320,6 +318,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         List<String> errors = paymentDateValidator
             .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
                           .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateWholeNumber(CallbackParams callbackParams){
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        if(caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")){
+            errors.add("Number of years should be a whole number");
+        }
+
+        if(caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")){
+            errors.add("Number of months should be a whole number");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
