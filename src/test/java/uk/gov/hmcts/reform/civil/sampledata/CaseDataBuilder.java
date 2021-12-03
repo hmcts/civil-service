@@ -948,17 +948,24 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentOne() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        selectLitigationFriend("Both");
+        selectLitigationFriend = null;
         return this;
     }
 
     public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentTwo() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        selectLitigationFriend("Respondent Two:");
+        respondent2SameLegalRepresentative=YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend("Both");
         return this;
     }
 

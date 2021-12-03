@@ -68,7 +68,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         @Test
         void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddLitigationFriend_1v2_andAndAddForBoth()
+                .atStateAddLitigationFriend_1v2_andAndAddForRespondentOne()
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
@@ -92,7 +92,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAddLitigationFriend_1v2_andAndAddForBoth().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateAddLitigationFriend_1v2_andAndAddForRespondentOne()
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -120,9 +121,21 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
+        }
+
+        @Test
+        void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked1V2SameDefendantSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateAddLitigationFriend_1v2_andAndAddForBoth()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
             assertThat(response.getData())
-                .containsEntry("respondent2LitigationFriendDate", localDateTime.format(ISO_DATE_TIME))
-                .containsEntry("respondent2LitigationFriendCreatedDate", localDateTime.format(ISO_DATE_TIME));
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
         }
     }
 

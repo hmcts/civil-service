@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -63,20 +64,28 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
 
-        if (!caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent Two")) {
+        if (caseData.getSelectLitigationFriend() == null) {
             caseDataUpdated
                 .respondent1LitigationFriendDate(currentDateTime)
                 .respondent1LitigationFriendCreatedDate(
                     ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
                         .orElse(currentDateTime));
+        } else if (caseData.getSelectLitigationFriend().getValue().getLabel() != "Both") {
+            if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent Two")) {
+                caseDataUpdated
+                    .respondent2LitigationFriendDate(currentDateTime)
+                    .respondent2LitigationFriendCreatedDate(
+                        ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
+                            .orElse(currentDateTime))
+                    .respondent2LitigationFriend(caseData.getRespondent1LitigationFriend())
+                    .respondent1LitigationFriend(null);
+            }
         } else {
             caseDataUpdated
-                .respondent2LitigationFriendDate(currentDateTime)
-                .respondent2LitigationFriendCreatedDate(
-                    ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
-                        .orElse(currentDateTime))
-                .respondent2LitigationFriend(caseData.getRespondent1LitigationFriend())
-                .respondent1LitigationFriend(null);
+                .respondent1LitigationFriendDate(currentDateTime)
+                .respondent1LitigationFriendCreatedDate(
+                    ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                        .orElse(currentDateTime));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
