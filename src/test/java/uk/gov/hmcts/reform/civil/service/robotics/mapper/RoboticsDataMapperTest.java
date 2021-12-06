@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
@@ -26,12 +27,14 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -72,10 +75,16 @@ class RoboticsDataMapperTest {
     FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    private Time time;
+
+    LocalDateTime localDateTime;
 
     @BeforeEach
     void setUp() {
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(ORGANISATION);
+        localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
+        when(time.now()).thenReturn(localDateTime);
     }
 
     @Autowired
