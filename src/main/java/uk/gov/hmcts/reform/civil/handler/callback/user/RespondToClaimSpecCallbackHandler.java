@@ -330,12 +330,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         List<String> errors = new ArrayList<>();
 
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()!=null) {
-            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")) {
-                errors.add("Number of years should be a whole number");
-            }
-
-            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
-                errors.add("Number of months should be a whole number");
+            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")
+            || caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
+                errors.add("Length of time unemployed must be whole numbers, like 10.");
             }
         }
 
