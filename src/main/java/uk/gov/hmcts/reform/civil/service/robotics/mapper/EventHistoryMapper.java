@@ -85,6 +85,9 @@ public class EventHistoryMapper {
                     case CLAIM_NOTIFIED:
                         buildClaimantHasNotifiedDefendant(builder, caseData);
                         break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                        buildTakenOfflineAfterClaimNotified(builder, caseData);
+                        break;
                     case CLAIM_DETAILS_NOTIFIED:
                         buildClaimDetailsNotified(builder, caseData);
                         break;
@@ -133,6 +136,12 @@ public class EventHistoryMapper {
                             caseData,
                             "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
                                 + "claim details within the allowed 2 weeks."
+                        );
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                        buildOfflineAfterClaimsDetailsNotified(
+                            builder,
+                            caseData
                         );
                         break;
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
@@ -347,6 +356,21 @@ public class EventHistoryMapper {
                 .build());
     }
 
+    private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
+    }
+
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.replyToDefence(List.of(
             Event.builder()
@@ -470,6 +494,21 @@ public class EventHistoryMapper {
             })
             .collect(Collectors.toList());
         builder.miscellaneous(events);
+    }
+
+    private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
     }
 
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

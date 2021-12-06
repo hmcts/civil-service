@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -40,6 +41,9 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -102,8 +106,7 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmail_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-
-        service.notifyRobotics(caseData);
+        service.notifyRobotics(caseData, false);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
@@ -124,7 +127,35 @@ class RoboticsNotificationServiceTest {
 
     @Test
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
+
         assertThrows(NullPointerException.class, () ->
-            service.notifyRobotics(null));
+            service.notifyRobotics(null, true));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        service.notifyRobotics(caseData, multiPartyScenario);
+
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String message = format(
+            "Multiparty claim data for %s",
+            reference + " - " + caseData.getCcdState());
+        String subject = format("Multiparty claim data for %s", reference
+            + " - " + caseData.getCcdState() + " - " + "Claimant has notified defendant.");
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
     }
 }

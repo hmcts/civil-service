@@ -152,6 +152,9 @@ public class CaseData implements MappableObject {
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
+    private final RespondToClaim respondToAdmittedClaim;
+    private final BigDecimal respondToAdmittedClaimOwingAmount;
+    private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
@@ -159,6 +162,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
 
+    private final String additionalInformationForJudge;
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 

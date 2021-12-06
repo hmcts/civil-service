@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -198,6 +199,7 @@ public class CaseDataBuilder {
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
+    private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -538,6 +540,8 @@ public class CaseDataBuilder {
                 return atStateClaimIssued();
             case CLAIM_NOTIFIED:
                 return atStateClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimDetailsNotified();
             case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 return atStateProceedsOfflineAfterClaimNotified();
             case CLAIM_DETAILS_NOTIFIED:
@@ -1071,6 +1075,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimDetailsNotified() {
+        atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDetailsNotified() {
         atStateClaimNotified();
         claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
@@ -1185,6 +1195,17 @@ public class CaseDataBuilder {
             .build();
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentAdmitPartOfClaimFastTrack() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         return this;
     }
 
@@ -1663,6 +1684,9 @@ public class CaseDataBuilder {
             .superClaimType(UNSPEC_CLAIM)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
+            //spec route
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondToAdmittedClaim(respondToClaim)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
