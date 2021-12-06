@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java .util.ArrayList;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
