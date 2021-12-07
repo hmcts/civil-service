@@ -333,7 +333,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()!=null) {
+        if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null
+            && caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()!=null) {
             if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")
             || caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
                 errors.add("Length of time unemployed must be whole numbers, like 10.");
