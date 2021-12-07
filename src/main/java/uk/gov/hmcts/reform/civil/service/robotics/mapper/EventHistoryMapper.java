@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
@@ -538,15 +539,17 @@ public class EventHistoryMapper {
         builder.miscellaneous(events);
     }
 
-    private void buildUnregisteredAndUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildUnregisteredAndUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder,
+                                                            CaseData caseData) {
         String localDateTime = time.now().toLocalDate().toString();
 
-        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered " +
-                                     "defendant solicitor firm. Unrepresented defendant: %s",
+        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
+                                                   + "defendant solicitor firm. Unrepresented defendant: %s",
                                                localDateTime,
                                                getDefendantNames(UNREPRESENTED, caseData).get(0));
-        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered " +
-                                                  "defendant solicitor firm. Unregistered defendant solicitor firm: %s",
+        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
+                                                  + "defendant solicitor firm. Unregistered defendant solicitor "
+                                                  + "firm: %s",
                                               localDateTime,
                                               getDefendantNames(UNREGISTERED, caseData).get(0));
 

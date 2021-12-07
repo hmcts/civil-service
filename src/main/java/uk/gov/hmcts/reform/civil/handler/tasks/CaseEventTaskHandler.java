@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,10 +28,9 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SE
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
 @RequiredArgsConstructor
 @Component
@@ -53,7 +53,12 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             .updateActivityId(externalTask.getActivityId());
 
         String flowState = externalTask.getVariable(FLOW_STATE);
-        CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess, flowState, startEventData);
+        CaseDataContent caseDataContent = caseDataContent(
+            startEventResponse,
+            businessProcess,
+            flowState,
+            startEventData
+        );
         data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 
@@ -154,12 +159,13 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                              getDefendantNames(UNREGISTERED, caseData), " and "
                                          ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    return format("Unrepresented defendant and unregistered defendant solicitor firm. " +
-                                      "Unrepresented defendant: %s. " +
-                                      "Unregistered defendant solicitor firm: %s.",
+                    return format("Unrepresented defendant and unregistered defendant solicitor firm. "
+                                      + "Unrepresented defendant: %s. "
+                                      + "Unregistered defendant solicitor firm: %s.",
                                          StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
-                                         StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and ")
-                    );
+                                         StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
+                default:
+                    break;
             }
         }
         return null;
