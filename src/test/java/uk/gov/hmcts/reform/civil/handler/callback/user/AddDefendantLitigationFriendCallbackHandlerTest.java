@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -50,6 +51,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
@@ -103,9 +107,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData())
-                .containsEntry("respondent1LitigationFriendDate", localDateTime.format(ISO_DATE_TIME))
-                .containsEntry("respondent1LitigationFriendCreatedDate", localDateTime.format(ISO_DATE_TIME));
         }
 
         @Test
@@ -141,6 +142,11 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @Nested
     class SubmittedCallback {
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+        }
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {

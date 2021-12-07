@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -40,6 +41,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private final Time time;
     private final ObjectMapper objectMapper;
     private final ExitSurveyContentService exitSurveyContentService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,6 +49,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit_multiparty,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -57,6 +60,24 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
+            .respondent1LitigationFriendDate(LocalDateTime.now())
+            .respondent1LitigationFriendCreatedDate(
+                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                    .orElse(LocalDateTime.now()))
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse aboutToSubmit_multiparty(CallbackParams callbackParams) {
+        if (!featureToggleService.isMultipartyEnabled()) {
+            return aboutToSubmit(callbackParams);
+        }
+
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = time.now();
 
@@ -80,7 +101,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                             .orElse(currentDateTime))
                     .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
                     .genericLitigationFriend(null);
-            }else if(caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent One")){
+            } else if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent One")) {
                 caseDataUpdated
                     .respondent1LitigationFriendDate(currentDateTime)
                     .respondent1LitigationFriendCreatedDate(
