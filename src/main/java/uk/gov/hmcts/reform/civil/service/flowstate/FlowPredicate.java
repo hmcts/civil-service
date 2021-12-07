@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -63,7 +64,9 @@ public class FlowPredicate {
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
 
     public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
-        caseData.getIssueDate() != null && caseData.getRespondent1OrgRegistered() == NO;
+        caseData.getIssueDate() != null
+            && caseData.getRespondent1OrgRegistered() == NO
+            && caseData.getRespondent1Represented() == YES;
 
     public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
@@ -71,8 +74,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent2OrgRegistered() != YES
-            && caseData.getRespondent2SameLegalRepresentative() != YES;
+            && caseData.getRespondent2OrgRegistered() != YES;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         caseData.getPaymentSuccessfulDate() == null
@@ -130,15 +132,22 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
+    public static final Predicate<CaseData> divergentRespond = caseData ->
+        getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
+        && caseData.getRespondent1ResponseDate() != null
+        && caseData.getRespondent2ResponseDate() != null
+        && caseData.getRespondentResponseIsSame() == NO
+        && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+
     private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseType() == responseType;
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
-                    || caseData.getRespondent2ClaimResponseType() == responseType);
-                break;
+//            case ONE_V_TWO_ONE_LEGAL_REP:
+//                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
+//                    || caseData.getRespondent2ClaimResponseType() == responseType);
+//                break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
                 break;

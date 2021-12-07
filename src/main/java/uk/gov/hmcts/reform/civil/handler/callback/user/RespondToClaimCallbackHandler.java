@@ -250,8 +250,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
             }
-            // represents 1st respondent - need to set deadline if only 1 respondent, or wait for 2nd respondent
-            // response before setting deadline
+            // represents 1st respondent - need to set deadline if only 1 respondent,
+            // or wait for 2nd respondent response before setting deadline
         } else {
             updatedData.respondent1ResponseDate(responseDate);
 
@@ -288,18 +288,25 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
+    //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+//        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
             "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
-                + "Defendant defence. You will be CC'ed.%n"
-                + "The Claimant has until %s to discontinue or proceed with this claim",
-            formatLocalDateTime(responseDeadline, DATE)
-        )
-            + exitSurveyContentService.respondentSurvey();
+                + "Defendant defence. You will be CC'ed."
+                + "The Claimant has until %s to discontinue or proceed with this claim"
+        );
+
+//        String body = format(
+//            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
+//                + "Defendant defence. You will be CC'ed.%n"
+//                + "The Claimant has until %s to discontinue or proceed with this claim",
+//            formatLocalDateTime(responseDeadline, DATE)
+//        )
+//            + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(

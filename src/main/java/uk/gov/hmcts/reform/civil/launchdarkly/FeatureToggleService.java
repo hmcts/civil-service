@@ -37,7 +37,8 @@ public class FeatureToggleService {
     }
 
     public boolean isMultipartyEnabled() {
-        return internalClient.boolVariation("multiparty", createLDUser().build(), false);
+//        return internalClient.boolVariation("multiparty", createLDUser().build(), false);
+        return true;
     }
 
     public boolean isRpaContinuousFeedEnabled() {
