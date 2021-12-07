@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -30,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -204,7 +204,7 @@ public class CaseDataBuilder {
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
-    private List<Element<EmployerDetailsLRspec>> responseClaimAdmitPartEmployer;
+    private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1582,11 +1582,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
         UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
         this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
-        return this;
-    }
-
-    public CaseDataBuilder responseClaimAdmitPartEmployer(EmployerDetailsLRspec employerDetailsLRspec) {
-        this.responseClaimAdmitPartEmployer = ElementUtils.wrapElements(employerDetailsLRspec);
         return this;
     }
 
