@@ -140,9 +140,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AdmitsPartOfTheClaimTest {
 
         @Test
-        public void testValidateWholeNumberWithError() {
+        public void testValidateLengthOfUnemploymentWithError() {
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-whole-number", "DEFENDANT_RESPONSE_SPEC");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-length-of-unemployment", "DEFENDANT_RESPONSE_SPEC");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

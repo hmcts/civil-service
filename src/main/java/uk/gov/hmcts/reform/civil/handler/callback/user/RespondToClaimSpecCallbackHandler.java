@@ -89,7 +89,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
-            .put(callbackKey(MID, "validate-whole-number"), this::validateWholeNumber)
+            .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .build();
     }
 
@@ -328,15 +328,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse validateWholeNumber(CallbackParams callbackParams) {
+    private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null
             && caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment() != null) {
-            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec()
-                .getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")
+            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()
+                .getNumberOfYearsInUnemployment().contains(".")
                 || caseData.getRespondToClaimAdmitPartUnemployedLRspec()
                 .getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
                 errors.add("Length of time unemployed must be whole numbers, like 10.");
