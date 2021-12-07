@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -32,7 +33,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -1557,7 +1557,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder generateYearsAndMonthsIncorrectInput(){
+    public CaseDataBuilder generateYearsAndMonthsIncorrectInput() {
         atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
@@ -1573,7 +1573,6 @@ public class CaseDataBuilder {
                                       .numberOfYearsInUnemployment("2.6")
                                       .build())
             .build();
-
 
         return this;
     }
