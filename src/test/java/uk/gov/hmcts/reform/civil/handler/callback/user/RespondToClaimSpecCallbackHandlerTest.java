@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 
@@ -118,6 +119,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
+                .responseClaimAdmitPartEmployer(EmployerDetailsLRspec.builder()
+                                                    .employerName("Test Employer").jobTitle("Test Job").build())
                 .build();
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
@@ -134,7 +137,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AdmitsPartOfTheClaimTest{
+    class AdmitsPartOfTheClaimTest {
 
         @Test
         public void testValidateWholeNumberWithError() {

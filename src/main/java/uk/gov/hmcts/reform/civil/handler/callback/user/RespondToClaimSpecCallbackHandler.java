@@ -34,11 +34,11 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -328,14 +328,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse validateWholeNumber(CallbackParams callbackParams){
+    private CallbackResponse validateWholeNumber(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()!=null) {
-            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")
-            || caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
+        if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null
+            && caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment() != null) {
+            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec()
+                .getLengthOfUnemployment().getNumberOfYearsInUnemployment().contains(".")
+                || caseData.getRespondToClaimAdmitPartUnemployedLRspec()
+                .getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
                 errors.add("Length of time unemployed must be whole numbers, like 10.");
             }
         }
