@@ -492,9 +492,26 @@ public class FlowStateAllowedEventService {
             .contains(caseEvent);
     }
 
+    public boolean isAllowedOnStateForSpec(String stateFullName, CaseEvent caseEvent) {
+        return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC
+            .getOrDefault(stateFullName, emptyList())
+            .contains(caseEvent);
+    }
+
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
-        return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
+
+        if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
+            || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
+            try {
+                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
+        }
     }
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
