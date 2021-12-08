@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -45,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -66,6 +69,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final StateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -288,31 +292,37 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
-    //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-//        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         String claimNumber = caseData.getLegacyCaseReference();
+        String body;
 
-        String body = format(
-            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
-                + "Defendant defence. You will be CC'ed."
-                + "The Claimant has until %s to discontinue or proceed with this claim"
-        );
-
-//        String body = format(
-//            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
-//                + "Defendant defence. You will be CC'ed.%n"
-//                + "The Claimant has until %s to discontinue or proceed with this claim",
-//            formatLocalDateTime(responseDeadline, DATE)
-//        )
-//            + exitSurveyContentService.respondentSurvey();
+        //catch scenario 1v2 Diff Sol - 1 Response Received
+        //responseDeadline has not been set yet
+        if (featureToggleService.isMultipartyEnabled()
+            && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+            && isAwaitingAnotherDefendantResponse(caseData)) {
+            body = "TBC";
+        } else {
+            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+            body = format(
+                "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
+                    + "Defendant defence. You will be CC'ed.%n"
+                    + "The Claimant has until %s to discontinue or proceed with this claim",
+                formatLocalDateTime(responseDeadline, DATE)
+            ) + exitSurveyContentService.respondentSurvey();
+        }
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
                 format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
+    }
+
+    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseType() == null
+            || caseData.getRespondent2ClaimResponseType() == null;
     }
 
     private boolean solicitorRepresentsOnlyRespondent2(CallbackParams callbackParams) {

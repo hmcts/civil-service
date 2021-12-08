@@ -144,10 +144,6 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseType() == responseType;
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
-//            case ONE_V_TWO_ONE_LEGAL_REP:
-//                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
-//                    || caseData.getRespondent2ClaimResponseType() == responseType);
-//                break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
                 break;
