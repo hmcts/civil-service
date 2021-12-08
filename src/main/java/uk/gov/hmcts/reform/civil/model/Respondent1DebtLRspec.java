@@ -12,7 +12,7 @@ import java.util.List;
 public class Respondent1DebtLRspec {
 
     private final List<Element<DebtLRspec>> debtDetails;
-    private final YesOrNo hasLoanCardDebtQ;
+    private final YesOrNo hasLoanCardDebt;
     private final List<Element<LoanCardDebtLRspec>> loanCardDebtDetails;
 
 }
