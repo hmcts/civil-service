@@ -278,8 +278,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
 
+        if (featureToggleService.isMultipartyEnabled()
+            && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+            && isAwaitingAnotherDefendantResponse(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
+            .state("AWAITING_APPLICANT_INTENTION")
             .build();
     }
 
@@ -292,6 +301,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
+    //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
