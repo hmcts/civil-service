@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -52,7 +53,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy,
+            callbackKey(V_1, ABOUT_TO_START), this::populateRespondentsCopy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
@@ -65,20 +66,26 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+    private CallbackResponse populateRespondentsCopy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .build();
+            .respondent1Copy(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedCaseData.respondent2Copy(caseData.getRespondent2());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
         Party respondent = callbackParams.getCaseData().getRespondent1();
         List<String> errors = dateOfBirthValidator.validate(respondent);
+        ofNullable(callbackParams.getCaseData().getRespondent2())
+            .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
