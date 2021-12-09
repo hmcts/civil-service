@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
+            .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .build();
     }
 
@@ -320,6 +322,26 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         List<String> errors = paymentDateValidator
             .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
                           .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null
+            && caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment() != null) {
+            if (caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment()
+                .getNumberOfYearsInUnemployment().contains(".")
+                || caseData.getRespondToClaimAdmitPartUnemployedLRspec()
+                .getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
+                errors.add("Length of time unemployed must be whole numbers, like 10.");
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

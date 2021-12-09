@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,6 +79,27 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void testSpecDefendantResponseFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+        }
+    }
+
+    @Nested
+    class AdmitsPartOfTheClaimTest {
+
+        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -97,23 +119,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceFastTrack()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-        }
-
-        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -130,5 +135,22 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
+
+        @Test
+        public void testValidateLengthOfUnemploymentWithError() {
+            CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "validate-length-of-unemployment", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            List<String> expectedErrorArray = new ArrayList<>();
+            expectedErrorArray.add("Length of time unemployed must be whole numbers, like 10.");
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
+        }
+
     }
 }
