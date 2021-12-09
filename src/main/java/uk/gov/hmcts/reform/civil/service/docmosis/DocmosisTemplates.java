@@ -7,7 +7,10 @@ public enum DocmosisTemplates {
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-00762.docx", "sealed_claim_form_%s.pdf"),
     N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N181("CV-UNS-HRN-ENG-00651.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-00789.docx", "acknowledgement_of_claim_form_%s.pdf");
+    N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-00789.docx", "acknowledgement_of_claim_form_%s.pdf"),
+    N3_MULTIPARTY_DIFF_SOL("CV-CMC-HRN-ENG-00789.docx", "directions_questionnaire_form_%s.pdf"),
+    N3_MULTIPARTY_SAME_SOL("CV-CMC-HRN-ENG-00790.docx", "directions_questionnaire_form_%s.pdf"),
+    N3_MULTIPARTY_2V1("CV-CMC-HRN-ENG-00788.docx", "directions_questionnaire_form_%s.pdf");
 
     private final String template;
     private final String documentTitle;
