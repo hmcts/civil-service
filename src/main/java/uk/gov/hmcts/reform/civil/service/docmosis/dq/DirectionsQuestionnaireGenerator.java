@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -150,8 +150,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var multiPartyRespondents = new ArrayList<>(List.of(Party.builder()
                                                                .name(respondent.getPartyName())
                                                                .primaryAddress(respondent.getPrimaryAddress())
-                                                               .representative(representativeService.
-                                                                                   getRespondent1Representative(
+                                                               .representative(representativeService
+                                                                                   .getRespondent1Representative(
                                                                                        caseData))
                                                                .litigationFriendName(
                                                                    ofNullable(caseData.getRespondent1LitigationFriend())
@@ -165,8 +165,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             multiPartyRespondents.add(Party.builder()
                                                  .name(respondent2.getPartyName())
                                                  .primaryAddress(respondent2.getPrimaryAddress())
-                                                 .representative(representativeService.
-                                                                     getRespondent2Representative(caseData))
+                                                 .representative(representativeService
+                                                                     .getRespondent2Representative(caseData))
                                                  .litigationFriendName(
                                                      ofNullable(caseData.getRespondent2LitigationFriend())
                                                          .map(LitigationFriend::getFullName)
