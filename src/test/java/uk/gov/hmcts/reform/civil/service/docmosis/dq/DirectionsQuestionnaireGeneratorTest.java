@@ -53,9 +53,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_DIFF_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_DIFF_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -72,9 +72,14 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_DEFENDANT_1V2_SAME_SOLICITOR = format(N3_MULTIPARTY_SAME_SOL.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_DEFENDANT_1V2_DIFF_SOLICITOR = format(N3_MULTIPARTY_DIFF_SOL.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_DEFENDANT_2V1 = format(N3_MULTIPARTY_2V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_DEFENDANT_1V2_SAME_SOLICITOR = format(N3_MULTIPARTY_SAME_SOL.
+                                                                                    getDocumentTitle(), "defendant",
+                                                                                REFERENCE_NUMBER);
+    private static final String FILE_NAME_DEFENDANT_1V2_DIFF_SOLICITOR = format(N3_MULTIPARTY_DIFF_SOL.
+                                                                                    getDocumentTitle(), "defendant",
+                                                                                REFERENCE_NUMBER);
+    private static final String FILE_NAME_DEFENDANT_2V1 = format(N3_MULTIPARTY_2V1.getDocumentTitle(), "defendant",
+                                                                 REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT = CaseDocumentBuilder.builder()
         .documentName(FILE_NAME_DEFENDANT)
         .documentType(DIRECTIONS_QUESTIONNAIRE)
@@ -182,8 +187,8 @@ class DirectionsQuestionnaireGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT_1V2_DIFF_SOLICITOR,
                                                   bytes, DIRECTIONS_QUESTIONNAIRE));
-        verify(documentGeneratorService).
-            generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N3_MULTIPARTY_DIFF_SOL));
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N3_MULTIPARTY_DIFF_SOL));
     }
 
     @Test
@@ -205,8 +210,8 @@ class DirectionsQuestionnaireGeneratorTest {
         verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT_2V1, bytes, DIRECTIONS_QUESTIONNAIRE));
-        verify(documentGeneratorService).
-            generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N3_MULTIPARTY_2V1));
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N3_MULTIPARTY_2V1));
     }
 
     @Test
