@@ -72,11 +72,11 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_DEFENDANT_1V2_SAME_SOLICITOR = format(N3_MULTIPARTY_SAME_SOL.
-                                                                                    getDocumentTitle(), "defendant",
+    private static final String FILE_NAME_DEFENDANT_1V2_SAME_SOLICITOR = format(N3_MULTIPARTY_SAME_SOL
+                                                                                    .getDocumentTitle(), "defendant",
                                                                                 REFERENCE_NUMBER);
-    private static final String FILE_NAME_DEFENDANT_1V2_DIFF_SOLICITOR = format(N3_MULTIPARTY_DIFF_SOL.
-                                                                                    getDocumentTitle(), "defendant",
+    private static final String FILE_NAME_DEFENDANT_1V2_DIFF_SOLICITOR = format(N3_MULTIPARTY_DIFF_SOL
+                                                                                    .getDocumentTitle(), "defendant",
                                                                                 REFERENCE_NUMBER);
     private static final String FILE_NAME_DEFENDANT_2V1 = format(N3_MULTIPARTY_2V1.getDocumentTitle(), "defendant",
                                                                  REFERENCE_NUMBER);
