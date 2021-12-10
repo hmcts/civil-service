@@ -35,11 +35,11 @@ import java.util.Locale;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_DIFF_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_DIFF_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N3_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -60,10 +60,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N3_MULTIPARTY_SAME_SOL);
+                docmosisDocument = documentGeneratorService
+                    .generateDocmosisDocument(templateData, N3_MULTIPARTY_SAME_SOL);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N3_MULTIPARTY_DIFF_SOL);
+                docmosisDocument = documentGeneratorService
+                    .generateDocmosisDocument(templateData, N3_MULTIPARTY_DIFF_SOL);
                 break;
             case TWO_V_ONE:
                 docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N3_MULTIPARTY_2V1);
@@ -145,23 +147,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private List<Party> getRespondents(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         var respondent = caseData.getRespondent1();
-        var multiParyRespondents = new ArrayList<>(List.of(Party.builder()
+        var multiPartyRespondents = new ArrayList<>(List.of(Party.builder()
                                                                .name(respondent.getPartyName())
                                                                .primaryAddress(respondent.getPrimaryAddress())
-                                                               .representative(representativeService.getRespondent1Representative(caseData))
+                                                               .representative(representativeService.
+                                                                                   getRespondent1Representative(
+                                                                                       caseData))
                                                                .litigationFriendName(
                                                                    ofNullable(caseData.getRespondent1LitigationFriend())
                                                                        .map(LitigationFriend::getFullName)
                                                                        .orElse(""))
                                                                .build()));
 
-        if(multiPartyScenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+        if (multiPartyScenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
             || multiPartyScenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
-            multiParyRespondents.add(Party.builder()
+            multiPartyRespondents.add(Party.builder()
                                                  .name(respondent2.getPartyName())
                                                  .primaryAddress(respondent2.getPrimaryAddress())
-                                                 .representative(representativeService.getRespondent2Representative(caseData))
+                                                 .representative(representativeService.
+                                                                     getRespondent2Representative(caseData))
                                                  .litigationFriendName(
                                                      ofNullable(caseData.getRespondent2LitigationFriend())
                                                          .map(LitigationFriend::getFullName)
@@ -169,8 +174,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                  .build());
         }
 
-
-        return multiParyRespondents;
+        return multiPartyRespondents;
     }
 
     private Experts getExperts(DQ dq) {
