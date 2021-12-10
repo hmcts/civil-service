@@ -339,7 +339,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .getNumberOfYearsInUnemployment().contains(".")
                 || caseData.getRespondToClaimAdmitPartUnemployedLRspec()
                 .getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
-                errors.add("Length of time unemployed must be whole numbers, like 10.");
+                errors.add("Length of time unemployed must be a whole number, for example, 10.");
             }
         }
 
