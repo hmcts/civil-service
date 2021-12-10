@@ -288,13 +288,13 @@ class DirectionsQuestionnaireGeneratorTest {
             );
         }
 
-        private Party getApplicant(CaseData caseData) {
+        private List<Party> getApplicant(CaseData caseData) {
             var applicant = caseData.getApplicant1();
-            return Party.builder()
+            return List.of(Party.builder()
                 .name(applicant.getPartyName())
                 .primaryAddress(applicant.getPrimaryAddress())
                 .litigationFriendName("applicant LF")
-                .build();
+                .build());
         }
 
         private List<Party> getRespondents(CaseData caseData) {
