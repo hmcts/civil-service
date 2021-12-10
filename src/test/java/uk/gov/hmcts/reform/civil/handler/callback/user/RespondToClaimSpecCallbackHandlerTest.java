@@ -146,7 +146,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Length of time unemployed must be whole numbers, like 10.");
+            expectedErrorArray.add("Length of time unemployed must be a whole number, for example, 10.");
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
