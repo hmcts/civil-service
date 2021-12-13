@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPE
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
-    public static final String NOT_VALID_DJ = "Case is not eligible for Default Judgement";
+    public static final String NOT_VALID_DJ = "Claim is not eligible for Default Judgement";
 
     private final ObjectMapper objectMapper;
 
