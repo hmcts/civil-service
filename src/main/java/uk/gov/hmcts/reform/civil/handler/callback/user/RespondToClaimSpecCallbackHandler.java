@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -77,11 +81,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
+            .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .build();
     }
 
@@ -94,21 +100,60 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
-        if ("DEFENDANT_RESPONSE_SPEC".equals(callbackParams.getRequest().getEventId())) {
-
-            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                             null);
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
-                .build();
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
+            caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
+            return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
     }
 
+    private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                                                                .orElseGet(() -> RespondToClaim.builder().build()));
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
+            return populateAllocatedTrack(caseData);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
+        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
+            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+        } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(caseData.getDefenceRouteRequired())
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
+            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+        }
+        return caseData;
+    }
+
+    private CallbackResponse populateAllocatedTrack(CaseData caseData) {
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                                                                         null);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("DEFENDANT_RESPONSE_SPEC")) {
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             CaseData caseData = callbackParams.getCaseData();
             if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
                 List<String> errors = postcodeValidator.validatePostCodeForDefendant(
@@ -150,8 +195,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // This will be taken care via different story,
         // because we don't have AC around this date field validation in ROC-9455
         CaseData caseData = callbackParams.getCaseData();
-        SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
-        List<String> errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+        List<String> errors;
+        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
+            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+
+        } else {
+            HearingLRspec hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
+            errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -258,6 +310,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .confirmationHeader(
                 format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
+            .build();
+    }
+
+    private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        List<String> errors = paymentDateValidator
+            .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                          .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 }
