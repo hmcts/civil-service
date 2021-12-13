@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
-public class PayingMoneyAsResultOfCourtOrder {
+public class PaymentUponCourtOrder {
 
     private final YesOrNo payingDetailsRequired;
     private final List<Element<PayingMoneyDetails>> payingMoneyDetails;
