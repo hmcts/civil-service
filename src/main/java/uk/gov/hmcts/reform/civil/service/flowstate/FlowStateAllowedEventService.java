@@ -502,20 +502,15 @@ public class FlowStateAllowedEventService {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
 
-        if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
-            || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
-            try {
-                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
-            } catch (Exception e) {
-                return false;
-            }
+        if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) || caseEvent.equals(CREATE_CLAIM_SPEC)) {
+            return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
         } else {
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
         }
     }
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
-        if (caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
+        if (caseEvent.equals(CREATE_CLAIM_SPEC)) {
             return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(caseEvent))
                 .map(Map.Entry::getKey)

@@ -63,16 +63,8 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             }
-        } else {
-            if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
-                notificationService.sendMail(
-                    caseData.getRespondentSolicitor1EmailAddress(),
-                    notificationsProperties.getSolicitorCaseTakenOffline(),
-                    addProperties(caseData),
-                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-                );
-            }
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
