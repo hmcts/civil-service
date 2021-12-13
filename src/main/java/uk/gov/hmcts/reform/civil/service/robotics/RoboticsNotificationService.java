@@ -69,7 +69,7 @@ public class RoboticsNotificationService {
         }
     }
 
-    private EmailData prepareEmailDataMultiParty(CaseData caseData)  {
+    private EmailData prepareEmailDataMultiParty(CaseData caseData) {
         RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
         byte[] roboticsJsonData;
         try {
