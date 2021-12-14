@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,9 +69,15 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
     IdamClient idamClient;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    private Time time;
+
+    LocalDateTime localDateTime;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
+        localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
+        when(time.now()).thenReturn(localDateTime);
         when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
     }
 

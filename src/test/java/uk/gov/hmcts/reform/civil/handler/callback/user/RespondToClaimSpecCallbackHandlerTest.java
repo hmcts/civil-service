@@ -139,27 +139,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testValidateLengthOfUnemploymentWithError() {
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
-            CallbackParams params = callbackParamsOf(
-                caseData, MID, "validate-length-of-unemployment", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Length of time unemployed must be whole numbers, like 10.");
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
-        }
-
-    }
-
-    @Nested
-    class AdmitsPartOfTheClaimTest {
-
-        @Test
-        public void testValidateLengthOfUnemploymentWithError() {
-            CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
             CallbackParams params = callbackParamsOf(caseData,
                                                      MID, "validate-length-of-unemployment",
                                                      "DEFENDANT_RESPONSE_SPEC");
