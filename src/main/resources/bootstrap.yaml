@@ -20,6 +20,7 @@ spring:
         sendgrid-api-key: SENDGRID_API_KEY
         robotics-notification-sender: robotics.notification.sender
         robotics-notification-recipient: robotics.notification.recipient
+        robotics-notification-multipartyrecipient: robotics.notification.multipartyrecipient
         launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
         os-postcode-lookup-api-key: OS_POSTCODE_LOOKUP_API_KEY
 
