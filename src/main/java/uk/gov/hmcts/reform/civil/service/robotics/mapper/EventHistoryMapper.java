@@ -53,7 +53,7 @@ public class EventHistoryMapper {
         List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-            states = stateFlowEngine.evaluate(caseData).getStateHistory();
+        states = stateFlowEngine.evaluate(caseData).getStateHistory();
 
         List<State> stateHistory = states;
         stateHistory
