@@ -269,6 +269,14 @@ public class StateFlowEngine {
         return build(DRAFT).evaluate(caseData);
     }
 
+    public StateFlow evaluateSpec(CaseDetails caseDetails) {
+        return evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
+    }
+
+    public StateFlow evaluateSpec(CaseData caseData) {
+        return build(SPEC_DRAFT).evaluate(caseData);
+    }
+
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
             .map(State::getName)
