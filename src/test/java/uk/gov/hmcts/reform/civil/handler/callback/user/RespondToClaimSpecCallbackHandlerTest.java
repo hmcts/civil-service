@@ -79,6 +79,27 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void testSpecDefendantResponseFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+        }
+    }
+
+    @Nested
+    class AdmitsPartOfTheClaimTest {
+
+        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -98,23 +119,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceFastTrack()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-        }
-
-        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -131,10 +135,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
-    }
-
-    @Nested
-    class AdmitsPartOfTheClaimTest {
 
         @Test
         public void testValidateLengthOfUnemploymentWithError() {
