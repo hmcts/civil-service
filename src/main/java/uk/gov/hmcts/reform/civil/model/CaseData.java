@@ -243,4 +243,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
 
     private final List<IdValue<Bundle>> caseBundles;
+
+    private final Respondent1DebtLRspec specDefendant1Debts;
 }
