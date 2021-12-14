@@ -202,16 +202,16 @@ class RpaConsumerTest extends BaseRpaTest {
 
         @Test
         @SneakyThrows
-        void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
+        void shouldGeneratePact_whenClaimAgainstUnrepresentedAndUnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                .legacyCaseReference("000DC0038")
+                .legacyCaseReference("000DC038")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
             assertThat(payload, validateJson());
 
-            String description = "Robotics case data for claim against unrepresented defendant";
+            String description = "Robotics case data for claim against unrepresented and unregistered defendant";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
@@ -491,7 +491,7 @@ class RpaConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenFullDefenceProceeds_withMaximalData() {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .legacyCaseReference("000DC037")
+                .legacyCaseReference("000DC036")
                 .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
