@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum EmploymentTypeCheckboxFixedListLRspec {
     EMPLOYED("Employed"),
-    SELF_EMPLOYED("Self-employed");
+    SELF("Self-employed");
 
     private final String displayedValue;
 }
