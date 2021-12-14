@@ -473,7 +473,8 @@
     },
     "solicitorIDType": {
       "$id": "#/definitions/solicitorIDType",
-      "type": "string",
+      "type": ["string",
+      "null"],
       "description": "Identifies the solicitor object in the json document.",
       "default": ""
     },
