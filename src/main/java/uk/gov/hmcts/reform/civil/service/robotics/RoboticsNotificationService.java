@@ -71,16 +71,15 @@ public class RoboticsNotificationService {
 
     private EmailData prepareEmailDataMultiParty(CaseData caseData) {
         RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-            String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
-
-            return EmailData.builder()
-                .message(String.format(
-                    "Multiparty claim data for %s",
+        String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+        return EmailData.builder()
+            .message(String.format(
+                "Multiparty claim data for %s",
                 caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
-                .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
-                    + " - " + caseData.getCcdState() + " - " + triggerEvent))
-                .to(roboticsEmailConfiguration.getMultipartyrecipient())
-                .build();
+            .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
+                + " - " + caseData.getCcdState() + " - " + triggerEvent))
+            .to(roboticsEmailConfiguration.getMultipartyrecipient())
+            .build();
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
