@@ -501,7 +501,6 @@ public class FlowStateAllowedEventService {
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-
         if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
             || caseEvent.equals(CREATE_CLAIM_SPEC)) {
             StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
