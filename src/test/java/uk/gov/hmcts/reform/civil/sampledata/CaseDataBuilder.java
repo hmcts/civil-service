@@ -1598,12 +1598,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
-        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
-        return this;
-    }
-
     public CaseDataBuilder generatePaymentDateForAdmitPartResponse() {
         atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
