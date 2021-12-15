@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-public enum HomeTypeOptionSpec {
+public enum HomeTypeOptionLRspec {
     OWNED_HOME,
     JOINTLY_OWNED_HOME,
     PRIVATE_RENTAL,

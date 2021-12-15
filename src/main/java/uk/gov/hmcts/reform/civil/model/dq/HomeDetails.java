@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import lombok.Data;
-import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionSpec;
+import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 
 @Data
 public class HomeDetails {
@@ -9,7 +9,7 @@ public class HomeDetails {
     /**
      * type of home.
      */
-    private final HomeTypeOptionSpec type;
+    private final HomeTypeOptionLRspec type;
 
     /**
      * home description when type is "other".
