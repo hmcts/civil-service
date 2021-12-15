@@ -19,12 +19,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
-    public static final String NOT_VALID_DJ = "Claim is not eligible for Default Judgment";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
 
     private final ObjectMapper objectMapper;
 
@@ -47,7 +49,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
-            errors.add(NOT_VALID_DJ);
+            String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
+            errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
