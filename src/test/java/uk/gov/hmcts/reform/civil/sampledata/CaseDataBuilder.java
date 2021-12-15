@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -206,6 +207,7 @@ public class CaseDataBuilder {
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
+    private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -622,6 +624,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
@@ -655,6 +658,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
@@ -670,6 +674,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
@@ -712,6 +717,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
@@ -727,9 +734,13 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant2() {
         atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
+        respondent1OrgRegistered = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
@@ -745,6 +756,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent2Represented = YES;
@@ -765,6 +777,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
+        respondent2 = PartyBuilder.builder().individual().build();
         atStatePendingClaimIssuedUnrepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -1008,8 +1021,10 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        respondent1OrgRegistered = NO;
         respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
         respondent2OrganisationPolicy = null;
         return this;
     }
@@ -1017,10 +1032,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
-        respondent1Represented = NO;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
         respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
         respondent2OrganisationPolicy = null;
+        respondent2 = PartyBuilder.builder().individual().build();
         return this;
     }
 
@@ -1055,7 +1073,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
-        defendantSolicitorNotifyClaimOptions("Respondent One: Solicitor A");
+        defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor A");
         return this;
     }
 
@@ -1596,6 +1614,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
+        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
+        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -1713,6 +1737,7 @@ public class CaseDataBuilder {
             //spec route
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
+            .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
