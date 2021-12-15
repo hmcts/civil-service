@@ -33,6 +33,7 @@ public class Respondent1DQ implements DQ {
     private final StatementOfTruth respondent1DQStatementOfTruth;
     private final FutureApplications respondent1DQFutureApplications;
     private final List<Element<AccountSimple>> respondent1BankAccountList;
+    private final HomeDetails respondent1DQHomeDetails;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
