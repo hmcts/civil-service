@@ -90,6 +90,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
+            .put(callbackKey(MID, "repaymentPlan"), this::repaymentPlan)
             .build();
     }
 
@@ -329,7 +330,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
-
+        System.out.println( "inside validate length of unemployement method ");
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
@@ -342,6 +343,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 errors.add("Length of time unemployed must be a whole number, for example, 10.");
             }
         }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse repaymentPlan(CallbackParams callbackParams) {
+        System.out.println(" repayment method");
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        System.out.println(" inside the method ");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
