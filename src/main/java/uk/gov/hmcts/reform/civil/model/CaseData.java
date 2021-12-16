@@ -162,6 +162,7 @@ public class CaseData implements MappableObject {
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;

@@ -208,6 +208,7 @@ public class CaseDataBuilder {
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private String responseToClaimAdmitPartWhyNotPayLRspec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1738,6 +1739,7 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
+            .responseToClaimAdmitPartWhyNotPayLRspec(responseToClaimAdmitPartWhyNotPayLRspec)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
