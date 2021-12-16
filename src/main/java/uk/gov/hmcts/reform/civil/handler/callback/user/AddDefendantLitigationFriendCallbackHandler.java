@@ -62,9 +62,9 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
-            .respondent1LitigationFriendDate(LocalDateTime.now())
-            .respondent1LitigationFriendCreatedDate(
-                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+            .genericLitigationFriendDate(LocalDateTime.now())
+            .genericLitigationFriendCreatedDate(
+                ofNullable(callbackParams.getCaseData().getGenericLitigationFriendCreatedDate())
                     .orElse(LocalDateTime.now()))
             .build();
 
