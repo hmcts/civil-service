@@ -52,6 +52,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         return EVENTS;
     }
 
+    // TODO: Make it compatible with emailing either respondent
     private CallbackResponse notifyApplicantSolicitorForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         var recipient = isCcNotification(callbackParams)
