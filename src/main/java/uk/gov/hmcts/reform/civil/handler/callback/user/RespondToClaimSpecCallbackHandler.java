@@ -349,10 +349,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse repaymentPlanMY(CallbackParams callbackParams) {
+    private CallbackResponse repaymentPlan(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
+        System.out.println("2");
         if (caseData.getRespondent1RepaymentPlan() != null
             && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
             errors = unavailableDateValidator.validateFirstPaymentDate(caseData.getRespondent1RepaymentPlan()
