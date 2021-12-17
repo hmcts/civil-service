@@ -140,23 +140,30 @@ public class FlowPredicate {
         && caseData.getRespondentResponseIsSame() == NO
         && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
 
-//    public static boolean atLeastOneResponseReceived (CaseData caseData) {
-//        return caseData.getAddRespondent2() == YES ?
-//            caseData.getRespondent1ClaimResponseType() != null || caseData.getRespondent2ClaimResponseType() != null
-//            : caseData.getRespondent1ClaimResponseType() != null;
-//    }
-
-//
-//    public static final Predicate<CaseData> allResponsesReceived = caseData ->
-//        caseData.getAddRespondent2() == YES ?
-//            atLeastOneResponseReceived(caseData) && caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null
-//            : atLeastOneResponseReceived(caseData) && caseData.getRespondent1ResponseDate() != null;
-
     public static final Predicate<CaseData> allResponsesReceived = caseData ->
-           caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null;
+        getPredicateForResponses(caseData);
+
+    private static boolean getPredicateForResponses(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null;
+            default:
+                return true;
+        }
+    }
 
     public static final Predicate<CaseData> awaitingResponses = caseData ->
-        caseData.getRespondent1ResponseDate() != null || caseData.getRespondent2ResponseDate() != null;
+        getPredicateForAwaitingResponses(caseData);
+
+    private static boolean getPredicateForAwaitingResponses(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return (caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() == null)
+                    || (caseData.getRespondent1ResponseDate() == null && caseData.getRespondent2ResponseDate() != null);
+            default:
+                return false;
+        }
+    }
 
     private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
