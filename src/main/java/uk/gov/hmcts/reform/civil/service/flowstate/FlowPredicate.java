@@ -148,7 +148,7 @@ public class FlowPredicate {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null;
             default:
-                return true;
+                return caseData.getRespondent1ResponseDate() != null;
         }
     }
 
