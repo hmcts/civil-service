@@ -349,7 +349,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse repaymentPlan(CallbackParams callbackParams) {
+    private CallbackResponse repaymentPlanMY(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
