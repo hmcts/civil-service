@@ -355,7 +355,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         if (caseData.getRespondent1RepaymentPlan() != null
             && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFirstPaymentDate(caseData.getRespondent1RepaymentPlan()
+            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
                                                                            .getFirstRepaymentDate());
         }
 
