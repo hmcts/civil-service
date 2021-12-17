@@ -57,7 +57,7 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
-  //enableFortifyScan()
+  enableFortifyScan()
  // enableSecurityScan()
 
   enableFullFunctionalTest(200)
@@ -68,20 +68,15 @@ withNightlyPipeline(type, product, component) {
     env.TESTS_FOR_ACCESSIBILITY = false
   }
 
-  //enableCrossBrowserTest()
+  enableCrossBrowserTest()
 
- // after('crossBrowserTest') {
- //   steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
- // }
+  after('crossBrowserTest') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
 
-//  enableCrossBrowserTest()
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 
-//  after('crossBrowserTest') {
-//    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-//  }
-
-//  after('fortify-scan') {
-//    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-//  }
 }
 
