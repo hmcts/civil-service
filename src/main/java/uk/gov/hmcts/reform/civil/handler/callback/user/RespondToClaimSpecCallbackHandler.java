@@ -330,7 +330,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
-        System.out.println( "inside validate length of unemployement method ");
+
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
@@ -350,11 +350,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse repaymentPlan(CallbackParams callbackParams) {
-        System.out.println(" repayment method");
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        System.out.println(" inside the method ");
+        if (caseData.getRespondent1RepaymentPlan() != null
+            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFirstPaymentDate(caseData.getRespondent1RepaymentPlan()
+                                                                           .getFirstRepaymentDate());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

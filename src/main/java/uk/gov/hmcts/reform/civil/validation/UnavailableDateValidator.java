@@ -115,7 +115,6 @@ public class UnavailableDateValidator implements
 
     private List<String> dateValidation(List<Element<UnavailableDateLRspec>> unavailabeDate) {
         List<String> errors = new ArrayList<>();
-        System.out.println("inside date validation ");
         unavailabeDate.forEach(element -> {
             UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
             if (SpecJourneyConstantLRSpec.SINGLE_DATE.equals(unavailableDateLRspecElement.getUnavailableDateType())
@@ -146,6 +145,18 @@ public class UnavailableDateValidator implements
                 errors.add("From Date should be less than To Date");
             }
         });
+        return errors;
+    }
+
+    public List<String> validateFirstPaymentDate(LocalDate firstPayment) {
+        List<String> errors = new ArrayList<>();
+
+        if (checkOneYearValidation(firstPayment)) {
+            errors.add("Date must be within the next 12 months.");
+        } else if (checkPastDateValidation(firstPayment)) {
+            errors.add("Date cannot be past date");
+        }
+
         return errors;
     }
 
