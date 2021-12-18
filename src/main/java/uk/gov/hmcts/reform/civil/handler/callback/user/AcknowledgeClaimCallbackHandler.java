@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,13 +10,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.*;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -26,16 +28,21 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Service
 @RequiredArgsConstructor
@@ -45,15 +52,20 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     public static final String CONFIRMATION_SUMMARY = "<br />You need to respond to the claim before %s."
         + "%n%n[Download the Acknowledgement of Claim form](%s)";
+    public static final String ERROR_DEFENDANT_RESPONSE_SUBMITTED =
+        "Defendant acknowledgement has already been recorded";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final StateFlowEngine stateFlowEngine;
+    private final CoreCaseUserService coreCaseUserService;
+    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final UserService userService;
+    private final InformAgreedExtensionDateCallbackHandler informAgreedExtensionDateCallbackHandler;
 
-    @Autowired
-    InformAgreedExtensionDateCallbackHandler informAgreedExtensionDateCallbackHandler;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,8 +84,31 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    //used in master
+    private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+     /*   // Show error message if defendant tries to submit response again
+        if (featureToggleService.isMultipartyEnabled()) {
+            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                    .build();
+            }
+        }*/
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
@@ -89,6 +124,22 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
 
+    }
+
+    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+
+    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        return caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
@@ -118,6 +169,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    //used in master
     private CallbackResponse setNewResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
@@ -136,6 +188,77 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setNewResponseDeadlineV2(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        //  Party response deadline is set to 28 days for multiparty scenarios as per CMC-1520
+        LocalDateTime newResponseDate1v2 = deadlinesCalculator.plus28DaysAt4pmDeadline(responseDeadline);
+
+        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
+
+                caseDataUpdated = caseData.toBuilder()
+                    .respondent1AcknowledgeNotificationDate(time.now())
+                    .respondent1ResponseDeadline(newResponseDate)
+                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                    .respondent1(updatedRespondent1)
+                    .respondent1Copy(null);
+
+        if(caseData.getAddApplicant2().equals(YES)) {
+            caseDataUpdated = caseData.toBuilder()
+                .respondent1AcknowledgeNotificationDate(time.now())
+                .respondent1ResponseDeadline(newResponseDate)
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent1(updatedRespondent1)
+                .respondent1Copy(null)
+                .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
+                .respondent1ClaimResponseIntentionTypeApplicant2
+                    (caseData.getRespondent1ClaimResponseIntentionTypeApplicant2());
+        }
+       else if((caseData.getRespondent2() != null)  && respondent2HasSameLegalRep(caseData)){
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .build();
+            caseDataUpdated = caseData.toBuilder()
+                .respondent1AcknowledgeNotificationDate(time.now())
+                .respondent2AcknowledgeNotificationDate(time.now())
+                .respondent1ResponseDeadline(newResponseDate1v2)
+                .respondent2ResponseDeadline(newResponseDate1v2)
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent1(updatedRespondent1)
+                .respondent2(updatedRespondent2)
+                .respondent1Copy(null)
+                .respondent2Copy(null)
+                .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
+                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType());
+        }
+
+        else if(caseData.getRespondent2() != null  && !respondent2HasSameLegalRep(caseData)){
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .build();
+            caseDataUpdated = caseData.toBuilder()
+                .respondent2AcknowledgeNotificationDate(time.now())
+                .respondent2ResponseDeadline(newResponseDate1v2)
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent2(updatedRespondent2)
+                .respondent2Copy(null)
+                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType());
+        }
+     if(caseData.getAddRespondent2() != null && caseData.getRespondent2() == null && !respondent2HasSameLegalRep(caseData)){
+         caseDataUpdated = caseData.toBuilder()
+             .respondent1AcknowledgeNotificationDate(time.now())
+             .respondent1ResponseDeadline(newResponseDate1v2);
+     }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
     }
 

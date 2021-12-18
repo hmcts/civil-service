@@ -108,6 +108,7 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
     private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
