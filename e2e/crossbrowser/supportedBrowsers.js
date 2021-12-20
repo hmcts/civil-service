@@ -13,36 +13,39 @@ const supportedBrowsers = {
   //     },
   //   },
   // },
-  safari: {
-    safari_mac_latest: {
-      browserName: 'safari',
-      platformName: 'macOS 11.00',
+
+  //Safari-passed
+
+  // safari: {
+  //   safari_mac_latest: {
+  //     browserName: 'safari',
+  //     platformName: 'macOS 11.00',
+  //     browserVersion: 'latest',
+  //     'sauce:options': {
+  //       name: 'Civil: MAC_SAFARI',
+  //       seleniumVersion: '3.141.59',
+  //       screenResolution: '1376x1032',
+  //     },
+  //   },
+  // },
+  chrome: {
+    chrome_win_latest: {
+      browserName: 'chrome',
+      platformName: LATEST_WINDOWS,
       browserVersion: 'latest',
       'sauce:options': {
-        name: 'Civil: MAC_SAFARI',
-        seleniumVersion: '3.141.59',
-        screenResolution: '1376x1032',
+        name: 'Civil: WIN_CHROME_LATEST',
+      },
+    },
+    chrome_mac_latest: {
+      browserName: 'chrome',
+      platformName: LATEST_MAC,
+      browserVersion: 'latest',
+      'sauce:options': {
+        name: 'Civil: MAC_CHROME_LATEST',
       },
     },
   },
-//   chrome: {
-//     chrome_win_latest: {
-//       browserName: 'chrome',
-//       platformName: LATEST_WINDOWS,
-//       browserVersion: 'latest',
-//       'sauce:options': {
-//         name: 'Civil: WIN_CHROME_LATEST',
-//       },
-//     },
-//     chrome_mac_latest: {
-//       browserName: 'chrome',
-//       platformName: LATEST_MAC,
-//       browserVersion: 'latest',
-//       'sauce:options': {
-//         name: 'Civil: MAC_CHROME_LATEST',
-//       },
-//     },
-//   },
 //   firefox: {
 //     firefox_win_latest: {
 //       browserName: 'firefox',
