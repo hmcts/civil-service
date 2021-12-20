@@ -159,7 +159,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testValidateRespondentPaymentDate() {
             CaseData caseData = CaseDataBuilder.builder().generatePaymentDateForAdmitPartResponse().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date", "DEFENDANT_RESPONSE_SPEC");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date",
+                                                     "DEFENDANT_RESPONSE_SPEC"
+            );
             when(validator.validate(any())).thenReturn(List.of("Validation error"));
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -179,7 +181,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void testValidateRepaymentDate() {
             CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC");
+            CallbackParams params = callbackParamsOf(caseData, MID,
+                                                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC");
             when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
