@@ -185,8 +185,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Date must be within the next 12 months");
             assertEquals("Validation error", response.getErrors().get(0));
 
         }
