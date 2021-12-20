@@ -2,29 +2,29 @@ const LATEST_MAC = 'macOS 10.15';
 const LATEST_WINDOWS = 'Windows 10';
 
 const supportedBrowsers = {
-  microsoft: {
-    ie11_win: {
-      browserName: 'internet explorer',
-      platformName: LATEST_WINDOWS,
+  // microsoft: {
+  //   ie11_win: {
+  //     browserName: 'internet explorer',
+  //     platformName: LATEST_WINDOWS,
+  //     browserVersion: 'latest',
+  //     'sauce:options': {
+  //       name: 'Civil: IE11',
+  //       screenResolution: '1400x1050',
+  //     },
+  //   },
+  // },
+  safari: {
+    safari_mac_latest: {
+      browserName: 'safari',
+      platformName: 'macOS 11.00',
       browserVersion: 'latest',
       'sauce:options': {
-        name: 'Civil: IE11',
-        screenResolution: '1400x1050',
+        name: 'Civil: MAC_SAFARI',
+        seleniumVersion: '3.141.59',
+        screenResolution: '1376x1032',
       },
     },
   },
-//   safari: {
-//     safari_mac_latest: {
-//       browserName: 'safari',
-//       platformName: 'macOS 11.00',
-//       browserVersion: 'latest',
-//       'sauce:options': {
-//         name: 'Civil: MAC_SAFARI',
-//         seleniumVersion: '3.141.59',
-//         screenResolution: '1376x1032',
-//       },
-//     },
-//   },
 //   chrome: {
 //     chrome_win_latest: {
 //       browserName: 'chrome',
