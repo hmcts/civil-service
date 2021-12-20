@@ -90,7 +90,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
-            .put(callbackKey(MID, "repaymentPlan"), this::repaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
             .build();
     }
 
@@ -349,7 +349,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse repaymentPlan(CallbackParams callbackParams) {
+    private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 

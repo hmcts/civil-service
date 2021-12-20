@@ -83,7 +83,6 @@ public class UnavailableDateValidator implements
 
     private boolean checkOneYearValidation(LocalDate localDate) {
         return localDate != null && localDate.isAfter(LocalDate.now().plusYears(1));
-
     }
 
     private boolean checkPastDateValidation(LocalDate localDate) {
@@ -147,11 +146,10 @@ public class UnavailableDateValidator implements
         List<String> errors = new ArrayList<>();
 
         if (checkOneYearValidation(paymentDate)) {
-            errors.add("Date must be within the next 12 months.");
+            errors.add("Date must be within the next 12 months");
         } else if (checkPastDateValidation(paymentDate)) {
             errors.add("Date cannot be past date");
         }
-
         return errors;
     }
 

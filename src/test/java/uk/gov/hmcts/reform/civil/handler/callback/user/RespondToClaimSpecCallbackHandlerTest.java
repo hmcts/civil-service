@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
+import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private PaymentDateValidator validator;
+    @Mock
+    private UnavailableDateValidator dateValidator;
 
     @BeforeEach
     public void setup() {
@@ -171,6 +174,21 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
              * */
             //assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
             assertEquals("Validation error", response.getErrors().get(0));
+        }
+
+        @Test
+        public void testValidateRepaymentDate() {
+            CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC");
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            List<String> expectedErrorArray = new ArrayList<>();
+            expectedErrorArray.add("Date must be within the next 12 months");
+            assertEquals("Validation error", response.getErrors().get(0));
+
         }
 
     }
