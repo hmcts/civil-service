@@ -14,7 +14,7 @@ const supportedBrowsers = {
   //   },
   // },
 
-  //Safari-passed
+  //Safari, all chrome -passed
 
   // safari: {
   //   safari_mac_latest: {
@@ -28,42 +28,42 @@ const supportedBrowsers = {
   //     },
   //   },
   // },
-  chrome: {
-    chrome_win_latest: {
-      browserName: 'chrome',
+  // chrome: {
+  //   chrome_win_latest: {
+  //     browserName: 'chrome',
+  //     platformName: LATEST_WINDOWS,
+  //     browserVersion: 'latest',
+  //     'sauce:options': {
+  //       name: 'Civil: WIN_CHROME_LATEST',
+  //     },
+  //   },
+  //   chrome_mac_latest: {
+  //     browserName: 'chrome',
+  //     platformName: LATEST_MAC,
+  //     browserVersion: 'latest',
+  //     'sauce:options': {
+  //       name: 'Civil: MAC_CHROME_LATEST',
+  //     },
+  //   },
+  // },
+  firefox: {
+    firefox_win_latest: {
+      browserName: 'firefox',
       platformName: LATEST_WINDOWS,
       browserVersion: 'latest',
       'sauce:options': {
-        name: 'Civil: WIN_CHROME_LATEST',
+        name: 'Civil: WIN_FIREFOX_LATEST',
       },
     },
-    chrome_mac_latest: {
-      browserName: 'chrome',
+    firefox_mac_latest: {
+      browserName: 'firefox',
       platformName: LATEST_MAC,
       browserVersion: 'latest',
       'sauce:options': {
-        name: 'Civil: MAC_CHROME_LATEST',
+        name: 'Civil: MAC_FIREFOX_LATEST',
       },
     },
   },
-//   firefox: {
-//     firefox_win_latest: {
-//       browserName: 'firefox',
-//       platformName: LATEST_WINDOWS,
-//       browserVersion: 'latest',
-//       'sauce:options': {
-//         name: 'Civil: WIN_FIREFOX_LATEST',
-//       },
-//     },
-//     firefox_mac_latest: {
-//       browserName: 'firefox',
-//       platformName: LATEST_MAC,
-//       browserVersion: 'latest',
-//       'sauce:options': {
-//         name: 'Civil: MAC_FIREFOX_LATEST',
-//       },
-//     },
-//   },
 };
 
 
