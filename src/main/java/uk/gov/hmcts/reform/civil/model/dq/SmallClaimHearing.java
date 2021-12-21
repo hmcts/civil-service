@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.model.dq;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.SmallClaimUnavailableDate;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
@@ -13,6 +13,6 @@ import java.util.List;
 public class SmallClaimHearing {
 
     private final YesOrNo unavailableDatesRequired;
-    private final List<Element<SmallClaimUnavailableDate>> smallClaimUnavailableDate;
+    private final List<Element<UnavailableDateLRspec>> smallClaimUnavailableDate;
 
 }
