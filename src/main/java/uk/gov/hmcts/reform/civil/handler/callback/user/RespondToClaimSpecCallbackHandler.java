@@ -351,12 +351,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
+        List<String> errors;
 
         if (caseData.getRespondent1RepaymentPlan() != null
             && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+             errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
                                                                            .getFirstRepaymentDate());
+        }
+        else
+        {
+           errors = new ArrayList<>();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
