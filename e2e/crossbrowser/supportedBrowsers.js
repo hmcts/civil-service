@@ -46,24 +46,24 @@ const supportedBrowsers = {
   //     },
   //   },
   // },
-  firefox: {
-    firefox_win_latest: {
+  // firefox: {
+  //   firefox_win_latest: {
+  //     browserName: 'firefox',
+  //     platformName: LATEST_WINDOWS,
+  //     browserVersion: 'latest',
+  //     'sauce:options': {
+  //       name: 'Civil: WIN_FIREFOX_LATEST',
+  //     },
+  //   },
+    firefox_mac_latest: {
       browserName: 'firefox',
-      platformName: LATEST_WINDOWS,
+      platformName: LATEST_MAC,
       browserVersion: 'latest',
       'sauce:options': {
-        name: 'Civil: WIN_FIREFOX_LATEST',
+        name: 'Civil: MAC_FIREFOX_LATEST',
       },
     },
-    // firefox_mac_latest: {
-    //   browserName: 'firefox',
-    //   platformName: LATEST_MAC,
-    //   browserVersion: 'latest',
-    //   'sauce:options': {
-    //     name: 'Civil: MAC_FIREFOX_LATEST',
-    //   },
-    // },
-  },
+ // },
 };
 
 
