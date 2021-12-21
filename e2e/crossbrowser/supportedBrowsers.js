@@ -14,8 +14,8 @@ const supportedBrowsers = {
   //   },
   // },
 
-  //Safari, all chrome -passed
-  //
+  // passing:  safari, chrome_win_latest, chrome_mac_latest, firefox_win
+  //failing: ie11-win, firefox_mac
   safari: {
     safari_mac_latest: {
       browserName: 'safari',
