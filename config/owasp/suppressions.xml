@@ -179,16 +179,9 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-   file name: ansi-regex:4.1.0
+   file name: ansi-regex@3.0.0
    ]]></notes>
     <packageUrl regex="true">^pkg:npm/ansi\-regex@.*$</packageUrl>
-    <vulnerabilityName>1002401</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: validator:10.11.0
-   ]]></notes>
-    <packageUrl regex="true">^pkg:npm/validator@.*$</packageUrl>
-    <vulnerabilityName>1004784</vulnerabilityName>
+    <vulnerabilityName>1004946</vulnerabilityName>
   </suppress>
 </suppressions>
