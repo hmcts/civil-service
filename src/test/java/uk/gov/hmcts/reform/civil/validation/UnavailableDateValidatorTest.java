@@ -179,7 +179,7 @@ class UnavailableDateValidatorTest {
         void shouldReturnError_whenPaymentDateMoreThanOneYearInFuture() {
 
             assertThat(validator.validateFuturePaymentDate(LocalDate.now().plusDays(368)))
-                .containsExactly("Date must be within the next 12 months");
+                .containsExactly("Date of first payment must be today or within the next 12 months");
 
         }
 
@@ -187,7 +187,7 @@ class UnavailableDateValidatorTest {
         void shouldReturnError_whenPaymentDateOfPast() {
 
             assertThat(validator.validateFuturePaymentDate(LocalDate.now().minusDays(12)))
-                .containsExactly("Date cannot be past date");
+                .containsExactly("Date of first payment must be today or within the next 12 months");
 
         }
     }
