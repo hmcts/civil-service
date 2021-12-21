@@ -145,9 +145,7 @@ public class UnavailableDateValidator implements
     public List<String> validateFuturePaymentDate(LocalDate paymentDate) {
         List<String> errors = new ArrayList<>();
 
-        if (checkOneYearValidation(paymentDate)) {
-            errors.add("Date of first payment must be today or within the next 12 months");
-        } else if (checkPastDateValidation(paymentDate)) {
+        if (checkOneYearValidation(paymentDate) || checkPastDateValidation(paymentDate)) {
             errors.add("Date of first payment must be today or within the next 12 months");
         }
         return errors;
