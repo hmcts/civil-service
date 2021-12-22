@@ -10,14 +10,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -34,6 +35,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
+            callbackKey(MID, "showcertifystatement"), this::checkStatus,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -43,22 +45,34 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse checkStatus(CallbackParams callbackParams){
+        return null;
+
+    }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
+        if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
+            LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
         }
+        List<String> listData = new ArrayList<>();
+        listData.add(caseData.getRespondent1().getIndividualFirstName() + " " + caseData.getRespondent1().getIndividualLastName());
+        if (nonNull(caseData.getRespondent2())) {
+            listData.add(caseData.getRespondent2().getIndividualFirstName() + " " + caseData.getRespondent2().getIndividualLastName() );
+            listData.add("Both Defendants");
+            caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
+        }
+            caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.size() == 0
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
-
-
     }
 
 

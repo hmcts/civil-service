@@ -70,6 +70,7 @@ public class CaseData implements MappableObject {
     private final Fee claimFee;
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
+    private final DynamicList defendantDetails;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
@@ -91,6 +92,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;
+
     private final Address respondentSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
@@ -206,6 +208,9 @@ public class CaseData implements MappableObject {
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+
+
+
 
     // dates
     private final LocalDateTime submittedDate;

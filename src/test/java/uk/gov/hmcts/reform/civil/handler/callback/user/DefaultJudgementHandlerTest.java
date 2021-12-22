@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -49,7 +51,7 @@ public class DefaultJudgementHandlerTest {
 
 
         @Test
-        void shouldReturnError_WhenAboutToStartIsInvoked() {
+        void shouldReturnError_WhenAboutToStartIsInvokedOneDefendants() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().
                 respondent1ResponseDeadline(
                     LocalDateTime.now().minusDays(15)).build();
@@ -60,6 +62,22 @@ public class DefaultJudgementHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithTwoDefendants() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
     }
 
 }
