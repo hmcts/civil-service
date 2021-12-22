@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-
 import uk.gov.hmcts.reform.civil.service.Time;
+
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,8 +215,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().
-                atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
