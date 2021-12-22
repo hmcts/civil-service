@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -270,7 +269,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.respondent2ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
@@ -282,7 +280,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         } else {
             updatedData.respondent1ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-
 
             if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
                 || caseData.getRespondent2ResponseDate() != null
