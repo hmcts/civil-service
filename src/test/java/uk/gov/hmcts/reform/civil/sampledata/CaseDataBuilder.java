@@ -196,13 +196,11 @@ public class CaseDataBuilder {
     private BigDecimal breakDownInterestTotal;
     protected LocalDateTime respondent1LitigationFriendDate;
     protected LocalDateTime respondent2LitigationFriendDate;
-    protected LocalDateTime genericLitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
     protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
     protected LocalDateTime respondent2LitigationFriendCreatedDate;
-    protected LocalDateTime genericLitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
@@ -493,6 +491,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimNotificationDeadline(LocalDateTime deadline) {
         this.claimNotificationDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
+        this.respondent1LitigationFriendCreatedDate = createdDate;
+        return this;
+    }
+    public CaseDataBuilder setRespondent1LitigationFriendDate(LocalDateTime date) {
+        this.respondent1LitigationFriendDate = date;
         return this;
     }
 
@@ -1136,6 +1143,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_SameSolicitor() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        addRespondent2LitigationFriend();
+        return this;
+    }
     public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
@@ -1571,6 +1584,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addRespondent2LitigationFriend() {
+        this.respondent2LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder addBothRespondent1LitigationFriend() {
         this.respondent1LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
@@ -1760,8 +1780,6 @@ public class CaseDataBuilder {
             .respondent2LitigationFriendDate(respondent2LitigationFriendDate)
             .respondent2LitigationFriendCreatedDate(respondent2LitigationFriendCreatedDate)
             .genericLitigationFriend(genericLitigationFriend)
-            .genericLitigationFriendDate(genericLitigationFriendDate)
-            .genericLitigationFriendCreatedDate(genericLitigationFriendCreatedDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)
