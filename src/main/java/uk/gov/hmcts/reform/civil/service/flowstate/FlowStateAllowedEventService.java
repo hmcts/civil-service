@@ -126,8 +126,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE,
-                DEFAULT_JUDGEMENT_SPEC
+                ADD_CASE_NOTE               
             )
         ),
 
@@ -143,9 +142,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
-                DEFAULT_JUDGEMENT_SPEC
-
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -159,8 +156,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
-                DEFAULT_JUDGEMENT_SPEC
+                ADD_CASE_NOTE
             )
         ),
 
@@ -358,7 +354,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
-                WITHDRAW_CLAIM
+                WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
         entry(
@@ -371,7 +368,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -384,7 +382,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
