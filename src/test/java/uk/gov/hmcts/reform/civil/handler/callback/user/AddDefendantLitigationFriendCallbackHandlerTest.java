@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
 
+import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -125,7 +125,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
-
 
         }
 
@@ -254,7 +253,12 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_WhenRespondent1LitigationFriendIsSet() {
+            localDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
+            when(time.now()).thenReturn(localDateTime);
+
             CaseData caseData = CaseDataBuilder.builder().addRespondent1LitigationFriend()
+                .setRespondent1LitigationFriendCreatedDate(localDateTime)
+                .setRespondent1LitigationFriendDate(localDateTime)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -264,6 +268,38 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+
+        }
+
+        @Test
+        void shouldSetConfirmRespondent1LitigationFriendIsPopulated_WithMultiParty_1v2_SameSolicitor() {
+            localDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
+            when(time.now()).thenReturn(localDateTime);
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .setRespondent1LitigationFriendCreatedDate(localDateTime)
+                .setRespondent1LitigationFriendDate(localDateTime)
+                .selectLitigationFriend(null)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
 
         }
 
