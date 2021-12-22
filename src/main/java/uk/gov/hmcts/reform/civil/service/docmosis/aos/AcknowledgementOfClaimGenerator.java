@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,9 +85,8 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                         .map(LitigationFriend::getFullName)
                         .orElse(""))
                 .build()));
-
-        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP || multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            var respondent2 = caseData.getRespondent2();
+        if ((multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP)) {
+                     var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
@@ -96,6 +96,22 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                                               .map(LitigationFriend::getFullName)
                                               .orElse(""))
                                       .build());
+
+        }
+        if(multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP){
+
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null) && (caseData.getRespondent2AcknowledgeNotificationDate() != null)){
+                respondentParties.remove(0);
+            }
+            else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null) &&
+            (caseData.getRespondent2AcknowledgeNotificationDate() != null)){
+                if(caseData.getRespondent2AcknowledgeNotificationDate().isAfter(caseData.getRespondent1AcknowledgeNotificationDate())){
+                    respondentParties.remove(0);
+                }
+                else{
+                    respondentParties.remove(1);
+                }
+            }
         }
         return respondentParties;
     }

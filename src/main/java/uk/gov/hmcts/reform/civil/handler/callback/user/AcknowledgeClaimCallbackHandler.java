@@ -244,7 +244,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
-                .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newResponseDate)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
@@ -274,6 +273,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1(updatedRespondent1)
                 .respondent2(caseData.getRespondent2Copy())
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1Copy(null)
                 .isRespondent1(null);
 
