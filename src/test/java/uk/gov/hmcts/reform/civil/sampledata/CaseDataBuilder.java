@@ -480,6 +480,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
+        this.respondent1LitigationFriendCreatedDate = createdDate;
+        return this;
+    }
+
+    public CaseDataBuilder setRespondent1LitigationFriendDate(LocalDateTime date) {
+        this.respondent1LitigationFriendDate = date;
+        return this;
+    }
+
     public CaseDataBuilder respondent2SameLegalRepresentative(YesOrNo respondent2SameLegalRepresentative) {
         this.respondent2SameLegalRepresentative = respondent2SameLegalRepresentative;
         return this;

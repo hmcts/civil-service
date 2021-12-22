@@ -116,8 +116,8 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                             .orElse(currentDateTime))
                     .genericLitigationFriend(null);
 
-            } else if (caseData.getSelectLitigationFriend().getValue().getLabel() != "Both") {
-                if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent Two")) {
+            } else if (!caseData.getSelectLitigationFriend().getValue().getLabel().equals("Both")) {
+                if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent Two")) {
                     caseDataUpdated
                         .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
                         .respondent2LitigationFriendDate(currentDateTime)
@@ -125,7 +125,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                             ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
                                 .orElse(currentDateTime))
                         .genericLitigationFriend(null);
-                } else if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent One")) {
+                } else if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent One")) {
                     caseDataUpdated
                         .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
                         .respondent1LitigationFriendDate(currentDateTime)
