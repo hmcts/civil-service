@@ -46,15 +46,16 @@ const supportedBrowsers = {
       },
     },
   },
-  // firefox: {
-  //   firefox_win_latest: {
-  //     browserName: 'firefox',
-  //     platformName: LATEST_WINDOWS,
-  //     browserVersion: 'latest',
-  //     'sauce:options': {
-  //       name: 'Civil: WIN_FIREFOX_LATEST',
-  //     },
-  //   },
+  firefox: {
+    firefox_win_latest: {
+      browserName: 'firefox',
+      platformName: LATEST_WINDOWS,
+      browserVersion: 'latest',
+      'sauce:options': {
+        name: 'Civil: WIN_FIREFOX_LATEST',
+      },
+    },
+  },
     // firefox_mac_latest: {
     //   browserName: 'firefox',
     //   platformName: LATEST_MAC,
