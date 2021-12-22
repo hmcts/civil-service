@@ -161,6 +161,9 @@ public class CaseDataBuilder {
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
+    protected LitigationFriend respondent2LitigationFriend;
+    protected LitigationFriend genericLitigationFriend;
+
     protected List<Element<CaseNote>> caseNotes;
 
     //dates
@@ -192,9 +195,14 @@ public class CaseDataBuilder {
     private LocalDate interestFromSpecificDate;
     private BigDecimal breakDownInterestTotal;
     protected LocalDateTime respondent1LitigationFriendDate;
+    protected LocalDateTime respondent2LitigationFriendDate;
+    protected LocalDateTime genericLitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
+    protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
+    protected LocalDateTime respondent2LitigationFriendCreatedDate;
+    protected LocalDateTime genericLitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
@@ -519,6 +527,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
         this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(defaultValue)
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder selectLitigationFriend(String defaultValue) {
+        this.selectLitigationFriend = DynamicList.builder()
             .value(DynamicListElement.builder()
                        .label(defaultValue)
                        .build())
@@ -1112,6 +1129,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentOne() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend = null;
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentTwo() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        respondent2SameLegalRepresentative=YES;
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        selectLitigationFriend("Both");
+
+        return this;
+    }
     public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension() {
         atStateClaimDetailsNotified();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -1701,6 +1741,12 @@ public class CaseDataBuilder {
             .respondent1LitigationFriend(respondent1LitigationFriend)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
             .respondent1LitigationFriendCreatedDate(respondent1LitigationFriendCreatedDate)
+            .respondent2LitigationFriend(respondent2LitigationFriend)
+            .respondent2LitigationFriendDate(respondent2LitigationFriendDate)
+            .respondent2LitigationFriendCreatedDate(respondent2LitigationFriendCreatedDate)
+            .genericLitigationFriend(genericLitigationFriend)
+            .genericLitigationFriendDate(genericLitigationFriendDate)
+            .genericLitigationFriendCreatedDate(genericLitigationFriendCreatedDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)
@@ -1728,6 +1774,7 @@ public class CaseDataBuilder {
             .isRespondent1(isRespondent1)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
+            .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
