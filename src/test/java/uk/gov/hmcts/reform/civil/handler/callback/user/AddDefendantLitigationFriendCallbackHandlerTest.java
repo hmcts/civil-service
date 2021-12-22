@@ -253,7 +253,12 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_WhenRespondent1LitigationFriendIsSet() {
+            localDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
+            when(time.now()).thenReturn(localDateTime);
+
             CaseData caseData = CaseDataBuilder.builder().addRespondent1LitigationFriend()
+                .setRespondent1LitigationFriendCreatedDate(localDateTime)
+                .setRespondent1LitigationFriendDate(localDateTime)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -264,6 +269,10 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData())
+                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
         }
 
         @Test

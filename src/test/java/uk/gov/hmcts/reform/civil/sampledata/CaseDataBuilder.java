@@ -202,7 +202,6 @@ public class CaseDataBuilder {
     protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
     protected LocalDateTime respondent2LitigationFriendCreatedDate;
-    protected LocalDateTime genericLitigationFriendCreatedDate;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
@@ -493,6 +492,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimNotificationDeadline(LocalDateTime deadline) {
         this.claimNotificationDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
+        this.respondent1LitigationFriendCreatedDate = createdDate;
+        return this;
+    }
+
+    public CaseDataBuilder setRespondent1LitigationFriendDate(LocalDateTime date) {
+        this.respondent1LitigationFriendDate = date;
         return this;
     }
 
@@ -1760,8 +1769,6 @@ public class CaseDataBuilder {
             .respondent2LitigationFriendDate(respondent2LitigationFriendDate)
             .respondent2LitigationFriendCreatedDate(respondent2LitigationFriendCreatedDate)
             .genericLitigationFriend(genericLitigationFriend)
-            .genericLitigationFriendDate(genericLitigationFriendDate)
-            .genericLitigationFriendCreatedDate(genericLitigationFriendCreatedDate)
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)

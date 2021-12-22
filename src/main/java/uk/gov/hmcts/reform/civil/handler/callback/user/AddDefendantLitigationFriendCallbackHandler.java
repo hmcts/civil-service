@@ -81,7 +81,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .respondent1LitigationFriend(caseDataUpdated.getGenericLitigationFriend())
             .respondent1LitigationFriendDate(LocalDateTime.now())
             .respondent1LitigationFriendCreatedDate(
-                ofNullable(callbackParams.getCaseData().getGenericLitigationFriendCreatedDate())
+                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
                     .orElse(LocalDateTime.now()))
             .genericLitigationFriend(null)
             .build();
