@@ -505,16 +505,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
-        this.respondent1LitigationFriendCreatedDate = createdDate;
-        return this;
-    }
-
-    public CaseDataBuilder setRespondent1LitigationFriendDate(LocalDateTime date) {
-        this.respondent1LitigationFriendDate = date;
-        return this;
-    }
-
     public CaseDataBuilder claimDismissedDate(LocalDateTime date) {
         this.claimDismissedDate = date;
         return this;
