@@ -236,6 +236,5 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
 
     private final YesOrNo isRespondent1;
-
     private final List<IdValue<Bundle>> caseBundles;
 }

@@ -126,6 +126,7 @@ public class CaseDataBuilder {
     protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
     //Acknowledge Claim
     protected ResponseIntention respondent1ClaimResponseIntentionType;
+    protected ResponseIntention respondent2ClaimResponseIntentionType;
     // Defendant Response Defendant 1
     protected RespondentResponseType respondent1ClaimResponseType;
     protected ResponseDocument respondent1ClaimResponseDocument;

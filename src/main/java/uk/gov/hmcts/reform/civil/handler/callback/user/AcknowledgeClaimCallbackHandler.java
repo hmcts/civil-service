@@ -74,7 +74,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV2,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -98,7 +98,14 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-     /*   // Show error message if defendant tries to submit response again
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedCaseData.respondent2Copy(caseData.getRespondent2());
+        }
+        // Show error message if defendant tries to submit response again
         if (featureToggleService.isMultipartyEnabled()) {
             if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null)
@@ -108,13 +115,15 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                     .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
                     .build();
             }
-        }*/
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedCaseData.respondent2Copy(caseData.getRespondent2());
         }
+        if (multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE) ||
+            multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)  &&
+                caseData.getRespondent1AcknowledgeNotificationDate() != null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                .build();
+        }
+
         var isRespondent1 = YES;
         if (informAgreedExtensionDateCallbackHandler.solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
@@ -147,7 +156,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         List<String> errors = dateOfBirthValidator.validate(respondent);
         ofNullable(callbackParams.getCaseData().getRespondent2())
             .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -177,7 +185,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
-
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
@@ -195,24 +203,30 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        //  Party response deadline is set to 28 days for multiparty scenarios as per CMC-1520
-        LocalDateTime newResponseDate1v2 = deadlinesCalculator.plus28DaysAt4pmDeadline(responseDeadline);
-
-        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
 
-                caseDataUpdated = caseData.toBuilder()
-                    .respondent1AcknowledgeNotificationDate(time.now())
-                    .respondent1ResponseDeadline(newResponseDate)
-                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                    .respondent1(updatedRespondent1)
-                    .respondent1Copy(null);
+        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+        var respondent1Check = YES;
+        if (informAgreedExtensionDateCallbackHandler.solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            respondent1Check = NO;
+        }
 
-        if(caseData.getAddApplicant2().equals(YES)) {
-            caseDataUpdated = caseData.toBuilder()
+        //for 1v1
+        if (caseData.getAddApplicant2().equals(NO) && caseData.getAddRespondent2().equals(NO)) {
+            caseDataUpdated
+                .respondent1AcknowledgeNotificationDate(time.now())
+                .respondent1ResponseDeadline(newResponseDate)
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent1(updatedRespondent1)
+                .respondent1Copy(null)
+                .build();
+        }
+        //for 2v1
+        if (caseData.getAddApplicant2().equals(YES)) {
+            caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newResponseDate)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
@@ -220,43 +234,76 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1Copy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent1ClaimResponseIntentionTypeApplicant2
-                    (caseData.getRespondent1ClaimResponseIntentionTypeApplicant2());
+                    (caseData.getRespondent1ClaimResponseIntentionTypeApplicant2())
+                .build();
         }
-       else if((caseData.getRespondent2() != null)  && respondent2HasSameLegalRep(caseData)){
+        //1v2 same solicitor
+        else if ((caseData.getRespondent2() != null) && respondent2HasSameLegalRep(caseData)) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();
-            caseDataUpdated = caseData.toBuilder()
+            caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent2AcknowledgeNotificationDate(time.now())
-                .respondent1ResponseDeadline(newResponseDate1v2)
-                .respondent2ResponseDeadline(newResponseDate1v2)
+                .respondent1ResponseDeadline(newResponseDate)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent2(updatedRespondent2)
                 .respondent1Copy(null)
                 .respondent2Copy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
-                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType());
+                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
+                .build();
         }
+        //1v2 different solicitor - sol 1
+        else if (caseData.getRespondent1() != null && caseData.getAddRespondent2().equals(YES)
+            && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
 
-        else if(caseData.getRespondent2() != null  && !respondent2HasSameLegalRep(caseData)){
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+            //Case event won't be changed until the 2nd solicitor acknowledges the claim
+            if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
+                caseDataUpdated
+                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                    .build();
+            } else {
+                caseDataUpdated
+                    .respondent1ResponseDeadline(newResponseDate)
+                    .build();
+            }
+            caseDataUpdated
+                .respondent1AcknowledgeNotificationDate(time.now())
+                .respondent1(updatedRespondent1)
+                .respondent2(caseData.getRespondent2Copy())
+                .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
+                .respondent1Copy(null)
+                .isRespondent1(null);
+
+        }
+        //1v2 different solicitor - sol 2
+        else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
+            && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
+            var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();
-            caseDataUpdated = caseData.toBuilder()
+            //Case event won't be changed until the other solicitor acknowledges the claim
+            if (caseData.getRespondent1AcknowledgeNotificationDate() != null) {
+                caseDataUpdated
+                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                    .build();
+            } else {
+                caseDataUpdated
+                    .respondent1ResponseDeadline(newResponseDate)
+                    .build();
+            }
+            caseDataUpdated
                 .respondent2AcknowledgeNotificationDate(time.now())
-                .respondent2ResponseDeadline(newResponseDate1v2)
-                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent2(updatedRespondent2)
+                .respondent1Copy(null)
                 .respondent2Copy(null)
-                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType());
+                .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
+                .isRespondent1(null)
+                .build();
         }
-     if(caseData.getAddRespondent2() != null && caseData.getRespondent2() == null && !respondent2HasSameLegalRep(caseData)){
-         caseDataUpdated = caseData.toBuilder()
-             .respondent1AcknowledgeNotificationDate(time.now())
-             .respondent1ResponseDeadline(newResponseDate1v2);
-     }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
