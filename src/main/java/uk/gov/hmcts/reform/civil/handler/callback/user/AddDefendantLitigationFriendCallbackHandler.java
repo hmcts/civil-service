@@ -81,7 +81,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .respondent1LitigationFriend(caseDataUpdated.getGenericLitigationFriend())
             .respondent1LitigationFriendDate(LocalDateTime.now())
             .respondent1LitigationFriendCreatedDate(
-                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                ofNullable(callbackParams.getCaseData().getGenericLitigationFriendCreatedDate())
                     .orElse(LocalDateTime.now()))
             .genericLitigationFriend(null)
             .build();
@@ -104,6 +104,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             return aboutToSubmitWithGenericFriend(callbackParams);
         } else {
 
+
             CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
 
@@ -116,8 +117,8 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                             .orElse(currentDateTime))
                     .genericLitigationFriend(null);
 
-            } else if (!caseData.getSelectLitigationFriend().getValue().getLabel().equals("Both")) {
-                if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent Two")) {
+            } else if (caseData.getSelectLitigationFriend().getValue().getLabel() != "Both") {
+                if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent Two")) {
                     caseDataUpdated
                         .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
                         .respondent2LitigationFriendDate(currentDateTime)
@@ -125,7 +126,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                             ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
                                 .orElse(currentDateTime))
                         .genericLitigationFriend(null);
-                } else if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent One")) {
+                } else if (caseData.getSelectLitigationFriend().getValue().getLabel().contains("Respondent One")) {
                     caseDataUpdated
                         .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
                         .respondent1LitigationFriendDate(currentDateTime)
@@ -135,7 +136,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                         .genericLitigationFriend(null);
                 }
             } else {
-                isLitigationFriendForToBothParty(caseData);
                 caseDataUpdated
                     .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
                     .respondent1LitigationFriendDate(currentDateTime)
@@ -174,6 +174,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             dynamicListOptions.add("Respondent Two: " + caseData.getRespondent2().getPartyName());
         }
 
+        isLitigationFriendForToBothParty(caseData);
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions));

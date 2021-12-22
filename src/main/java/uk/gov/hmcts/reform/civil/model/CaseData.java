@@ -241,9 +241,11 @@ public class CaseData implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
+    private final LocalDateTime genericLitigationFriendDate;
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
+    private final LocalDateTime genericLitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
 
     private final List<IdValue<Bundle>> caseBundles;
