@@ -104,7 +104,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             return aboutToSubmitWithGenericFriend(callbackParams);
         } else {
 
-
             CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
 

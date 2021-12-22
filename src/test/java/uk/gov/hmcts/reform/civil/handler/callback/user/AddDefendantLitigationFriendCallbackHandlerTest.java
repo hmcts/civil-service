@@ -126,7 +126,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
 
-
         }
 
         @Test
@@ -216,8 +215,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder().
-                atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
