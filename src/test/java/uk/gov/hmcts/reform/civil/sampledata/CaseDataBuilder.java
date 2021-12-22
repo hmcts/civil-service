@@ -1129,29 +1129,20 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentOne() {
+    public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        selectLitigationFriend = null;
-
+        addGenericRespondentLitigationFriend();
         return this;
     }
 
-    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForRespondentTwo() {
+    public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        respondent2SameLegalRepresentative=YES;
-
+        addRespondentLitigationFriend();
         return this;
     }
 
-    public CaseDataBuilder atStateAddLitigationFriend_1v2_andAndAddForBoth() {
-        atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
-        selectLitigationFriend("Both");
-
-        return this;
-    }
     public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension() {
         atStateClaimDetailsNotified();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -1563,6 +1554,30 @@ public class CaseDataBuilder {
             .build();
         this.respondent1LitigationFriendDate = claimNotificationDate.plusDays(1);
         this.respondent1LitigationFriendCreatedDate = claimNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder addGenericRespondentLitigationFriend() {
+        this.genericLitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1LitigationFriend() {
+        this.respondent1LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addBothRespondent1LitigationFriend() {
+        this.respondent1LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .build();
+        this.respondent2LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend 2")
+            .build();
         return this;
     }
 
