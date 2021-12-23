@@ -141,7 +141,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("")
-            .startsWith("Respondent Two:");
+            .startsWith("Defendant Two:");
     }
 
     @Override

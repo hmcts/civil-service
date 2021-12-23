@@ -146,7 +146,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private boolean shouldEmailRespondent2Solicitor(CaseData caseData) {
         return caseData.getDefendantSolicitorNotifyClaimOptions() != null
             && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()
-            .startsWith("Respondent Two:");
+            .startsWith("Defendant Two:");
     }
 
     @Override

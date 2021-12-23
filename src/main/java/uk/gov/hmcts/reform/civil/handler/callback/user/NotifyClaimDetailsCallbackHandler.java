@@ -141,10 +141,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
-        dynamicListOptions.add("Respondent One: " + caseData.getRespondent1().getPartyName());
+        dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
 
         if (nonNull(caseData.getRespondent2())) {
-            dynamicListOptions.add("Respondent Two: " + caseData.getRespondent2().getPartyName());
+            dynamicListOptions.add("Defendant Two: " + caseData.getRespondent2().getPartyName());
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

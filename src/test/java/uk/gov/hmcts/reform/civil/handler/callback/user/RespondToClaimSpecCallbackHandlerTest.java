@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
+import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +37,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private PaymentDateValidator validator;
+    @Mock
+    private UnavailableDateValidator dateValidator;
 
     @BeforeEach
     public void setup() {
@@ -78,6 +82,27 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void testSpecDefendantResponseFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+        }
+    }
+
+    @Nested
+    class AdmitsPartOfTheClaimTest {
+
+        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -97,23 +122,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceFastTrack()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-        }
-
-        @Test
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -130,5 +138,59 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
+
+        @Test
+        public void testValidateLengthOfUnemploymentWithError() {
+            CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
+            CallbackParams params = callbackParamsOf(caseData,
+                                                     MID, "validate-length-of-unemployment",
+                                                     "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            List<String> expectedErrorArray = new ArrayList<>();
+            expectedErrorArray.add("Length of time unemployed must be a whole number, for example, 10.");
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
+        }
+
+        @Test
+        public void testValidateRespondentPaymentDate() {
+            CaseData caseData = CaseDataBuilder.builder().generatePaymentDateForAdmitPartResponse().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date",
+                                                     "DEFENDANT_RESPONSE_SPEC"
+            );
+            when(validator.validate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            List<String> expectedErrorArray = new ArrayList<>();
+            expectedErrorArray.add("Date for when will the amount be paid must be today or in the future.");
+
+            assertThat(response).isNotNull();
+            /*
+             * It was not possible to capture the error message generated by @FutureOrPresent in the class
+             * */
+            //assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
+            assertEquals("Validation error", response.getErrors().get(0));
+        }
+
+        @Test
+        public void testValidateRepaymentDate() {
+            CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
+            CallbackParams params = callbackParamsOf(caseData, MID,
+                                                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC");
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertEquals("Validation error", response.getErrors().get(0));
+
+        }
+
     }
 }
