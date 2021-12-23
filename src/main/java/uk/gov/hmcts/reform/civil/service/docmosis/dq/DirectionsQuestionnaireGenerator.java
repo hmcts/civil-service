@@ -35,6 +35,8 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
@@ -88,7 +90,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private Boolean isRespondentState(CaseData caseData) {
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        return state.equals(FULL_DEFENCE.fullName());
+        return state.equals(FULL_DEFENCE.fullName()) || state.equals(AWAITING_RESPONSES_RECEIVED.fullName()) || state.equals(ALL_RESPONSES_RECEIVED.fullName());
     }
 
     private Party getApplicant(CaseData caseData) {
@@ -105,6 +107,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private List<Party> getRespondents(CaseData caseData) {
         var respondent = caseData.getRespondent1();
+        if(stateFlowEngine.evaluate(caseData).getFlags().get("RESPONDENT_SOLICITOR_TWO")){
+            respondent = caseData.getRespondent2();
+        }
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
