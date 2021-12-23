@@ -1152,6 +1152,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAddRespondent1GenericLitigationFriend_1v2_SameSolicitor() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        addGenericRespondentLitigationFriend();
+        addRespondent1LitigationFriend();
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddRespondent2GenericLitigationFriend_1v2_SameSolicitor() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        addGenericRespondentLitigationFriend();
+        addRespondent2LitigationFriend();
+        return this;
+    }
+
+    public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_SameSolicitor() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimOneDefendantSolicitor();
+        addRespondent2LitigationFriend();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension() {
         atStateClaimDetailsNotified();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -1575,6 +1598,13 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addRespondent1LitigationFriend() {
         this.respondent1LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Litigation Friend")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2LitigationFriend() {
+        this.respondent2LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
             .build();
         return this;
