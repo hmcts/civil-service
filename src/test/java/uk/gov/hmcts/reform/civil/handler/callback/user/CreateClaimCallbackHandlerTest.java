@@ -1018,6 +1018,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .build());
             }
         }
+
         @Nested
         class Respondent1HaveLegalRepresentation1V2SameSolicitor {
 

@@ -509,16 +509,15 @@ public class EventHistoryMapper {
 
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-        String ResponseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
+        String responseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
 
         if ((dateAcknowledge == null) && (caseData.getRespondent2AcknowledgeNotificationDate() == null)) {
             return;
         }
 
-        if(caseData.getRespondent2AcknowledgeNotificationDate()!= null)
-        {
+        if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
             dateAcknowledge = caseData.getRespondent2AcknowledgeNotificationDate();
-            ResponseIntentionType= caseData.getRespondent2ClaimResponseIntentionType().getLabel();
+            responseIntentionType = caseData.getRespondent2ClaimResponseIntentionType().getLabel();
         }
 
         builder
@@ -544,11 +543,12 @@ public class EventHistoryMapper {
                         .dateReceived(dateAcknowledge)
                         .litigiousPartyID("002")
                         .eventDetails(EventDetails.builder()
-                                          .responseIntention(ResponseIntentionType)
+                                          .responseIntention(responseIntentionType)
                                           .build())
                         .eventDetailsText(format(
                             "responseIntention: %s",
-                            ResponseIntentionType))
+                            responseIntentionType
+                        ))
                         .build()
                 ));
     }

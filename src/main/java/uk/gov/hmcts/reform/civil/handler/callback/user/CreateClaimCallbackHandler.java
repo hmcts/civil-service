@@ -251,6 +251,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
+
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
@@ -264,16 +265,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
         }
     }
+
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
-
-        if (caseData.getRespondent1OrgRegistered() == YES &&
-            caseData.getRespondent1Represented() == YES &&
-            caseData.getRespondent2SameLegalRepresentative() == YES) {
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
 
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
