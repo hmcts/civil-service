@@ -100,7 +100,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             return aboutToSubmit(callbackParams);
             //when CCD changes are merged
         } else if (!featureToggleService.isMultipartyEnabled() && caseData.getGenericLitigationFriend() != null) {
-
             return aboutToSubmitWithGenericFriend(callbackParams);
         } else {
 
@@ -147,6 +146,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                         ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
                             .orElse(currentDateTime))
                     .genericLitigationFriend(null);
+                isLitigationFriendForToBothParty(caseData);
             }
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataUpdated.build().toMap(objectMapper))
@@ -173,7 +173,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             dynamicListOptions.add("Respondent Two: " + caseData.getRespondent2().getPartyName());
         }
 
-        isLitigationFriendForToBothParty(caseData);
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions));

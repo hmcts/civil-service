@@ -196,7 +196,6 @@ public class CaseDataBuilder {
     private BigDecimal breakDownInterestTotal;
     protected LocalDateTime respondent1LitigationFriendDate;
     protected LocalDateTime respondent2LitigationFriendDate;
-    protected LocalDateTime genericLitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
     protected DynamicList defendantSolicitorNotifyClaimDetailsOptions;
     protected DynamicList selectLitigationFriend;

@@ -271,6 +271,23 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         }
 
         @Test
+        void shouldTestGenericLitFriend_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .addRespondent1LitigationFriend()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriend.fullName")
+                .isEqualTo("Mr Litigation Friend");
+
+        }
+
+        @Test
         void shouldSetRespondent2_whenRespondent1OptionIsSelected_WithMultiParty_1v2_SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
