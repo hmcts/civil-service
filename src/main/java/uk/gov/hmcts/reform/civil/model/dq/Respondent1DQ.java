@@ -25,6 +25,7 @@ public class Respondent1DQ implements DQ {
     private final Witnesses respondent1DQWitnesses;
     private final Hearing respondent1DQHearing;
     private final SmallClaimHearing respondent1DQHearingSmallClaim;
+    private final SmallClaimHearing respondent1DQHearingSmallClaimPartAdmit;
     private final HearingLRspec respondent1DQHearingFastClaim;
     private final Document respondent1DQDraftDirections;
     private final RequestedCourt respondent1DQRequestedCourt;
