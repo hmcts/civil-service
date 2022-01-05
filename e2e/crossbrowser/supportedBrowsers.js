@@ -16,18 +16,18 @@ const supportedBrowsers = {
 
   // passing:  safari, chrome_win_latest, chrome_mac_latest, firefox_win
   //failing: ie11-win, firefox_mac
-  // safari: {
-  //   safari_mac_latest: {
-  //     browserName: 'safari',
-  //     platformName: 'macOS 11.00',
-  //     browserVersion: 'latest',
-  //     'sauce:options': {
-  //       name: 'Civil: MAC_SAFARI',
-  //       seleniumVersion: '3.141.59',
-  //       screenResolution: '1376x1032',
-  //     },
-  //   },
-  // },
+  safari: {
+    safari_mac_latest: {
+      browserName: 'safari',
+      platformName: 'macOS 11.00',
+      browserVersion: 'latest',
+      'sauce:options': {
+        name: 'Civil: MAC_SAFARI',
+        seleniumVersion: '3.141.59',
+        screenResolution: '1376x1032',
+      },
+    },
+  },
   chrome: {
     chrome_win_latest: {
       browserName: 'chrome',
