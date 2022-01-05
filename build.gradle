@@ -322,7 +322,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.0'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.1'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.1'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.16-preview.1'
@@ -342,7 +342,7 @@ dependencies {
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.16.0'
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.0'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.1'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.0'
 
   // JAX-B dependencies for JDK 9+
@@ -352,9 +352,9 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.2.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
