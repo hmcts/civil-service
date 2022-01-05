@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import javax.validation.constraints.PastOrPresent;
 
@@ -12,11 +11,11 @@ import javax.validation.constraints.PastOrPresent;
 @Builder
 public class RespondToClaim {
 
-    private final BigDecimal howMuchWasPaid;
+    // TODO CCD-2383. Until that is resolved, this field has to be a String
+    private final String howMuchWasPaid;
     @PastOrPresent(message = "Date for when amount was paid must be today or in the past",
         groups = PaymentDateGroup.class)
     private final LocalDate whenWasThisAmountPaid;
     private final PaymentMethod howWasThisAmountPaid;
     private final String howWasThisAmountPaidOther;
-
 }

@@ -96,7 +96,8 @@ public class CaseDataBuilder {
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDate PAST_DATE = now().minusDays(1);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
-    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
+    public static final String FAST_TRACK_CLAIM_AMOUNT_STRING = "10000";
+    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = new BigDecimal(FAST_TRACK_CLAIM_AMOUNT_STRING);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
     // Create Claim
@@ -1406,7 +1407,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentRespondToClaimFastTrack(RespondentResponseType respondentResponseType) {
         atStateNotificationAcknowledged();
-        respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT).build();
+        respondToClaim = RespondToClaim.builder().howMuchWasPaid(FAST_TRACK_CLAIM_AMOUNT_STRING).build();
         totalClaimAmount = FAST_TRACK_CLAIM_AMOUNT;
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;

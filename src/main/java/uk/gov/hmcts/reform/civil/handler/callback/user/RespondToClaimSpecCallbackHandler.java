@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,14 +133,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
+            // TODO CCD-2383. Until that is resolved, this field has to be a String
+            && new BigDecimal(caseData.getRespondToClaim().getHowMuchWasPaid())
+            .compareTo(caseData.getTotalClaimAmount()) < 0) {
             caseData = caseData.toBuilder()
                 .respondent1ClaimResponsePaymentAdmissionForSpec(
                     RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
         } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
             .equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
+            // TODO CCD-2383. Until that is resolved, this field has to be a String
+            && new BigDecimal(caseData.getRespondToClaim().getHowMuchWasPaid())
+            .compareTo(caseData.getTotalClaimAmount()) >= 0) {
             caseData = caseData.toBuilder()
                 .respondent1ClaimResponsePaymentAdmissionForSpec(
                     RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
@@ -148,8 +153,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                         null);
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
+            caseData.getTotalClaimAmount(),
+            null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
