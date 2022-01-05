@@ -1047,33 +1047,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class Respondent1HaveLegalRepresentation1V2SameSolicitor {
-
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .multiPartyClaimOneDefendantSolicitor().build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-                String body = format(
-                    CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
-                ) + exitSurveyContentService.applicantSurvey();
-
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
-                        ))
-                        .confirmationBody(body)
-                        .build());
-            }
-        }
-
-        @Nested
         class Respondent1SolicitorOrgNotRegisteredInMyHmcts {
 
             @Test

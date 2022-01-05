@@ -37,7 +37,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        AcknowledgementOfClaimForm templateData = getTemplateData(caseData);
+        AcknowledgementOfClaimForm templateData = getTemplateDataForAcknowldgeClaim(caseData);
         DocmosisTemplates docmosisTemplate =
             getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N9;
         DocmosisDocument docmosisDocument =
@@ -112,5 +112,18 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
             }
         }
         return respondentParties;
+    }
+
+    public AcknowledgementOfClaimForm getTemplateDataForAcknowldgeClaim(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        return AcknowledgementOfClaimForm.builder()
+            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .referenceNumber(caseData.getLegacyCaseReference())
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData))
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
+            .build();
+
     }
 }
