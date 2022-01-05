@@ -148,10 +148,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
-            caseData.getTotalClaimAmount(),
-            null
-        );
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+            null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
