@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import javax.validation.constraints.PastOrPresent;
 
@@ -11,8 +13,8 @@ import javax.validation.constraints.PastOrPresent;
 @Builder
 public class RespondToClaim {
 
-    // TODO CCD-2383. Until that is resolved, this field has to be a String
-    private final String howMuchWasPaid;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal howMuchWasPaid;
     @PastOrPresent(message = "Date for when amount was paid must be today or in the past",
         groups = PaymentDateGroup.class)
     private final LocalDate whenWasThisAmountPaid;
