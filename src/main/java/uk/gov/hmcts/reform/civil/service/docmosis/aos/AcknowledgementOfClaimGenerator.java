@@ -25,7 +25,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9_MULTIPARTY_SAME_SOL;
 
 @Service
@@ -39,7 +39,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     public CaseDocument generate(CaseData caseData, String authorisation) {
         AcknowledgementOfClaimForm templateData = getTemplateDataForAcknowldgeClaim(caseData);
         DocmosisTemplates docmosisTemplate =
-            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N9;
+            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N11;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 

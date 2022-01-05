@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
@@ -56,7 +56,7 @@ class AcknowledgementOfClaimGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N9.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String fileName = format(N11.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
         .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
@@ -83,8 +83,8 @@ class AcknowledgementOfClaimGeneratorTest {
 
     @Test
     void shouldGenerateAcknowledgementOfClaim_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N9)))
-            .thenReturn(new DocmosisDocument(N9.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
@@ -117,7 +117,7 @@ class AcknowledgementOfClaimGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService)
-            .generateDocmosisDocument(expectedDocmosisData, N9);
+            .generateDocmosisDocument(expectedDocmosisData, N11);
     }
 
     @Test
@@ -146,8 +146,8 @@ class AcknowledgementOfClaimGeneratorTest {
 
     @Test
     void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitorDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N9)))
-            .thenReturn(new DocmosisDocument(N9.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
@@ -165,7 +165,7 @@ class AcknowledgementOfClaimGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
-            any(AcknowledgementOfClaimForm.class), eq(N9));
+            any(AcknowledgementOfClaimForm.class), eq(N11));
     }
 
     @Nested
