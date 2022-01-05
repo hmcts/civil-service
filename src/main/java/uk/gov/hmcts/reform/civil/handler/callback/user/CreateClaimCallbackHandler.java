@@ -120,7 +120,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
-        String userBearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = onboardingOrganisationControlService.validateOrganisation();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
