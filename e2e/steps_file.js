@@ -122,6 +122,7 @@ module.exports = function () {
 
         if (!config.idamStub.enabled || config.idamStub.enabled === 'false') {
           output.log(`Signing in user: ${user.type}`);
+          this.click('#cookie-reject-submit');
           await loginPage.signIn(user);
         }
       }, SIGNED_IN_SELECTOR);
