@@ -94,6 +94,8 @@ const CASE_HEADER = 'ccd-case-header > h1';
 
 const TEST_FILE_PATH = './e2e/fixtures/examplePDF.pdf';
 
+const RETRIES = 3
+
 let caseId, screenshotNumber, eventName, currentEventName;
 let eventNumber = 0;
 
@@ -110,9 +112,13 @@ module.exports = function () {
       }
 
       await this.retryUntilExists(async () => {
-        this.amOnPage(config.url.manageCase);
-        this.amOnPage(config.url.manageCase);
-        this.amOnPage(config.url.manageCase);
+        for (let i = 0; i < RETRIES; i++) {
+          this.amOnPage(config.url.manageCase);
+          this.wait(5);
+          if (this.seeInCurrentUrl('redirect_uri')) {
+            break;
+          }
+        }
 
         if (!config.idamStub.enabled || config.idamStub.enabled === 'false') {
           output.log(`Signing in user: ${user.type}`);
