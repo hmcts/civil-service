@@ -91,6 +91,7 @@ const specConfirmLegalRepDetails = require('./fragments/confirmLegalRepDetailsLR
 const SIGNED_IN_SELECTOR = 'exui-header';
 const SIGNED_OUT_SELECTOR = '#global-header';
 const CASE_HEADER = 'ccd-case-header > h1';
+const REJECT_COOKIES = '#cookie-reject-submit';
 
 const TEST_FILE_PATH = './e2e/fixtures/examplePDF.pdf';
 
@@ -122,7 +123,10 @@ module.exports = function () {
 
         if (!config.idamStub.enabled || config.idamStub.enabled === 'false') {
           output.log(`Signing in user: ${user.type}`);
-          this.click('#cookie-reject-submit');
+          if (await this.hasSelector(REJECT_COOKIES)) {
+            this.click('#cookie-reject-submit');
+            this.click('#cookie-reject-all-success-banner-hide');
+          }
           await loginPage.signIn(user);
         }
       }, SIGNED_IN_SELECTOR);
