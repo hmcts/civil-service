@@ -152,18 +152,17 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "eligibilityCheck";
 
         @Test
-        void shouldReturnError_whenOrganisationIsNotRegistered() {
+        void shouldNotReturnError_whenOrganisationIsNotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().build();
 
             given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
-                .willReturn(List.of(format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd")));
+                .willReturn(List.of());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors())
-                .containsExactly(format(ORG_NOT_ONBOARDED, "Solicitor tribunal ltd"));
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test

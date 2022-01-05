@@ -43,14 +43,13 @@ class OnBoardingOrganisationControlServiceTest {
     }
 
     @Test
-    void shouldReturnError_whenOrganisationNotInAllowedList() {
+    void shouldNotReturnError_whenOrganisationNotInAllowedList() {
         String firm = "Solicitor tribunal ltd";
         when(organisationService.findOrganisation(USER_TOKEN))
             .thenReturn(Optional.of(Organisation.builder().name(firm).organisationIdentifier("0F99S99").build()));
 
         when(featureToggleService.isOrganisationOnboarded("0F99S99")).thenReturn(false);
 
-        assertThat(onBoardingOrganisationControlService.validateOrganisation(USER_TOKEN))
-            .contains(ORG_NOT_ONBOARDED);
+        assertThat(onBoardingOrganisationControlService.validateOrganisation(USER_TOKEN)).isEmpty();
     }
 }
