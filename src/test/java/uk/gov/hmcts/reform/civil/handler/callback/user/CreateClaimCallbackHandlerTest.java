@@ -154,7 +154,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnError_whenOrganisationIsNotRegistered() {
             CaseData caseData = CaseDataBuilder.builder().build();
 
-            given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
+            given(onBoardingOrganisationControlService.validateOrganisation())
                 .willReturn(List.of());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -168,7 +168,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnError_whenOrganisationIsRegistered() {
             CaseData caseData = CaseDataBuilder.builder().build();
 
-            given(onBoardingOrganisationControlService.validateOrganisation("BEARER_TOKEN"))
+            given(onBoardingOrganisationControlService.validateOrganisation())
                 .willReturn(List.of());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

@@ -38,7 +38,7 @@ class OnBoardingOrganisationControlServiceTest {
 
         when(featureToggleService.isOrganisationOnboarded("0FA7S8S")).thenReturn(true);
 
-        assertThat(onBoardingOrganisationControlService.validateOrganisation(USER_TOKEN)).isEmpty();
+        assertThat(onBoardingOrganisationControlService.validateOrganisation()).isEmpty();
     }
 
     @Test
@@ -49,6 +49,6 @@ class OnBoardingOrganisationControlServiceTest {
 
         when(featureToggleService.isOrganisationOnboarded("0F99S99")).thenReturn(false);
 
-        assertThat(onBoardingOrganisationControlService.validateOrganisation(USER_TOKEN)).isEmpty();
+        assertThat(onBoardingOrganisationControlService.validateOrganisation()).isEmpty();
     }
 }

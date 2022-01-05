@@ -163,7 +163,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
         String userBearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<String> errors = onboardingOrganisationControlService.validateOrganisation(userBearerToken);
+        List<String> errors = onboardingOrganisationControlService.validateOrganisation();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
