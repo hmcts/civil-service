@@ -72,7 +72,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCal
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService.ORG_NOT_ONBOARDED;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {

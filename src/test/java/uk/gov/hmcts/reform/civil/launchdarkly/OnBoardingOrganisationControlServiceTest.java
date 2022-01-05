@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService.ORG_NOT_ONBOARDED;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
