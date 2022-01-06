@@ -17,12 +17,16 @@ public enum MultiPartyScenario {
         }
 
         if (caseData.getRespondent2() != null) {
-            return  (caseData.getRespondent2SameLegalRepresentative() == null
+            return (caseData.getRespondent2SameLegalRepresentative() == null
                 || caseData.getRespondent2SameLegalRepresentative().equals(NO))
                 ? ONE_V_TWO_TWO_LEGAL_REP
                 : ONE_V_TWO_ONE_LEGAL_REP;
         }
 
         return ONE_V_ONE;
+    }
+
+    public static boolean isMultiPartyScenario(CaseData caseData) {
+        return caseData.getApplicant2() != null || caseData.getRespondent2() != null;
     }
 }

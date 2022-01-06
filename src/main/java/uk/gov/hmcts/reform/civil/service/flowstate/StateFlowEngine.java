@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -93,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @Component
 @RequiredArgsConstructor
@@ -101,9 +103,9 @@ public class StateFlowEngine {
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
 
-    public StateFlow build() {
+    public StateFlow build(FlowState.Main initialState) {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
-            .initial(DRAFT)
+            .initial(initialState)
                 .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
                     .set(flags -> flags.putAll(
                         Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
@@ -121,17 +123,41 @@ public class StateFlowEngine {
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
-                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented
-                                                                                       .or(respondent2NotRepresented))
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered
-                                                                                      .or(respondent2OrgNotRegistered))
+            .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
+            // Unrepresented
+            // 1. Both def1 and def2 unrepresented
+            // 2. Def1 unrepresented, Def2 registered
+            // 3. Def1 registered, Def 2 unrepresented
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(
+                (respondent1NotRepresented.and(respondent2NotRepresented))
+                    .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                    .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
+            // Unregistered
+            // 1. Both def1 and def2 unregistered
+            // 2. Def1 unregistered, Def2 registered
+            // 3. Def1 registered, Def 2 unregistered
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
+                ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                    .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                    .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                            .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                    .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))))
+            // Unrepresented and Unregistered
+            // 1. Def1 unrepresented, Def2 unregistered
+            // 2. Def1 unregistered, Def 2 unrepresented
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
+                (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                    .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
+                            .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem)
             .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
             .state(CLAIM_ISSUED)
                 .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
@@ -237,115 +263,13 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
             .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+            .state(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
             .state(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)
             .state(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
-            .build();
-    }
-
-    public StateFlow buildSpec() {
-        return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
-            .initial(SPEC_DRAFT)
-            .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
-            .state(CLAIM_SUBMITTED)
-            .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
-            .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
-            .state(CLAIM_ISSUED_PAYMENT_FAILED)
-            .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
-            .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
-            .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(respondent1NotRepresented)
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(respondent1OrgNotRegistered)
-            .state(PENDING_CLAIM_ISSUED)
-            .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem)
-            .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
-            .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
-            .state(CLAIM_ISSUED)
-            .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
-            .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
-            .state(CLAIM_NOTIFIED)
-            .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
-            .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimNotified)
-            .transitionTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
-            .onlyIf(pastClaimDetailsNotificationDeadline)
-            .state(CLAIM_DETAILS_NOTIFIED)
-            .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-            .onlyIf((not(notificationAcknowledged)))
-            .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-            .transitionTo(FULL_DEFENCE)
-            .onlyIf(fullDefence.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
-            .transitionTo(FULL_ADMISSION)
-            .onlyIf(fullAdmission.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
-            .transitionTo(PART_ADMISSION)
-            .onlyIf(partAdmission.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
-            .transitionTo(COUNTER_CLAIM)
-            .onlyIf(counterClaim.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
-            .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
-            .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-            .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-            .transitionTo(FULL_DEFENCE)
-            .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullDefence))
-            .transitionTo(FULL_ADMISSION)
-            .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullAdmission))
-            .transitionTo(PART_ADMISSION)
-            .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
-            .transitionTo(COUNTER_CLAIM)
-            .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(counterClaim))
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotifiedExtension)
-            .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyIf(caseDismissedAfterDetailNotifiedExtension)
-            .state(NOTIFICATION_ACKNOWLEDGED)
-            .transitionTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
-            .onlyIf(notificationAcknowledged.and(respondent1TimeExtension))
-            .transitionTo(FULL_DEFENCE)
-            .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(fullDefence))
-            .transitionTo(FULL_ADMISSION)
-            .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(fullAdmission))
-            .transitionTo(PART_ADMISSION)
-            .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(partAdmission))
-            .transitionTo(COUNTER_CLAIM)
-            .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(counterClaim))
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF)
-            .onlyIf(takenOfflineByStaffAfterNotificationAcknowledged)
-            .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
-            .transitionTo(FULL_DEFENCE)
-            .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullDefence))
-            .transitionTo(FULL_ADMISSION)
-            .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullAdmission))
-            .transitionTo(PART_ADMISSION)
-            .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(partAdmission))
-            .transitionTo(COUNTER_CLAIM)
-            .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(counterClaim))
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF)
-            .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
-            .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
-            .state(FULL_DEFENCE)
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(fullDefenceProceed)
-            .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
-            .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-            .onlyIf(applicantOutOfTime)
-            .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
-            .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
-            .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
-            .state(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-            .transitionTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
-            .onlyIf(applicantOutOfTimeProcessedByCamunda)
-            .state(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
-            .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
-            .state(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
-            .state(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(claimDismissedByCamunda)
             .build();
     }
 
@@ -355,9 +279,9 @@ public class StateFlowEngine {
 
     public StateFlow evaluate(CaseData caseData) {
         if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            return buildSpec().evaluate(caseData);
+            return build(SPEC_DRAFT).evaluate(caseData);
         }
-        return build().evaluate(caseData);
+        return build(DRAFT).evaluate(caseData);
     }
 
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
@@ -365,17 +289,11 @@ public class StateFlowEngine {
     }
 
     public StateFlow evaluateSpec(CaseData caseData) {
-        return buildSpec().evaluate(caseData);
+        return build(SPEC_DRAFT).evaluate(caseData);
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(name -> name.equals(state.fullName()));
-    }
-
-    public boolean hasSpecTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
-        return evaluateSpec(caseDetails).getStateHistory().stream()
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
     }

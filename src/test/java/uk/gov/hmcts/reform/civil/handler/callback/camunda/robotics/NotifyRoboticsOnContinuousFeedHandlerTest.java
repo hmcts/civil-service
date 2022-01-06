@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -68,6 +70,24 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     PrdAdminUserConfiguration userConfig;
     @MockBean
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    @MockBean
+    private Time time;
+
+    @Nested
+    class ValidJsonPayload {
+
+        @Autowired
+        private NotifyRoboticsOnContinuousFeedHandler handler;
+
+        @Test
+        void shouldNotifyRobotics_whenNoSchemaErrors() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
+        }
+    }
 
     @Nested
     class InValidJsonPayload {

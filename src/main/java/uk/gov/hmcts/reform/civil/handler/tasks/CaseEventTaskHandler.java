@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -27,6 +28,9 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SE
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
 @RequiredArgsConstructor
 @Component
@@ -49,7 +53,12 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             .updateActivityId(externalTask.getActivityId());
 
         String flowState = externalTask.getVariable(FLOW_STATE);
-        CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess, flowState);
+        CaseDataContent caseDataContent = caseDataContent(
+            startEventResponse,
+            businessProcess,
+            flowState,
+            startEventData
+        );
         data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 
@@ -64,7 +73,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse,
                                             BusinessProcess businessProcess,
-                                            String flowState) {
+                                            String flowState,
+                                            CaseData caseData) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
         data.put("businessProcess", businessProcess);
 
@@ -72,7 +82,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
                        .summary(getSummary(startEventResponse.getEventId(), flowState))
-                       .description(getDescription(startEventResponse.getEventId(), data))
+                       .description(getDescription(startEventResponse.getEventId(), data, flowState, caseData))
                        .build())
             .data(data)
             .build();
@@ -89,16 +99,18 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case COUNTER_CLAIM:
                     return "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    return "RPA Reason: Unrepresented defendant.";
+                    return "RPA Reason: Unrepresented defendant(s).";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    return "RPA Reason: Unregistered defendant solicitor firm.";
+                    return "RPA Reason: Unregistered defendant solicitor firm(s).";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                    return "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
                 case FULL_DEFENCE_PROCEED:
                     return "RPA Reason: Applicant proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
                     return "RPA Reason: Claimant intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    return "RPA Reason: Only one of the respondent is notified.";
+                    return "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
                 default:
@@ -108,8 +120,10 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return null;
     }
 
-    private String getDescription(String eventId, Map data) {
+    private String getDescription(String eventId, Map data, String state, CaseData caseData) {
         Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             if (Objects.nonNull(claimProceedsInCaseman)) {
                 String claimString = claimProceedsInCaseman.toString();
@@ -131,6 +145,27 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                         }
                     }
                 }
+            }
+
+            switch (flowState) {
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                    return format("Unrepresented defendant: %s",
+                                  StringUtils.join(
+                                             getDefendantNames(UNREPRESENTED, caseData), " and "
+                                         ));
+                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                    return format("Unregistered defendant solicitor firm: %s",
+                                         StringUtils.join(
+                                             getDefendantNames(UNREGISTERED, caseData), " and "
+                                         ));
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                    return format("Unrepresented defendant and unregistered defendant solicitor firm. "
+                                      + "Unrepresented defendant: %s. "
+                                      + "Unregistered defendant solicitor firm: %s.",
+                                         StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                                         StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
+                default:
+                    break;
             }
         }
         return null;

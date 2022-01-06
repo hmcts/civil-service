@@ -11,4 +11,5 @@ public class RoboticsEmailConfiguration {
 
     private String sender;
     private String recipient;
+    private String multipartyrecipient;
 }

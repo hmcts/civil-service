@@ -5,9 +5,11 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -23,14 +25,19 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -87,8 +94,10 @@ public class CaseDataBuilder {
     public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = SUBMITTED_DATE_TIME.plusDays(120);
     public static final LocalDate CLAIM_ISSUED_DATE = now();
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
+    public static final LocalDate PAST_DATE = now().minusDays(1);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
+    public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -198,6 +207,11 @@ public class CaseDataBuilder {
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
+    private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
+    private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
+    private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private RepaymentPlanLRspec respondent1RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -529,13 +543,17 @@ public class CaseDataBuilder {
             case PENDING_CLAIM_ISSUED:
                 return atStatePendingClaimIssued();
             case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                return atStatePendingClaimIssuedUnRegisteredDefendant();
+                return atStatePendingClaimIssuedUnregisteredDefendant();
             case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                return atStatePendingClaimIssuedUnRepresentedDefendant();
+                return atStatePendingClaimIssuedUnrepresentedDefendant();
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                return atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
             case CLAIM_ISSUED:
                 return atStateClaimIssued();
             case CLAIM_NOTIFIED:
                 return atStateClaimNotified();
+            case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                return atStateProceedsOfflineAfterClaimDetailsNotified();
             case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 return atStateProceedsOfflineAfterClaimNotified();
             case CLAIM_DETAILS_NOTIFIED:
@@ -561,7 +579,9 @@ public class CaseDataBuilder {
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                 return atStateProceedsOfflineUnrepresentedDefendants();
             case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
-                return atStateProceedsOfflineUnregisteredDefendant();
+                return atStateProceedsOfflineUnregisteredDefendants();
+            case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                return atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2();
             case TAKEN_OFFLINE_BY_STAFF:
                 return atStateTakenOfflineByStaff();
             case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
@@ -607,7 +627,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendants() {
-        atStatePendingClaimIssuedUnRepresentedDefendant();
+        atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
@@ -616,8 +637,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOffline1v1UnrepresentedDefendant() {
+        atStateProceedsOfflineUnrepresentedDefendants();
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1() {
-        atStatePendingClaimIssuedUnRepresentedDefendant();
+        atStatePendingClaimIssuedUnrepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
@@ -631,18 +660,142 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant() {
-        atStatePendingClaimIssuedUnRegisteredDefendant();
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant2() {
+        atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor2OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .build();
+        respondentSolicitor1OrganisationDetails = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
+        atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        respondent1Represented = YES;
+        respondent2Represented = YES;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
             .organisationName("test org name")
             .fax("123123123")
             .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOffline1v1UnregisteredDefendant() {
+        atStateProceedsOfflineUnregisteredDefendants();
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1() {
+        atStatePendingClaimIssuedUnregisteredDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant2() {
+        atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrgRegistered = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
+        atStatePendingClaimIssuedUnrepresentedDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org name 2")
+            .fax("123123123")
+            .dx("test org dx 2")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
+        respondent2 = PartyBuilder.builder().individual().build();
+        atStatePendingClaimIssuedUnrepresentedDefendant();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg2@email.com")
+            .organisationName("test org name 2")
+            .fax("123123123")
+            .dx("test org dx 2")
             .phoneNumber("0123456789")
             .address(AddressBuilder.defaults().build())
             .build();
@@ -857,7 +1010,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStatePendingClaimIssuedUnRegisteredDefendant() {
+    public CaseDataBuilder atStatePendingClaimIssuedUnregisteredDefendant() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
@@ -868,13 +1021,28 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStatePendingClaimIssuedUnRepresentedDefendant() {
+    public CaseDataBuilder atStatePendingClaimIssuedUnrepresentedDefendant() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
+        respondent1OrgRegistered = NO;
         respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
         respondent2OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant() {
+        atStatePaymentSuccessful();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+        respondent2 = PartyBuilder.builder().individual().build();
         return this;
     }
 
@@ -909,12 +1077,18 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor() {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
-        defendantSolicitorNotifyClaimOptions("Respondent One: Solicitor A");
+        defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor A");
         return this;
     }
 
     public CaseDataBuilder atStateProceedsOfflineAfterClaimNotified() {
         atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineAfterClaimDetailsNotified() {
+        atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         return this;
     }
@@ -1033,6 +1207,17 @@ public class CaseDataBuilder {
             .build();
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentAdmitPartOfClaimFastTrack() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         return this;
     }
 
@@ -1397,6 +1582,61 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder generateYearsAndMonthsIncorrectInput() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+
+        respondToClaimAdmitPartUnemployedLRspec = UnemployedComplexTypeLRspec.builder()
+            .unemployedComplexTypeRequired("No")
+            .lengthOfUnemployment(LengthOfUnemploymentComplexTypeLRspec.builder()
+                                      .numberOfMonthsInUnemployment("1.5")
+                                      .numberOfYearsInUnemployment("2.6")
+                                      .build())
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder generatePaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+
+        respondToClaimAdmitPartLRspec = RespondToClaimAdmitPartLRspec.builder()
+            .whenWillThisAmountBePaid(PAST_DATE)
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder generateRepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+
+        respondent1RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
+        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
+        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -1511,9 +1751,16 @@ public class CaseDataBuilder {
             .superClaimType(UNSPEC_CLAIM)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
+            //spec route
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondToAdmittedClaim(respondToClaim)
+            .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
+            .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
+            .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .build();
     }
 }

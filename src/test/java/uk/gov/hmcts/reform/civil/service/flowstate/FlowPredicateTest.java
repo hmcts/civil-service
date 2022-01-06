@@ -192,7 +192,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
             assertTrue(respondent1NotRepresented.test(caseData));
         }
 
@@ -208,7 +208,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRegisteredDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
             assertTrue(respondent1OrgNotRegistered.test(caseData));
         }
 
