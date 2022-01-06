@@ -63,9 +63,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
     public static final String ERROR_DEFENDANT_RESPONSE_SUBMITTED =
-        "There is a problem" +
-        "\n" +
-        "You have already submitted the defendant's response";
+        "There is a problem"
+        + "\n"
+        + "You have already submitted the defendant's response";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
