@@ -104,12 +104,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UserService userService;
 
     @Nested
-    class AboutToStartCallbackV1 {
+    class AboutToStartCallback {
 
         @Test
         void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -120,7 +120,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToStartCallback {
+    class AboutToStartCallbackV1 {
 
         @Test
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
@@ -128,7 +128,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -141,7 +141,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotError_WhenNoRespondent2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
