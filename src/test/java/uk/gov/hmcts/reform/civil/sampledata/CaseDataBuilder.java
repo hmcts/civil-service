@@ -892,8 +892,6 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        addApplicant2 = NO;
-        addRespondent2 = YES;
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();

@@ -61,6 +61,11 @@ class AcknowledgementOfClaimGeneratorTest {
         .documentName(fileName)
         .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
         .build();
+    private static final String fileName_1v2 = format(N9_MULTIPARTY_SAME_SOL.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final CaseDocument CASE_DOCUMENT_1V2 = CaseDocumentBuilder.builder()
+        .documentName(fileName_1v2)
+        .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
+        .build();
 
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
@@ -126,8 +131,8 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(new DocmosisDocument(N9_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
-            .thenReturn(CASE_DOCUMENT);
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_1v2, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
+            .thenReturn(CASE_DOCUMENT_1V2);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .respondent2(PartyBuilder.builder().individual().build())
@@ -136,10 +141,10 @@ class AcknowledgementOfClaimGeneratorTest {
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_1V2);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName_1v2, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(AcknowledgementOfClaimForm.class), eq(N9_MULTIPARTY_SAME_SOL));
     }
