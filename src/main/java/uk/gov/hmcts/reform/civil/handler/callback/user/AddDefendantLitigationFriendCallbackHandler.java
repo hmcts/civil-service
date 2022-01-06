@@ -49,7 +49,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit_multiparty,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmitMultiparty,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -91,7 +91,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse aboutToSubmit_multiparty(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmitMultiparty(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = time.now();
 
