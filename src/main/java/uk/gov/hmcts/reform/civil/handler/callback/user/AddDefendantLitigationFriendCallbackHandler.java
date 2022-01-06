@@ -167,7 +167,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
-        dynamicListOptions.add("Respondent One: " + caseData.getApplicant1().getPartyName());
+        dynamicListOptions.add("Respondent One: " + caseData.getRespondent1().getPartyName());
 
         if (nonNull(caseData.getRespondent2())) {
             dynamicListOptions.add("Respondent Two: " + caseData.getRespondent2().getPartyName());
