@@ -56,5 +56,4 @@ public class DeadlinesCalculator {
     private boolean is4pmOrAfter(LocalDateTime dateOfService) {
         return dateOfService.getHour() >= 16;
     }
-
 }

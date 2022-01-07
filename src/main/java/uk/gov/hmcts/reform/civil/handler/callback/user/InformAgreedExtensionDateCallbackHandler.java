@@ -180,7 +180,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    public boolean solicitorRepresentsOnlyRespondent2(CallbackParams callbackParams) {
+    private boolean solicitorRepresentsOnlyRespondent2(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 

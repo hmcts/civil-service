@@ -110,17 +110,17 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
         }
-        // Show error message if defendant tries to submit response again
-        if (featureToggleService.isMultipartyEnabled()) {
-            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
-                && caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
-                    .build();
-            }
+        // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
+        if (featureToggleService.isMultipartyEnabled()
+            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null)
+            || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                .build();
         }
+
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1AcknowledgeNotificationDate() != null) {
@@ -174,7 +174,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
