@@ -13,6 +13,9 @@ import javax.validation.constraints.PastOrPresent;
 @Builder
 public class RespondToClaim {
 
+    /**
+     * money amount in pence.
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal howMuchWasPaid;
     @PastOrPresent(message = "Date for when amount was paid must be today or in the past",

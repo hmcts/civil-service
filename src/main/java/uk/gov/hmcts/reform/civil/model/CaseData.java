@@ -123,6 +123,9 @@ public class CaseData implements MappableObject {
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
+    /**
+     * money amount in pounds.
+     */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
     private final YesOrNo claimInterest;
@@ -157,8 +160,16 @@ public class CaseData implements MappableObject {
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
+    /**
+     * money amount in pence.
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    /**
+     * money amount in pounds.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;

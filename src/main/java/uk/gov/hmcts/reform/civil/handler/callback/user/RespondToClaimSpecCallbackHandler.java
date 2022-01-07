@@ -33,6 +33,8 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,6 +123,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
+        if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
+            BigDecimal valuePounds = caseData.getRespondToAdmittedClaimOwingAmount().divide(
+                BigDecimal.valueOf(100),
+                2,
+                RoundingMode.FLOOR
+            );
+            caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
+                .build();
+        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
@@ -131,25 +142,27 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
-            caseData = caseData.toBuilder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
-        } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(caseData.getDefenceRouteRequired())
-            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
-            caseData = caseData.toBuilder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
+            int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
+                .compareTo(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(100)));
+            if (comparison < 0) {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+            } else {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+            }
         }
         return caseData;
     }
 
     private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                         null);
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
+            caseData.getTotalClaimAmount(),
+            null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
