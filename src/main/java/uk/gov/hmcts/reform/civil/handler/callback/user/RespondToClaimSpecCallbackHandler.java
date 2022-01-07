@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -124,11 +125,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
-            BigDecimal valuePounds = caseData.getRespondToAdmittedClaimOwingAmount().divide(
-                BigDecimal.valueOf(100),
-                2,
-                RoundingMode.FLOOR
-            );
+            BigDecimal valuePounds = MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
             caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
                 .build();
         }
