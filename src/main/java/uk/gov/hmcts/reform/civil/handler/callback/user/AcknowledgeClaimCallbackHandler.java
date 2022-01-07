@@ -78,7 +78,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
-            callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
+            callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV2,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -163,22 +163,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .respondent1AcknowledgeNotificationDate(time.now())
-            .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
             .build();
     }
 

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
@@ -66,6 +68,7 @@ class AcknowledgementOfClaimGeneratorTest {
         .documentName(fileName_1v2)
         .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
         .build();
+    private LocalDateTime acknowledgementDate;
 
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
@@ -150,7 +153,7 @@ class AcknowledgementOfClaimGeneratorTest {
     }
 
     @Test
-    void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitorDataIsProvided() {
+    void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitor1DataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
             .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
 
@@ -160,6 +163,87 @@ class AcknowledgementOfClaimGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(AcknowledgementOfClaimForm.class), eq(N11));
+    }
+
+    @Test
+    void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitor2DataIsProvided() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1AcknowledgeNotificationDate(null)
+            .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(AcknowledgementOfClaimForm.class), eq(N11));
+    }
+
+    @Test
+    void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitor1AcknowledgesFirst() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(AcknowledgementOfClaimForm.class), eq(N11));
+    }
+
+    @Test
+    void shouldGenerateAcknowledgementOfClaim_when1V2DifferentSolicitor2AcknowledgesFirst() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
+            .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();

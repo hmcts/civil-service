@@ -57,12 +57,4 @@ public class DeadlinesCalculator {
         return dateOfService.getHour() >= 16;
     }
 
-    public LocalDateTime plus28DaysAt4pmDeadline(LocalDateTime startDate) {
-        LocalDateTime dateTime = startDate;
-        if (is4pmOrAfter(startDate)) {
-            dateTime = startDate.plusDays(1);
-        }
-        LocalDate notificationDeadline = dateTime.plusDays(28).toLocalDate();
-        return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
-    }
 }
