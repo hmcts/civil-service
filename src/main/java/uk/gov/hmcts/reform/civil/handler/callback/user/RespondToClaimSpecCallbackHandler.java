@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,7 +124,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
-            BigDecimal valuePounds = MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
+            BigDecimal valuePounds = MonetaryConversions
+                .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
             caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
                 .build();
         }
