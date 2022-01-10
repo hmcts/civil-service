@@ -3,7 +3,5 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 public enum FlowFlag {
     ONE_RESPONDENT_REPRESENTATIVE,
     TWO_RESPONDENT_REPRESENTATIVES,
-    RPA_CONTINUOUS_FEED,
-    RESPONDENT_SOLICITOR_ONE,
-    RESPONDENT_SOLICITOR_TWO
+    RPA_CONTINUOUS_FEED
 }

@@ -107,9 +107,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private List<Party> getRespondents(CaseData caseData) {
         var respondent = caseData.getRespondent1();
-        if(stateFlowEngine.evaluate(caseData).getFlags().get("RESPONDENT_SOLICITOR_TWO")){
+
+        if ((caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null)) {
             respondent = caseData.getRespondent2();
+        } else if ((caseData.getRespondent1ResponseDate() != null
+                    && caseData.getRespondent2ResponseDate() != null)){
+            if(caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())){
+                respondent = caseData.getRespondent2();
+            }
         }
+
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())

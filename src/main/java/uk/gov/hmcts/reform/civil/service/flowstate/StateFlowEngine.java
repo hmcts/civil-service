@@ -57,8 +57,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1Detected;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2Detected;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -151,9 +149,6 @@ public class StateFlowEngine {
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(AWAITING_RESPONSES_RECEIVED).onlyIf(awaitingResponses)
-                    .set(flags -> flags.putAll(
-                        Map.of(FlowFlag.RESPONDENT_SOLICITOR_ONE.name(), respondent1Detected.equals(true)?true:false,
-                               FlowFlag.RESPONDENT_SOLICITOR_TWO.name(), respondent2Detected.equals(true)?true:false)))
             .state(AWAITING_RESPONSES_RECEIVED)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
@@ -163,9 +158,6 @@ public class StateFlowEngine {
             .state(ALL_RESPONSES_RECEIVED)
                 .transitionTo(FULL_DEFENCE)
                     .onlyIf(fullDefence.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
-                        .set(flags -> flags.putAll(
-                            Map.of(FlowFlag.RESPONDENT_SOLICITOR_ONE.name(), respondent1Detected.equals(true)?true:false,
-                                   FlowFlag.RESPONDENT_SOLICITOR_TWO.name(), respondent2Detected.equals(true)?true:false)))
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(fullAdmission.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
                 .transitionTo(PART_ADMISSION)

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -188,32 +187,6 @@ public class FlowPredicate {
                 break;
         }
         return predicate;
-    }
-    //TODO find a way to identify if respondent1 is logged in, in order to set the flag in the state flow
-    public static final Predicate<CaseData> respondent1Detected = caseData ->
-        detectRespondent1(caseData);
-
-    private static boolean detectRespondent1(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() == null)
-                    || (caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
-            default:
-                return false;
-        }
-    }
-    //TODO find a way to identify if respondent2 is logged in, in order to set the flag in the state flow
-    public static final Predicate<CaseData> respondent2Detected = caseData ->
-        detectRespondent2(caseData);
-
-    private static boolean detectRespondent2(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null)
-                    || (caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
-            default:
-                return false;
-        }
     }
 
     public static final Predicate<CaseData> fullDefenceAfterNotifyDetails = caseData ->
