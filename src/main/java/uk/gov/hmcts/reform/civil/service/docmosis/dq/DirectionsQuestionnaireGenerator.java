@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,6 +67,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
         DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+        //do we need to have a new object for Respondent2DQ?
+
+        if(isRespondent2(caseData)){
+            return DirectionsQuestionnaireForm.builder()
+                .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                .referenceNumber(caseData.getLegacyCaseReference())
+                .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+                .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
+                .applicant(getApplicant(caseData))
+                .respondents(getRespondents(caseData))
+                .allocatedTrack(caseData.getAllocatedTrack())
+                .build();
+        }
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -105,16 +119,23 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
+    private boolean isRespondent2(CaseData caseData){
+        if ((caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null)) {
+            return true;
+        } else if ((caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent2ResponseDate() != null)){
+            if(caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private List<Party> getRespondents(CaseData caseData) {
         var respondent = caseData.getRespondent1();
 
-        if ((caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null)) {
+        if(isRespondent2(caseData)){
             respondent = caseData.getRespondent2();
-        } else if ((caseData.getRespondent1ResponseDate() != null
-                    && caseData.getRespondent2ResponseDate() != null)){
-            if(caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())){
-                respondent = caseData.getRespondent2();
-            }
         }
 
         return List.of(Party.builder()
