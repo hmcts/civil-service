@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -87,7 +86,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
-    private final OnBoardingOrganisationControlService onboardingOrganisationControlService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
@@ -96,7 +94,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
@@ -117,13 +114,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
-        List<String> errors = onboardingOrganisationControlService.validateOrganisation();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {

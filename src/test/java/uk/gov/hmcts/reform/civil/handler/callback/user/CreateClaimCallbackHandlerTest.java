@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -107,9 +106,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private OrganisationService organisationService;
 
     @MockBean
-    private OnBoardingOrganisationControlService onBoardingOrganisationControlService;
-
-    @MockBean
     private IdamClient idamClient;
 
     @MockBean
@@ -143,41 +139,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
         }
-    }
-
-    @Nested
-    class MidEventEligibilityCallback {
-
-        private static final String PAGE_ID = "eligibilityCheck";
-
-        @Test
-        void shouldNotReturnError_whenOrganisationIsNotRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-
-            given(onBoardingOrganisationControlService.validateOrganisation())
-                .willReturn(List.of());
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldNotReturnError_whenOrganisationIsRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-
-            given(onBoardingOrganisationControlService.validateOrganisation())
-                .willReturn(List.of());
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
-
     }
 
     @Nested
