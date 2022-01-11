@@ -25,6 +25,9 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.ApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.RespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -46,6 +49,9 @@ public class CaseData implements MappableObject {
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
+    private final ApplicationType generalAppType;
+    private final RespondentOrderAgreement generalAppRespondentAgreement;
+    private final List<Element<GeneralApplication>> generalApplications;
     private final SolicitorReferences solicitorReferences;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
