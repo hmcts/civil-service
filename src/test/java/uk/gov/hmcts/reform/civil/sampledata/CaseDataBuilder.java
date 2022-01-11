@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
@@ -95,6 +97,7 @@ public class CaseDataBuilder {
     public static final LocalDate PAST_DATE = now().minusDays(1);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
+    public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -214,6 +217,7 @@ public class CaseDataBuilder {
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private RepaymentPlanLRspec respondent1RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1707,6 +1711,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder generateRepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+
+        respondent1RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
         UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
         this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
@@ -1841,6 +1858,7 @@ public class CaseDataBuilder {
             .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .build();
     }
 }

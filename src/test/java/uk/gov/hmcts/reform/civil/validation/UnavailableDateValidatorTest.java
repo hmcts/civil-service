@@ -168,4 +168,28 @@ class UnavailableDateValidatorTest {
             assertThat(validator.validate(hearing)).isEmpty();
         }
     }
+
+    @Nested
+    class RepaymentPlanTest {
+
+        @InjectMocks
+        UnavailableDateValidator validator;
+
+        @Test
+        void shouldReturnError_whenPaymentDateMoreThanOneYearInFuture() {
+
+            assertThat(validator.validateFuturePaymentDate(LocalDate.now().plusDays(368)))
+                .containsExactly("Date of first payment must be today or within the next 12 months");
+
+        }
+
+        @Test
+        void shouldReturnError_whenPaymentDateOfPast() {
+
+            assertThat(validator.validateFuturePaymentDate(LocalDate.now().minusDays(12)))
+                .containsExactly("Date of first payment must be today or within the next 12 months");
+
+        }
+    }
+
 }
