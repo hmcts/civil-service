@@ -177,6 +177,9 @@ public class StateFlowEngine {
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived.and(not(notificationAcknowledged)))
                 .transitionTo(AWAITING_RESPONSES_RECEIVED).onlyIf(awaitingResponses.and(not(notificationAcknowledged)))
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
+                .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf(caseDismissedAfterDetailNotified)
             .state(AWAITING_RESPONSES_RECEIVED)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
