@@ -46,7 +46,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
-            //callbackKey(MID, "select-litigant-friend"), this::selectLitigantFriend,
+            callbackKey(MID, "select-litigant-friend"), this::selectLitigantFriend,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmitMultiparty,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -73,35 +73,14 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .build();
     }
 
-    /**
     private CallbackResponse selectLitigantFriend(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder()
-                      .selectedLitigationFriend(caseData.getSelectLitigationFriend().getValue().getLabel()
-                                                    .split(":")[0])
+            .data(caseData.toBuilder().genericLitigationFriend(caseData.getRespondent1LitigationFriend())
                       .build().toMap(objectMapper))
             .build();
     }
-     if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent Two")) {
-     caseDataUpdated
-     .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
-     .respondent2LitigationFriendDate(currentDateTime)
-     .respondent2LitigationFriendCreatedDate(
-     ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
-     .orElse(currentDateTime))
-     .genericLitigationFriend(null);
-     } else if (caseData.getSelectLitigationFriend().getValue().getLabel().equals("Respondent One")) {
-     caseDataUpdated
-     .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
-     .respondent1LitigationFriendDate(currentDateTime)
-     .respondent1LitigationFriendCreatedDate(
-     ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
-     .orElse(currentDateTime))
-     .genericLitigationFriend(null);
-     }
-     **/
 
     private CallbackResponse aboutToSubmitMultiparty(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -135,7 +114,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                     .respondent2LitigationFriendCreatedDate(
                         ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
                             .orElse(currentDateTime))
-                    .respondent1LitigationFriend(null);
+                    .respondent1LitigationFriend(caseData.getGenericLitigationFriend());
 
             } else if ("Defendant One".equals(caseData.getSelectLitigationFriend().getValue().getLabel()
                 .split(":")[0])) {
@@ -149,7 +128,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                 .data(caseDataUpdated.build().toMap(objectMapper))
                 .build();
         }
-
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -172,7 +150,8 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
         //build options for field (Default Value & List Options), add to case data
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions));
+        caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions))
+            .genericLitigationFriend(caseData.getRespondent1LitigationFriend());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
