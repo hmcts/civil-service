@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -133,15 +132,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private List<Party> getRespondents(CaseData caseData) {
         var respondent = caseData.getRespondent1();
+        var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
 
         if(isRespondent2(caseData)){
             respondent = caseData.getRespondent2();
+            respondentRepresentative = representativeService.getRespondent2Representative(caseData);
         }
 
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
-                           .representative(representativeService.getRespondent1Representative(caseData))
+                           .representative(respondentRepresentative)
                            .litigationFriendName(
                                ofNullable(caseData.getRespondent1LitigationFriend())
                                    .map(LitigationFriend::getFullName)
