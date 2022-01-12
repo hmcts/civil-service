@@ -90,6 +90,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
+            .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
             .build();
     }
 
@@ -341,6 +342,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .getLengthOfUnemployment().getNumberOfMonthsInUnemployment().contains(".")) {
                 errors.add("Length of time unemployed must be a whole number, for example, 10.");
             }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors;
+
+        if (caseData.getRespondent1RepaymentPlan() != null
+            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+                                                                            .getFirstRepaymentDate());
+        } else {
+            errors = new ArrayList<>();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

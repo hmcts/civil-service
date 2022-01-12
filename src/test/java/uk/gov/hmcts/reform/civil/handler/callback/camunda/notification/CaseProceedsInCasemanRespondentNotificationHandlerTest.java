@@ -75,7 +75,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(stateFlowEngine.hasSpecTransitionedTo(params.getRequest().getCaseDetails(), CLAIM_NOTIFIED))
+            when(stateFlowEngine.hasTransitionedTo(params.getRequest().getCaseDetails(), CLAIM_NOTIFIED))
                 .thenReturn(false);
 
             handler.handle(params);
