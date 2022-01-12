@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAEvidence;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -92,6 +93,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
         List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData),
                                                                         caseData.getGeneralApplications());
+        applications.forEach(app -> {
+            System.out.println(app.getValue().getBusinessProcess().getActivityId() + "\t"
+                                   + app.getValue().getBusinessProcess().getStatus());
+        });
         return dataBuilder
             .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
@@ -103,11 +108,17 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
+            .generalAppUploadEvidences(GAEvidence.builder().build())
             .build();
     }
 
     private GeneralApplication buildApplication(CaseData caseData) {
-        return GeneralApplication.builder()
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
+        if (caseData.getGeneralAppUploadEvidences() != null
+            && caseData.getGeneralAppUploadEvidences().getEvidenceDocument() != null) {
+            applicationBuilder.evidenceDocument(caseData.getGeneralAppUploadEvidences().getEvidenceDocument());
+        }
+        return applicationBuilder
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
