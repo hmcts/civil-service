@@ -9,14 +9,14 @@ import lombok.Setter;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class PBADetails {
+public class GAPbaDetails {
 
     private final String applicantsPbaAccountsList;
     private final String pbaReference;
 
     @JsonCreator
-    PBADetails(@JsonProperty("applicantsPbaAccountsList") String applicantsPbaAccountsList,
-               @JsonProperty("pbaReference") String pbaReference) {
+    GAPbaDetails(@JsonProperty("applicantsPbaAccountsList") String applicantsPbaAccountsList,
+                 @JsonProperty("pbaReference") String pbaReference) {
         this.applicantsPbaAccountsList = applicantsPbaAccountsList;
         this.pbaReference = pbaReference;
     }

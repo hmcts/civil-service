@@ -12,16 +12,16 @@ import java.time.LocalDate;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class UrgencyRequirement {
+public class GAUrgencyRequirement {
 
     private final YesOrNo generalAppUrgency;
     private final String reasonsForUrgency;
     private final LocalDate urgentAppConsiderationDate;
 
     @JsonCreator
-    UrgencyRequirement(@JsonProperty("generalAppUrgency") YesOrNo generalAppUrgency,
-                       @JsonProperty("reasonsForUrgency") String reasonsForUrgency,
-                       @JsonProperty("urgentAppConsiderationDate") LocalDate urgentAppConsiderationDate) {
+    GAUrgencyRequirement(@JsonProperty("generalAppUrgency") YesOrNo generalAppUrgency,
+                         @JsonProperty("reasonsForUrgency") String reasonsForUrgency,
+                         @JsonProperty("urgentAppConsiderationDate") LocalDate urgentAppConsiderationDate) {
         this.generalAppUrgency = generalAppUrgency;
         this.reasonsForUrgency = reasonsForUrgency;
         this.urgentAppConsiderationDate = urgentAppConsiderationDate;

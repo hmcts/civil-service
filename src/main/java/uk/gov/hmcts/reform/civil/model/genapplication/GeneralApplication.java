@@ -11,25 +11,29 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @Builder(toBuilder = true)
 public class GeneralApplication implements MappableObject {
 
-    private final ApplicationType generalAppType;
-    private final RespondentOrderAgreement generalAppRespondentAgreement;
+    private final GAApplicationType generalAppType;
+    private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
-    private final PBADetails generalAppPBADetails;
+    private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
     private final String generalAppReasonsOfOrder;
-    private final InformOtherParty generalAppInformOtherParty;
-    private final UrgencyRequirement generalAppUrgencyRequirement;
+    private final GAInformOtherParty generalAppInformOtherParty;
+    private final GAUrgencyRequirement generalAppUrgencyRequirement;
+    private final GAStatementOfTruth generalAppStatementOfTruth;
+    private final GAHearingDetails generalAppHearingDetails;
 
     @JsonCreator
-    GeneralApplication(@JsonProperty("generalAppType") ApplicationType generalAppType,
+    GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
-                           RespondentOrderAgreement generalAppRespondentAgreement,
+                           GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
-                       @JsonProperty("generalAppPBADetails") PBADetails generalAppPBADetails,
+                       @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
                        @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
-                       @JsonProperty("generalAppInformOtherParty") InformOtherParty generalAppInformOtherParty,
-                       @JsonProperty("generalAppUrgencyRequirement") UrgencyRequirement generalAppUrgencyRequirement) {
+                       @JsonProperty("generalAppInformOtherParty") GAInformOtherParty generalAppInformOtherParty,
+                       @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
+                       @JsonProperty("generalAppStatementOfTruth") GAStatementOfTruth generalAppStatementOfTruth,
+                       @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -38,5 +42,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppReasonsOfOrder = generalAppReasonsOfOrder;
         this.generalAppInformOtherParty = generalAppInformOtherParty;
         this.generalAppUrgencyRequirement = generalAppUrgencyRequirement;
+        this.generalAppStatementOfTruth = generalAppStatementOfTruth;
+        this.generalAppHearingDetails = generalAppHearingDetails;
     }
 }

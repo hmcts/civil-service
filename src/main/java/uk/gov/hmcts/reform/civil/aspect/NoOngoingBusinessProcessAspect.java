@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.List;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @Slf4j
@@ -34,7 +35,9 @@ public class NoOngoingBusinessProcessAspect {
         CaseData caseData = callbackParams.getCaseData();
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
-            || caseData.hasNoOngoingBusinessProcess()) {
+            || caseData.hasNoOngoingBusinessProcess()
+            || valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
+        ) {
             return joinPoint.proceed();
         }
         log.info(format(

@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class RespondentOrderAgreement {
+public class GARespondentOrderAgreement {
 
     private final YesOrNo hasAgreed;
 
     @JsonCreator
-    RespondentOrderAgreement(@JsonProperty("hasAgreed") YesOrNo hasAgreed) {
+    GARespondentOrderAgreement(@JsonProperty("hasAgreed") YesOrNo hasAgreed) {
         this.hasAgreed = hasAgreed;
     }
 }
