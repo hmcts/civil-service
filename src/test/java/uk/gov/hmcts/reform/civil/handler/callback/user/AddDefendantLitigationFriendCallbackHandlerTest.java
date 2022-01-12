@@ -104,15 +104,16 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
 
         }
 
         @Test
-        void shouldSetRespondent1_WhenGenericLitigationFriendIsSet_WithMultiParty_1v2_SameSolicitor() {
+        void shouldSetRespondent1LF_WhenRespondentOneSelected_WithMultiParty_1v2_SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddRespondent1GenericLitigationFriend_1v2_SameSolicitor()
-                .selectLitigationFriend("Respondent One")
+                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .selectLitigationFriend("Defendant One: Mr. Def One")
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -128,10 +129,29 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         }
 
         @Test
-        void shouldSetRespondent2_WhenGenericLitigationFriendIsSet_WithMultiParty_1v2_SameSolicitor() {
+        void shouldSetRespondent2LF_WhenRespondentTwoSelected_WithMultiParty_1v2_SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddRespondent2GenericLitigationFriend_1v2_SameSolicitor()
-                .selectLitigationFriend("Respondent Two")
+                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .selectLitigationFriend("Defendant Two: Mr Def Two")
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
+
+        }
+
+        @Test
+        void shouldSetBothRespondentLF_WhenBothRespondentSelected_WithMultiParty_1v2_SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .selectLitigationFriend("Both")
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -142,7 +162,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
 
         }

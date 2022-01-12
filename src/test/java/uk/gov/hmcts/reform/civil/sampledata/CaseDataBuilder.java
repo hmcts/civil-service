@@ -1155,22 +1155,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateAddRespondent1GenericLitigationFriend_1v2_SameSolicitor() {
-        atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
-        addGenericRespondentLitigationFriend();
-        addRespondent1LitigationFriend();
-        return this;
-    }
-
-    public CaseDataBuilder atStateAddRespondent2GenericLitigationFriend_1v2_SameSolicitor() {
-        atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
-        addGenericRespondentLitigationFriend();
-        addRespondent2LitigationFriend();
-        return this;
-    }
-
     public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
