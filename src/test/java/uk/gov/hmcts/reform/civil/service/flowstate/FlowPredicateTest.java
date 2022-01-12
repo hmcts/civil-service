@@ -540,20 +540,22 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnFalse_whenDefendantsBothRespondedAndResponsesNotTheSame() {
+                void shouldReturnTrue_whenDefendantsRespondedWithAtLeastOneFullDefence() {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(PART_ADMISSION)
                         .respondentResponseIsSame(YesOrNo.NO)
                         .build();
 
-                    assertFalse(fullDefence.test(caseData));
+                    assertTrue(fullDefence.test(caseData));
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyOneResponse() {
+                void shouldReturnFalse_whenDefendantsRespondedWithNoFullDefenceResponse() {
                     CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .atStateRespondentPartAdmissionAfterNotifyDetails()
+                        .respondent2Responds(PART_ADMISSION)
+                        .respondentResponseIsSame(YesOrNo.NO)
                         .build();
 
                     assertFalse(fullDefence.test(caseData));
