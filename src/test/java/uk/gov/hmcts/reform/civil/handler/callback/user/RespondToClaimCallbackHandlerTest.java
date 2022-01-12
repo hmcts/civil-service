@@ -813,7 +813,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void shouldReturnExpectedResponse_whenInvoked() {
+        void shouldReturnConfirmationScreen_when1v1ResponseSubmitted() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -829,6 +829,51 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             + "The Claimant has until %s to discontinue or proceed with this claim",
                         formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
                         + exitSurveyContentService.respondentSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v2_andReceivedFirstResponse() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(
+                        format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
+                    .confirmationBody("TBC")
+                    .build());
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v2_andReceivedBothResponses() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(
+                        format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
+                    .confirmationBody(format(
+                        "<br /> The Claimant legal representative will get a notification to confirm you have "
+                            + "provided the Defendant defence. You will be CC'ed.%n"
+                            + "The Claimant has until %s to discontinue or proceed with this claim",
+                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }
