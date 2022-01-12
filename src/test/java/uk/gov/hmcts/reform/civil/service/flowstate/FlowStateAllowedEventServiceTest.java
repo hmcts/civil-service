@@ -416,7 +416,8 @@ class FlowStateAllowedEventServiceTest {
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()}),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    AWAITING_RESPONSES_RECEIVED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{FULL_DEFENCE.fullName()}),
                 of(
@@ -424,7 +425,8 @@ class FlowStateAllowedEventServiceTest {
                     new String[]{NOTIFICATION_ACKNOWLEDGED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -435,7 +437,8 @@ class FlowStateAllowedEventServiceTest {
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -446,7 +449,8 @@ class FlowStateAllowedEventServiceTest {
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -459,8 +463,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
-                        CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
-
+                        CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -471,7 +475,8 @@ class FlowStateAllowedEventServiceTest {
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -480,7 +485,8 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[]{CLAIM_NOTIFIED.fullName()}),
                 of(INFORM_AGREED_EXTENSION_DATE, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
-                    NOTIFICATION_ACKNOWLEDGED.fullName()}),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    AWAITING_RESPONSES_RECEIVED.fullName()}),
                 of(
                     AMEND_PARTY_DETAILS,
                     new String[]{CLAIM_ISSUED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
@@ -489,7 +495,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE.fullName(), FULL_ADMISSION.fullName(),
                         PART_ADMISSION.fullName(), COUNTER_CLAIM.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
-                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        AWAITING_RESPONSES_RECEIVED.fullName()
                     }
                 )
             );
