@@ -336,7 +336,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (featureToggleService.isMultipartyEnabled()
             && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
-            body = "TBC";
+            body = "Once the other defendant's legal representative has submitted their defence, we will send the "
+                 + "claimant's legal representative a notification. You will receive a copy of this notification, "
+                 + "as it will include details of when the claimant must respond.";
         } else {
             LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
             body = format(

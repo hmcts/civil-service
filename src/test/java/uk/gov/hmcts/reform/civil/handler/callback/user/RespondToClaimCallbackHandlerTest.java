@@ -854,7 +854,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(
                         format("# You have submitted the Defendant's defence%n## Claim number: 000DC001"))
-                    .confirmationBody("TBC")
+                    .confirmationBody("Once the other defendant's legal representative has submitted their defence, "
+                                          + "we will send the claimant's legal representative a notification. "
+                                          + "You will receive a copy of this notification, as it will include details "
+                                          + "of when the claimant must respond.")
                     .build());
         }
 
