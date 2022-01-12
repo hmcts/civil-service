@@ -18,7 +18,6 @@ public class RepaymentPlanLRspec {
     private final BigDecimal paymentAmount;
     private final PaymentFrequencyLRspec repaymentFrequency;
     private final LocalDate firstRepaymentDate;
-
-
+    private int lengthOfPaymentPlan;
 
 }

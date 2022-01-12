@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -351,14 +353,44 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors;
+        List<String> errors = new ArrayList<>();
+        int lengthOfPayment;
+        double paymentAmount;
+        double totalClaimAmount;
 
-        if (caseData.getRespondent1RepaymentPlan() != null
-            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
-                                                                            .getFirstRepaymentDate());
-        } else {
-            errors = new ArrayList<>();
+        if (caseData.getRespondent1RepaymentPlan() != null) {
+
+            if (caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
+                errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+                                                                                .getFirstRepaymentDate());
+            }
+            if (caseData.getRespondent1RepaymentPlan().getRepaymentFrequency() != null
+                && caseData.getRespondent1RepaymentPlan().getPaymentAmount() != null) {
+
+                paymentAmount = MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan()
+                                                                        .getPaymentAmount()).doubleValue();
+
+                totalClaimAmount = caseData.getTotalClaimAmount().doubleValue();
+                double divideVal = totalClaimAmount / paymentAmount;
+                PaymentFrequencyLRspec frequency = caseData.getRespondent1RepaymentPlan().getRepaymentFrequency();
+
+                int noOfWeeks = 0;
+                if (("ONCE_ONE_WEEK").equals(frequency.toString())) {
+                    noOfWeeks = 4;
+                }
+                if (("ONCE_TWO_WEEK").equals(frequency.toString())) {
+                    noOfWeeks = 2;
+                }
+                if (("ONCE_ONE_MONTH").equals(frequency.toString())) {
+                    noOfWeeks = 1;
+                }
+
+                //BigDecimal bigDivision = totalClaimAmount.divide(paymentAmount, 2, RoundingMode.UNNECESSARY);
+                //lengthOfPayment = int ((bigDivision) * noOfWeeks);
+
+                lengthOfPayment = (int) ((totalClaimAmount / paymentAmount) * noOfWeeks);
+
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
