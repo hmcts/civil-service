@@ -66,9 +66,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
         DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
-        //do we need to have a new object for Respondent2DQ?
 
         if(isRespondent2(caseData)){
+            dq = caseData.getRespondent2DQ();
             return DirectionsQuestionnaireForm.builder()
                 .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
                 .referenceNumber(caseData.getLegacyCaseReference())
@@ -76,6 +76,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
                 .applicant(getApplicant(caseData))
                 .respondents(getRespondents(caseData))
+                .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+                .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
+                .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+                .experts(getExperts(dq))
+                .witnesses(getWitnesses(dq))
+                .hearing(getHearing(dq))
+                .hearingSupport(getHearingSupport(dq))
+                .furtherInformation(dq.getFurtherInformation())
+                .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+                .statementOfTruth(dq.getStatementOfTruth())
                 .allocatedTrack(caseData.getAllocatedTrack())
                 .build();
         }
