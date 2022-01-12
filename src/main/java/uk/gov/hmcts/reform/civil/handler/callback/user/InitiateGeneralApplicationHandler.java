@@ -73,11 +73,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        dataBuilder.businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION));
-
-        return dataBuilder;
+        return caseData.toBuilder();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
@@ -93,10 +89,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
         List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData),
                                                                         caseData.getGeneralApplications());
-        applications.forEach(app -> {
-            System.out.println(app.getValue().getBusinessProcess().getActivityId() + "\t"
-                                   + app.getValue().getBusinessProcess().getStatus());
-        });
         return dataBuilder
             .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
