@@ -726,10 +726,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        //TODO applicant response date set after resp sol 2 responds after resp sol 1
-        //TODO applicant response date set after resp sol 1 responds after resp sol 2
-        //TODO either respondent 1 or 2 says full defence
-
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneDefendantRepAnsweringToTwoApplicants() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
