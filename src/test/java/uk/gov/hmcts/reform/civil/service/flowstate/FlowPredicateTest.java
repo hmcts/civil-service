@@ -528,23 +528,25 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyDefendant1Responded() {
+                void shouldReturnTrue_whenOnlyDefendant1RespondedWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(PART_ADMISSION)
                         .build();
 
-                    assertFalse(fullDefence.test(caseData));
+                    assertTrue(fullDefence.test(caseData));
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyDefendant2Responded() {
+                void shouldReturnFalse_whenOnlyDefendant2RespondedWithFullDefence() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentPartAdmission()
                         .respondent2Responds(FULL_DEFENCE)
                         .build();
 
-                    assertFalse(fullDefence.test(caseData));
+                    assertTrue(fullDefence.test(caseData));
                 }
             }
 
