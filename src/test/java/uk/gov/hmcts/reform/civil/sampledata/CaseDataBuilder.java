@@ -1212,7 +1212,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim() {
         atStateRespondentFullAdmission();
-            respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
