@@ -218,17 +218,17 @@ public class FlowPredicate {
         && getPredicateForAtLeastOneFullDefenceResponse(caseData);
 
     private static boolean getPredicateForAtLeastOneFullDefenceResponse(CaseData caseData) {
-        boolean bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence =
+        boolean bothDefendantsResponsesAreDifferentAndAtLeastOneSelectedFullDefence =
             hasAtLeastOneFullDefenceResponse(caseData)
                 && caseData.getRespondent1ResponseDate() != null
                 && caseData.getRespondent2ResponseDate() != null
                 && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence
+                return bothDefendantsResponsesAreDifferentAndAtLeastOneSelectedFullDefence
                     && caseData.getRespondentResponseIsSame() == NO;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence;
+                return bothDefendantsResponsesAreDifferentAndAtLeastOneSelectedFullDefence;
             default:
                 return false;
         }
