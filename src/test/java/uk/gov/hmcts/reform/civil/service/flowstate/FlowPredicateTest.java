@@ -652,62 +652,6 @@ class FlowPredicateTest {
             }
         }
 
-        @Nested
-        class MultiParty {
-            CaseDataBuilder caseDataBuilder;
-
-            @Nested
-            class OneVTwoWithOneRep {
-
-                @BeforeEach
-                void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor();
-                }
-
-                @Test
-                void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSame() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .respondent2Responds(FULL_DEFENCE)
-                        .respondentResponseIsSame(YesOrNo.YES)
-                        .build();
-
-                    assertTrue(fullDefence.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSameButMarkedDifferent() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .respondent2Responds(FULL_DEFENCE)
-                        .respondentResponseIsSame(YesOrNo.NO)
-                        .build();
-
-                    assertTrue(fullDefence.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenDefendantsBothRespondedAndResponsesNotTheSame() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .respondent2Responds(PART_ADMISSION)
-                        .respondentResponseIsSame(YesOrNo.NO)
-                        .build();
-
-                    assertFalse(fullDefence.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenOnlyOneResponse() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .build();
-
-                    assertFalse(fullDefence.test(caseData));
-                }
-            }
-        }
-
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClosed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDiscontinued().build();

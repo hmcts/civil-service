@@ -61,7 +61,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -908,65 +907,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
-                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("respondent1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(name, role);
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when1V1() {
-                String name = "John Smith";
-                String role = "Solicitor";
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .build()
-                    .toBuilder()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
-
-                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("respondent1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(name, role);
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
-            }
-
-            @Test
-            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when2V1SameRep() {
-                String name = "John Smith";
-                String role = "Solicitor";
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .multiPartyClaimOneDefendantSolicitor()
-                    .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .respondent2Responds(FULL_DEFENCE)
-                    .build()
-                    .toBuilder()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
-
                 CallbackParams callbackParams = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
