@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.atLeastOneRespondentHasFullDefenceResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNot
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespond;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
@@ -539,7 +541,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyDefendant2RespondedWithFullDefence() {
+                void shouldReturnTrue_whenOnlyDefendant2RespondedWithFullDefence() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentPartAdmission()
@@ -547,6 +549,28 @@ class FlowPredicateTest {
                         .build();
 
                     assertTrue(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendant1RespondedWithFullAdmissionAndDefendant2RespondedWithCounterClaim() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
+                        .build();
+
+                    assertFalse(atLeastOneRespondentHasFullDefenceResponse.test(caseData));
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenBothDefendantsRespondedWithFullAdmission() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                        .build();
+
+                    assertFalse(atLeastOneRespondentHasFullDefenceResponse.test(caseData));
+                    assertTrue(fullAdmission.test(caseData));
                 }
             }
 
