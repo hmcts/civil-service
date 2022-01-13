@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -26,6 +27,7 @@ public class GeneralApplication implements MappableObject {
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final List<Element<Document>> evidenceDocument;
+    private final YesOrNo isMultiParty;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -39,7 +41,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
                        @JsonProperty("generalAppStatementOfTruth") GAStatementOfTruth generalAppStatementOfTruth,
                        @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
-                       @JsonProperty("evidenceDocument") List<Element<Document>> evidenceDocument) {
+                       @JsonProperty("evidenceDocument") List<Element<Document>> evidenceDocument,
+                       @JsonProperty("isMultiParty") YesOrNo isMultiParty) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -51,5 +54,6 @@ public class GeneralApplication implements MappableObject {
         this.generalAppStatementOfTruth = generalAppStatementOfTruth;
         this.generalAppHearingDetails = generalAppHearingDetails;
         this.evidenceDocument = evidenceDocument;
+        this.isMultiParty = isMultiParty;
     }
 }
