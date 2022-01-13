@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.atLeastOneRespondentHasFullDefenceResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -530,25 +529,25 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnTrue_whenOnlyDefendant1RespondedWithFullDefense() {
+                void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(PART_ADMISSION)
                         .build();
 
-                    assertTrue(fullDefence.test(caseData));
+                    assertTrue(divergentRespond.test(caseData));
                 }
 
                 @Test
-                void shouldReturnTrue_whenOnlyDefendant2RespondedWithFullDefence() {
+                void shouldReturnDivergentRespond_whenOnlyDefendant2RespondedWithFullDefence() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentPartAdmission()
                         .respondent2Responds(FULL_DEFENCE)
                         .build();
 
-                    assertTrue(fullDefence.test(caseData));
+                    assertTrue(divergentRespond.test(caseData));
                 }
 
                 @Test
@@ -558,7 +557,6 @@ class FlowPredicateTest {
                         .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
                         .build();
 
-                    assertFalse(atLeastOneRespondentHasFullDefenceResponse.test(caseData));
                     assertTrue(divergentRespond.test(caseData));
                 }
 
@@ -569,7 +567,6 @@ class FlowPredicateTest {
                         .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
                         .build();
 
-                    assertFalse(atLeastOneRespondentHasFullDefenceResponse.test(caseData));
                     assertTrue(fullAdmission.test(caseData));
                 }
             }
