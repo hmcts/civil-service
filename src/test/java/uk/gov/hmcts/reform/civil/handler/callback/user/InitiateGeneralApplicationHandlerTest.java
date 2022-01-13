@@ -142,7 +142,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmit {
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
-            when(initiateGeneralAppService.buildApplication(any(CaseData.class))).thenCallRealMethod();
             when(initiateGeneralAppService.buildCaseData(any(
                 uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder.class), any(CaseData.class)))
                 .thenCallRealMethod();

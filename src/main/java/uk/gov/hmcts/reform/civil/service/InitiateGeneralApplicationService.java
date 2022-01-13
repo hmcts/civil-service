@@ -48,7 +48,7 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    public GeneralApplication buildApplication(CaseData caseData) {
+    private GeneralApplication buildApplication(CaseData caseData) {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppUploadEvidences() != null
             && caseData.getGeneralAppUploadEvidences().getEvidenceDocument() != null) {
