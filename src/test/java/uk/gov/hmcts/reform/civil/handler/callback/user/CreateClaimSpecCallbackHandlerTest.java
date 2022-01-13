@@ -148,7 +148,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-
     @Nested
     class MidEventEligibilityCallback {
 
