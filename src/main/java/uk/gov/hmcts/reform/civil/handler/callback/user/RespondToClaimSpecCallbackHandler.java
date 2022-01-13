@@ -302,16 +302,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
-            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
-                + "Defendant defence. You will be CC'ed.%n"
-                + "The Claimant has until %s to discontinue or proceed with this claim",
-            formatLocalDateTime(responseDeadline, DATE)
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "%n%nThe claimant has until %s to respond to your claim. We will let you know when they respond."
+                + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+            formatLocalDateTime(responseDeadline, DATE),
+            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
         )
             + exitSurveyContentService.respondentSurvey();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
-                format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
+                format("# You've submitted your response%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
     }
