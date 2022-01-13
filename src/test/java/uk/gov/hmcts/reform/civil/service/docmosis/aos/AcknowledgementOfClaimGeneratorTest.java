@@ -190,6 +190,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent1AcknowledgeNotificationDate(null)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .respondent2ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
@@ -217,6 +218,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .respondent2ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();

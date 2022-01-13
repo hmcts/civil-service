@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,14 +117,29 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
 
     public AcknowledgementOfClaimForm getTemplateDataForAcknowldgeClaim(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
+                } else {
+                    responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+                }
+            }
+        }
         return AcknowledgementOfClaimForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData))
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
-            .build();
+                .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                .referenceNumber(caseData.getLegacyCaseReference())
+                .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData))
+                .issueDate(caseData.getIssueDate())
+                .responseDeadline(responseDeadline)
+                .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
+                .build();
 
     }
 }
