@@ -453,7 +453,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
 
             assertThat(response.getData())
-                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
         }
     }

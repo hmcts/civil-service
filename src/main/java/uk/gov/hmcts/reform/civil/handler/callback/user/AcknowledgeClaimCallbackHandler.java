@@ -189,8 +189,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setNewResponseDeadlineV2(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent1ResponseDeadline);
+        LocalDateTime newDeadlineRespondent2 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent2ResponseDeadline);
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
@@ -202,12 +204,12 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             respondent1Check = NO;
         }
 
-        //for 1v1
+        /* for 1v1 */
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
             && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
-                .respondent1ResponseDeadline(newResponseDate)
+                .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
@@ -217,7 +219,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
-                .respondent1ResponseDeadline(newResponseDate)
+                .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
@@ -233,7 +235,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
-                .respondent1ResponseDeadline(newResponseDate)
+                .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent2(updatedRespondent2)
@@ -246,21 +248,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
             //1v2 diff login 1
-            //Case event won't be changed until the 2nd solicitor acknowledges the claim
-            if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
-                caseDataUpdated
-                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                    .build();
-            } else {
-                caseDataUpdated.respondent1ResponseDeadline(newResponseDate)
-                    .build();
-            }
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1(updatedRespondent1)
                 .respondent2(caseData.getRespondent2Copy())
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .respondent1Copy(null)
                 .isRespondent1(null);
 
@@ -270,22 +264,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();
             //1v2 diff login 2
-            //Case event won't be changed until the other solicitor acknowledges the claim
-            if (caseData.getRespondent1AcknowledgeNotificationDate() != null) {
-                caseDataUpdated
-                    .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                    .build();
-            } else {
-                caseDataUpdated
-                    .respondent1ResponseDeadline(newResponseDate)
-                    .build();
-            }
             caseDataUpdated
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent2(updatedRespondent2)
                 .respondent1Copy(null)
                 .respondent2Copy(null)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
+                .respondent2ResponseDeadline(newDeadlineRespondent2)
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .isRespondent1(null)
                 .build();
@@ -298,9 +283,12 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        LocalDateTime responseDeadline = isRespondent1(callbackParams)
+            ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
+
         String body = format(
             CONFIRMATION_SUMMARY,
-            formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
+            formatLocalDateTime(responseDeadline, DATE_TIME_AT),
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()))
             + exitSurveyContentService.respondentSurvey();
 
@@ -311,5 +299,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             ))
             .confirmationBody(body)
             .build();
+    }
+
+    private boolean isRespondent1(CallbackParams callbackParams) {
+        return !solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO);
     }
 }
