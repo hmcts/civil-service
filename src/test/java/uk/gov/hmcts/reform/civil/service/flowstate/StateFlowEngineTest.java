@@ -25,39 +25,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -909,6 +877,103 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry("RPA_CONTINUOUS_FEED", true)
+                );
+            }
+        }
+
+        @Nested
+        class DefendantResponse_Multiparty {
+
+            @Test
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+            void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(FULL_DEFENCE.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(10)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
+            }
+
+            @Test
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            void shouldReturnFullDefence_in1v2Scenario_whenEitherRespondentSubmitsFullDefenceResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(FULL_DEFENCE.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(10)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
+            }
+
+            //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
+            @Test
+            void shouldReturnDivergentResponse_in1v2Scenario_whenNeitherRespondentSubmitsFullDefenceResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(DIVERGENT_RESPOND.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(10)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
         }

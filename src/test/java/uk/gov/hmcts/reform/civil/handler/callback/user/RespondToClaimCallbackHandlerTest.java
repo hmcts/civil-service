@@ -862,7 +862,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence_1v2()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

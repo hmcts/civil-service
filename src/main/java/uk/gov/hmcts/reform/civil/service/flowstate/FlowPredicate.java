@@ -135,11 +135,29 @@ public class FlowPredicate {
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
     public static final Predicate<CaseData> divergentRespond = caseData ->
-        getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
-        && caseData.getRespondent1ResponseDate() != null
-        && caseData.getRespondent2ResponseDate() != null
-        && caseData.getRespondentResponseIsSame() == NO
-        && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+        getPredicateForDivergentResponses(caseData);
+
+    private static boolean getPredicateForDivergentResponses(CaseData caseData) {
+        boolean bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence =
+            !hasAtLeastOneFullDefenceResponse(caseData)
+            && caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent2ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence
+                    && caseData.getRespondentResponseIsSame() == NO;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence;
+            default:
+                return false;
+        }
+    }
+
+    private static boolean hasAtLeastOneFullDefenceResponse(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseType() == FULL_DEFENCE;
+    }
 
     public static final Predicate<CaseData> allResponsesReceived = caseData ->
         getPredicateForResponses(caseData);

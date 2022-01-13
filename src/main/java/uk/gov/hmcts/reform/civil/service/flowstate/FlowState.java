@@ -39,6 +39,7 @@ public interface FlowState {
         FULL_ADMISSION,
         PART_ADMISSION,
         COUNTER_CLAIM,
+        DIVERGENT_RESPOND,
         FULL_DEFENCE_PROCEED,
         FULL_DEFENCE_NOT_PROCEED,
         ALL_RESPONSES_RECEIVED,
