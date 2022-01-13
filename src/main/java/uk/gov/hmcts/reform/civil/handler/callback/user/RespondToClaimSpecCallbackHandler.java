@@ -303,7 +303,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         String body = format(
             "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                + "%n%nThe claimant has until 4pm on %s to respond to your claim. We will let you know when they respond."
+                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                + "We will let you know when they respond."
                 + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
             formatLocalDateTime(responseDeadline, DATE),
             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
