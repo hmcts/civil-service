@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
@@ -89,6 +90,20 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         @BeforeEach
         private void setup() {
             when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(time.now()).thenReturn(LocalDateTime.now());
+        }
+
+        @Test
+        void shouldSetLitigantFriendFlag_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .selectLitigationFriend("Defendant One: Mr. Def One")
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-litigation-friend");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("litigantFriendSelection").isEqualTo("DEFENDANT ONE");
+
         }
 
         @Test
@@ -112,7 +127,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         @Test
         void shouldSetRespondent1LF_WhenRespondentOneSelected_WithMultiParty_1v2_SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
                 .selectLitigationFriend("Defendant One: Mr. Def One")
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
@@ -124,6 +139,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
 
         }
@@ -131,7 +148,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         @Test
         void shouldSetRespondent2LF_WhenRespondentTwoSelected_WithMultiParty_1v2_SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .atStateAddRespondent2LitigationFriend_1v2_SameSolicitor()
                 .selectLitigationFriend("Defendant Two: Mr Def Two")
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
@@ -144,6 +161,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
 
         }
 
@@ -163,7 +182,11 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
 
         }
 
