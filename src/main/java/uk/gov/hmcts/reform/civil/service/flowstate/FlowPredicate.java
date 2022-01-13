@@ -213,6 +213,27 @@ public class FlowPredicate {
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
 
+    public static final Predicate<CaseData> atLeastOneRespondentHasFullDefenceResponse = caseData ->
+        getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+        && getPredicateForAtLeastOneFullDefenceResponse(caseData);
+
+    private static boolean getPredicateForAtLeastOneFullDefenceResponse(CaseData caseData) {
+        boolean bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence =
+            hasAtLeastOneFullDefenceResponse(caseData)
+                && caseData.getRespondent1ResponseDate() != null
+                && caseData.getRespondent2ResponseDate() != null
+                && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence
+                    && caseData.getRespondentResponseIsSame() == NO;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferentAndNeitherSelectedFullDefence;
+            default:
+                return false;
+        }
+    }
+
     public static final Predicate<CaseData> fullDefenceAfterAcknowledge = caseData ->
         caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1AcknowledgeNotificationDate() != null
