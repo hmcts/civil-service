@@ -229,7 +229,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
-                    .confirmationBody(body + exitSurveyContentService.applicantSurvey())
+                    .confirmationBody(body)
                     .build());
         }
     }

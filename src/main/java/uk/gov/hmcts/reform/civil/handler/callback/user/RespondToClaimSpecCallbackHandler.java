@@ -308,8 +308,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
             formatLocalDateTime(responseDeadline, DATE),
             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-        )
-            + exitSurveyContentService.respondentSurvey();
+        );
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
