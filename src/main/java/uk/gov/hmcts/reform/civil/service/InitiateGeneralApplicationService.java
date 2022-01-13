@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAEvidence;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -44,15 +43,14 @@ public class InitiateGeneralApplicationService {
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
-            .generalAppUploadEvidences(GAEvidence.builder().build())
+            .generalAppEvidenceDocument(java.util.Collections.emptyList())
             .build();
     }
 
     private GeneralApplication buildApplication(CaseData caseData) {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
-        if (caseData.getGeneralAppUploadEvidences() != null
-            && caseData.getGeneralAppUploadEvidences().getEvidenceDocument() != null) {
-            applicationBuilder.evidenceDocument(caseData.getGeneralAppUploadEvidences().getEvidenceDocument());
+        if (caseData.getGeneralAppEvidenceDocument() != null) {
+            applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
         }
         if (MultiPartyScenario.isMultiPartyScenario(caseData)) {
             applicationBuilder.isMultiParty(YES);

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAEvidence;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -93,10 +92,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                             .name(STRING_CONSTANT)
                                             .role(STRING_CONSTANT)
                                             .build())
-            .generalAppUploadEvidences(GAEvidence.builder()
-                                           .evidenceDocument(wrapElements(Document.builder()
-                                                                              .documentUrl(STRING_CONSTANT).build()))
-                                           .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .judgeName(STRING_CONSTANT)
                                           .hearingDate(APP_DATE_EPOCH)
@@ -176,7 +172,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(application.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate())
                 .isEqualTo(APP_DATE_EPOCH);
             assertThat(application.getGeneralAppStatementOfTruth().getName()).isEqualTo(STRING_CONSTANT);
-            assertThat(unwrapElements(application.getEvidenceDocument()).get(0).getDocumentUrl())
+            assertThat(unwrapElements(application.getGeneralAppEvidenceDocument()).get(0).getDocumentUrl())
                 .isEqualTo(STRING_CONSTANT);
             assertThat(application.getGeneralAppHearingDetails().getSupportRequirement()
                            .contains(OTHER_SUPPORT)).isTrue();
