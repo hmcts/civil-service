@@ -123,6 +123,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
@@ -156,6 +157,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {

@@ -148,6 +148,36 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+
+    @Nested
+    class MidEventEligibilityCallback {
+
+        private static final String PAGE_ID = "eligibilityCheck";
+
+        @Test
+        void shouldNotReturnError_whenOrganisationIsNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnError_whenOrganisationIsRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
     @Nested
     class MidEventApplicantCallback {
 
