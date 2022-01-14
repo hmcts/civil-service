@@ -10,12 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -48,10 +50,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
+        if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
         }
+        List<String> listData = new ArrayList<>();
+        listData.add(caseData.getRespondent1().getIndividualFirstName() + " " + caseData.getRespondent1().getIndividualLastName());
+        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.size() == 0
