@@ -4,12 +4,12 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.5.6'
-  id 'org.owasp.dependencycheck' version '6.5.0.1'
-  id 'com.github.ben-manes.versions' version '0.39.0'
+  id 'org.owasp.dependencycheck' version '6.5.2.1'
+  id 'com.github.ben-manes.versions' version '0.40.0'
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.0.5"
+  id "org.flywaydb.flyway" version "8.3.0"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -70,7 +70,7 @@ allprojects {
     dependencies {
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.69'
       // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.7'
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.9'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
       dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
         entry 'guava'
@@ -296,10 +296,12 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.0'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core', version: '3.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.7'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.8'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.6'
@@ -320,15 +322,15 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.0'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.1'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.1'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.16-preview.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.1'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.54'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.13'
@@ -340,8 +342,8 @@ dependencies {
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.16.0'
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.0'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.0'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.1'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
@@ -350,9 +352,9 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.6.3'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.1.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.2.0'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

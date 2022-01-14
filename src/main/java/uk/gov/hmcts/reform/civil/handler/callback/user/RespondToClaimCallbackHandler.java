@@ -63,7 +63,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
     public static final String ERROR_DEFENDANT_RESPONSE_SUBMITTED =
-        "Defendant response has already been recorded";
+        "There is a problem"
+        + "\n"
+        + "You have already submitted the defendant's response";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
@@ -381,7 +383,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.respondent2ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
@@ -402,7 +403,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         } else {
             updatedData.respondent1ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-
 
             if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
                 || caseData.getRespondent2ResponseDate() != null

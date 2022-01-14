@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -26,6 +28,9 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
@@ -48,18 +53,14 @@ public class EventHistoryMapper {
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
+    private final Time time;
 
     public EventHistory buildEvents(CaseData caseData) {
         List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            states = stateFlowEngine.evaluateSpec(caseData)
-                .getStateHistory();
-        } else {
-            states = stateFlowEngine.evaluate(caseData)
-                .getStateHistory();
-        }
+        states = stateFlowEngine.evaluate(caseData).getStateHistory();
+
         List<State> stateHistory = states;
         stateHistory
             .forEach(state -> {
@@ -67,6 +68,9 @@ public class EventHistoryMapper {
                 switch (flowState) {
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
+                        break;
+                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                        buildUnregisteredAndUnrepresentedDefendant(builder, caseData);
                         break;
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
@@ -76,6 +80,9 @@ public class EventHistoryMapper {
                         break;
                     case CLAIM_NOTIFIED:
                         buildClaimantHasNotifiedDefendant(builder, caseData);
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                        buildTakenOfflineAfterClaimNotified(builder, caseData);
                         break;
                     case CLAIM_DETAILS_NOTIFIED:
                         buildClaimDetailsNotified(builder, caseData);
@@ -125,6 +132,12 @@ public class EventHistoryMapper {
                             caseData,
                             "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
                                 + "claim details within the allowed 2 weeks."
+                        );
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                        buildOfflineAfterClaimsDetailsNotified(
+                            builder,
+                            caseData
                         );
                         break;
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
@@ -339,6 +352,21 @@ public class EventHistoryMapper {
                 .build());
     }
 
+    private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            List.of(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
+                                      .build())
+                    .build()
+            ));
+    }
+
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.replyToDefence(List.of(
             Event.builder()
@@ -438,31 +466,103 @@ public class EventHistoryMapper {
     }
 
     private void buildUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        List<String> unrepresentedDefendantsNames = getDefendantNames(UNREPRESENTED, caseData);
+
+        List<Event> events = IntStream.range(0, unrepresentedDefendantsNames.size())
+            .mapToObj(index -> {
+                String paginatedMessage = unrepresentedDefendantsNames.size() > 1
+                    ? format("[%d of %d - %s] ",
+                             index + 1,
+                             unrepresentedDefendantsNames.size(),
+                             time.now().toLocalDate().toString())
+                    : "";
+                String eventText = format("RPA Reason: %sUnrepresented defendant: %s",
+                                          paginatedMessage,
+                                          unrepresentedDefendantsNames.get(index));
+
+                return Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText(eventText)
+                    .eventDetails(EventDetails.builder().miscText(eventText).build())
+                    .build();
+            })
+            .collect(Collectors.toList());
+        builder.miscellaneous(events);
+    }
+
+    private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: Unrepresented defendant.")
+                    .eventDetailsText("RPA Reason: Only one of the respondent is notified.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Unrepresented defendant.")
+                                      .miscText("RPA Reason: Only one of the respondent is notified.")
                                       .build())
                     .build()
             ));
     }
 
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        List<String> unregisteredDefendantsNames = getDefendantNames(UNREGISTERED, caseData);
+
+        List<Event> events = IntStream.range(0, unregisteredDefendantsNames.size())
+            .mapToObj(index -> {
+                String paginatedMessage = unregisteredDefendantsNames.size() > 1
+                    ? format("[%d of %d - %s] ",
+                             index + 1,
+                             unregisteredDefendantsNames.size(),
+                             time.now().toLocalDate().toString())
+                    : "";
+                String eventText = format("RPA Reason: %sUnregistered defendant solicitor firm: %s",
+                                          paginatedMessage,
+                                          unregisteredDefendantsNames.get(index));
+
+                return Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText(eventText)
+                    .eventDetails(EventDetails.builder().miscText(eventText).build())
+                    .build();
+            })
+            .collect(Collectors.toList());
+        builder.miscellaneous(events);
+    }
+
+    private void buildUnregisteredAndUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder,
+                                                            CaseData caseData) {
+        String localDateTime = time.now().toLocalDate().toString();
+
+        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
+                                                   + "defendant solicitor firm. Unrepresented defendant: %s",
+                                               localDateTime,
+                                               getDefendantNames(UNREPRESENTED, caseData).get(0));
+        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
+                                                  + "defendant solicitor firm. Unregistered defendant solicitor "
+                                                  + "firm: %s",
+                                              localDateTime,
+                                              getDefendantNames(UNREGISTERED, caseData).get(0));
+
         builder.miscellaneous(
             List.of(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Unregistered defendant solicitor firm.")
-                                      .build())
+                    .eventDetailsText(unrepresentedEventText)
+                    .eventDetails(EventDetails.builder().miscText(unrepresentedEventText).build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText(unregisteredEventText)
+                    .eventDetails(EventDetails.builder().miscText(unregisteredEventText).build())
                     .build()
             ));
     }

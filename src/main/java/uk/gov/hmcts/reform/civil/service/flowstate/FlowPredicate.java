@@ -10,8 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -123,6 +121,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         caseData.getRespondent1AcknowledgeNotificationDate() != null;
+
     public static final Predicate<CaseData> respondent1TimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null;
 
@@ -133,12 +132,47 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
+    private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
+        boolean basePredicate = caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseType() == responseType;
+        boolean predicate = false;
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
+                    || caseData.getRespondent2ClaimResponseType() == responseType);
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                predicate = basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
+                break;
+            case ONE_V_ONE:
+                predicate = basePredicate;
+                break;
+            case TWO_V_ONE:
+                predicate = basePredicate && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
+                break;
+            default:
+                break;
+        }
+        return predicate;
+    }
+
     public static final Predicate<CaseData> divergentRespond = caseData ->
-        getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
-        && caseData.getRespondent1ResponseDate() != null
-        && caseData.getRespondent2ResponseDate() != null
-        && caseData.getRespondentResponseIsSame() == NO
-        && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+        getPredicateForDivergentResponses(caseData);
+
+    private static boolean getPredicateForDivergentResponses(CaseData caseData) {
+        boolean bothDefendantsResponsesAreDifferent = caseData.getRespondent1ResponseDate() != null
+                && caseData.getRespondent2ResponseDate() != null
+                && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferent
+                    && caseData.getRespondentResponseIsSame() == NO;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return bothDefendantsResponsesAreDifferent;
+            default:
+                return false;
+        }
+    }
 
     public static final Predicate<CaseData> allResponsesReceived = caseData ->
         getPredicateForResponses(caseData);
@@ -163,30 +197,6 @@ public class FlowPredicate {
             default:
                 return false;
         }
-    }
-
-    private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
-        boolean basePredicate = caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseType() == responseType;
-        boolean predicate = false;
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
-                    || caseData.getRespondent2ClaimResponseType() == responseType);
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
-                break;
-            case ONE_V_ONE:
-                predicate = basePredicate;
-                break;
-            case TWO_V_ONE:
-                predicate = basePredicate && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
-                break;
-            default:
-                break;
-        }
-        return predicate;
     }
 
     public static final Predicate<CaseData> fullDefenceAfterNotifyDetails = caseData ->

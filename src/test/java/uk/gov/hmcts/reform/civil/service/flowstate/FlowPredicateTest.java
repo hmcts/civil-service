@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNot
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespond;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
@@ -192,7 +193,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
             assertTrue(respondent1NotRepresented.test(caseData));
         }
 
@@ -208,7 +209,7 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenRespondentNotRegistered() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRegisteredDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
             assertTrue(respondent1OrgNotRegistered.test(caseData));
         }
 
@@ -528,23 +529,45 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyDefendant1Responded() {
+                void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(PART_ADMISSION)
                         .build();
 
-                    assertFalse(fullDefence.test(caseData));
+                    assertTrue(divergentRespond.test(caseData));
                 }
 
                 @Test
-                void shouldReturnFalse_whenOnlyDefendant2Responded() {
+                void shouldReturnDivergentRespond_whenOnlyDefendant2RespondedWithFullDefence() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentPartAdmission()
                         .respondent2Responds(FULL_DEFENCE)
                         .build();
 
-                    assertFalse(fullDefence.test(caseData));
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendant1RespondedWithFullAdmissionAndDefendant2RespondedWithCounterClaim() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
+                        .build();
+
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenBothDefendantsRespondedWithFullAdmission() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                        .build();
+
+                    assertTrue(fullAdmission.test(caseData));
                 }
             }
 
