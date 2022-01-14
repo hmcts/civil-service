@@ -160,6 +160,16 @@ public class FlowPredicate {
         getPredicateForDivergentResponses(caseData);
 
     private static boolean getPredicateForDivergentResponses(CaseData caseData) {
+
+        if((caseData.getRespondent1DQ()!=null
+            && caseData.getRespondent1ClaimResponseType()!=null
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
+        || (caseData.getRespondent2DQ()!=null
+            && caseData.getRespondent2ClaimResponseType()!=null
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))){
+            return false;
+        }
+
         boolean bothDefendantsResponsesAreDifferent = caseData.getRespondent1ResponseDate() != null
                 && caseData.getRespondent2ResponseDate() != null
                 && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();

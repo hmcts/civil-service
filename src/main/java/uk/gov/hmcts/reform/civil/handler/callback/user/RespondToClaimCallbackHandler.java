@@ -324,17 +324,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
 
-                updatedData.businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-
-                if(caseData.getRespondent1DQ()!=null
-                    && caseData.getRespondent1ClaimResponseType()!=null
-                    && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)){
-                    updatedData.respondent1ResponseDate(responseDate);
-                } else if(caseData.getRespondent2DQ()!=null
-                    && caseData.getRespondent2ClaimResponseType()!=null
-                    && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)){
-                    updatedData.respondent2ResponseDate(responseDate);
-                }
+                updatedData
+                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
+                    .respondent1ResponseDate(responseDate)
+                    .respondent2ResponseDate(responseDate);
 
 
                 if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
@@ -364,6 +357,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.respondent2DQ(dq2);
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+
 
             }
 
