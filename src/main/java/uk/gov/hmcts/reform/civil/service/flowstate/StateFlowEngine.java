@@ -157,7 +157,10 @@ public class StateFlowEngine {
                 .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(ALL_RESPONSES_RECEIVED)
                 .transitionTo(FULL_DEFENCE)
+                    /*
+                    this is causing 1v2 (single sol) when respondentResponseIsSame=NO to fail
                     .onlyIf(fullDefence.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
+                    */
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(fullAdmission.and(not(notificationAcknowledged.or(respondent1TimeExtension))))
                 .transitionTo(PART_ADMISSION)
