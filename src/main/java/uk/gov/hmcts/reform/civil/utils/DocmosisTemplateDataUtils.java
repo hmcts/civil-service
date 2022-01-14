@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -11,6 +12,8 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 public class DocmosisTemplateDataUtils {
 
@@ -90,5 +93,69 @@ public class DocmosisTemplateDataUtils {
         Optional.ofNullable(litigationFriend)
             .map(LitigationFriend::getFullName)
             .ifPresent(fullName -> stringBuilder.append(format(" (proceeding by L/F %s)", fullName)));
+    }
+
+    public static SolicitorReferences fetchSolicitorReferencesMultiparty(CaseData caseData) {
+
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            //case where respondent 2 acknowledges first
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                if (null == caseData.getRespondentSolicitor2Reference()) {
+                    return SolicitorReferences
+                        .builder().respondentSolicitor2Reference("Not Provided")
+                        .build();
+                }
+                return SolicitorReferences
+                    .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                    .build();
+
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                //case where resp 1 acknowledges first
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    if (null == caseData.getRespondentSolicitor2Reference()) {
+                        return SolicitorReferences
+                            .builder().respondentSolicitor2Reference("Not Provided")
+                            .build();
+                    }
+                    return SolicitorReferences
+                        .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                        .build();
+
+                } else { //case where resp 2 acknowledges first
+                    return SolicitorReferences
+                        .builder()
+                        .respondentSolicitor1Reference(
+                            ofNullable(caseData.getSolicitorReferences())
+                                .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                                .orElse("Not Provided"))
+                        .build();
+                }
+            } else { //case where respondent 1 acknowledges first
+                return SolicitorReferences
+                    .builder()
+                    .respondentSolicitor1Reference(
+                        ofNullable(caseData.getSolicitorReferences())
+                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                            .orElse("Not Provided"))
+                    .build();
+            }
+        } else { //cases other than ONE_V_TWO_TWO_LEGAL_REP
+            return SolicitorReferences
+                .builder()
+                .applicantSolicitor1Reference(
+                    ofNullable(caseData.getSolicitorReferences())
+                        .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                        .orElse("Not Provided"))
+                .respondentSolicitor1Reference(
+                    ofNullable(caseData.getSolicitorReferences())
+                        .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                        .orElse("Not Provided"))
+                .build();
+        }
+
     }
 }
