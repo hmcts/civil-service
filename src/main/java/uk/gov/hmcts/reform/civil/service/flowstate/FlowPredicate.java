@@ -156,7 +156,7 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespond = caseData ->
+    public static final Predicate<CaseData> divergentRespondWithoutFullDefence = caseData ->
         getPredicateForDivergentResponses(caseData);
 
     private static boolean getPredicateForDivergentResponses(CaseData caseData) {
@@ -172,6 +172,13 @@ public class FlowPredicate {
             default:
                 return false;
         }
+    }
+
+    public static final Predicate<CaseData> divergentRespondWithFullDefence = caseData ->
+        getPredicateForDivergentResponsesWithFullDefence(caseData);
+
+    private static boolean getPredicateForDivergentResponsesWithFullDefence(CaseData caseData) {
+        return true;
     }
 
     public static final Predicate<CaseData> allResponsesReceived = caseData ->
