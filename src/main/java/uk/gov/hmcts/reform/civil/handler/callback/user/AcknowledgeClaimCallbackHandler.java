@@ -112,9 +112,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
         if (featureToggleService.isMultipartyEnabled()
-            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+            && (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1AcknowledgeNotificationDate() != null)
-            || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
@@ -130,7 +130,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
 
         var isRespondent1 = YES;
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
         updatedCaseData.isRespondent1(isRespondent1);
@@ -140,7 +140,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     }
 
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
@@ -192,7 +192,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
         LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent1ResponseDeadline);
-        LocalDateTime newDeadlineRespondent2 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent2ResponseDeadline);
+        LocalDateTime newDeadlineRespondent2 = null;
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
@@ -200,8 +200,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
         var respondent1Check = YES;
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             respondent1Check = NO;
+            newDeadlineRespondent2 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent2ResponseDeadline);
         }
 
         /* for 1v1 */
@@ -302,6 +303,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isRespondent1(CallbackParams callbackParams) {
-        return !solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO);
+        return !solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
     }
 }
