@@ -78,6 +78,15 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
                     caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
                 }
+            } else {
+                CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
+                    caseData,
+                    callbackParams.getParams().get(BEARER_TOKEN).toString()
+                );
+
+                List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
+                systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
             }
         } else {
             CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
