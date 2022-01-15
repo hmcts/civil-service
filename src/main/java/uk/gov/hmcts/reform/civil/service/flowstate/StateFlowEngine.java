@@ -206,10 +206,12 @@ public class StateFlowEngine {
                                 .and(not(respondent1TimeExtension))
                                 .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithoutFullDefence.and(not(respondent1TimeExtension)))
+                    .onlyIf(divergentRespondWithoutFullDefence
+                                .and(not(respondent1TimeExtension)))
                 .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
-                   .onlyIf(divergentRespondWithFullDefence.and(not(respondent1TimeExtension)).and(not(
-                       divergentRespondWithoutFullDefence)))
+                   .onlyIf(divergentRespondWithFullDefence
+                               .and(not(respondent1TimeExtension))
+                               .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
@@ -219,8 +221,12 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullAdmission))
                 .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(respondent1TimeExtension
-                                .and(not(notificationAcknowledged)).and(divergentRespondWithoutFullDefence))
+                    .onlyIf(divergentRespondWithoutFullDefence
+                                .and(not(respondent1TimeExtension)))
+                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
+                    .onlyIf(divergentRespondWithFullDefence
+                                .and(not(respondent1TimeExtension))
+                                .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
                 .transitionTo(COUNTER_CLAIM)
@@ -260,8 +266,12 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullAdmission))
                 .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(respondent1TimeExtension
-                                .and(notificationAcknowledged).and(divergentRespondWithoutFullDefence))
+                    .onlyIf(divergentRespondWithoutFullDefence
+                                .and(not(respondent1TimeExtension)))
+                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
+                    .onlyIf(divergentRespondWithFullDefence
+                                .and(not(respondent1TimeExtension))
+                                .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(partAdmission))
                 .transitionTo(COUNTER_CLAIM)
