@@ -170,6 +170,46 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("respondent2Copy")).isNull();
             assertThat(response.getData().get("respondent2Copy")).isNull();
         }
+
+        @Test
+        void shouldTriggerError_WhenRespondent1HasAlreadySubmittedResponseAndTheyTryToSubmitAgain() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()
+                           .equals("There is a problem\nYou have already submitted the defendant's response"));
+        }
+
+        @Test
+        void shouldTriggerError_WhenRespondent2HasAlreadySubmittedResponseAndTheyTryToSubmitAgain() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()
+                           .equals("There is a problem\nYou have already submitted the defendant's response"));
+        }
     }
 
     @Nested
