@@ -166,20 +166,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-
-            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
-                .organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
-
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
-        }
-    }
-
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
