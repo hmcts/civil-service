@@ -161,12 +161,12 @@ public class FlowPredicate {
 
     private static boolean getPredicateForDivergentResponses(CaseData caseData) {
 
-        if((caseData.getRespondent1DQ()!=null
-            && caseData.getRespondent1ClaimResponseType()!=null
+        if ((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-        || (caseData.getRespondent2DQ()!=null
-            && caseData.getRespondent2ClaimResponseType()!=null
-            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))){
+            || (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))) {
             return false;
         }
 
@@ -191,19 +191,19 @@ public class FlowPredicate {
         return isDivergentResponsesWithFullDefence(caseData);
     }
 
-    private static boolean isDivergentResponsesWithFullDefence(CaseData caseData){
-        if(((caseData.getRespondent1DQ()!=null
-            && caseData.getRespondent1ClaimResponseType()!=null
+    private static boolean isDivergentResponsesWithFullDefence(CaseData caseData) {
+        if (((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
             && !caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            && (caseData.getRespondent2DQ()!=null
-            && caseData.getRespondent2ClaimResponseType()!=null
+            && (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))
-        || ((caseData.getRespondent1DQ()!=null
-            && caseData.getRespondent1ClaimResponseType()!=null
+            || ((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            && (caseData.getRespondent2DQ()!=null
-            && caseData.getRespondent2ClaimResponseType()!=null
-            && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))){
+            && (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
+            && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))) {
             return true;
         }
         return false;

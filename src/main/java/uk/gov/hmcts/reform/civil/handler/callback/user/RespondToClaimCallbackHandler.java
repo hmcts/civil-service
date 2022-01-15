@@ -16,7 +16,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
@@ -144,13 +147,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isMultipartyEnabled()) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)){
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)){
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if(respondent2HasSameLegalRep(caseData)) {
+            } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if(caseData.getRespondent2DQ()!=null && caseData.getRespondent2DQ().getRespondent2DQWitnesses()!=null) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
                         return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
                     }
                 }
@@ -162,13 +166,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isMultipartyEnabled()) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)){
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)){
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if(respondent2HasSameLegalRep(caseData)) {
+            } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if(caseData.getRespondent2DQ()!=null && caseData.getRespondent2DQ().getRespondent2DQExperts()!=null) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
                         return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
                     }
                 }
@@ -182,11 +187,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
 
         if (featureToggleService.isMultipartyEnabled()) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)){
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 hearing = caseData.getRespondent2DQ().getHearing();
-            } else if(respondent2HasSameLegalRep(caseData)) {
+            } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if(caseData.getRespondent2DQ()!=null && caseData.getRespondent2DQ().getHearing()!=null) {
+                    if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
                         hearing = caseData.getRespondent2DQ().getHearing();
                     }
                 }
@@ -214,12 +219,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        if((caseData.getRespondent1ClaimResponseType() !=null && caseData.getRespondent1ClaimResponseType().equals(
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
             RespondentResponseType.FULL_DEFENCE))
-        || (caseData.getRespondent2ClaimResponseType() !=null && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))){
+            || (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
                 .build();
         }
@@ -329,7 +337,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate);
 
-
                 if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
                     || caseData.getRespondent2ResponseDate() != null
                     || (caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES)) {
@@ -357,7 +364,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.respondent2DQ(dq2);
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-
 
             }
 
