@@ -92,7 +92,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             switch (flowState) {
-                case DIVERGENT_RESPOND:
+                case DIVERGENT_RESPOND_WITH_FULL_DEFENCE:
+                case DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE:
                     return "RPA Reason: Divergent respond.";
                 case FULL_ADMISSION:
                     return "RPA Reason: Defendant fully admits.";
@@ -115,8 +116,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
-                case DIVERGENT_RESPOND_WITH_FULL_DEFENCE:
-                    return "RPA Reason: Case taken offline as divergent";
                 default:
                     throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }
