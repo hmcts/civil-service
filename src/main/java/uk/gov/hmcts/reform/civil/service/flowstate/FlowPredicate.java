@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -9,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
@@ -188,12 +191,10 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
 
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
-        caseData.getApplicant1ProceedWithClaim() != null
-            && caseData.getApplicant1ProceedWithClaim() == YES;
+        getPredicateForClaimantIntentionProceed(caseData);
 
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
-        caseData.getApplicant1ProceedWithClaim() != null
-            && caseData.getApplicant1ProceedWithClaim() == NO;
+        getPredicateForClaimantIntentionNotProceed(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
         caseData.getTakenOfflineDate() != null;
@@ -291,5 +292,57 @@ public class FlowPredicate {
 
     private FlowPredicate() {
         //Utility class
+    }
+
+    private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
+        boolean predicate = false;
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = (caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == YES)
+                    || (caseData.getApplicant1ProceedWithClaimRespondent2() != null
+                    && caseData.getApplicant1ProceedWithClaimRespondent2() == YES);
+                break;
+            case ONE_V_ONE:
+                predicate = caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == YES;
+                break;
+            case TWO_V_ONE:
+                predicate = (caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == YES)
+                    || (caseData.getApplicant2ProceedWithClaim() != null
+                    && caseData.getApplicant2ProceedWithClaim() == YES);
+                break;
+            default:
+                break;
+        }
+        return predicate;
+    }
+
+    private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
+        boolean predicate = false;
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = (caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == NO)
+                    && (caseData.getApplicant1ProceedWithClaimRespondent2() != null
+                    && caseData.getApplicant1ProceedWithClaimRespondent2() == NO);
+                break;
+            case ONE_V_ONE:
+                predicate = caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == NO;
+                break;
+            case TWO_V_ONE:
+                predicate = (caseData.getApplicant1ProceedWithClaim() != null
+                    && caseData.getApplicant1ProceedWithClaim() == NO)
+                    && (caseData.getApplicant2ProceedWithClaim() != null
+                    && caseData.getApplicant2ProceedWithClaim() == NO);
+                break;
+            default:
+                break;
+        }
+        return predicate;
     }
 }
