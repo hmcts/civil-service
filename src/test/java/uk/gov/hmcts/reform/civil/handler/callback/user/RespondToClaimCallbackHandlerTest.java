@@ -720,7 +720,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        @Disabled
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneRepGivingSeparateAnswers() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -746,7 +745,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        @Disabled
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when2ndRepAnsweringAfter1stAlreadyAnswered() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -818,7 +816,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(response.getState(), CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
-        @Disabled
         @Test
         void shouldNotSetApplicantResponseDeadlineOrTransitionCcdState_when2ndRespondentAnsweringBefore1st() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -937,7 +934,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .containsExactly(null, null);
             }
 
-            @Disabled
             @Test
             void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when2V1SameRep() {
                 String name = "John Smith";
@@ -991,7 +987,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
 
-        @Disabled
         @Test
         void shouldReturnConfirmationScreen_when1v2_andReceivedFirstResponse() {
             when(featureToggleService.isMultipartyEnabled()).thenReturn(true);

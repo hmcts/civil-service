@@ -529,7 +529,6 @@ class FlowPredicateTest {
                     assertTrue(fullDefence.test(caseData));
                 }
 
-                @Disabled
                 @Test
                 void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()
