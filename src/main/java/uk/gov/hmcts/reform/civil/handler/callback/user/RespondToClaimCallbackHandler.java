@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -89,6 +92,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
+            .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
@@ -141,16 +145,59 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isMultipartyEnabled()) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
         return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isMultipartyEnabled()) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
         return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
+
+        if (featureToggleService.isMultipartyEnabled()) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+                hearing = caseData.getRespondent2DQ().getHearing();
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
+                        hearing = caseData.getRespondent2DQ().getHearing();
+                    }
+                }
+            }
+        }
+
         List<String> errors = unavailableDateValidator.validate(hearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -167,6 +214,26 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))
+            || (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
+                .build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
@@ -248,23 +315,57 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // if responses are marked as same, copy respondent 1 values into respondent 2
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
                 updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
+                updatedData
+                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
+                    .respondent1ResponseDate(responseDate)
+                    .respondent2ResponseDate(responseDate)
+                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+
+                // moving statement of truth value to correct field, this was not possible in mid event.
+                StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+                Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+                    .respondent1DQStatementOfTruth(statementOfTruth)
+                    .build();
+
+                updatedData.respondent1DQ(dq);
+                // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+                updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+            } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+
+                updatedData
+                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
+                    .respondent1ResponseDate(responseDate)
+                    .respondent2ResponseDate(responseDate);
+
+                if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
+                    || caseData.getRespondent2ResponseDate() != null
+                    || (caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES)) {
+                    updatedData
+                        .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                }
+
+                // moving statement of truth value to correct field, this was not possible in mid event.
+                StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+                Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+                    .respondent1DQStatementOfTruth(statementOfTruth)
+                    .build();
+
+                updatedData.respondent1DQ(dq);
+
+                if (caseData.getRespondent1ResponseDate() != null) {
+                    updatedData
+                        .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                }
+
+                Respondent2DQ dq2 = caseData.getRespondent2DQ().toBuilder()
+                    .respondent2DQStatementOfTruth(statementOfTruth)
+                    .build();
+
+                updatedData.respondent2DQ(dq2);
+                // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+                updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+
             }
-
-            updatedData
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
-                .respondent1ResponseDate(responseDate)
-                .respondent2ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
-
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .build();
-
-            updatedData.respondent1DQ(dq);
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
 
             // only represents 2nd respondent - need to wait for respondent 1 before setting applicant response deadline
         } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
@@ -279,6 +380,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // 1v1, 2v1
             // represents 1st respondent - need to set deadline if only 1 respondent,
             // or wait for 2nd respondent response before setting deadline
+            // moving statement of truth value to correct field, this was not possible in mid event.
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+            Respondent2DQ dq = caseData.getRespondent2DQ().toBuilder()
+                .respondent2DQStatementOfTruth(statementOfTruth)
+                .build();
+
+            updatedData.respondent2DQ(dq);
+            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
             updatedData.respondent1ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
@@ -358,9 +468,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (featureToggleService.isMultipartyEnabled()
             && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
-            body = "Once the other defendant's legal representative has submitted their defence, we will send the "
-                + "claimant's legal representative a notification. You will receive a copy of this notification, "
-                + "as it will include details of when the claimant must respond.";
+            body = "TBC";
+        } else if (respondent2HasSameLegalRep(caseData)) {
+            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                body = "TBC";
+                } else {
+                body = "TBC";
+            }
         } else {
             LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
             body = format(

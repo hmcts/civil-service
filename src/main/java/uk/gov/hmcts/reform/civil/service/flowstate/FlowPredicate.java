@@ -157,10 +157,20 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespond = caseData ->
+    public static final Predicate<CaseData> divergentRespondWithoutFullDefence = caseData ->
         getPredicateForDivergentResponses(caseData);
 
     private static boolean getPredicateForDivergentResponses(CaseData caseData) {
+
+        if ((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
+            || (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))) {
+            return false;
+        }
+
         boolean bothDefendantsResponsesAreDifferent = caseData.getRespondent1ResponseDate() != null
                 && caseData.getRespondent2ResponseDate() != null
                 && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
@@ -173,6 +183,31 @@ public class FlowPredicate {
             default:
                 return false;
         }
+    }
+
+    public static final Predicate<CaseData> divergentRespondWithFullDefence = caseData ->
+        getPredicateForDivergentResponsesWithFullDefence(caseData);
+
+    private static boolean getPredicateForDivergentResponsesWithFullDefence(CaseData caseData) {
+        return isDivergentResponsesWithFullDefence(caseData);
+    }
+
+    private static boolean isDivergentResponsesWithFullDefence(CaseData caseData) {
+        if (((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
+            && !caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
+            && (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))
+            || ((caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
+            && (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2ClaimResponseType() != null
+            && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))) {
+            return true;
+        }
+        return false;
     }
 
     public static final Predicate<CaseData> allResponsesReceived = caseData ->

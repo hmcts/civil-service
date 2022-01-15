@@ -31,7 +31,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOnlyOneRespondentRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespond;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithFullDefence;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithoutFullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
@@ -71,7 +72,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITH_FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FLOW_NAME;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
@@ -194,17 +196,20 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(fullAdmission
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespond)))
+                                .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(partAdmission
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespond)))
+                                .and(not(divergentRespondWithoutFullDefence)))
                 .transitionTo(COUNTER_CLAIM)
                     .onlyIf(counterClaim
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespond)))
-                .transitionTo(DIVERGENT_RESPOND)
-                    .onlyIf(divergentRespond.and(not(respondent1TimeExtension)))
+                                .and(not(divergentRespondWithoutFullDefence)))
+                .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
+                    .onlyIf(divergentRespondWithoutFullDefence.and(not(respondent1TimeExtension)))
+                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
+                   .onlyIf(divergentRespondWithFullDefence.and(not(respondent1TimeExtension)).and(not(
+                       divergentRespondWithoutFullDefence)))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
@@ -286,7 +291,8 @@ public class StateFlowEngine {
             .state(FULL_ADMISSION)
             .state(DIVERGENT_RESPOND)
             .state(PART_ADMISSION)
-            .state(DIVERGENT_RESPOND)
+            .state(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
+            .state(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
             .state(ALL_RESPONSES_RECEIVED)
             .state(AWAITING_RESPONSES_RECEIVED)
             .state(COUNTER_CLAIM)
