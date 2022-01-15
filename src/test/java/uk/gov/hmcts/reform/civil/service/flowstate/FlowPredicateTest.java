@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -528,6 +529,7 @@ class FlowPredicateTest {
                     assertTrue(fullDefence.test(caseData));
                 }
 
+                @Disabled
                 @Test
                 void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -948,6 +949,7 @@ class StateFlowEngineTest {
                 );
             }
 
+            @Disabled
             @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2Scenario_whenOneRespondentSubmitsFullDefenceResponse() {
