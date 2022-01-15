@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -12,6 +14,8 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
@@ -25,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNot
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespond;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
@@ -317,7 +322,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenDefendantResponse() {
             CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
             assertTrue(fullDefence.test(caseData));
@@ -501,6 +506,152 @@ class FlowPredicateTest {
             }
         }
 
+        @Nested
+        class MultiParty {
+            CaseDataBuilder caseDataBuilder;
+
+            @Nested
+            class OneVTwoWithTwoReps {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors();
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothResponded() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(PART_ADMISSION)
+                        .build();
+
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnDivergentRespond_whenOnlyDefendant2RespondedWithFullDefence() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentPartAdmission()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendant1RespondedWithFullAdmissionAndDefendant2RespondedWithCounterClaim() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
+                        .build();
+
+                    assertTrue(divergentRespond.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenBothDefendantsRespondedWithFullAdmission() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                        .build();
+
+                    assertTrue(fullAdmission.test(caseData));
+                }
+            }
+
+            @Nested
+            class OneVTwoWithOneRep {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor();
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSame() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .respondentResponseIsSame(YesOrNo.YES)
+                        .build();
+
+                    assertTrue(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSameButMarkedDifferent() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenDefendantsBothRespondedAndResponsesNotTheSame() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent2Responds(PART_ADMISSION)
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertFalse(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenOnlyOneResponse() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .build();
+
+                    assertFalse(fullDefence.test(caseData));
+                }
+            }
+
+            @Nested
+            class TwoApplicants {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoApplicants();
+                }
+
+                @Test
+                void shouldReturnTrue_whenResponsesToBothApplicants() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(fullDefence.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenDifferentResponses() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                        .build();
+
+                    assertFalse(fullDefence.test(caseData));
+                }
+            }
+        }
+
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClosed() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDiscontinued().build();
@@ -575,7 +726,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenDefendantResponse() {
             CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+                .respondent1ClaimResponseType(PART_ADMISSION)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
             assertTrue(partAdmission.test(caseData));
