@@ -31,7 +31,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNot
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithoutFullDefence;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
@@ -531,25 +532,25 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnDivergentRespond_whenOnlyDefendant1RespondedWithFullDefense() {
+                void shouldGoOffline_whenDivergentRespondAndFirstResponseWithFullDefense() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
                         .respondent2Responds(PART_ADMISSION)
                         .build();
 
-                    assertTrue(divergentRespondWithoutFullDefence.test(caseData));
+                    assertTrue(divergentRespondGoOffline.test(caseData));
                 }
 
                 @Test
-                void shouldReturnDivergentRespond_whenOnlyDefendant2RespondedWithFullDefence() {
+                void shouldGenerateDQAndGoOffline_whenDivergentAndSecondDefendantRespondedWithFullDefence() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentPartAdmission()
                         .respondent2Responds(FULL_DEFENCE)
                         .build();
 
-                    assertTrue(divergentRespondWithoutFullDefence.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOffline.test(caseData));
                 }
 
                 @Test
@@ -559,7 +560,7 @@ class FlowPredicateTest {
                         .atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim()
                         .build();
 
-                    assertTrue(divergentRespondWithoutFullDefence.test(caseData));
+                    assertTrue(divergentRespondGoOffline.test(caseData));
                 }
 
                 @Test

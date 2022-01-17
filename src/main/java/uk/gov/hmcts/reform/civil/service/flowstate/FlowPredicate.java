@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -157,57 +156,50 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespondWithoutFullDefence = caseData ->
-        getPredicateForDivergentResponses(caseData);
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = caseData ->
+        isDivergentResponsesWithDQAndGoOffline(caseData);
 
-    private static boolean getPredicateForDivergentResponses(CaseData caseData) {
-
-        if ((caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            || (caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))) {
-            return false;
-        }
-
-        boolean bothDefendantsResponsesAreDifferent = caseData.getRespondent1ResponseDate() != null
-                && caseData.getRespondent2ResponseDate() != null
-                && caseData.getRespondent1ClaimResponseType() != caseData.getRespondent2ClaimResponseType();
+    private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return bothDefendantsResponsesAreDifferent
-                    && caseData.getRespondentResponseIsSame() == NO;
+                //scenario: either of them have submitted full defence response
+                return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
+                    && (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    || caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return bothDefendantsResponsesAreDifferent;
+                //scenario: latest response is full defence
+                return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
+                    && ((caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
+                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
+                    || (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
             default:
                 return false;
         }
     }
 
-    public static final Predicate<CaseData> divergentRespondWithFullDefence = caseData ->
-        getPredicateForDivergentResponsesWithFullDefence(caseData);
+    public static final Predicate<CaseData> divergentRespondGoOffline = caseData ->
+        isDivergentResponsesGoOffline(caseData);
 
-    private static boolean getPredicateForDivergentResponsesWithFullDefence(CaseData caseData) {
-        return isDivergentResponsesWithFullDefence(caseData);
-    }
-
-    private static boolean isDivergentResponsesWithFullDefence(CaseData caseData) {
-        if (((caseData.getRespondent1DQ() == null
-            && caseData.getRespondent1ClaimResponseType() != null
-            && !caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            && (caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))
-            || ((caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            && (caseData.getRespondent2DQ() == null
-            && caseData.getRespondent2ClaimResponseType() != null
-            && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)))) {
-            return true;
+    private static boolean isDivergentResponsesGoOffline(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
+                    //scenario: latest response is not full defence
+                    && (((!caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
+                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
+                    || !caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())))
+                    //scenario: neither responses are full defence
+                    || (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)));
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
+                    && (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
+            default:
+                return false;
         }
-        return false;
     }
 
     public static final Predicate<CaseData> allResponsesReceived = caseData ->
