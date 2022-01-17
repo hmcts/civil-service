@@ -62,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NON_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -184,7 +184,7 @@ public class StateFlowEngine {
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived.and(not(notificationAcknowledged)))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .onlyIf(awaitingResponsesFullDefenceReceived.and(not(notificationAcknowledged)))
-                .transitionTo(AWAITING_RESPONSES_NON_FULL_DEFENCE_RECEIVED)
+                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
                     .onlyIf(awaitingResponsesNonFullDefenceReceived.and(not(notificationAcknowledged)))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
@@ -195,7 +195,7 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimNotified)
                 .transitionTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(pastClaimDetailsNotificationDeadline)
-            .state(AWAITING_RESPONSES_NON_FULL_DEFENCE_RECEIVED)
+            .state(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimNotified)
@@ -253,7 +253,7 @@ public class StateFlowEngine {
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
                                 .and(awaitingResponsesFullDefenceReceived))
-                .transitionTo(AWAITING_RESPONSES_NON_FULL_DEFENCE_RECEIVED)
+                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
                     .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
                                 .and(awaitingResponsesNonFullDefenceReceived))
                 /*  We can no longer go from ACKNOWLEDGED to
@@ -321,7 +321,7 @@ public class StateFlowEngine {
             .state(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
             .state(ALL_RESPONSES_RECEIVED)
             .state(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-            .state(AWAITING_RESPONSES_NON_FULL_DEFENCE_RECEIVED)
+            .state(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
             .state(COUNTER_CLAIM)
             .state(FULL_DEFENCE_PROCEED)
             .state(FULL_DEFENCE_NOT_PROCEED)
