@@ -25,6 +25,14 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -46,6 +54,17 @@ public class CaseData implements MappableObject {
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
+    private final GAApplicationType generalAppType;
+    private final GARespondentOrderAgreement generalAppRespondentAgreement;
+    private final GAPbaDetails generalAppPBADetails;
+    private final String generalAppDetailsOfOrder;
+    private final String generalAppReasonsOfOrder;
+    private final GAInformOtherParty generalAppInformOtherParty;
+    private final GAUrgencyRequirement generalAppUrgencyRequirement;
+    private final GAStatementOfTruth generalAppStatementOfTruth;
+    private final GAHearingDetails generalAppHearingDetails;
+    private final List<Element<Document>> generalAppEvidenceDocument;
+    private final List<Element<GeneralApplication>> generalApplications;
     private final SolicitorReferences solicitorReferences;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
@@ -109,6 +128,8 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
@@ -233,6 +254,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDate;
@@ -247,7 +269,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
-
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
