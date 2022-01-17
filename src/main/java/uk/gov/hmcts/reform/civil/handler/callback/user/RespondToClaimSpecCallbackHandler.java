@@ -140,8 +140,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
+            // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
             int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
-                .compareTo(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(100)));
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
                 caseData = caseData.toBuilder()
                     .respondent1ClaimResponsePaymentAdmissionForSpec(
