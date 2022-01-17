@@ -210,8 +210,7 @@ public class StateFlowEngine {
                                 .and(not(respondent1TimeExtension)))
                 .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
                    .onlyIf(divergentRespondWithFullDefence
-                               .and(not(respondent1TimeExtension))
-                               .and(not(divergentRespondWithoutFullDefence)))
+                               .and(not(respondent1TimeExtension)))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
@@ -225,8 +224,7 @@ public class StateFlowEngine {
                                 .and(not(respondent1TimeExtension)))
                 .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
                     .onlyIf(divergentRespondWithFullDefence
-                                .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespondWithoutFullDefence)))
+                                .and(not(respondent1TimeExtension)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
                 .transitionTo(COUNTER_CLAIM)

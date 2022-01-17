@@ -330,38 +330,39 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.respondent1DQ(dq);
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+                //1v2 same solictor responding to respondents individually
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
 
                 updatedData
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
-                    .respondent2ResponseDate(responseDate);
+                    .respondent2ResponseDate(responseDate)
+                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
 
-                if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
-                    || caseData.getRespondent2ResponseDate() != null
-                    || (caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES)) {
-                    updatedData
-                        .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
-                }
-
-                // moving statement of truth value to correct field, this was not possible in mid event.
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-                Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                    .respondent1DQStatementOfTruth(statementOfTruth)
-                    .build();
+                if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+                    // moving statement of truth value to correct field, this was not possible in mid event.
+                    Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+                        .respondent1DQStatementOfTruth(statementOfTruth)
+                        .build();
 
-                updatedData.respondent1DQ(dq);
-
-                if (caseData.getRespondent1ResponseDate() != null) {
-                    updatedData
-                        .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    updatedData.respondent1DQ(dq);
+                } else {
+                    //required as ccd populated the respondent DQ with null objects.
+                    updatedData.respondent1DQ(null);
                 }
 
-                Respondent2DQ dq2 = caseData.getRespondent2DQ().toBuilder()
-                    .respondent2DQStatementOfTruth(statementOfTruth)
-                    .build();
+                if (caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
 
-                updatedData.respondent2DQ(dq2);
+                    Respondent2DQ dq2 = caseData.getRespondent2DQ().toBuilder()
+                        .respondent2DQStatementOfTruth(statementOfTruth)
+                        .build();
+
+                    updatedData.respondent2DQ(dq2);
+                } else {
+                    updatedData.respondent2DQ(null);
+                }
+
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
 

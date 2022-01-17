@@ -981,6 +981,36 @@ class StateFlowEngineTest {
                 );
             }
 
+            @Test
+                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(10)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(2).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                    entry("RPA_CONTINUOUS_FEED", true)
+                );
+            }
+
             //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
             @Test
             void shouldReturnDivergentResponse_in1v2Scenario_whenNeitherRespondentSubmitsFullDefenceResponse() {
