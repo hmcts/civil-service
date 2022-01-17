@@ -273,7 +273,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent2ResponseDeadline(LocalDateTime deadline) {
-        this.respondent1ResponseDeadline = deadline;
+        this.respondent2ResponseDeadline = deadline;
         return this;
     }
 
