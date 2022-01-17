@@ -107,6 +107,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Nested
     class AboutToStartV1Callback {
+        public static final String ERROR_EXTENSION_DATE_SUBMITTED =
+            "This action cannot currently be performed because it has already been completed";
 
         @BeforeEach
         void setup() {
@@ -175,8 +177,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("This action cannot currently be performed because it has already been completed");
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
         }
 
         @Test
@@ -192,8 +193,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("This action cannot currently be performed because it has already been completed");
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
         }
 
         @Test
@@ -211,8 +211,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("This action cannot currently be performed because it has already been completed");
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
         }
 
         @Test
@@ -230,8 +229,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("This action cannot currently be performed because it has already been completed");
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
         }
 
         @Test
@@ -250,8 +248,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors())
-                .containsOnly("This action cannot currently be performed because it has already been completed");
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
         }
     }
 
