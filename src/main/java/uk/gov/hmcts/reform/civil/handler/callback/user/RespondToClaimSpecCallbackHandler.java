@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -121,12 +122,32 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
+        caseData = cleanOtherPaths(caseData);
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
+    }
+
+    /**
+     * The user can progress down a path to realize they were wrong choosing it. When they go back, the information
+     * they filled in will still be in caseData. In some cases, that stale information can lead frontend to error.
+     * Because of the limitations on showConditions, we have to make sure that those fields are properly cleaned
+     * to prevent such misleading
+     *
+     * @param caseData caseData
+     * @return if there was need to remove stale information, the modified caseData. Otherwise, the
+     *     caseData passed as parameter
+     */
+    private CaseData cleanOtherPaths(CaseData caseData) {
+        CaseData modified = caseData;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            && caseData.getSpecDefenceFullAdmittedRequired() != null) {
+            modified = caseData.toBuilder().specDefenceFullAdmittedRequired(null).build();
+        }
+        return modified;
     }
 
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
@@ -148,8 +169,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                         null);
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
+            caseData.getTotalClaimAmount(),
+            null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
