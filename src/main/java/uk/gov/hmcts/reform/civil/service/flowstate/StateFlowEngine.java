@@ -31,8 +31,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOnlyOneRespondentRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithFullDefence;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithoutFullDefence;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
@@ -72,8 +72,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITH_FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FLOW_NAME;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
@@ -196,20 +196,20 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(fullAdmission
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespondWithoutFullDefence)))
+                                .and(not(divergentRespondGoOffline)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(partAdmission
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespondWithoutFullDefence)))
+                                .and(not(divergentRespondGoOffline)))
                 .transitionTo(COUNTER_CLAIM)
                     .onlyIf(counterClaim
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespondWithoutFullDefence)))
-                .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithoutFullDefence
+                                .and(not(divergentRespondGoOffline)))
+                .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
+                    .onlyIf(divergentRespondGoOffline
                                 .and(not(respondent1TimeExtension)))
-                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
-                   .onlyIf(divergentRespondWithFullDefence
+                .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
+                   .onlyIf(divergentRespondWithDQAndGoOffline
                                .and(not(respondent1TimeExtension)))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
@@ -219,11 +219,11 @@ public class StateFlowEngine {
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullDefence))
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullAdmission))
-                .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithoutFullDefence
+                .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
+                    .onlyIf(divergentRespondGoOffline
                                 .and(not(respondent1TimeExtension)))
-                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithFullDefence
+                .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
+                    .onlyIf(divergentRespondWithDQAndGoOffline
                                 .and(not(respondent1TimeExtension)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
@@ -263,13 +263,13 @@ public class StateFlowEngine {
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullDefence))
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(fullAdmission))
-                .transitionTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithoutFullDefence
+                .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
+                    .onlyIf(divergentRespondGoOffline
                                 .and(not(respondent1TimeExtension)))
-                .transitionTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
-                    .onlyIf(divergentRespondWithFullDefence
+                .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
+                    .onlyIf(divergentRespondWithDQAndGoOffline
                                 .and(not(respondent1TimeExtension))
-                                .and(not(divergentRespondWithoutFullDefence)))
+                                .and(not(divergentRespondGoOffline)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(respondent1TimeExtension.and(notificationAcknowledged).and(partAdmission))
                 .transitionTo(COUNTER_CLAIM)
@@ -300,8 +300,8 @@ public class StateFlowEngine {
             .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
             .state(FULL_ADMISSION)
             .state(PART_ADMISSION)
-            .state(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE)
-            .state(DIVERGENT_RESPOND_WITH_FULL_DEFENCE)
+            .state(DIVERGENT_RESPOND_GO_OFFLINE)
+            .state(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
             .state(ALL_RESPONSES_RECEIVED)
             .state(AWAITING_RESPONSES_RECEIVED)
             .state(COUNTER_CLAIM)

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,8 +37,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_WITH_FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -952,7 +951,7 @@ class StateFlowEngineTest {
 
             @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
-            void shouldReturnDivergentResponse_in1v2Scenario_whenOneRespondentSubmitsFullDefenceResponse() {
+            void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimTwoDefendantSolicitors()
@@ -963,7 +962,7 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName());
+                    .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(10)
                     .extracting(State::getName)
@@ -971,7 +970,7 @@ class StateFlowEngineTest {
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName()
+                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(3).contains(
@@ -982,7 +981,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
@@ -994,7 +993,7 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName());
+                    .isEqualTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(10)
                     .extracting(State::getName)
@@ -1002,7 +1001,7 @@ class StateFlowEngineTest {
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_WITH_FULL_DEFENCE.fullName()
+                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(2).contains(
@@ -1024,7 +1023,7 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE.fullName());
+                    .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(10)
                     .extracting(State::getName)
@@ -1032,7 +1031,7 @@ class StateFlowEngineTest {
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE.fullName()
+                        ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(3).contains(

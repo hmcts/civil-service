@@ -1266,7 +1266,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
-        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
         return this;
     }
 
@@ -1745,7 +1745,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Responds(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
-        this.respondent2ResponseDate = LocalDateTime.now();
+        this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
         return this;
     }
 

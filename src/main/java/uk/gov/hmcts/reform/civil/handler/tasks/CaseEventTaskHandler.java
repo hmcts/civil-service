@@ -92,8 +92,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             switch (flowState) {
-                case DIVERGENT_RESPOND_WITH_FULL_DEFENCE:
-                case DIVERGENT_RESPOND_WITHOUT_FULL_DEFENCE:
+                case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
+                case DIVERGENT_RESPOND_GO_OFFLINE:
                     return "RPA Reason: Divergent respond.";
                 case FULL_ADMISSION:
                     return "RPA Reason: Defendant fully admits.";
