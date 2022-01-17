@@ -228,12 +228,12 @@ public class FlowPredicate {
     private static boolean getPredicateForAwaitingResponsesFullDefenceReceived(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseType() != null &&
-                    caseData.getRespondent2ClaimResponseType() == null
+                return (caseData.getRespondent1ClaimResponseType() != null
+                    && caseData.getRespondent2ClaimResponseType() == null
                     && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
                     ||
-                    (caseData.getRespondent1ClaimResponseType() == null &&
-                    caseData.getRespondent2ClaimResponseType() != null
+                    (caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
                     && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             default:
                 return false;
@@ -246,12 +246,12 @@ public class FlowPredicate {
     private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceived(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseType() != null &&
-                    caseData.getRespondent2ClaimResponseType() == null
+                return (caseData.getRespondent1ClaimResponseType() != null
+                    && caseData.getRespondent2ClaimResponseType() == null
                     && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
                     ||
-                    (caseData.getRespondent1ClaimResponseType() == null &&
-                    caseData.getRespondent2ClaimResponseType() != null
+                    (caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
                     && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             default:
                 return false;
