@@ -1175,6 +1175,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
+        atStateClaimDetailsNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();

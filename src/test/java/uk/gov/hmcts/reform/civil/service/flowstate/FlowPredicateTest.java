@@ -19,6 +19,8 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -559,6 +561,46 @@ class FlowPredicateTest {
                         .build();
 
                     assertTrue(divergentRespondWithoutFullDefence.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullDefenceReceivedShouldReturnFalse() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentCounterClaimAfterNotifyDetails()
+                        .build();
+
+                    assertFalse(awaitingResponsesFullDefenceReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentCounterClaimAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceReceivedShouldReturnFalse() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .build();
+
+                    assertFalse(awaitingResponsesNonFullDefenceReceived.test(caseData));
                 }
 
                 @Test
