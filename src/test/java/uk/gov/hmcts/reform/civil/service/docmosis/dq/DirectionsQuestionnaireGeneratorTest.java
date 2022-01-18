@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -386,7 +388,21 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData, "ONE");
+            }
+
+            @Test
+            void whenRespondent2ResponseOrRespondent2LaterResponse_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent2DQ(), caseData, "TWO");
             }
 
             @Test
@@ -402,10 +418,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData, "ONE");
             }
 
-            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq,
+                                                      CaseData caseData, String respondentIndicator) {
                 Assertions.assertAll(
                     "DQ data should be as expected",
                     () -> assertEquals(
@@ -420,7 +437,8 @@ class DirectionsQuestionnaireGeneratorTest {
                         templateData.getDisclosureOfNonElectronicDocuments(),
                         dq.getDisclosureOfNonElectronicDocuments()
                     ),
-                    () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
+                    () -> assertEquals(templateData.getRespondents(), respondentIndicator.equals("ONE")
+                        ? getRespondent1(caseData) : getRespondent2(caseData)),
                     () -> assertEquals(templateData.getApplicant(), getApplicant(caseData)),
                     () -> assertEquals(templateData.getExperts(), getExperts(dq)),
                     () -> assertEquals(templateData.getWitnesses(), getWitnesses(dq)),
@@ -440,12 +458,22 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
             }
 
-            private List<Party> getRespondents(CaseData caseData) {
+            private List<Party> getRespondent1(CaseData caseData) {
                 var respondent = caseData.getRespondent1();
                 return List.of(Party.builder()
                                    .name(respondent.getPartyName())
                                    .primaryAddress(respondent.getPrimaryAddress())
                                    .representative(defendant1Representative)
+                                   .litigationFriendName("respondent LF")
+                                   .build());
+            }
+
+            private List<Party> getRespondent2(CaseData caseData) {
+                var respondent = caseData.getRespondent2();
+                return List.of(Party.builder()
+                                   .name(respondent.getPartyName())
+                                   .primaryAddress(respondent.getPrimaryAddress())
+                                   .representative(defendant2Representative)
                                    .litigationFriendName("respondent LF")
                                    .build());
             }
