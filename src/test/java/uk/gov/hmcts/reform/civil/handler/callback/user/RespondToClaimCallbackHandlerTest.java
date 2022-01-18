@@ -990,4 +990,35 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
     }
+
+    @Nested
+    class MidEventSetGenericResponseTypeFlagCallback {
+
+        private static final String PAGE_ID = "set-generic-response-type-flag";
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Respondent1IsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Respondent2IsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .respondent1ClaimResponseType(null)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+    }
 }
