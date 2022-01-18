@@ -135,7 +135,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    public DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
         DQ dq = caseData.getRespondent2DQ();
 
         return DirectionsQuestionnaireForm.builder()
@@ -159,7 +159,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData) {
+    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData) {
         DQ dq = caseData.getRespondent1DQ();
 
         return DirectionsQuestionnaireForm.builder()
