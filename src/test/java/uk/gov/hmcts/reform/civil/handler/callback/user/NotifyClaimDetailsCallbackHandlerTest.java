@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -34,6 +35,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.DEADLINE;
@@ -202,6 +205,28 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDate", localDateTime.format(ISO_DATE_TIME))
                     .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
+                    .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldUpdateBusinessProcess_whenInvoked1v2DifferentSolicitor() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(NO)
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("businessProcess")
+                    .extracting("camundaEvent", "status")
+                    .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS.name(), "READY");
+
+                assertThat(response.getData())
+                    .containsEntry("claimDetailsNotificationDate", localDateTime.format(ISO_DATE_TIME))
+                    .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
+                    .containsEntry("respondent2ResponseDeadline", newDate.format(ISO_DATE_TIME))
                     .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
             }
         }
