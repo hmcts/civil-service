@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 
-import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.util.List;
+import javax.validation.ConstraintValidatorContext;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
