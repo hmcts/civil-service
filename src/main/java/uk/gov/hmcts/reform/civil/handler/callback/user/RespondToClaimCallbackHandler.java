@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -222,14 +223,27 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData.CaseDataBuilder updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))
-            || (caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))) {
+        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+            if (isRespondentResponseTypeFullDefense(caseData.getRespondent1ClaimResponseType())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
+                    .build();
+            }
+        } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            if (isRespondentResponseTypeFullDefense(caseData.getRespondent2ClaimResponseType())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
+                    .build();
+            }
+        } else {
+            // have to check both respondent responses or 1v2 diff sol will fail on respondent 2 if response is not full defense
+            if (isRespondentResponseTypeFullDefense(caseData.getRespondent1ClaimResponseType())) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                .build();
+                    .build();
+            } if (caseData.getRespondent2ClaimResponseType() != null) {
+                if (isRespondentResponseTypeFullDefense(caseData.getRespondent2ClaimResponseType())) {
+                    updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
+                        .build();
+                }
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -454,6 +468,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
+    }
+
+    private boolean isRespondentResponseTypeFullDefense(RespondentResponseType respondentResponseType) {
+        return respondentResponseType.equals(FULL_DEFENCE);
     }
 
     //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
