@@ -1903,6 +1903,7 @@ public class CaseDataBuilder {
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .applicant1DQ(applicant1DQ)
+            .respondent2DQ(respondent2DQ)
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)

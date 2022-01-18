@@ -32,13 +32,16 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -51,6 +54,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -387,7 +391,69 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData, "ONE");
+            }
+
+            @Test
+            void whenRespondent2ResponseOrRespondent2LaterResponse_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent2DQ(), caseData, "TWO");
+            }
+
+            @Test
+            void when1v2SolRespondsTo2ndDefendantWithDivergentResponse_shouldGetRespondentDQData() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                    .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .build();
+                CaseDocument caseDocument = generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN, "TWO");
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+            }
+
+            @Test
+            void when1v2SolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                    .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .build();
+                CaseDocument caseDocument = generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN, "ONE");
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
             }
 
             @Test
@@ -403,11 +469,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData, "ONE");
             }
 
-            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData,
-                                                      DQ dq, CaseData caseData) {
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq,
+                                                      CaseData caseData, String respondentIndicator) {
                 Assertions.assertAll(
                     "DQ data should be as expected",
                     () -> assertEquals(
@@ -422,7 +488,8 @@ class DirectionsQuestionnaireGeneratorTest {
                         templateData.getDisclosureOfNonElectronicDocuments(),
                         dq.getDisclosureOfNonElectronicDocuments()
                     ),
-                    () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
+                    () -> assertEquals(templateData.getRespondents(), respondentIndicator.equals("ONE")
+                        ? getRespondent1(caseData) : getRespondent2(caseData)),
                     () -> assertEquals(templateData.getApplicant(), getApplicant(caseData)),
                     () -> assertEquals(templateData.getExperts(), getExperts(dq)),
                     () -> assertEquals(templateData.getWitnesses(), getWitnesses(dq)),
@@ -442,12 +509,22 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
             }
 
-            private List<Party> getRespondents(CaseData caseData) {
+            private List<Party> getRespondent1(CaseData caseData) {
                 var respondent = caseData.getRespondent1();
                 return List.of(Party.builder()
                                    .name(respondent.getPartyName())
                                    .primaryAddress(respondent.getPrimaryAddress())
                                    .representative(defendant1Representative)
+                                   .litigationFriendName("respondent LF")
+                                   .build());
+            }
+
+            private List<Party> getRespondent2(CaseData caseData) {
+                var respondent = caseData.getRespondent2();
+                return List.of(Party.builder()
+                                   .name(respondent.getPartyName())
+                                   .primaryAddress(respondent.getPrimaryAddress())
+                                   .representative(defendant2Representative)
                                    .litigationFriendName("respondent LF")
                                    .build());
             }
