@@ -18,8 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 @AllArgsConstructor
 @RequestMapping(
     path = "/claims",
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    consumes = MediaType.APPLICATION_JSON_VALUE
+    produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class ClaimsController {
 
