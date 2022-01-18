@@ -37,7 +37,7 @@ public class DefaultJudgementSpecHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldNotReturnError_WhenAboutToStartIsInvoked() {
+        void shouldReturnError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -49,7 +49,7 @@ public class DefaultJudgementSpecHandlerTest {
 
 
         @Test
-        void shouldReturnError_WhenAboutToStartIsInvoked() {
+        void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().
                 respondent1ResponseDeadline(
                     LocalDateTime.now().minusDays(15)).build();
@@ -59,6 +59,20 @@ public class DefaultJudgementSpecHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedOneDefendant(){
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().
+                respondent1ResponseDeadline(
+                    LocalDateTime.now().minusDays(15)).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+
         }
     }
 
