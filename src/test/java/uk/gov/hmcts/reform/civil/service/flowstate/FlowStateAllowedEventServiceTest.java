@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
@@ -218,7 +219,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
-                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -418,7 +418,6 @@ class FlowStateAllowedEventServiceTest {
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     AWAITING_RESPONSES_RECEIVED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{FULL_DEFENCE.fullName()}),

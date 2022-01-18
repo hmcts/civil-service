@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -37,8 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -87,30 +84,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime notificationDateTime = time.now();
 
         LocalDate notificationDate = notificationDateTime.toLocalDate();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        CaseData updatedCaseData;
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            updatedCaseData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                    6,
-                    notificationDate
-                ))
-                .build();
-        } else {
-            updatedCaseData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                    6,
-                    notificationDate
-                ))
-                .build();
-        }
+        CaseData updatedCaseData = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
+            .claimDetailsNotificationDate(notificationDateTime)
+            .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, notificationDate))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
