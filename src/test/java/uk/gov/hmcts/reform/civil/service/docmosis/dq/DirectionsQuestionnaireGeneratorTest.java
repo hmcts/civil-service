@@ -184,7 +184,8 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
             }
 
-            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData,
+                                                      DQ dq, CaseData caseData) {
                 Assertions.assertAll(
                     "DQ data should be as expected",
                     () -> assertEquals(
@@ -405,7 +406,8 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
             }
 
-            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData,
+                                                      DQ dq, CaseData caseData) {
                 Assertions.assertAll(
                     "DQ data should be as expected",
                     () -> assertEquals(

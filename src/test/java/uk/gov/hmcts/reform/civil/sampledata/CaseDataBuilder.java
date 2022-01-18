@@ -1415,7 +1415,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
-        //respondent2DQ();
+        respondent2DQ();
         return this;
     }
 
@@ -1901,6 +1901,7 @@ public class CaseDataBuilder {
             .withdrawClaim(withdrawClaim)
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ)
             .applicant1DQ(applicant1DQ)
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)

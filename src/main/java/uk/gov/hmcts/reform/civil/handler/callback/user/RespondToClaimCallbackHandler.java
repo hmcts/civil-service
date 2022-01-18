@@ -456,7 +456,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
-    //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
@@ -490,11 +489,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
         return caseData.getRespondent1ClaimResponseType() == null
             || caseData.getRespondent2ClaimResponseType() == null;
-    }
-
-    private boolean isAwaitingDefendantOneResponse(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseType() == null
-            && caseData.getRespondent2ClaimResponseType() != null;
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
