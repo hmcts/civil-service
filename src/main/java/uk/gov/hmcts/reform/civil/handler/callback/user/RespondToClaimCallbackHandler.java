@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -121,11 +119,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        LocalDateTime dateTime = LocalDateTime.now();
-        ArrayList<String> errors = new ArrayList<>();
 
+        // Show error message if defendant tries to submit response again
         if (featureToggleService.isMultipartyEnabled()) {
-            // Show error message if defendant tries to submit response again
             if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
                 && caseData.getRespondent1ResponseDate() != null)
                 || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
@@ -133,14 +129,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
                     .build();
-            }
-
-            //Show error message if defendant 2 tries to submit a response after deadline has passed
-            var responseDeadline = caseData.getRespondent2ResponseDeadline();
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && caseData.getRespondent2ResponseDate() == null
-                && dateTime.toLocalDate().isAfter(responseDeadline.toLocalDate())) {
-                errors.add("You cannot submit a response now as you have passed your deadline");
             }
         }
 
@@ -153,7 +141,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
-            .errors(errors)
             .build();
     }
 
@@ -235,27 +222,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData.CaseDataBuilder updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-            if (isRespondentResponseTypeFullDefense(caseData.getRespondent1ClaimResponseType())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                    .build();
-            }
-        } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-            if (isRespondentResponseTypeFullDefense(caseData.getRespondent2ClaimResponseType())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                    .build();
-            }
-        } else {
-            // have to check both respondent responses or 1v2 diff sol will fail on respondent 2 if response is not full defense
-            if (isRespondentResponseTypeFullDefense(caseData.getRespondent1ClaimResponseType())) {
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))
+            || (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                    .build();
-            } if (caseData.getRespondent2ClaimResponseType() != null) {
-                if (isRespondentResponseTypeFullDefense(caseData.getRespondent2ClaimResponseType())) {
-                    updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                        .build();
-                }
-            }
+                .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -482,11 +456,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }
 
-    private boolean isRespondentResponseTypeFullDefense(RespondentResponseType respondentResponseType) {
-        return respondentResponseType.equals(FULL_DEFENCE);
-    }
-
-    //TODO: find a workaround for applicant1respondentdeadline not being set in 1v2 diff sol case
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
