@@ -69,16 +69,27 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final CaseDocument CASE_DOCUMENT_DEFENDANT = CaseDocumentBuilder.builder()
-        .documentName(FILE_NAME_DEFENDANT)
-        .documentType(DIRECTIONS_QUESTIONNAIRE)
-        .build();
-    private static final CaseDocument CASE_DOCUMENT_CLAIMANT = CaseDocumentBuilder.builder()
-        .documentName(FILE_NAME_CLAIMANT)
-        .documentType(DIRECTIONS_QUESTIONNAIRE)
-        .build();
 
-    private final Representative representative = Representative.builder().organisationName("test org").build();
+    private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
+        CaseDocumentBuilder.builder()
+            .documentName(FILE_NAME_DEFENDANT)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .build();
+    private static final CaseDocument CASE_DOCUMENT_CLAIMANT =
+        CaseDocumentBuilder.builder()
+            .documentName(FILE_NAME_CLAIMANT)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .build();
+
+    private final Representative defendant1Representative =
+        Representative.builder()
+            .organisationName("test org")
+            .build();
+
+    private final Representative defendant2Representative =
+        Representative.builder()
+            .organisationName("test org 2")
+            .build();
 
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
@@ -95,215 +106,442 @@ class DirectionsQuestionnaireGeneratorTest {
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
 
-    @BeforeEach
-    void setup() {
-        when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
-    }
+    @Nested
+    class RespondentOne {
 
-    @Test
-    void shouldGenerateDefendantCertificateOfService_whenStateFlowIsFullDefence() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
-            .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+        @BeforeEach
+        void setup() {
+            when(representativeService.getRespondent1Representative(any())).thenReturn(defendant1Representative);
+        }
 
-        when(documentManagementService.uploadDocument(
-            BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-        ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+        @Test
+        void shouldGenerateRespondentOneCertificateOfService_whenStateFlowIsFullDefence() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
 
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
-        verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-        verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
-    }
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
 
-    @Test
-    void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
-            .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+        @Test
+        void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(
-            BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-        ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
 
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
-        verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-        verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Nested
+        class GetTemplateData {
+
+            @Test
+            void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .build()
+                    .toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
+                Assertions.assertAll(
+                    "DQ data should be as expected",
+                    () -> assertEquals(
+                        templateData.getFileDirectionsQuestionnaire(),
+                        dq.getFileDirectionQuestionnaire()
+                    ),
+                    () -> assertEquals(
+                        templateData.getDisclosureOfElectronicDocuments(),
+                        dq.getDisclosureOfElectronicDocuments()
+                    ),
+                    () -> assertEquals(
+                        templateData.getDisclosureOfNonElectronicDocuments(),
+                        dq.getDisclosureOfNonElectronicDocuments()
+                    ),
+                    () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
+                    () -> assertEquals(templateData.getApplicant(), getApplicant(caseData)),
+                    () -> assertEquals(templateData.getExperts(), getExperts(dq)),
+                    () -> assertEquals(templateData.getWitnesses(), getWitnesses(dq)),
+                    () -> assertEquals(templateData.getHearing(), getHearing(dq)),
+                    () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
+                    () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
+                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth())
+                );
+            }
+
+            private Party getApplicant(CaseData caseData) {
+                var applicant = caseData.getApplicant1();
+                return Party.builder()
+                    .name(applicant.getPartyName())
+                    .primaryAddress(applicant.getPrimaryAddress())
+                    .litigationFriendName("applicant LF")
+                    .build();
+            }
+
+            private List<Party> getRespondents(CaseData caseData) {
+                var respondent = caseData.getRespondent1();
+                return List.of(Party.builder()
+                                   .name(respondent.getPartyName())
+                                   .primaryAddress(respondent.getPrimaryAddress())
+                                   .representative(defendant1Representative)
+                                   .litigationFriendName("respondent LF")
+                                   .build());
+            }
+
+            private Experts getExperts(DQ dq) {
+                var experts = dq.getExperts();
+                return Experts.builder()
+                    .expertRequired(experts.getExpertRequired())
+                    .expertReportsSent(
+                        ofNullable(experts.getExpertReportsSent())
+                            .map(ExpertReportsSent::getDisplayedValue)
+                            .orElse(""))
+                    .jointExpertSuitable(experts.getJointExpertSuitable())
+                    .details(getExpertsDetails(dq))
+                    .build();
+            }
+
+            private List<Expert> getExpertsDetails(DQ dq) {
+                return unwrapElements(dq.getExperts().getDetails())
+                    .stream()
+                    .map(expert -> Expert.builder()
+                        .name(expert.getName())
+                        .fieldOfExpertise(expert.getFieldOfExpertise())
+                        .whyRequired(expert.getWhyRequired())
+                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                                           .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
+                        .build())
+                    .collect(toList());
+            }
+
+            private Witnesses getWitnesses(DQ dq) {
+                var witnesses = dq.getWitnesses();
+                return Witnesses.builder()
+                    .witnessesToAppear(witnesses.getWitnessesToAppear())
+                    .details(unwrapElements(witnesses.getDetails()))
+                    .build();
+            }
+
+            private Hearing getHearing(DQ dq) {
+                var hearing = dq.getHearing();
+                return Hearing.builder()
+                    .hearingLength(getHearingLength(dq))
+                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
+                    .build();
+            }
+
+            private String getHearingLength(DQ dq) {
+                var hearing = dq.getHearing();
+                switch (hearing.getHearingLength()) {
+                    case LESS_THAN_DAY:
+                        return hearing.getHearingLengthHours() + " hours";
+                    case ONE_DAY:
+                        return "One day";
+                    default:
+                        return hearing.getHearingLengthDays() + " days";
+                }
+            }
+
+            private String getHearingSupport(DQ dq) {
+                var stringBuilder = new StringBuilder();
+                ofNullable(dq.getHearingSupport())
+                    .map(HearingSupport::getRequirements)
+                    .orElse(List.of())
+                    .forEach(requirement -> {
+                        var hearingSupport = dq.getHearingSupport();
+                        stringBuilder.append(requirement.getDisplayedValue());
+                        switch (requirement) {
+                            case SIGN_INTERPRETER:
+                                stringBuilder.append(" - ").append(hearingSupport.getSignLanguageRequired());
+                                break;
+                            case LANGUAGE_INTERPRETER:
+                                stringBuilder.append(" - ").append(hearingSupport.getLanguageToBeInterpreted());
+                                break;
+                            case OTHER_SUPPORT:
+                                stringBuilder.append(" - ").append(hearingSupport.getOtherSupport());
+                                break;
+                            default:
+                                break;
+                        }
+                        stringBuilder.append("\n");
+                    });
+                return stringBuilder.toString().trim();
+            }
+
+            private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+                var welshLanguageRequirements = dq.getWelshLanguageRequirements();
+                return WelshLanguageRequirements.builder()
+                    .evidence(ofNullable(
+                        welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
+                    .court(ofNullable(
+                        welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
+                    .documents(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
+                    .build();
+            }
+        }
     }
 
     @Nested
-    class GetTemplateData {
+    class RespondentTwo {
 
-        @Test
-        void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                .build();
-            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-
-            verify(representativeService).getRespondent1Representative(caseData);
-            assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
+        @BeforeEach
+        void setup() {
+            when(representativeService.getRespondent2Representative(any())).thenReturn(defendant2Representative);
         }
 
         @Test
-        void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
+        void shouldGenerateRespondentTwoCertificateOfService_whenStateFlowIsFullDefenceForBoth() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .build()
-                .toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Test
+        void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
             verify(representativeService).getRespondent1Representative(caseData);
-            assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
         }
 
-        private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
-            Assertions.assertAll(
-                "DQ data should be as expected",
-                () -> assertEquals(templateData.getFileDirectionsQuestionnaire(), dq.getFileDirectionQuestionnaire()),
-                () -> assertEquals(
-                    templateData.getDisclosureOfElectronicDocuments(),
-                    dq.getDisclosureOfElectronicDocuments()
-                ),
-                () -> assertEquals(
-                    templateData.getDisclosureOfNonElectronicDocuments(),
-                    dq.getDisclosureOfNonElectronicDocuments()
-                ),
-                () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
-                () -> assertEquals(templateData.getApplicant(), getApplicant(caseData)),
-                () -> assertEquals(templateData.getExperts(), getExperts(dq)),
-                () -> assertEquals(templateData.getWitnesses(), getWitnesses(dq)),
-                () -> assertEquals(templateData.getHearing(), getHearing(dq)),
-                () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
-                () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
-                () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth())
-            );
-        }
+        @Nested
+        class GetTemplateData {
 
-        private Party getApplicant(CaseData caseData) {
-            var applicant = caseData.getApplicant1();
-            return Party.builder()
-                .name(applicant.getPartyName())
-                .primaryAddress(applicant.getPrimaryAddress())
-                .litigationFriendName("applicant LF")
-                .build();
-        }
+            @Test
+            void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-        private List<Party> getRespondents(CaseData caseData) {
-            var respondent = caseData.getRespondent1();
-            return List.of(Party.builder()
-                               .name(respondent.getPartyName())
-                               .primaryAddress(respondent.getPrimaryAddress())
-                               .representative(representative)
-                               .litigationFriendName("respondent LF")
-                               .build());
-        }
-
-        private Experts getExperts(DQ dq) {
-            var experts = dq.getExperts();
-            return Experts.builder()
-                .expertRequired(experts.getExpertRequired())
-                .expertReportsSent(
-                    ofNullable(experts.getExpertReportsSent())
-                        .map(ExpertReportsSent::getDisplayedValue)
-                        .orElse(""))
-                .jointExpertSuitable(experts.getJointExpertSuitable())
-                .details(getExpertsDetails(dq))
-                .build();
-        }
-
-        private List<Expert> getExpertsDetails(DQ dq) {
-            return unwrapElements(dq.getExperts().getDetails())
-                .stream()
-                .map(expert -> Expert.builder()
-                    .name(expert.getName())
-                    .fieldOfExpertise(expert.getFieldOfExpertise())
-                    .whyRequired(expert.getWhyRequired())
-                    .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                                       .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                    .build())
-                .collect(toList());
-        }
-
-        private Witnesses getWitnesses(DQ dq) {
-            var witnesses = dq.getWitnesses();
-            return Witnesses.builder()
-                .witnessesToAppear(witnesses.getWitnessesToAppear())
-                .details(unwrapElements(witnesses.getDetails()))
-                .build();
-        }
-
-        private Hearing getHearing(DQ dq) {
-            var hearing = dq.getHearing();
-            return Hearing.builder()
-                .hearingLength(getHearingLength(dq))
-                .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                .build();
-        }
-
-        private String getHearingLength(DQ dq) {
-            var hearing = dq.getHearing();
-            switch (hearing.getHearingLength()) {
-                case LESS_THAN_DAY:
-                    return hearing.getHearingLengthHours() + " hours";
-                case ONE_DAY:
-                    return "One day";
-                default:
-                    return hearing.getHearingLengthDays() + " days";
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
             }
-        }
 
-        private String getHearingSupport(DQ dq) {
-            var stringBuilder = new StringBuilder();
-            ofNullable(dq.getHearingSupport())
-                .map(HearingSupport::getRequirements)
-                .orElse(List.of())
-                .forEach(requirement -> {
-                    var hearingSupport = dq.getHearingSupport();
-                    stringBuilder.append(requirement.getDisplayedValue());
-                    switch (requirement) {
-                        case SIGN_INTERPRETER:
-                            stringBuilder.append(" - ").append(hearingSupport.getSignLanguageRequired());
-                            break;
-                        case LANGUAGE_INTERPRETER:
-                            stringBuilder.append(" - ").append(hearingSupport.getLanguageToBeInterpreted());
-                            break;
-                        case OTHER_SUPPORT:
-                            stringBuilder.append(" - ").append(hearingSupport.getOtherSupport());
-                            break;
-                        default:
-                            break;
-                    }
-                    stringBuilder.append("\n");
-                });
-            return stringBuilder.toString().trim();
-        }
+            @Test
+            void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .build()
+                    .toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
 
-        private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
-            var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-            return WelshLanguageRequirements.builder()
-                .evidence(ofNullable(
-                    welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-                .court(ofNullable(
-                    welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-                .documents(ofNullable(
-                    welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-                .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq, CaseData caseData) {
+                Assertions.assertAll(
+                    "DQ data should be as expected",
+                    () -> assertEquals(
+                        templateData.getFileDirectionsQuestionnaire(),
+                        dq.getFileDirectionQuestionnaire()
+                    ),
+                    () -> assertEquals(
+                        templateData.getDisclosureOfElectronicDocuments(),
+                        dq.getDisclosureOfElectronicDocuments()
+                    ),
+                    () -> assertEquals(
+                        templateData.getDisclosureOfNonElectronicDocuments(),
+                        dq.getDisclosureOfNonElectronicDocuments()
+                    ),
+                    () -> assertEquals(templateData.getRespondents(), getRespondents(caseData)),
+                    () -> assertEquals(templateData.getApplicant(), getApplicant(caseData)),
+                    () -> assertEquals(templateData.getExperts(), getExperts(dq)),
+                    () -> assertEquals(templateData.getWitnesses(), getWitnesses(dq)),
+                    () -> assertEquals(templateData.getHearing(), getHearing(dq)),
+                    () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
+                    () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
+                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth())
+                );
+            }
+
+            private Party getApplicant(CaseData caseData) {
+                var applicant = caseData.getApplicant1();
+                return Party.builder()
+                    .name(applicant.getPartyName())
+                    .primaryAddress(applicant.getPrimaryAddress())
+                    .litigationFriendName("applicant LF")
+                    .build();
+            }
+
+            private List<Party> getRespondents(CaseData caseData) {
+                var respondent = caseData.getRespondent1();
+                return List.of(Party.builder()
+                                   .name(respondent.getPartyName())
+                                   .primaryAddress(respondent.getPrimaryAddress())
+                                   .representative(defendant1Representative)
+                                   .litigationFriendName("respondent LF")
+                                   .build());
+            }
+
+            private Experts getExperts(DQ dq) {
+                var experts = dq.getExperts();
+                return Experts.builder()
+                    .expertRequired(experts.getExpertRequired())
+                    .expertReportsSent(
+                        ofNullable(experts.getExpertReportsSent())
+                            .map(ExpertReportsSent::getDisplayedValue)
+                            .orElse(""))
+                    .jointExpertSuitable(experts.getJointExpertSuitable())
+                    .details(getExpertsDetails(dq))
+                    .build();
+            }
+
+            private List<Expert> getExpertsDetails(DQ dq) {
+                return unwrapElements(dq.getExperts().getDetails())
+                    .stream()
+                    .map(expert -> Expert.builder()
+                        .name(expert.getName())
+                        .fieldOfExpertise(expert.getFieldOfExpertise())
+                        .whyRequired(expert.getWhyRequired())
+                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                                           .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
+                        .build())
+                    .collect(toList());
+            }
+
+            private Witnesses getWitnesses(DQ dq) {
+                var witnesses = dq.getWitnesses();
+                return Witnesses.builder()
+                    .witnessesToAppear(witnesses.getWitnessesToAppear())
+                    .details(unwrapElements(witnesses.getDetails()))
+                    .build();
+            }
+
+            private Hearing getHearing(DQ dq) {
+                var hearing = dq.getHearing();
+                return Hearing.builder()
+                    .hearingLength(getHearingLength(dq))
+                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
+                    .build();
+            }
+
+            private String getHearingLength(DQ dq) {
+                var hearing = dq.getHearing();
+                switch (hearing.getHearingLength()) {
+                    case LESS_THAN_DAY:
+                        return hearing.getHearingLengthHours() + " hours";
+                    case ONE_DAY:
+                        return "One day";
+                    default:
+                        return hearing.getHearingLengthDays() + " days";
+                }
+            }
+
+            private String getHearingSupport(DQ dq) {
+                var stringBuilder = new StringBuilder();
+                ofNullable(dq.getHearingSupport())
+                    .map(HearingSupport::getRequirements)
+                    .orElse(List.of())
+                    .forEach(requirement -> {
+                        var hearingSupport = dq.getHearingSupport();
+                        stringBuilder.append(requirement.getDisplayedValue());
+                        switch (requirement) {
+                            case SIGN_INTERPRETER:
+                                stringBuilder.append(" - ").append(hearingSupport.getSignLanguageRequired());
+                                break;
+                            case LANGUAGE_INTERPRETER:
+                                stringBuilder.append(" - ").append(hearingSupport.getLanguageToBeInterpreted());
+                                break;
+                            case OTHER_SUPPORT:
+                                stringBuilder.append(" - ").append(hearingSupport.getOtherSupport());
+                                break;
+                            default:
+                                break;
+                        }
+                        stringBuilder.append("\n");
+                    });
+                return stringBuilder.toString().trim();
+            }
+
+            private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+                var welshLanguageRequirements = dq.getWelshLanguageRequirements();
+                return WelshLanguageRequirements.builder()
+                    .evidence(ofNullable(
+                        welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
+                    .court(ofNullable(
+                        welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
+                    .documents(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
+                    .build();
+            }
         }
     }
 }
