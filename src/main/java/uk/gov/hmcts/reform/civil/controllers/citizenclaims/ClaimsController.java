@@ -1,68 +1,50 @@
 package uk.gov.hmcts.reform.civil.controllers.citizenclaims;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-
-import java.util.Optional;
-import javax.validation.constraints.NotNull;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Api
 @Slf4j
-@RestController
 @AllArgsConstructor
-@RequestMapping(
-    path = "/claims",
+@RestController
+@RequestMapping(path = "/claims",
     produces = MediaType.APPLICATION_JSON_VALUE,
     consumes = MediaType.APPLICATION_JSON_VALUE
-)
+    )
+
 public class ClaimsController {
-    private final CallbackHandlerFactory callbackHandlerFactory;
+
+    private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    @PostMapping(path = {
-        "/{claims-id}",
-        "/claims-list",
-        "/ras/am/role-assigments"
-    })
-    @ApiOperation("get all claims from CCD")
-    public CallbackResponse getclaims(){
-     /*   @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @PathVariable("callback-type") String callbackType,
-        @NotNull @RequestBody CallbackRequest callback,
-        @PathVariable("version") Optional<CallbackVersion> version,
-        @PathVariable("page-id") Optional<String> pageId
-        ) {
-        log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
-                 callback.getEventId(), callbackType, pageId, version
-        );
+    @GetMapping(path = "/{claimId}")
+    @ApiOperation("Handles claim by claimId from CCD")
+    public ResponseEntity<CaseData> getClaim( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @PathVariable("claimId") long claimId){
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .request(callback)
-            .type(CallbackType.fromValue(callbackType))
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
-            .version(version.orElse(null))
-            .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toCaseData(callback.getCaseDetails()))
-            .build();
+        log.info("Received claimId" + claimId + "from CCD");
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId));
 
-        return callbackHandlerFactory.dispatch(callbackParams);*/
-        return null;//only to commit without error
+        return new ResponseEntity<>(caseData, HttpStatus.OK);
+    }
+    @GetMapping(path = "/list")
+    @ApiOperation("Handles all callbacks from CCD")
+    public ResponseEntity<CaseData> getList( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation){
+
+        log.info("Received callback from CCD");
+        //modify the service to get all claims instead of 1.
+        long id=1641908933090158L;
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(id));
+
+        return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 }
