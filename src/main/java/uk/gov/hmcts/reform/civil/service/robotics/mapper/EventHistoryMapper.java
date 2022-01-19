@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -668,8 +669,16 @@ public class EventHistoryMapper {
 
     private void buildConsentExtensionFilingDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime dateReceived = caseData.getRespondent1TimeExtensionDate();
-        if (dateReceived == null) {
+        LocalDate respondentSolicitorAgreedDeadlineExtension = caseData
+            .getRespondentSolicitor1AgreedDeadlineExtension();
+        if ((dateReceived == null) && (caseData.getRespondent2TimeExtensionDate() == null)) {
             return;
+        }
+
+        if (caseData.getRespondent2TimeExtensionDate() != null) {
+            dateReceived = caseData.getRespondent2TimeExtensionDate();
+            respondentSolicitorAgreedDeadlineExtension = caseData
+                .getRespondentSolicitor2AgreedDeadlineExtension();
         }
         builder.consentExtensionFilingDefence(
             List.of(
@@ -678,11 +687,10 @@ public class EventHistoryMapper {
                     .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
                     .dateReceived(dateReceived)
                     .litigiousPartyID("002")
-                    .eventDetailsText(format("agreedExtensionDate: %s", caseData
-                        .getRespondentSolicitor1AgreedDeadlineExtension()
+                    .eventDetailsText(format("agreedExtensionDate: %s", respondentSolicitorAgreedDeadlineExtension
                         .format(ISO_DATE)))
                     .eventDetails(EventDetails.builder()
-                                      .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                      .agreedExtensionDate(respondentSolicitorAgreedDeadlineExtension
                                                                .format(ISO_DATE))
                                       .build())
                     .build()

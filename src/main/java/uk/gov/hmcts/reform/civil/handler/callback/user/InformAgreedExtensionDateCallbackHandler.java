@@ -173,6 +173,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .respondent2ResponseDeadline(newDeadline);
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent2TimeExtensionDate(time.now())
                 .respondent2ResponseDeadline(newDeadline);
         } else {
