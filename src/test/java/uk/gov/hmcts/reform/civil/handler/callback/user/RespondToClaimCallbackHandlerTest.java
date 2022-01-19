@@ -1212,5 +1212,20 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_BothRespondentAreFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                .containsExactly("It is not possible to respond for both defendants with reject all. "
+                                                                 + "Please go back and select single response option.");
+        }
     }
 }

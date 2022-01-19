@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -232,7 +233,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
         }
 
+        List<String> errors = new ArrayList<>();
+        if (isFullDefenceForBothDefendants(caseData)) {
+            errors.add(
+                "It is not possible to respond for both defendants with reject all. "
+                    + "Please go back and select single response option."
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
@@ -501,5 +511,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             userInfo.getUid(),
             caseRole
         );
+    }
+
+    private boolean isFullDefenceForBothDefendants(CaseData caseData) {
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))
+            && (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
+            return true;
+        }
+        return false;
     }
 }
