@@ -119,6 +119,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        LocalDateTime dateTime = LocalDateTime.now();
 
         // Show error message if defendant tries to submit response again
         if (featureToggleService.isMultipartyEnabled()) {
@@ -128,6 +129,21 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 && caseData.getRespondent2ResponseDate() != null)) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                    .build();
+            }
+
+            //Show error message if defendant tries to submit a response after deadline has passed
+            var respondent1ResponseDeadlineDeadline = caseData.getRespondent1ResponseDeadline();
+            var respondent2ResponseDeadlineDeadline = caseData.getRespondent2ResponseDeadline();
+
+            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+                && caseData.getRespondent1ResponseDate() == null
+                && dateTime.toLocalDate().isAfter(respondent1ResponseDeadlineDeadline.toLocalDate()))
+                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && caseData.getRespondent2ResponseDate() == null
+                && dateTime.toLocalDate().isAfter(respondent2ResponseDeadlineDeadline.toLocalDate()))) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of("You cannot submit a response now as you have passed your deadline"))
                     .build();
             }
         }
