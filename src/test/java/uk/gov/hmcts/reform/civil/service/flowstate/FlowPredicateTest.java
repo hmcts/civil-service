@@ -514,6 +514,38 @@ class FlowPredicateTest {
             CaseDataBuilder caseDataBuilder;
 
             @Nested
+            class TwoVOne {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoApplicants();
+                }
+
+                @Test
+                void shouldReturnTrue_whenDivergentResponses() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                        .respondent1ClaimResponseType(FULL_DEFENCE)
+                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                        .build();
+
+                    assertTrue(divergentRespondGoOffline.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenSameResponses() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                        .respondent1ClaimResponseType(PART_ADMISSION)
+                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                        .build();
+
+                    assertFalse(divergentRespondGoOffline.test(caseData));
+                }
+
+            }
+
+            @Nested
             class OneVTwoWithTwoReps {
 
                 @BeforeEach
