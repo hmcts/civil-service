@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -120,9 +121,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        LocalDateTime dateTime = LocalDateTime.now();
+        ArrayList<String> errors = new ArrayList<>();
 
-        // Show error message if defendant tries to submit response again
         if (featureToggleService.isMultipartyEnabled()) {
+            // Show error message if defendant tries to submit response again
             if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
                 && caseData.getRespondent1ResponseDate() != null)
                 || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
@@ -130,6 +133,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
                     .build();
+            }
+
+            //Show error message if defendant 2 tries to submit a response after deadline has passed
+            var responseDeadline = caseData.getRespondent2ResponseDeadline();
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && caseData.getRespondent2ResponseDate() == null
+                && dateTime.toLocalDate().isAfter(responseDeadline.toLocalDate())) {
+                errors.add("You cannot submit a response now as you have passed your deadline");
             }
         }
 
@@ -142,6 +153,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
