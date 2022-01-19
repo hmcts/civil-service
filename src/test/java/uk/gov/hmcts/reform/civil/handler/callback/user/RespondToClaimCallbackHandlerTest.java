@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -104,6 +107,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CoreCaseUserService coreCaseUserService;
 
+    @MockBean
+    private StateFlowEngine stateFlowEngine;
+
+    @Mock
+    private StateFlow mockedStateFlow;
+
     @Autowired
     private UserService userService;
 
@@ -141,6 +150,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToStartCallbackV1 {
+
+        @BeforeEach
+        public void setup() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
 
         @Test
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
@@ -303,6 +318,57 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "validate-unavailable-dates";
 
+        @BeforeEach
+        public void setup() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
+
+        @Test
+        void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(true);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldValidateExperts_whenDef2HasSameLRAndDiffResAndRespondent2DQHearingPresent() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
         @Test
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
             Hearing hearing = Hearing.builder()
@@ -387,6 +453,69 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "experts";
 
+        @BeforeEach
+        public void setup() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
+
+        @Test
+        void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolOneRole() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
+                .thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder()
+                                                                       .expertRequired(NO)
+                                                                       .build()).build())
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2DQ(Respondent2DQ
+                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldValidateExperts_whenMultipartyAndSameLRDiffResponseAndRespondent2DQExperts() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent2DQ(Respondent2DQ
+                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
         @Test
         void shouldReturnError_whenExpertRequiredAndNullDetails() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -443,8 +572,66 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "witnesses";
 
+        @BeforeEach
+        public void setup() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
+
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolOneRole() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
+                .thenReturn(true);
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(true);
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSameLRDiffResponseAndRespondent2DQWitness() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
         @Test
         void shouldReturnError_whenWitnessRequiredAndNullDetails() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
@@ -458,6 +645,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
@@ -472,6 +660,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
@@ -567,89 +756,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).doesNotContainKey("respondent1Copy");
             assertThat(response.getData())
                 .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1")
                 .isEqualTo("test address");
-        }
-
-        @Test
-        void shouldCopyRespondent1ResponseSetApplicantResponseAndSetBusinessProcess_whenOneRepGivingOneAnswer() {
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondentResponseIsSame(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("respondent2ClaimResponseType", caseData.getRespondent1ClaimResponseType().toString())
-                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
-                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
-        }
-
-        @Disabled
-        @Test
-        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneRepGivingSeparateAnswers() {
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent2Responds(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
-                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
-        }
-
-        @Test
-        void shouldCopyRespondentPrimaryAddresses_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .build();
-            String address = "test address";
-            var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
-            caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).doesNotContainKey("respondent1Copy");
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
         }
 
         @Test
@@ -715,6 +828,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             )).thenReturn(deadline);
 
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         }
 
         @Test
@@ -742,18 +857,19 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        @Disabled
         @Test
-        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneRepGivingSeparateAnswers() {
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsNotTheSame() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent2Responds(FULL_DEFENCE)
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondentResponseIsSame(NO)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
+
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -768,7 +884,34 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        @Disabled
+        @Test
+        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsTheSame() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                //respondent1ClaimResponseType is copied into respondent2ClaimResponseType via handler
+                .atStateRespondentFullDefence()
+                .respondentResponseIsSame(YES)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when2ndRepAnsweringAfter1stAlreadyAnswered() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -777,6 +920,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondent2Responds(FULL_DEFENCE)
+                .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
@@ -840,7 +984,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(response.getState(), CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
-        @Disabled
         @Test
         void shouldNotSetApplicantResponseDeadlineOrTransitionCcdState_when2ndRespondentAnsweringBefore1st() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -959,16 +1102,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .containsExactly(null, null);
             }
 
-            @Disabled
             @Test
             void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_when2V1SameRep() {
                 String name = "John Smith";
                 String role = "Solicitor";
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .respondent2Responds(FULL_DEFENCE)
                     .build()
                     .toBuilder()
                     .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1060,6 +1201,37 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                       )
                                           + exitSurveyContentService.respondentSurvey())
                     .build());
+        }
+    }
+
+    @Nested
+    class MidEventSetGenericResponseTypeFlagCallback {
+
+        private static final String PAGE_ID = "set-generic-response-type-flag";
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Respondent1IsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Respondent2IsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .respondent1ClaimResponseType(null)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
     }
 }

@@ -83,6 +83,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
                 }
             } else {
+                // TODO explore the possibility of this being redundant and remove if so
                 CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString()

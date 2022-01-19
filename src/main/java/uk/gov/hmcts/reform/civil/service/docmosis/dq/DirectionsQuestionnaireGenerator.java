@@ -135,7 +135,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    public DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
         DQ dq = caseData.getRespondent2DQ();
 
         return DirectionsQuestionnaireForm.builder()
@@ -159,7 +159,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData) {
+    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData) {
         DQ dq = caseData.getRespondent1DQ();
 
         return DirectionsQuestionnaireForm.builder()
@@ -203,7 +203,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private boolean isRespondent2(CaseData caseData) {
-        if ((caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null)) {
+        if (caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null) {
             return true;
         } else if ((caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent2ResponseDate() != null)) {
@@ -240,6 +240,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                    .build());
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if (currentDefendantFor1v2SingleSolIndividualResponse.equals("ONE")) {
+                    // TODO remove the variable use as class variable and add specific test to check below party
                     return List.of(Party.builder()
                                        .name(caseData.getRespondent1().getPartyName())
                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())

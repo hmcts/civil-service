@@ -522,11 +522,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             || caseData.getRespondent2ClaimResponseType() == null;
     }
 
-    private boolean isAwaitingDefendantOneResponse(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseType() == null
-            && caseData.getRespondent2ClaimResponseType() != null;
-    }
-
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());

@@ -135,7 +135,6 @@ public class CaseDataBuilder {
     protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
     //Acknowledge Claim
     protected ResponseIntention respondent1ClaimResponseIntentionType;
-    protected ResponseIntention respondent2ClaimResponseIntentionType;
     // Defendant Response Defendant 1
     protected RespondentResponseType respondent1ClaimResponseType;
     protected ResponseDocument respondent1ClaimResponseDocument;
@@ -185,7 +184,6 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDeadline;
     protected LocalDateTime respondent1TimeExtensionDate;
     protected LocalDateTime respondent1AcknowledgeNotificationDate;
-    protected LocalDateTime respondent2AcknowledgeNotificationDate;
     protected LocalDateTime respondent1ResponseDate;
     protected LocalDateTime respondent2ResponseDate;
     protected LocalDateTime applicant1ResponseDeadline;
@@ -1424,7 +1422,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
-        //respondent2DQ();
+        respondent2DQ();
         return this;
     }
 
@@ -1602,28 +1600,10 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateNotificationAcknowledged1v2SameSolicitor() {
-        atStateClaimDetailsNotified();
-        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
-        respondent1AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
-        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
-        respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
-        respondent1ResponseDeadline = RESPONSE_DEADLINE;
-        return this;
-    }
-
     public CaseDataBuilder atStateNotificationAcknowledged() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
         respondent1AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
-        respondent1ResponseDeadline = RESPONSE_DEADLINE;
-        return this;
-    }
-
-    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2() {
-        atStateClaimDetailsNotified();
-        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
-        respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
@@ -1910,7 +1890,9 @@ public class CaseDataBuilder {
             .withdrawClaim(withdrawClaim)
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ)
             .applicant1DQ(applicant1DQ)
+            .respondent2DQ(respondent2DQ)
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)
