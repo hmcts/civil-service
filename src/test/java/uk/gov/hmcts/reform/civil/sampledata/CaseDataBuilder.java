@@ -271,7 +271,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent2ResponseDeadline(LocalDateTime deadline) {
-        this.respondent1ResponseDeadline = deadline;
+        this.respondent2ResponseDeadline = deadline;
         return this;
     }
 
@@ -1170,6 +1170,15 @@ public class CaseDataBuilder {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimDetailsOptions("Defendant One: Solicitor");
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
+        atStateClaimDetailsNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
 
