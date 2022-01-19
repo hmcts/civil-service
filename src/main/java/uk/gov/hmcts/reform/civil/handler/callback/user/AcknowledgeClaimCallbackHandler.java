@@ -51,8 +51,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy,
+            callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
