@@ -133,15 +133,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             }
 
             //Show error message if defendant tries to submit a response after deadline has passed
-            var respondent1ResponseDeadlineDeadline = caseData.getRespondent1ResponseDeadline();
-            var respondent2ResponseDeadlineDeadline = caseData.getRespondent2ResponseDeadline();
+            var respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
+            var respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
 
             if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
                 && caseData.getRespondent1ResponseDate() == null
-                && dateTime.toLocalDate().isAfter(respondent1ResponseDeadlineDeadline.toLocalDate()))
+                && respondent1ResponseDeadline != null
+                && dateTime.toLocalDate().isAfter(respondent1ResponseDeadline.toLocalDate()))
                 || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
                 && caseData.getRespondent2ResponseDate() == null
-                && dateTime.toLocalDate().isAfter(respondent2ResponseDeadlineDeadline.toLocalDate()))) {
+                && respondent2ResponseDeadline != null
+                && dateTime.toLocalDate().isAfter(respondent2ResponseDeadline.toLocalDate()))) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of("You cannot submit a response now as you have passed your deadline"))
                     .build();
