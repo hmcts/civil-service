@@ -79,13 +79,13 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         //finding extension date for the correct respondent in a 1v2 different solicitor scenario
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondentSolicitor1AgreedDeadlineExtension() == null)
-                && (caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
+            if ((caseData.getRespondent1TimeExtensionDate() == null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-            } else if ((caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null)
-                && (caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
-                if (caseData.getRespondentSolicitor2AgreedDeadlineExtension()
-                    .isAfter(caseData.getRespondentSolicitor1AgreedDeadlineExtension())) {
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                if (caseData.getRespondent2TimeExtensionDate()
+                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                     extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
                 } else {
                     extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
@@ -110,13 +110,13 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         //finding email for the correct respondent in a 1v2 different solicitor scenario
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondentSolicitor1AgreedDeadlineExtension() == null)
-                && (caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
+            if ((caseData.getRespondent1TimeExtensionDate() == null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 respondentSolicitorEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
-            } else if ((caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null)
-                && (caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
-                if (caseData.getRespondentSolicitor2AgreedDeadlineExtension()
-                    .isAfter(caseData.getRespondentSolicitor1AgreedDeadlineExtension())) {
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                if (caseData.getRespondent2TimeExtensionDate()
+                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                     respondentSolicitorEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
                 } else {
                     respondentSolicitorEmailAddress = caseData.getRespondentSolicitor1EmailAddress();

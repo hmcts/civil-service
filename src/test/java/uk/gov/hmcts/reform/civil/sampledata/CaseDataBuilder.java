@@ -178,6 +178,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent2ResponseDeadline;
     protected LocalDateTime claimDismissedDeadline;
     protected LocalDateTime respondent1TimeExtensionDate;
+    protected LocalDateTime respondent2TimeExtensionDate;
     protected LocalDateTime respondent1AcknowledgeNotificationDate;
     protected LocalDateTime respondent1ResponseDate;
     protected LocalDateTime respondent2ResponseDate;
@@ -299,6 +300,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
         this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent1TimeExtensionDate = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent2TimeExtensionDate = extensionDate;
         return this;
     }
 
@@ -1731,6 +1742,7 @@ public class CaseDataBuilder {
             .respondent2ResponseDeadline(respondent2ResponseDeadline)
             .claimDismissedDeadline(claimDismissedDeadline)
             .respondent1TimeExtensionDate(respondent1TimeExtensionDate)
+            .respondent2TimeExtensionDate(respondent2TimeExtensionDate)
             .respondent1AcknowledgeNotificationDate(respondent1AcknowledgeNotificationDate)
             .respondent1ResponseDate(respondent1ResponseDate)
             .respondent2ResponseDate(respondent2ResponseDate)
