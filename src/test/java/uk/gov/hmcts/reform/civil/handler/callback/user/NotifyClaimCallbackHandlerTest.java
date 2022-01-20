@@ -263,7 +263,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             + "You must notify the defendant with the claim details by %s";
         public static final String CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim sent to "
             + "1 Defendant legal representative only.%n%n"
-            + "You must notify the other defendant legal representative of the claim by %s";
+            + "Your claim will progress offline.";
 
         @BeforeEach
         void setup() {
