@@ -48,6 +48,7 @@ public class CaseData implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
+    private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
@@ -110,6 +111,8 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
@@ -246,6 +249,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDate;
@@ -260,7 +264,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
-
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
