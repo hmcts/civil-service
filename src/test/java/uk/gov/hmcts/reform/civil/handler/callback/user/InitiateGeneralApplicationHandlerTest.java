@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -119,6 +120,66 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
     }
 
+    private CaseData getTestCaseDataForUrgencyCheckMidEvent(CaseData caseData, boolean isApplicationUrgent,
+                                                            LocalDate urgencyConsiderationDate) {
+        GAUrgencyRequirement.GAUrgencyRequirementBuilder urBuilder = GAUrgencyRequirement.builder();
+        if (isApplicationUrgent) {
+            urBuilder.generalAppUrgency(YES)
+                    .reasonsForUrgency(STRING_CONSTANT);
+        } else {
+            urBuilder.generalAppUrgency(NO);
+        }
+        urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
+        GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
+        return caseData.toBuilder()
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                        .hasAgreed(NO)
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                        .pbaReference(STRING_CONSTANT)
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppInformOtherParty(GAInformOtherParty.builder()
+                        .isWithNotice(NO)
+                        .reasonsForWithoutNotice(STRING_CONSTANT)
+                        .build())
+                .generalAppUrgencyRequirement(gaUrgencyRequirement)
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(HOUR_1)
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .unavailableTrailDateTo(APP_DATE_EPOCH)
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrailRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
+    }
+
     @Nested
     class AboutToStartCallback {
 
@@ -135,11 +196,81 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventForUrgencyCheck {
+
+        private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
+
+        @Test
+        void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
+            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                    true, null);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains("Details of urgency consideration date required.");
+        }
+
+        @Test
+        void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
+            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                    false, LocalDate.now());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(
+                    "Urgency consideration date should not be provided for a non-urgent application.");
+        }
+
+        @Test
+        void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
+            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                    true, LocalDate.now().minusDays(1));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(
+                    "The date entered cannot be in the past.");
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
+            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                    true, LocalDate.now());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
+            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                    false, null);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
     class AboutToSubmit {
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
-            when(initiateGeneralAppService.buildCaseData(any(
-                uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder.class), any(CaseData.class)))
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class), any(CaseData.class)))
                 .thenCallRealMethod();
             CaseData caseData = getTestCaseData(CaseDataBuilder.builder().build());
 
