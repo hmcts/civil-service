@@ -22,7 +22,7 @@ public class ClaimsControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    public void shouldReturn_http200() {
+    public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
         when(coreCaseDataService.getCase(1L))
             .thenReturn(expectedCaseDetails);
