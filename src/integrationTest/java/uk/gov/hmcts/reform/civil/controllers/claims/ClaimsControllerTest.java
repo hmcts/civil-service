@@ -23,7 +23,7 @@ public class ClaimsControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    public void shouldReturnOk() {
+    public void shouldReturn_http200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
         when(coreCaseDataService.getCase(1L))
             .thenReturn(expectedCaseDetails);
