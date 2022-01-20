@@ -53,7 +53,7 @@ public class ClaimsController {
     @ApiOperation("Handles all callbacks from CCD")
     public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
 
-        log.info("Received callback from CCD");
+        log.info("Received callback from CCD getting claim list");
 
         Query query = new Query(QueryBuilders.matchQuery("case_type_id", "CIVIL"), emptyList(), 0);
         SearchResult claims = coreCaseDataService.searchCases(query);
