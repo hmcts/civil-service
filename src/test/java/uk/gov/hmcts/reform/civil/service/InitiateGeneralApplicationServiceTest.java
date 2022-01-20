@@ -53,7 +53,7 @@ class InitiateGeneralApplicationServiceTest {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                                      .applicantsPbaAccounts(STRING_NUM_CONSTANT)
                                       .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -112,7 +112,7 @@ class InitiateGeneralApplicationServiceTest {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                        .applicantsPbaAccounts(STRING_NUM_CONSTANT)
                         .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -188,7 +188,7 @@ class InitiateGeneralApplicationServiceTest {
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccountsList()).isNull();
+        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccounts()).isNull();
         assertThat(caseData.getGeneralAppPBADetails().getPbaReference()).isNull();
         assertThat(caseData.getGeneralAppDetailsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppReasonsOfOrder()).isEmpty();
@@ -229,7 +229,7 @@ class InitiateGeneralApplicationServiceTest {
 
         assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
         assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccountsList())
+        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
             .isEqualTo(STRING_NUM_CONSTANT);
         assertThat(application.getGeneralAppPBADetails().getPbaReference())
             .isEqualTo(STRING_CONSTANT);

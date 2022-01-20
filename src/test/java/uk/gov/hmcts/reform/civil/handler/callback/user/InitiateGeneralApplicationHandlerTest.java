@@ -75,7 +75,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                                      .applicantsPbaAccounts(STRING_NUM_CONSTANT)
                                       .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -139,7 +139,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                        .applicantsPbaAccounts(STRING_NUM_CONSTANT)
                         .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -294,7 +294,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             GeneralApplication application = unwrapElements(responseData.getGeneralApplications()).get(0);
             assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
             assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-            assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccountsList())
+            assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
                 .isEqualTo(STRING_NUM_CONSTANT);
             assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);
             assertThat(application.getGeneralAppReasonsOfOrder()).isEqualTo(STRING_CONSTANT);
