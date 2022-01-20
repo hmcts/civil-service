@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -223,11 +224,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))
+                && caseData.getRespondent1ClaimResponseType().equals(
+                RespondentResponseType.FULL_DEFENCE))
             || (caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))) {
+                && caseData.getRespondent2ClaimResponseType().equals(
+                RespondentResponseType.FULL_DEFENCE))
+            || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                || RespondentResponseType.FULL_DEFENCE.equals(caseData
+                .getRespondent1ClaimResponseTypeToApplicant2())))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
                 .build();
         }
