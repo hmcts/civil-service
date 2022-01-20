@@ -177,7 +177,7 @@ public class StateFlowEngine {
                     .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(CLAIM_DETAILS_NOTIFIED)
                 .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)))
+                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(not(allResponsesReceived)))
                 //Acknowledging Claim First
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 //Direct Response, without Acknowledging
@@ -203,25 +203,20 @@ public class StateFlowEngine {
                 .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(ALL_RESPONSES_RECEIVED)
                 .transitionTo(FULL_DEFENCE)
-                    .onlyIf(fullDefence.and(not(respondent1TimeExtension)))
+                    .onlyIf(fullDefence)
                 .transitionTo(FULL_ADMISSION)
                     .onlyIf(fullAdmission
-                                .and(not(respondent1TimeExtension))
                                 .and(not(divergentRespondGoOffline)))
                 .transitionTo(PART_ADMISSION)
                     .onlyIf(partAdmission
-                                .and(not(respondent1TimeExtension))
                                 .and(not(divergentRespondGoOffline)))
                 .transitionTo(COUNTER_CLAIM)
                     .onlyIf(counterClaim
-                                .and(not(respondent1TimeExtension))
                                 .and(not(divergentRespondGoOffline)))
                 .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
-                    .onlyIf(divergentRespondGoOffline
-                                .and(not(respondent1TimeExtension)))
+                    .onlyIf(divergentRespondGoOffline)
                 .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
-                   .onlyIf(divergentRespondWithDQAndGoOffline
-                               .and(not(respondent1TimeExtension)))
+                   .onlyIf(divergentRespondWithDQAndGoOffline)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyIf(caseDismissedAfterDetailNotified)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
