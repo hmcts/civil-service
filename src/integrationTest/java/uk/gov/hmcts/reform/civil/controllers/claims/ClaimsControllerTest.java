@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ClaimsControllerTest extends BaseIntegrationTest {
 
     private static final String CLAIMS_URL = "/claims/{claimId}";
+    private static final String CLAIMS_LIST_URL = "/claims/list";
 
     @Test
     @SneakyThrows
@@ -19,6 +20,13 @@ public class ClaimsControllerTest extends BaseIntegrationTest {
         mockMvc.perform(get(CLAIMS_URL, 1).header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN))
             .andExpect(status().isOk());
 
+
+    }
+    @Test
+    @SneakyThrows
+    public void shouldReturnListOk() {
+        mockMvc.perform(get(CLAIMS_LIST_URL, 1).header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN))
+            .andExpect(status().isOk());
 
     }
 }
