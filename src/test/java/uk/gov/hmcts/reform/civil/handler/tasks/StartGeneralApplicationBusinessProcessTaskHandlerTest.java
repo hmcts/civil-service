@@ -48,14 +48,15 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartGeneralApplicationBusinessProcessTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     StartGeneralApplicationBusinessProcessTaskHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class
 })
-@ExtendWith(SpringExtension.class)
-public class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallbackHandlerTest {
+class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallbackHandlerTest {
+
     private static final String CASE_ID = "1";
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
     public static final String ERROR_CODE = "ABORT";
