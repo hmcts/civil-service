@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -187,7 +188,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
         return state.equals(FULL_DEFENCE.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-            || state.equals(ALL_RESPONSES_RECEIVED.fullName());
+            || state.equals(ALL_RESPONSES_RECEIVED.fullName())
+            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName());
     }
 
     private Party getApplicant(CaseData caseData) {
