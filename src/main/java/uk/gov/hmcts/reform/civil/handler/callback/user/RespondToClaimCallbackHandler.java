@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +121,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        LocalDateTime dateTime = LocalDateTime.now();
 
         // Show error message if defendant tries to submit response again
         if (featureToggleService.isMultipartyEnabled()) {
@@ -129,6 +131,21 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 && caseData.getRespondent2ResponseDate() != null)) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                    .build();
+            }
+
+            //Show error message if defendant tries to submit a response after deadline has passed
+            var respondent1ResponseDeadlineDeadline = caseData.getRespondent1ResponseDeadline();
+            var respondent2ResponseDeadlineDeadline = caseData.getRespondent2ResponseDeadline();
+
+            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+                && caseData.getRespondent1ResponseDate() == null
+                && dateTime.toLocalDate().isAfter(respondent1ResponseDeadlineDeadline.toLocalDate()))
+                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && caseData.getRespondent2ResponseDate() == null
+                && dateTime.toLocalDate().isAfter(respondent2ResponseDeadlineDeadline.toLocalDate()))) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of("You cannot submit a response now as you have passed your deadline"))
                     .build();
             }
         }
@@ -237,7 +254,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
         }
 
+        List<String> errors = new ArrayList<>();
+        if (isFullDefenceForBothDefendants(caseData)) {
+            errors.add(
+                "It is not possible to respond for both defendants with Reject all of the claim. "
+                    + "Please go back and select single response option."
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
@@ -506,5 +532,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             userInfo.getUid(),
             caseRole
         );
+    }
+
+    private boolean isFullDefenceForBothDefendants(CaseData caseData) {
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))
+            && (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
+            return true;
+        }
+        return false;
     }
 }
