@@ -157,6 +157,7 @@ public class CaseData implements MappableObject {
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
