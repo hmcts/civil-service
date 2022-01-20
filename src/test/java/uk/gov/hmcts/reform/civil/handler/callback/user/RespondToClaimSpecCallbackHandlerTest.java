@@ -13,13 +13,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +101,65 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
         }
+
+        @Test
+        public void testSpecDefendantResponseFastTrackDefendantPaid() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+
+            RespondToClaim respondToClaim = RespondToClaim.builder()
+                // how much was paid is pence, total claim amount is pounds
+                .howMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(100)))
+                .build();
+
+            caseData = caseData.toBuilder()
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+                .respondToClaim(respondToClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
+                .isEqualTo(RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT.name());
+        }
+
+        @Test
+        public void testSpecDefendantResponseFastTrackDefendantPaidLessThanClaimed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .build();
+
+            RespondToClaim respondToClaim = RespondToClaim.builder()
+                // how much was paid is pence, total claim amount is pounds
+                // multiply by less than 100 so defendant paid less than claimed
+                .howMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(50)))
+                .build();
+
+            caseData = caseData.toBuilder()
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+                .respondToClaim(respondToClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
+                .isEqualTo(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.name());
+        }
     }
 
     @Nested
@@ -140,11 +203,39 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void testSpecDefendantResponseAdmitPartOfClaimFastTrackStillOwes() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            // admitted amount is pence, total claimed is pounds
+            BigDecimal admittedAmount = caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(50));
+            caseData = caseData.toBuilder()
+                .respondToAdmittedClaimOwingAmount(admittedAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertEquals(0, new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmount").toString())
+                .compareTo(
+                    new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmountPounds").toString())
+                        .multiply(BigDecimal.valueOf(100))));
+        }
+
+        @Test
         public void testValidateLengthOfUnemploymentWithError() {
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
             CallbackParams params = callbackParamsOf(caseData,
                                                      MID, "validate-length-of-unemployment",
-                                                     "DEFENDANT_RESPONSE_SPEC");
+                                                     "DEFENDANT_RESPONSE_SPEC"
+            );
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -182,7 +273,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void testValidateRepaymentDate() {
             CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
             CallbackParams params = callbackParamsOf(caseData, MID,
-                                                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC");
+                                                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC"
+            );
             when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
