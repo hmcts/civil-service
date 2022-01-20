@@ -29,11 +29,9 @@ public class ClaimsControllerTest extends BaseIntegrationTest {
             .thenReturn(expectedCaseDetails);
 
         mockMvc.perform(
-                get(CLAIMS_URL, 1L)
-                    .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)).andDo(print())
-
-            .andExpect(status().isOk());
-
-
+            get(CLAIMS_URL, 1L)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
