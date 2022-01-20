@@ -165,6 +165,7 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
+                ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,

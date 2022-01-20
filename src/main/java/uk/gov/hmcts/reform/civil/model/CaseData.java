@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -49,6 +50,7 @@ public class CaseData implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
+    private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
@@ -111,6 +113,8 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
@@ -124,6 +128,9 @@ public class CaseData implements MappableObject {
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
+    /**
+     * money amount in pounds.
+     */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
     private final YesOrNo claimInterest;
@@ -158,7 +165,16 @@ public class CaseData implements MappableObject {
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
+    /**
+     * money amount in pence.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    /**
+     * money amount in pounds.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
@@ -239,6 +255,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
     private final LocalDateTime respondent2ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
@@ -253,7 +270,6 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
-
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
