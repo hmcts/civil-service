@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
@@ -30,20 +31,22 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    private final FeatureToggleService toggleService;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-        RoboticsCaseData roboticsCaseData = null;
-        RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;
 
         CaseData caseData = callbackParams.getCaseData();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
 
-            if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                if (toggleService.isLrSpecEnabled()) {
+                    RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
+                }
             } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 

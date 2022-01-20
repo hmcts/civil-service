@@ -44,6 +44,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
     }
 
+    public boolean isLrSpecEnabled() {
+        return isFeatureEnabled("specified-lr-journey");
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))

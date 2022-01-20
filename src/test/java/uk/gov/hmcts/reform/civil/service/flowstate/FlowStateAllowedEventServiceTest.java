@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -584,6 +585,19 @@ class FlowStateAllowedEventServiceTest {
                 expected = false;
             }
             //work around ends.
+
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
+                .isEqualTo(expected);
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
+        void shouldReturnValidStates_whenCaseEventIsGiven_spec(
+            boolean expected,
+            CaseDetails caseDetails,
+            CaseEvent caseEvent
+        ) {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
 
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);

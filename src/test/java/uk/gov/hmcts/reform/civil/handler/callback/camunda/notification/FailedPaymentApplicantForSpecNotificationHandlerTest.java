@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -42,6 +43,8 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
     private OrganisationService organisationService;
     @Autowired
     private FailedPaymentApplicantForSpecNotificationHandler handler;
+    @MockBean
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {

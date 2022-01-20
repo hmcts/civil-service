@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -57,6 +58,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
+    private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
 
     @Override
@@ -96,7 +98,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
         //TODO: update to get correct deadline as a part of CMC-1346
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
             var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
@@ -163,7 +165,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         String body;
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)

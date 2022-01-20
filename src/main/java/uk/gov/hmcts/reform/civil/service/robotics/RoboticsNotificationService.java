@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -35,6 +36,7 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
         requireNonNull(caseData);
@@ -48,7 +50,7 @@ public class RoboticsNotificationService {
         RoboticsCaseDataSpec roboticsCaseDataSpec;
         byte[] roboticsJsonData;
         try {
-            if (null != caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) && toggleService.isLrSpecEnabled()) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
             } else {

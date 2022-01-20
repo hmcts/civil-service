@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -46,7 +47,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +72,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class CreateClaimSpecCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
-    private static final List<CaseEvent> EVENTS = Arrays.asList(
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(
         CaseEvent.CREATE_CLAIM_SPEC
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
@@ -118,6 +119,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final ValidateEmailService validateEmailService;
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -156,7 +158,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
@@ -218,7 +224,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = new ArrayList<String>();
+            List<String> errors = new ArrayList<>();
             if (caseData.getInterestFromSpecificDate() != null) {
                 if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
                     errors.add("Correct the date. You can’t use a future date.");
@@ -235,7 +241,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
             timelineOfEvent.forEach(timelineOfEvents -> {
@@ -490,15 +496,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         String totalAmount = " | Description | Amount | \n |---|---| \n | ";
         StringBuilder stringBuilder = new StringBuilder();
-        claimAmountBreakups.stream().forEach(
+        claimAmountBreakups.forEach(
             claimAmountBreakup -> {
                 ref.totalClaimAmount =
                     ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
-                stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append("£ "
-                                         + MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue()
-                                                                                   .getClaimAmount()) + " |\n ");
+                stringBuilder.append(claimAmountBreakup.getValue().getClaimReason()).append(" | ");
+                stringBuilder.append("£ ")
+                    .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
+                    .append(" |\n ");
             }
         );
         totalAmount = totalAmount.concat(stringBuilder.toString());
