@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -31,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -706,6 +709,134 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled",
                 "consentExtensionFilingDefence",
                 "acknowledgementOfServiceReceived"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvent_whenRespondent2ExtendsTimeRespondent1TimeExtended() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2TimeExtensionDate(LocalDateTime.now().plusDays(5))
+                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now().plusDays(14))
+                .build();
+
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(5)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent2TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                    .getRespondentSolicitor2AgreedDeadlineExtension()
+                    .format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvent_whenRespondent1ExtendsTimeRespondent2TimeNotExtended() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2TimeExtensionDate(null)
+                .respondentSolicitor2AgreedDeadlineExtension(null)
+                .build();
+
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(3)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent1TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                    .getRespondentSolicitor1AgreedDeadlineExtension()
+                    .format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvent_whenRespondent1ExtendsTimeRespondent2TimeExtended() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent1TimeExtensionDate(LocalDateTime.now().plusDays(5))
+                .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now().plusDays(14))
+                .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
+                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now().plusDays(14))
+                .build();
+
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(5)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent1TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                    .getRespondentSolicitor1AgreedDeadlineExtension()
+                    .format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
             );
         }
     }

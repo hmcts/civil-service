@@ -684,13 +684,17 @@ public class EventHistoryMapper {
             if ((caseData.getRespondent1TimeExtensionDate() == null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+                dateReceived  = caseData.getRespondent2TimeExtensionDate();
             } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 if (caseData.getRespondent2TimeExtensionDate()
                     .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                     extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+                    dateReceived  = caseData.getRespondent2TimeExtensionDate();
                 } else {
                     extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+                    dateReceived  = caseData.getRespondent1TimeExtensionDate();
+
                 }
             }
         }
