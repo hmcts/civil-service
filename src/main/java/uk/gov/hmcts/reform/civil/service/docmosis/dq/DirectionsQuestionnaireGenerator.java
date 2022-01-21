@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -33,7 +35,9 @@ import java.util.Locale;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -47,18 +51,22 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
+        DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
+            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData,
+            templateId);
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.DIRECTIONS_QUESTIONNAIRE)
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE)
         );
     }
 
-    private String getFileName(CaseData caseData) {
+    private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
-        return String.format(N181.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
+        return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
     @Override
@@ -71,6 +79,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(getApplicant(caseData))
+            .applicant2(TWO_V_ONE.equals(MultiPartyScenario
+                .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -98,6 +108,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .primaryAddress(applicant.getPrimaryAddress())
             .litigationFriendName(
                 ofNullable(caseData.getApplicant1LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .build();
+    }
+
+    private Party getApplicant2(CaseData caseData) {
+        var applicant = caseData.getApplicant2();
+        return Party.builder()
+            .name(applicant.getPartyName())
+            .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant2LitigationFriend())
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
             .build();
