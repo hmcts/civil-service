@@ -123,16 +123,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
         }
 
         @Test
@@ -176,7 +174,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotError_WhenNoRespondent2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
