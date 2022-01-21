@@ -256,7 +256,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     return List.of(Party.builder()
                                        .name(caseData.getRespondent2().getPartyName())
                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                                       .representative(representativeService.getRespondent2Representative(caseData))
+                                       .representative(representativeService.getRespondent1Representative(caseData))
                                        .litigationFriendName(
                                            ofNullable(caseData.getRespondent1LitigationFriend())
                                                .map(LitigationFriend::getFullName)
