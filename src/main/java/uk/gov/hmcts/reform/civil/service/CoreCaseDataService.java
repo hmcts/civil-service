@@ -32,7 +32,7 @@ public class CoreCaseDataService {
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
-
+    private static final String SERVICE_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjaXZpbCIsImV4cCI6MTY0Mjc5MTEzNX0.avNNWjyoiH1OB6Wds-IjJChZmEDx9Q1GwThAqe-ZHs5H1fxNa_Wr9rqBGf7hQsrKlC9DQfJIjinJT7_Il8X1hg";
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
     }

@@ -41,7 +41,7 @@ public class ClaimsController {
             claimId
         );
 
-        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId));
+        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
         log.info(
             "CaseDataResponse : {}",
             caseDataResponse
