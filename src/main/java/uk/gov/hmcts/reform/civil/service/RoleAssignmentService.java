@@ -25,7 +25,6 @@ public class RoleAssignmentService {
             log.debug(actorId, "Getting Role assignments for actorId {0}");
         }
         return roleAssignmentApi.getRoleAssignments(
-            //MediaType.ALL_VALUE,
             getUserToken(),
             authTokenGenerator.generate(),
             actorId
