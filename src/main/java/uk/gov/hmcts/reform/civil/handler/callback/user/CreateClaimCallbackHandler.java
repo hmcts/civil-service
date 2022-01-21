@@ -201,8 +201,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .respondent2SameLegalRepresentative(NO);
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        // only default this to NO if respondent 1 isn't represented
+        if (callbackParams.getCaseData().getRespondent1Represented().equals(NO)) {
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
