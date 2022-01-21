@@ -40,6 +40,7 @@ class InitiateGeneralApplicationServiceTest {
     private static final String STRING_CONSTANT = "this is a string";
     private static final String STRING_NUM_CONSTANT = "123456789";
     private static final LocalDate APP_DATE_EPOCH = EPOCH;
+    private static final DynamicList PBALIST = DynamicList.builder().build();
 
     @Autowired
     private InitiateGeneralApplicationService service;
@@ -53,7 +54,7 @@ class InitiateGeneralApplicationServiceTest {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(STRING_NUM_CONSTANT)
+                                      .applicantsPbaAccounts(PBALIST)
                                       .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -112,7 +113,7 @@ class InitiateGeneralApplicationServiceTest {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(STRING_NUM_CONSTANT)
+                        .applicantsPbaAccounts(PBALIST)
                         .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -230,7 +231,7 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
         assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
         assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
-            .isEqualTo(STRING_NUM_CONSTANT);
+            .isEqualTo(PBALIST);
         assertThat(application.getGeneralAppPBADetails().getPbaReference())
             .isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);

@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -31,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
+    private static final String CONSENT_INFO_PAGE = "consented-unconsented";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -49,8 +51,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::getPbaAccounts,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
+            callbackKey(MID, CONSENT_INFO_PAGE), this::setWithNoticeForConsentedApplications,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -76,6 +79,24 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return organisationService.findOrganisation(authToken)
                 .map(Organisation::getPaymentAccount)
                 .orElse(emptyList());
+    }
+
+    private CallbackResponse setWithNoticeForConsentedApplications(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        GARespondentOrderAgreement consentInfo = caseData.getGeneralAppRespondentAgreement();
+        if (consentInfo.getHasAgreed() == YES) {
+            caseDataBuilder.generalAppInformOtherParty(
+                    GAInformOtherParty.builder()
+                            .isWithNotice(YES)
+                            .reasonsForWithoutNotice(caseData.getCcdCaseReference().toString())
+                            .build());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
