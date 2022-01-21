@@ -79,7 +79,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
         List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
         List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
-            isValidRange(caseData.getHearingSupportRequirementsDJ().getHearingDates());
+            isValidRange(hearingDatesElement);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
