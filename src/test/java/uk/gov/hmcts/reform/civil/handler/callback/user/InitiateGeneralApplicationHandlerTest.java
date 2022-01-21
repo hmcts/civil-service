@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -25,13 +26,20 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -61,6 +69,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private InitiateGeneralApplicationService initiateGeneralAppService;
+
+    @MockBean
+    private OrganisationService organisationService;
 
     private static final String STRING_CONSTANT = "this is a string";
     private static final String STRING_NUM_CONSTANT = "123456789";
@@ -184,6 +195,42 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private final Organisation organisation = Organisation.builder()
+                .paymentAccount(List.of("12345", "98765"))
+                .build();
+
+        @Test
+        void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            DynamicList dynamicList = getDynamicList(response);
+            List<String> actualPbas = dynamicList.getListItems().stream()
+                    .map(DynamicListElement::getLabel)
+                    .collect(Collectors.toList());
+
+            assertThat(actualPbas).containsOnly("12345", "98765");
+            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
+        }
+
+        @Test
+        void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(getDynamicList(response))
+                    .isEqualTo(DynamicList.builder()
+                            .value(DynamicListElement.builder().code(null).label(null).build())
+                            .listItems(Collections.<DynamicListElement>emptyList()).build());
+        }
+
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -193,6 +240,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getGeneralAppPBADetails().getApplicantsPbaAccounts();
         }
     }
 

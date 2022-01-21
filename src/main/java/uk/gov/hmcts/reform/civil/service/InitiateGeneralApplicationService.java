@@ -57,10 +57,6 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
-        if (caseData.getGeneralAppRespondentAgreement().getHasAgreed() == YES) {
-            applicationBuilder.generalAppInformOtherParty(
-                    GAInformOtherParty.builder().isWithNotice(NO).build());
-        }
 
         return applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
