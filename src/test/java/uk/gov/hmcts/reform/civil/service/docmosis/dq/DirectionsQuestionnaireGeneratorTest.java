@@ -163,8 +163,8 @@ class DirectionsQuestionnaireGeneratorTest {
                 .thenReturn(new DocmosisDocument(N181_2V1.getDocumentTitle(), bytes));
 
             when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+                BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -173,15 +173,16 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
             verify(representativeService).getRespondent1Representative(caseData);
             verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181_2V1));
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                eq(N181_2V1));
         }
 
-    @Nested
-    class GetTemplateData {
+        @Nested
+        class GetTemplateData {
 
             @Test
             void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
@@ -211,29 +212,29 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
             }
 
-        @Test
-        void whenMultiparty2v1_shouldGetDQData() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimTwoApplicants()
-                .build()
-                .toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicantTwo LF").build())
-                .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                .build();
+            @Test
+            void whenMultiparty2v1_shouldGetDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoApplicants()
+                    .build()
+                    .toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicantTwo LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
 
-            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-            verify(representativeService).getRespondent1Representative(caseData);
-            assertThatDqFieldsAreCorrect2v1(templateData, caseData.getApplicant1DQ(), caseData);
-        }
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect2v1(templateData, caseData.getRespondent1DQ(), caseData);
+            }
 
-        private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
-                                                     CaseData caseData) {
-            assertEquals(templateData.getApplicant2(), getApplicant2(caseData));
-            assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
-        }
+            private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
+                                                         CaseData caseData) {
+                assertEquals(templateData.getApplicant2(), getApplicant2(caseData));
+                assertThatDqFieldsAreCorrect(templateData, dq, caseData);
+            }
 
             private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData,
                                                       DQ dq, CaseData caseData) {
@@ -271,14 +272,14 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
             }
 
-        private Party getApplicant2(CaseData caseData) {
-            var applicant = caseData.getApplicant2();
-            return Party.builder()
-                .name(applicant.getPartyName())
-                .primaryAddress(applicant.getPrimaryAddress())
-                .litigationFriendName("applicantTwo LF")
-                .build();
-        }
+            private Party getApplicant2(CaseData caseData) {
+                var applicant = caseData.getApplicant2();
+                return Party.builder()
+                    .name(applicant.getPartyName())
+                    .primaryAddress(applicant.getPrimaryAddress())
+                    .litigationFriendName("applicantTwo LF")
+                    .build();
+            }
 
             private List<Party> getRespondents(CaseData caseData) {
                 var respondent = caseData.getRespondent1();

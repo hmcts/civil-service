@@ -88,7 +88,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(), DocumentType.DIRECTIONS_QUESTIONNAIRE)
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE)
         );
     }
 
@@ -131,6 +132,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(getApplicant(caseData))
+            .applicant2(TWO_V_ONE.equals(MultiPartyScenario
+                .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -179,8 +182,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(getApplicant(caseData))
-            .applicant2(TWO_V_ONE.equals(MultiPartyScenario
-                .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
