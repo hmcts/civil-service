@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -139,6 +140,7 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent1ClaimResponseType;
     protected ResponseDocument respondent1ClaimResponseDocument;
     protected Respondent1DQ respondent1DQ;
+    protected Respondent2DQ respondent2DQ;
     protected Applicant1DQ applicant1DQ;
     // Defendant Response Defendant 2
     protected RespondentResponseType respondent2ClaimResponseType;
@@ -271,7 +273,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent2ResponseDeadline(LocalDateTime deadline) {
-        this.respondent1ResponseDeadline = deadline;
+        this.respondent2ResponseDeadline = deadline;
         return this;
     }
 
@@ -347,6 +349,36 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
         this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQ() {
+        respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQ(Respondent2DQ respondent2DQ) {
+        this.respondent2DQ = respondent2DQ;
         return this;
     }
 
@@ -1143,6 +1175,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
+        atStateClaimDetailsNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
@@ -1234,7 +1275,62 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
-        respondent1ResponseDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses() {
+        atStateRespondentFullDefence();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim() {
+        atStateRespondentFullDefence();
+        respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ() {
+        atStateRespondentFullDefence();
+        respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondentResponseIsSame(NO);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateDivergentResponse_1v2_Resp1FullAdmissionAndResp2CounterClaim() {
+        atStateRespondentFullAdmission();
+        respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse() {
+        atStateRespondentFullAdmission();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
         return this;
     }
 
@@ -1314,11 +1410,21 @@ public class CaseDataBuilder {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent1ResponseDate = LocalDateTime.now();
-        ccdState = AWAITING_APPLICANT_INTENTION;
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse() {
+        atStateClaimDetailsNotified();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
         return this;
     }
 
@@ -1649,7 +1755,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Responds(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
-        this.respondent2ResponseDate = LocalDateTime.now();
+        this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
         return this;
     }
 
@@ -1804,7 +1910,9 @@ public class CaseDataBuilder {
             .withdrawClaim(withdrawClaim)
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ)
             .applicant1DQ(applicant1DQ)
+            .respondent2DQ(respondent2DQ)
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
             .respondent1OrganisationPolicy(respondent1OrganisationPolicy)

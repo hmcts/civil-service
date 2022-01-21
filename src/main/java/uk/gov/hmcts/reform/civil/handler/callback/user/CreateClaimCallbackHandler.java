@@ -274,7 +274,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (caseData.getRespondent1OrgRegistered() == YES
             && caseData.getRespondent1Represented() == YES
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
-
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
             dataBuilder.respondent2OrgRegistered(YES);
