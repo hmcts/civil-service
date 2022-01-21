@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -44,6 +48,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
+            callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -57,18 +62,58 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationHeader(getHeader())
+            .confirmationBody(getBody())
             .build();
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
 
         return format("# You cannot request default judgment");
 
     }
 
-    private String getBody(CaseData caseData) {
+
+    private CallbackResponse validateDateValues(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
+        List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
+            isValidRange(caseData.getHearingSupportRequirementsDJ().getHearingDates());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+
+    }
+
+    private List<String> isValidRange(List<Element<HearingDates>> hearingDatesElement) {
+        List<String> errors = new ArrayList<>();
+        hearingDatesElement.forEach(element -> {
+            HearingDates hearingDates = element.getValue();
+            if (checkPastDateValidation(hearingDates.getHearingUnavailableFrom()) || checkPastDateValidation(
+                hearingDates.getHearingUnavailableFrom())) {
+                errors.add("Unavailable Date cannot be past date");
+            } else if (checkThreeMonthsValidation(hearingDates.getHearingUnavailableFrom()) || checkThreeMonthsValidation(
+                hearingDates.getHearingUnavailableFrom())) {
+                errors.add("Unavailable Dates must be within the next 3 months.");
+            } else if (hearingDates.getHearingUnavailableFrom()
+                .isAfter(hearingDates.getHearingUnavailableUntil())) {
+                errors.add("Unavailable From Date should be less than To Date");
+            }
+
+        });
+        return errors;
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+    private boolean checkThreeMonthsValidation(LocalDate localDate) {
+        return localDate != null && localDate.isAfter(LocalDate.now().plusMonths(3));
+    }
+
+    private String getBody() {
         return format(CPR_REQUIRED_INFO);
 
     }
@@ -81,7 +126,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -90,6 +134,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
