@@ -53,7 +53,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     public static final String NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim details sent to "
         + "1 Defendant legal representative only.%n%n"
-        + "You must notify the other defendant legal representative of the claim details by %s";
+        + "Your claim will progress offline.";
 
     public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
         "Your claim will progress offline if you only notify one Defendant of the claim details.";
