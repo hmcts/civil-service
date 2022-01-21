@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentService;
+
 import static java.util.Collections.emptyList;
 @Api
 @Slf4j
@@ -26,8 +28,11 @@ import static java.util.Collections.emptyList;
 )
 public class CasesController {
 
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final RoleAssignmentService roleAssignmentService;
 
     @GetMapping(path = {
         "/{cid}",
@@ -59,5 +64,16 @@ public class CasesController {
         SearchResult claims = coreCaseDataService.searchCases(query);
 
         return new ResponseEntity<>(claims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/actors/{actorId}")
+    @ApiOperation("Gets credentials for actorId from RAS")
+    public String getCredentials(@PathVariable("actorId") String actorId,
+                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                 @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization) {
+        log.info( "Received ActorId: {}",actorId);
+        String response = roleAssignmentService.getRoleAssignments(actorId);
+        log.info("ActorId: {}", response);
+        return response;
     }
 }
