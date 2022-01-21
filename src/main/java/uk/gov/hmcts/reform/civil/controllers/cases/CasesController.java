@@ -30,6 +30,8 @@ public class CasesController {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final RoleAssignmentService roleAssignmentService;
