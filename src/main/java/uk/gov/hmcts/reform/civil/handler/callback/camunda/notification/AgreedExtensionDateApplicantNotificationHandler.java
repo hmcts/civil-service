@@ -83,6 +83,9 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
             } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() == null)) {
+                extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 if (caseData.getRespondent2TimeExtensionDate()
                     .isAfter(caseData.getRespondent1TimeExtensionDate())) {
@@ -113,6 +116,9 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
             if ((caseData.getRespondent1TimeExtensionDate() == null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 respondentSolicitorEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() == null)) {
+                respondentSolicitorEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
             } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 if (caseData.getRespondent2TimeExtensionDate()
