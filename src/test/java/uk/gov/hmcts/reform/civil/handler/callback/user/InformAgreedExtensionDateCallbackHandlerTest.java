@@ -435,9 +435,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
-                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
                 .extracting("businessProcess")
