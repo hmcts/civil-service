@@ -28,6 +28,9 @@ public class NotificationsProperties {
     private String solicitorDefendantResponseCaseTakenOffline;
 
     @NotEmpty
+    private String solicitorDefendantResponseCaseTakenOfflineMultiparty;
+
+    @NotEmpty
     private String claimantSolicitorDefendantResponseFullDefence;
 
     @NotEmpty
