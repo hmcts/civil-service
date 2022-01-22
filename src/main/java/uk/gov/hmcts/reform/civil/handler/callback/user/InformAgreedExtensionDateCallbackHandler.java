@@ -139,7 +139,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        System.out.println("*********iae*******" + stateFlowEngine.evaluate(caseData).getState() + "****************");
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
@@ -156,7 +155,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        System.out.println("*********iaev1******" + stateFlowEngine.evaluate(caseData).getState() + "****************");
+
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
             : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
