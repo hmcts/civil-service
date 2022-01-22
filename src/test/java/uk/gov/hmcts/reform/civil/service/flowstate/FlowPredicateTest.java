@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
@@ -45,8 +46,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -355,18 +356,7 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
-                Predicate<CaseData> predicate =
-                    fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
-                assertFalse(predicate.test(caseData));
-            }
-
-            @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
-                    .build();
-                Predicate<CaseData> predicate =
-                    fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+                Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
                 assertFalse(predicate.test(caseData));
             }
 
@@ -385,13 +375,12 @@ class FlowPredicateTest {
         class TransitionClaimDetailsNotifiedTimeExtension {
 
             @Test
-            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
-                Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
-                    fullDefence);
-                assertTrue(predicate.test(caseData));
+                Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
+                assertFalse(predicate.test(caseData));
             }
 
             @Test
@@ -449,13 +438,13 @@ class FlowPredicateTest {
             }
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
                     .build();
                 Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
-                    fullDefence);
-                assertFalse(predicate.test(caseData));
+                    allResponsesReceived);
+                assertTrue(predicate.test(caseData));
             }
 
             @Test
@@ -488,15 +477,6 @@ class FlowPredicateTest {
                     .build();
                 Predicate<CaseData> predicate = respondentTimeExtension.and(notificationAcknowledged).and(fullDefence);
                 assertFalse(predicate.test(caseData));
-            }
-
-            @Test
-            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
-                    .build();
-                Predicate<CaseData> predicate = respondentTimeExtension.and(notificationAcknowledged).and(fullDefence);
-                assertTrue(predicate.test(caseData));
             }
 
             @Test

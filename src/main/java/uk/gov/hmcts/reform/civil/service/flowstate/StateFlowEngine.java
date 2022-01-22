@@ -47,9 +47,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -261,18 +261,18 @@ public class StateFlowEngine {
             .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
             .onlyIf(caseDismissedAfterClaimAcknowledged)
             .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
-            .transitionTo(ALL_RESPONSES_RECEIVED)
-            .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived))
-            .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-            .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
-                        .and(awaitingResponsesFullDefenceReceived))
-            .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-            .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
-                        .and(awaitingResponsesNonFullDefenceReceived))
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF)
-            .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
-            .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
+                .transitionTo(ALL_RESPONSES_RECEIVED)
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived))
+                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
+                            .and(awaitingResponsesFullDefenceReceived))
+                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
+                            .and(awaitingResponsesNonFullDefenceReceived))
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF)
+                    .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
+                .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
+                    .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
             .state(FULL_DEFENCE)
             .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(fullDefenceProceed)
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)

@@ -156,7 +156,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        System.out.println("*********iaev1******" + stateFlowEngine.evaluate(caseData).getState() + "****************");
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
             : caseData.getRespondentSolicitor1AgreedDeadlineExtension();

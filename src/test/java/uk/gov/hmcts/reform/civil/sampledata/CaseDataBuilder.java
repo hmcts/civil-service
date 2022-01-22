@@ -1380,7 +1380,7 @@ public class CaseDataBuilder {
         atStateNotificationAcknowledgedTimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
-        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        //respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
         ccdState = AWAITING_APPLICANT_INTENTION;
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
