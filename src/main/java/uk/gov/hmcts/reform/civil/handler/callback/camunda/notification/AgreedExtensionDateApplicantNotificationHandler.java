@@ -85,8 +85,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
             } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                 && (caseData.getRespondent2TimeExtensionDate() == null)) {
                 extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-            }
-            else if ((caseData.getRespondent1TimeExtensionDate() != null)
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                 && (caseData.getRespondent2TimeExtensionDate() != null)) {
                 if (caseData.getRespondent2TimeExtensionDate()
                     .isAfter(caseData.getRespondent1TimeExtensionDate())) {
