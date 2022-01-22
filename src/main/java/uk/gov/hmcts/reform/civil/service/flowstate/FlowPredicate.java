@@ -190,8 +190,9 @@ public class FlowPredicate {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 
-    public static final Predicate<CaseData> respondent1TimeExtension = caseData ->
-        caseData.getRespondent1TimeExtensionDate() != null;
+    public static final Predicate<CaseData> respondentTimeExtension = caseData ->
+        (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
+            || (caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2ResponseDate() == null);
 
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
