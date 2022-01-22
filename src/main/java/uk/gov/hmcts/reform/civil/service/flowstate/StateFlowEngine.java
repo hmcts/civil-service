@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1TimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
@@ -177,7 +177,7 @@ public class StateFlowEngine {
                     .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(CLAIM_DETAILS_NOTIFIED)
                 .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(not(allResponsesReceived)))
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(not(allResponsesReceived)))
                 //Acknowledging Claim First
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 //Direct Response, without Acknowledging
@@ -222,32 +222,32 @@ public class StateFlowEngine {
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(FULL_DEFENCE)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullDefence))
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(fullDefence))
                 .transitionTo(FULL_ADMISSION)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(fullAdmission))
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(fullAdmission))
                 .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
                     .onlyIf(divergentRespondGoOffline
-                                .and(not(respondent1TimeExtension)))
+                                .and(not(respondentTimeExtension)))
                 .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
                     .onlyIf(divergentRespondWithDQAndGoOffline
-                                .and(not(respondent1TimeExtension)))
+                                .and(not(respondentTimeExtension)))
                 .transitionTo(PART_ADMISSION)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(partAdmission))
                 .transitionTo(COUNTER_CLAIM)
-                    .onlyIf(respondent1TimeExtension.and(not(notificationAcknowledged)).and(counterClaim))
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(counterClaim))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotifiedExtension)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotifiedExtension)
             .state(NOTIFICATION_ACKNOWLEDGED)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
-                    .onlyIf(notificationAcknowledged.and(respondent1TimeExtension))
+                    .onlyIf(notificationAcknowledged.and(respondentTimeExtension))
                 .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(allResponsesReceived))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
                                 .and(awaitingResponsesFullDefenceReceived))
                 .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
                                 .and(awaitingResponsesNonFullDefenceReceived))
                 /*  We can no longer go from ACKNOWLEDGED to
                     FULL_DEFENCE, FULL_ADMISSION, PART_ADMISSION or COUNTER_CLAIM
@@ -270,12 +270,12 @@ public class StateFlowEngine {
                     .onlyIf(caseDismissedAfterClaimAcknowledged)
             .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                 .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension)).and(allResponsesReceived))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
                         .and(awaitingResponsesFullDefenceReceived))
                 .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(not(respondent1TimeExtension))
+                    .onlyIf(notificationAcknowledged.and(not(respondentTimeExtension))
                         .and(awaitingResponsesNonFullDefenceReceived))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF)
                     .onlyIf(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
