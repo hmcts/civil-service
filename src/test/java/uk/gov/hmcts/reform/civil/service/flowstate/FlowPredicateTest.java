@@ -914,7 +914,7 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenDefendantResponse() {
             CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
             assertTrue(counterClaim.test(caseData));
