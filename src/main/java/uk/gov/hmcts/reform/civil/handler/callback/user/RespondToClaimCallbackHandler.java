@@ -243,26 +243,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))
-            || (caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                .build();
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData =
-            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
-
-        if ((caseData.getRespondent1ClaimResponseType() != null
                 && caseData.getRespondent1ClaimResponseType().equals(
                 RespondentResponseType.FULL_DEFENCE))
             || (caseData.getRespondent2ClaimResponseType() != null
