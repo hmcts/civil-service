@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ClaimsControllerTest extends BaseIntegrationTest {
 
-    private static final String CLAIMS_URL = "/claims/{claimId}";
+    private static final String CLAIMS_URL = "/cases/{claimId}";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;

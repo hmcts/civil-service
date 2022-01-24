@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 @RestController
 @AllArgsConstructor
 @RequestMapping(
-    path = "/claims",
+    path = "/cases",
     produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class ClaimsController {
