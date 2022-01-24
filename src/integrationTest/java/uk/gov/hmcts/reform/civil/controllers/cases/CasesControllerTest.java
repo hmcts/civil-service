@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.claims;
+package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ClaimsControllerTest extends BaseIntegrationTest {
+public class CasesControllerTest extends BaseIntegrationTest {
 
     private static final String CLAIMS_URL = "/cases/{claimId}";
 
