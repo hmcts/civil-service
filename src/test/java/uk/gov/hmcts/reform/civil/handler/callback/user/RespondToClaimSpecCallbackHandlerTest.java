@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -20,18 +21,24 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -43,6 +50,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private PaymentDateValidator validator;
     @Mock
     private UnavailableDateValidator dateValidator;
+    @Mock
+    private ExitSurveyContentService exitSurveyContentService;
 
     @BeforeEach
     public void setup() {
@@ -284,5 +293,36 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+    }
+
+    @Nested
+    class SubmittedCallback {
+        @Test
+        void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            String body = format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                    + "We will let you know when they respond."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                formatLocalDateTime(responseDeadline, DATE),
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
+                    .confirmationBody(body)
+                    .build());
+        }
     }
 }
