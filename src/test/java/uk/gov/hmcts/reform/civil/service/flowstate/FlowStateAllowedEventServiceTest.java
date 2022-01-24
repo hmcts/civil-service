@@ -252,7 +252,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        INFORM_AGREED_EXTENSION_DATE
+                        INFORM_AGREED_EXTENSION_DATE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
