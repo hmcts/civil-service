@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -153,11 +155,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
-            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -258,6 +257,39 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
+    private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+
+        if ((caseData.getRespondent1ClaimResponseType() != null
+                && caseData.getRespondent1ClaimResponseType().equals(
+                RespondentResponseType.FULL_DEFENCE))
+            || (caseData.getRespondent2ClaimResponseType() != null
+                && caseData.getRespondent2ClaimResponseType().equals(
+                RespondentResponseType.FULL_DEFENCE))
+            || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                || RespondentResponseType.FULL_DEFENCE.equals(caseData
+                .getRespondent1ClaimResponseTypeToApplicant2())))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
+                .build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        if (isFullDefenceForBothDefendants(caseData)) {
+            errors.add(
+                "It is not possible to respond for both defendants with Reject all of the claim. "
+                    + "Please go back and select single response option."
+            );
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -316,8 +348,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -326,7 +356,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         LocalDateTime responseDate = time.now();
@@ -433,7 +462,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData
                     .respondent2(updatedRespondent2)
                     .respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
@@ -526,5 +554,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             userInfo.getUid(),
             caseRole
         );
+    }
+
+    private boolean isFullDefenceForBothDefendants(CaseData caseData) {
+        if ((caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))
+            && (caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE))) {
+            return true;
+        }
+        return false;
     }
 }
