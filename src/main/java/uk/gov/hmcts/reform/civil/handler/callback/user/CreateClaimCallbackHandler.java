@@ -285,6 +285,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
 
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();

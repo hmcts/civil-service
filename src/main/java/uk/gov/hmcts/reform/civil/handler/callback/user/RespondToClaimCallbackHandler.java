@@ -155,8 +155,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
+            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -328,6 +331,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
+
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -336,6 +341,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         LocalDateTime responseDate = time.now();
@@ -442,6 +448,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData
                     .respondent2(updatedRespondent2)
                     .respondent2Copy(null);
+                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
