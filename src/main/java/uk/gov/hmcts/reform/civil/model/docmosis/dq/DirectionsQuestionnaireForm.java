@@ -38,6 +38,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate submittedOn;
     private final Party applicant;
+    private final Party applicant2;
     private final List<Party> respondents;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
