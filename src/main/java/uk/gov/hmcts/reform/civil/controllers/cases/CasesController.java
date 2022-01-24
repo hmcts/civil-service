@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.math.BigDecimal;
+
 @Api
 @Slf4j
 @RestController
@@ -42,6 +44,7 @@ public class CasesController {
         );
 
         var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
+        caseDataResponse.setTotalClaimAmount(BigDecimal.valueOf(150.00));
         log.info(
             "CaseDataResponse : {}",
             caseDataResponse
