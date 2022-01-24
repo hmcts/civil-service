@@ -40,6 +40,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         + "%n%n * The Defendant has not satisfied the whole claim, including costs."
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
+    public static final String HEADER = "# You cannot request default judgment";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
 
@@ -60,16 +61,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
-            .confirmationBody(getBody())
+            .confirmationHeader(getFormattedString(HEADER))
+            .confirmationBody(getFormattedString(CPR_REQUIRED_INFO))
             .build();
     }
 
-    private String getHeader() {
-
-        return format("# You cannot request default judgment");
+    private String getFormattedString(String message) {
+        return format(message);
 
     }
 
@@ -113,10 +113,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return localDate != null && localDate.isAfter(LocalDate.now().plusMonths(3));
     }
 
-    private String getBody() {
-        return format(CPR_REQUIRED_INFO);
-
-    }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
