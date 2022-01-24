@@ -11,11 +11,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
 
@@ -64,6 +68,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @BeforeEach
     void setup() {
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
+        when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
+            anyString(), anyString())).thenReturn(DOCUMENT);
     }
 
     @Test
@@ -82,4 +88,69 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
     }
+
+    @Test
+    void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent1DQ() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondentResponseIsSame(YesOrNo.NO)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
+            "BEARER_TOKEN", "ONE");
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
+    }
+
+    @Test
+    void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondentResponseIsSame(YesOrNo.NO)
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
+            "BEARER_TOKEN", "TWO");
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
+    }
+
+    @Test
+    void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRSameResponse() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondentResponseIsSame(YesOrNo.YES)
+            .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(directionsQuestionnaireGenerator).generate(caseData, "BEARER_TOKEN");
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
+    }
+
 }
