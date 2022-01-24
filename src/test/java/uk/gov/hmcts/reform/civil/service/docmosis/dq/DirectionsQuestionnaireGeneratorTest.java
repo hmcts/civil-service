@@ -56,7 +56,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -157,30 +156,6 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
         }
 
-        @Test
-        void shouldGenerateDQ_when2v1ScenarioWithFullDefence() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181_2V1)))
-                .thenReturn(new DocmosisDocument(N181_2V1.getDocumentTitle(), bytes));
-
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimTwoApplicants()
-                .build();
-
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
-            verify(representativeService).getRespondent1Representative(caseData);
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(N181_2V1));
-        }
-
         @Nested
         class GetTemplateData {
 
@@ -210,30 +185,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
-            }
-
-            @Test
-            void whenMultiparty2v1_shouldGetDQData() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimTwoApplicants()
-                    .build()
-                    .toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicantTwo LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .build();
-
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-
-                verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect2v1(templateData, caseData.getRespondent1DQ(), caseData);
-            }
-
-            private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
-                                                         CaseData caseData) {
-                assertEquals(templateData.getApplicant2(), getApplicant2(caseData));
-                assertThatDqFieldsAreCorrect(templateData, dq, caseData);
             }
 
             private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData,
@@ -269,15 +220,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .name(applicant.getPartyName())
                     .primaryAddress(applicant.getPrimaryAddress())
                     .litigationFriendName("applicant LF")
-                    .build();
-            }
-
-            private Party getApplicant2(CaseData caseData) {
-                var applicant = caseData.getApplicant2();
-                return Party.builder()
-                    .name(applicant.getPartyName())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicantTwo LF")
                     .build();
             }
 

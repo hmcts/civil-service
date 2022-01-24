@@ -26,7 +26,4 @@ public interface NotificationData {
     String RESPONDENT_TWO_RESPONSE = "defendantTwoResponse";
 
     Map<String, String> addProperties(CaseData caseData);
-
-    Map<String, String> addPropertiesForMultiparty(CaseData caseData);
-
 }

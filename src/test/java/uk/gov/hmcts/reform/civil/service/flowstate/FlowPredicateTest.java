@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
@@ -513,115 +512,6 @@ class FlowPredicateTest {
         @Nested
         class MultiParty {
             CaseDataBuilder caseDataBuilder;
-
-            @Nested
-            class TwoVOne {
-
-                @BeforeEach
-                void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoApplicants();
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(COUNTER_CLAIM)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertTrue(divergentRespondGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondGoOfflineAndOneFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertFalse(divergentRespondGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondGoOfflineAndBothFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                        .build();
-
-                    assertFalse(divergentRespondGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondWithDQGoOfflineBothNotFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(COUNTER_CLAIM)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertFalse(divergentRespondWithDQAndGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondWithDQGoOfflineAndOneFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertTrue(divergentRespondWithDQAndGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondWithDQGoOfflineAndBothFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                        .build();
-
-                    assertFalse(divergentRespondWithDQAndGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateFullDefenceBothNotFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(COUNTER_CLAIM)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertFalse(fullDefence.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateFullDefenceAndOneFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                        .build();
-
-                    assertFalse(fullDefence.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateFullDefenceAndBothFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                        .respondent1ClaimResponseType(FULL_DEFENCE)
-                        .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(fullDefence.test(caseData));
-                }
-
-            }
 
             @Nested
             class OneVTwoWithTwoReps {
