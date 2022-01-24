@@ -277,36 +277,6 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED,
-                    new CaseEvent[]{
-                        DEFENDANT_RESPONSE,
-                        ACKNOWLEDGE_CLAIM,
-                        INFORM_AGREED_EXTENSION_DATE,
-                        ADD_DEFENDANT_LITIGATION_FRIEND,
-                        WITHDRAW_CLAIM,
-                        DISCONTINUE_CLAIM,
-                        AMEND_PARTY_DETAILS,
-                        CASE_PROCEEDS_IN_CASEMAN,
-                        DISMISS_CLAIM,
-                        ADD_CASE_NOTE
-                    }
-                ),
-                of(
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
-                    new CaseEvent[]{
-                        DEFENDANT_RESPONSE,
-                        ACKNOWLEDGE_CLAIM,
-                        INFORM_AGREED_EXTENSION_DATE,
-                        ADD_DEFENDANT_LITIGATION_FRIEND,
-                        WITHDRAW_CLAIM,
-                        DISCONTINUE_CLAIM,
-                        AMEND_PARTY_DETAILS,
-                        CASE_PROCEEDS_IN_CASEMAN,
-                        DISMISS_CLAIM,
-                        ADD_CASE_NOTE
-                    }
-                ),
-                of(
                     FULL_DEFENCE,
                     new CaseEvent[]{
                         CLAIMANT_RESPONSE,
