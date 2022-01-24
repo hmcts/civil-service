@@ -91,10 +91,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         hearingDatesElement.forEach(element -> {
             HearingDates hearingDates = element.getValue();
             if (checkPastDateValidation(hearingDates.getHearingUnavailableFrom()) || checkPastDateValidation(
-                hearingDates.getHearingUnavailableFrom())) {
+                hearingDates.getHearingUnavailableUntil())) {
                 errors.add("Unavailable Date cannot be past date");
             } else if (checkThreeMonthsValidation(hearingDates.getHearingUnavailableFrom()) || checkThreeMonthsValidation(
-                hearingDates.getHearingUnavailableFrom())) {
+                hearingDates.getHearingUnavailableUntil())) {
                 errors.add("Unavailable Dates must be within the next 3 months.");
             } else if (hearingDates.getHearingUnavailableFrom()
                 .isAfter(hearingDates.getHearingUnavailableUntil())) {
