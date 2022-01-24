@@ -201,8 +201,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .respondent2SameLegalRepresentative(NO);
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        // only default this to NO if respondent 1 isn't represented
+        if (callbackParams.getCaseData().getRespondent1Represented().equals(NO)) {
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -251,15 +255,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+
+            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
+                .organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
+        }
+    }
+
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
             && caseData.getRespondent1Represented() == YES
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
-
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
             dataBuilder.respondent2OrgRegistered(YES);
