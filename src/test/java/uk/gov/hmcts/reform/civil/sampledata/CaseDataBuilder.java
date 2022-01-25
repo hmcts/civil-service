@@ -283,6 +283,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2AcknowledgeNotificationDate(LocalDateTime dateTime) {
+        this.respondent2AcknowledgeNotificationDate = dateTime;
+        return this;
+    }
+
     public CaseDataBuilder applicantSolicitor1ServiceAddress(Address applicantSolicitor1ServiceAddress) {
         this.applicantSolicitor1ServiceAddress = applicantSolicitor1ServiceAddress;
         return this;
@@ -1953,6 +1958,7 @@ public class CaseDataBuilder {
             .respondent1TimeExtensionDate(respondent1TimeExtensionDate)
             .respondent2TimeExtensionDate(respondent2TimeExtensionDate)
             .respondent1AcknowledgeNotificationDate(respondent1AcknowledgeNotificationDate)
+            .respondent2AcknowledgeNotificationDate(respondent2AcknowledgeNotificationDate)
             .respondent1ResponseDate(respondent1ResponseDate)
             .respondent2ResponseDate(respondent2ResponseDate)
             .applicant1ResponseDate(applicant1ResponseDate)
