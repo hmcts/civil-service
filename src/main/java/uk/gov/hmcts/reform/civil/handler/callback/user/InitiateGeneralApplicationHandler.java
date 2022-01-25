@@ -11,8 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -36,15 +42,39 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
+            callbackKey(ABOUT_TO_START), this::getPbaAccounts,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
+    private CallbackResponse getPbaAccounts(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
+                .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers)).build());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+    }
+
+    private List<String> getPbaAccounts(String authToken) {
+        return organisationService.findOrganisation(authToken)
+                .map(Organisation::getPaymentAccount)
+                .orElse(emptyList());
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
@@ -73,11 +103,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
-    }
-
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
@@ -92,16 +117,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(initiateGeneralApplicationService.buildCaseData(dataBuilder, caseData).toMap(objectMapper))
             .build();
-    }
-
-    /**
-     * To be used to return empty callback response, will be used in overriding classes.
-     *
-     * @param callbackParams This parameter is required as this is passed as reference for execute method in CallBack
-     * @return empty callback response
-     */
-    protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     /**
