@@ -1340,7 +1340,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnError_WhenBothFullDefenceAndSingleSolicitor() {
+        void shouldReturnError_WhenBothFullDefenceAndSameRespondent() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
