@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.math.BigDecimal;
-
 @Api
 @Slf4j
 @RestController
