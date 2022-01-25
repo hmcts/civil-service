@@ -201,6 +201,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
+            // TODO: duplicate code - need to refactor
             LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
             Party respondent = caseData.getRespondent1();
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
