@@ -260,7 +260,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         List<String> errors = new ArrayList<>();
-        if (isFullDefenceForBothDefendants(caseData)) {
+        if (isFullDefenceForBothDefendants(caseData) && respondent2HasSameLegalRep(caseData)) {
             errors.add(
                 "It is not possible to respond for both defendants with Reject all of the claim. "
                     + "Please go back and select single response option."
