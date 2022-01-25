@@ -29,12 +29,12 @@ public class CasesController {
     private final CaseDetailsConverter caseDetailsConverter;
 
     @GetMapping(path = {
-        "/{cid}",
+        "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
 
-    public ResponseEntity<CaseData> getClaimById(
-        @PathVariable("cid") Long claimId
+    public ResponseEntity<CaseData> getCaseById(
+        @PathVariable("caseId") Long claimId
     ) {
         log.info(
             "Received CaseId: {}",
@@ -42,10 +42,7 @@ public class CasesController {
         );
 
         var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
-        log.info(
-            "CaseDataResponse : {}",
-            caseDataResponse
-        );
+
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
 }
