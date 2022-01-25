@@ -60,6 +60,10 @@ public class InitiateGeneralApplicationService {
 
         return applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .applicantSolicitor1UserDetails(caseData.getApplicantSolicitor1UserDetails())
+            .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
+            .respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy())
+            .respondentSolicitor1EmailAddress(caseData.getRespondentSolicitor1EmailAddress())
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
