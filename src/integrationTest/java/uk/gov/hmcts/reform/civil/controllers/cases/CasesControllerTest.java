@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentService;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,6 +24,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+
+    @MockBean
+    private RoleAssignmentService roleAssignmentService;
 
     @Test
     @SneakyThrows
@@ -43,5 +47,11 @@ public class CasesControllerTest extends BaseIntegrationTest {
     public void shouldReturnOk() {
         doGet(BEARER_TOKEN, CLAIMS_LIST_URL)
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    public void shouldReturnRASAssignment() {
+        when(roleAssignmentService.getRoleAssignments(ACTOR_ID)).thenReturn(ACTOR_ROLE);
     }
 }
