@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.claims;
+package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,35 +21,35 @@ import static java.util.Collections.emptyList;
 @RestController
 @AllArgsConstructor
 @RequestMapping(
-    path = "/claims",
+    path = "/cases",
     produces = MediaType.APPLICATION_JSON_VALUE
 )
-public class ClaimsController {
+public class CasesController {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @GetMapping(path = {
-        "/{claimId}",
+        "/{cid}",
     })
-    @ApiOperation("get claim by id from CCD")
+    @ApiOperation("get case by id from CCD")
 
     public ResponseEntity<CaseData> getClaimById(
-        @PathVariable("claimId") Long claimId
+        @PathVariable("cid") Long claimId
     ) {
         log.info(
-            "Received ClaimId: {}",
+            "Received CaseId: {}",
             claimId
         );
 
-        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId));
+        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
         log.info(
             "CaseDataResponse : {}",
             caseDataResponse
         );
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
-    @GetMapping(path = "/list")
+    @GetMapping(path = "/")
     @ApiOperation("Handles all callbacks from CCD")
     public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
 
