@@ -316,7 +316,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -428,11 +427,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             if (respondent2NotPresent(caseData)
                 || applicant2Present(caseData)
-                || caseData.getRespondent2ResponseDate() != null ) {
-                updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                || caseData.getRespondent2ResponseDate() != null) {
+                updatedData.applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
             }
-
             // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
             if (ofNullable(caseData.getRespondent2()).isPresent()
                 && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -486,7 +483,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean respondent2NotPresent(CaseData caseData) {
-        return caseData.getAddRespondent2() == null || (caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO);
+        return caseData.getAddRespondent2() == null
+            || (caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2() == NO);
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
