@@ -44,7 +44,6 @@ public class CasesController {
         );
 
         var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
-        caseDataResponse.setTotalClaimAmount(BigDecimal.valueOf(150.00));
         log.info(
             "CaseDataResponse : {}",
             caseDataResponse
