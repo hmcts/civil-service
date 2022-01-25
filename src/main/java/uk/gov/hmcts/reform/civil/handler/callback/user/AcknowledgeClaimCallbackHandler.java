@@ -107,11 +107,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
-            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
         if (featureToggleService.isMultipartyEnabled()
