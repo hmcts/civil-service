@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 
@@ -40,6 +41,7 @@ class InitiateGeneralApplicationServiceTest {
     private static final String STRING_CONSTANT = "this is a string";
     private static final String STRING_NUM_CONSTANT = "123456789";
     private static final LocalDate APP_DATE_EPOCH = EPOCH;
+    private static final DynamicList PBALIST = DynamicList.builder().build();
 
     @Autowired
     private InitiateGeneralApplicationService service;
@@ -53,7 +55,7 @@ class InitiateGeneralApplicationServiceTest {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                                      .applicantsPbaAccounts(PBALIST)
                                       .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -112,7 +114,7 @@ class InitiateGeneralApplicationServiceTest {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccountsList(STRING_NUM_CONSTANT)
+                        .applicantsPbaAccounts(PBALIST)
                         .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
@@ -170,7 +172,7 @@ class InitiateGeneralApplicationServiceTest {
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
         CaseData caseData = getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserInfo.builder().build());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
@@ -180,7 +182,7 @@ class InitiateGeneralApplicationServiceTest {
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
         CaseData caseData = getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserInfo.builder().build());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
@@ -188,7 +190,7 @@ class InitiateGeneralApplicationServiceTest {
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccountsList()).isNull();
+        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccounts()).isNull();
         assertThat(caseData.getGeneralAppPBADetails().getPbaReference()).isNull();
         assertThat(caseData.getGeneralAppDetailsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppReasonsOfOrder()).isEmpty();
@@ -229,8 +231,8 @@ class InitiateGeneralApplicationServiceTest {
 
         assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
         assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccountsList())
-            .isEqualTo(STRING_NUM_CONSTANT);
+        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
+            .isEqualTo(PBALIST);
         assertThat(application.getGeneralAppPBADetails().getPbaReference())
             .isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);

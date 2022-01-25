@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -14,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 
@@ -29,8 +33,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
-        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData),
+    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserInfo userInfo) {
+        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userInfo),
                                                                         caseData.getGeneralApplications());
         return dataBuilder
             .generalApplications(applications)
@@ -47,7 +51,52 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData) {
+    private IdamUserDetails getApplicant1SolicitorUserDetails(CaseData caseData, UserInfo userInfo) {
+        IdamUserDetails applicantDetails = IdamUserDetails.builder().build();
+
+        if (caseData.getApplicantSolicitor1UserDetails() != null) {
+            if (isApplicantSolicitorEmailExits(caseData.getApplicantSolicitor1UserDetails(), userInfo)) {
+                return caseData.getApplicantSolicitor1UserDetails();
+            } else {
+                applicantDetails.toBuilder().email(userInfo.getGivenName())
+                    .id(userInfo.getUid()).build();
+                return applicantDetails;
+            }
+        }
+        return caseData.getApplicantSolicitor1UserDetails();
+        // throw new IllegalArgumentException("ApplicantSolicitor1UserDetails::emailData cannot be null");
+    }
+
+    private OrganisationPolicy getApplicant1OrganisationPolicy(CaseData caseData, UserInfo userInfo) {
+
+        if (caseData.getApplicant1OrganisationPolicy() != null
+            && caseData.getApplicant1OrganisationPolicy() != null) {
+            if (isApplicantSolicitorEmailExits(caseData.getApplicantSolicitor1UserDetails(), userInfo)) {
+                return caseData.getApplicant1OrganisationPolicy();
+            } else {
+                return caseData.getRespondent1OrganisationPolicy();
+            }
+        }
+        return caseData.getApplicant1OrganisationPolicy();
+        // throw new IllegalArgumentException("OrganisationPolicy and Applicant1SolicitorUserDetails are required");
+    }
+
+    private String getRespondent1SolicitorEmail(CaseData caseData, UserInfo userInfo) {
+
+        if (caseData.getRespondentSolicitor1EmailAddress() != null) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        } else {
+            return userInfo.getGivenName();
+        }
+        // throw new IllegalArgumentException("RespondentSolicitor1EmailAddress cannot be null");
+    }
+
+    private boolean isApplicantSolicitorEmailExits(IdamUserDetails applicantSolicitor, UserInfo userInfo) {
+        return StringUtils.isNotBlank(applicantSolicitor.getEmail())
+            && userInfo.getGivenName().equals(applicantSolicitor.getEmail());
+    }
+
+    private GeneralApplication buildApplication(CaseData caseData, UserInfo userInfo) {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
             applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
@@ -60,6 +109,10 @@ public class InitiateGeneralApplicationService {
 
         return applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .applicantSolicitor1UserDetails(getApplicant1SolicitorUserDetails(caseData, userInfo))
+            .applicant1OrganisationPolicy(getApplicant1OrganisationPolicy(caseData, userInfo))
+            .respondent1OrganisationPolicy(getApplicant1OrganisationPolicy(caseData, userInfo))
+            .respondentSolicitor1EmailAddress(getRespondent1SolicitorEmail(caseData, userInfo))
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
