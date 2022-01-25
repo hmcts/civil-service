@@ -316,6 +316,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
+
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -425,9 +426,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.respondent1ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-            if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
-                || caseData.getRespondent2ResponseDate() != null
-                || (caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES)) {
+            if (respondent2NotPresent(caseData)
+                || applicant2Present(caseData)
+                || caseData.getRespondent2ResponseDate() != null ) {
                 updatedData
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
             }
@@ -478,6 +479,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
+    }
+
+    private boolean applicant2Present(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
+    }
+
+    private boolean respondent2NotPresent(CaseData caseData) {
+        return caseData.getAddRespondent2() == null || (caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO);
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
@@ -538,8 +547,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {
         if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
             && (caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(
             RespondentResponseType.FULL_DEFENCE))) {
