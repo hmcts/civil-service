@@ -55,7 +55,7 @@ public class CasesController {
 
         log.info("Received callback from CCD getting claim list");
 
-        Query query = new Query(QueryBuilders.matchQuery("case_type_id", "CIVIL"), emptyList(), 0);
+        Query query = new Query(QueryBuilders.termsQuery("reference", "1641908933090158","1643189246210274" ), emptyList(), 0);
         SearchResult claims = coreCaseDataService.searchCases(query);
 
         return new ResponseEntity<>(claims, HttpStatus.OK);
