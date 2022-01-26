@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 public class DocmosisTemplateDataUtils {
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
-
+    public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
         String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
@@ -75,11 +75,11 @@ public class DocmosisTemplateDataUtils {
             .applicantSolicitor1Reference(
                 ofNullable(solicitorReferences)
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                    .orElse("Not Provided"))
+                    .orElse(REFERENCE_NOT_PROVIDED))
             .respondentSolicitor1Reference(
                 ofNullable(solicitorReferences)
                     .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                    .orElse("Not Provided"))
+                    .orElse(REFERENCE_NOT_PROVIDED))
             .build();
     }
 
@@ -104,11 +104,19 @@ public class DocmosisTemplateDataUtils {
                 && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
                 if (null == caseData.getRespondentSolicitor2Reference()) {
                     return SolicitorReferences
-                        .builder().respondentSolicitor2Reference("Not Provided")
+                        .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
+                        .applicantSolicitor1Reference(
+                            ofNullable(caseData.getSolicitorReferences())
+                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                .orElse(REFERENCE_NOT_PROVIDED))
                         .build();
                 }
                 return SolicitorReferences
                     .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                    .applicantSolicitor1Reference(
+                        ofNullable(caseData.getSolicitorReferences())
+                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                            .orElse(REFERENCE_NOT_PROVIDED))
                     .build();
 
             } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
@@ -118,11 +126,19 @@ public class DocmosisTemplateDataUtils {
                     .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
                     if (null == caseData.getRespondentSolicitor2Reference()) {
                         return SolicitorReferences
-                            .builder().respondentSolicitor2Reference("Not Provided")
+                            .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
+                            .applicantSolicitor1Reference(
+                                ofNullable(caseData.getSolicitorReferences())
+                                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                    .orElse(REFERENCE_NOT_PROVIDED))
                             .build();
                     }
                     return SolicitorReferences
                         .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                        .applicantSolicitor1Reference(
+                            ofNullable(caseData.getSolicitorReferences())
+                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                .orElse(REFERENCE_NOT_PROVIDED))
                         .build();
 
                 } else { //case where resp 2 acknowledges first
@@ -131,7 +147,11 @@ public class DocmosisTemplateDataUtils {
                         .respondentSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                                .orElse("Not Provided"))
+                                .orElse(REFERENCE_NOT_PROVIDED))
+                        .applicantSolicitor1Reference(
+                            ofNullable(caseData.getSolicitorReferences())
+                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                .orElse(REFERENCE_NOT_PROVIDED))
                         .build();
                 }
             } else { //case where respondent 1 acknowledges first
@@ -140,7 +160,11 @@ public class DocmosisTemplateDataUtils {
                     .respondentSolicitor1Reference(
                         ofNullable(caseData.getSolicitorReferences())
                             .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                            .orElse("Not Provided"))
+                            .orElse(REFERENCE_NOT_PROVIDED))
+                    .applicantSolicitor1Reference(
+                        ofNullable(caseData.getSolicitorReferences())
+                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                            .orElse(REFERENCE_NOT_PROVIDED))
                     .build();
             }
         } else { //cases other than ONE_V_TWO_TWO_LEGAL_REP
@@ -149,11 +173,11 @@ public class DocmosisTemplateDataUtils {
                 .applicantSolicitor1Reference(
                     ofNullable(caseData.getSolicitorReferences())
                         .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                        .orElse("Not Provided"))
+                        .orElse(REFERENCE_NOT_PROVIDED))
                 .respondentSolicitor1Reference(
                     ofNullable(caseData.getSolicitorReferences())
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                        .orElse("Not Provided"))
+                        .orElse(REFERENCE_NOT_PROVIDED))
                 .build();
         }
 

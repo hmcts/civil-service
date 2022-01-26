@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +29,8 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -678,6 +682,30 @@ public class EventHistoryMapper {
         if (dateReceived == null) {
             return;
         }
+        // date and time check to find the login
+        LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+
+        //finding extension date for the correct respondent in a 1v2 different solicitor scenario
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1TimeExtensionDate() == null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+                dateReceived  = caseData.getRespondent2TimeExtensionDate();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                if (caseData.getRespondent2TimeExtensionDate()
+                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
+                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+                    dateReceived  = caseData.getRespondent2TimeExtensionDate();
+                } else {
+                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+                    dateReceived  = caseData.getRespondent1TimeExtensionDate();
+
+                }
+            }
+        }
+
         builder.consentExtensionFilingDefence(
             List.of(
                 Event.builder()
@@ -685,11 +713,10 @@ public class EventHistoryMapper {
                     .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
                     .dateReceived(dateReceived)
                     .litigiousPartyID("002")
-                    .eventDetailsText(format("agreedExtensionDate: %s", caseData
-                        .getRespondentSolicitor1AgreedDeadlineExtension()
+                    .eventDetailsText(format("agreedExtensionDate: %s", extensionDate
                         .format(ISO_DATE)))
                     .eventDetails(EventDetails.builder()
-                                      .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                      .agreedExtensionDate(extensionDate
                                                                .format(ISO_DATE))
                                       .build())
                     .build()
