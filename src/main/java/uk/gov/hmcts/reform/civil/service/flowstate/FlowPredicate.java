@@ -122,8 +122,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         caseData.getRespondent1AcknowledgeNotificationDate() != null;
 
-    public static final Predicate<CaseData> respondent1TimeExtension = caseData ->
-        caseData.getRespondent1TimeExtensionDate() != null;
+    public static final Predicate<CaseData> respondentTimeExtension = caseData ->
+        (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
+            || (caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2ResponseDate() == null);
 
     public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -173,6 +174,11 @@ public class FlowPredicate {
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
                     || (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                     && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
+            case TWO_V_ONE:
+                return (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) || FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
+                    && !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) && FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default:
                 return false;
         }
@@ -197,6 +203,9 @@ public class FlowPredicate {
                 return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
                     && (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                     && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
+            case TWO_V_ONE:
+                return !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) || FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default:
                 return false;
         }

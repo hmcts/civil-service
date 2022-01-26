@@ -213,7 +213,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INFORM_AGREED_EXTENSION_DATE
                     }
                 ),
                 of(
@@ -241,7 +242,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INFORM_AGREED_EXTENSION_DATE
                     }
                 ),
                 of(
@@ -510,6 +512,8 @@ class FlowStateAllowedEventServiceTest {
                 of(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS, new String[]{CLAIM_NOTIFIED.fullName()}),
                 of(INFORM_AGREED_EXTENSION_DATE, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
                 of(
