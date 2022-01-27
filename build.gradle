@@ -198,6 +198,10 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
 
+task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:nightly-multiparty'
+}
+
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:crossbrowser'
 }
