@@ -41,6 +41,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
     public static final String HEADER = "# You cannot request default judgment";
+    public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
+    public static final String TRIAL_TEXT = "will be trial hearing provided text";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
 
@@ -81,6 +83,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
         List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
             isValidRange(hearingDatesElement);
+
+//        var a = caseData.getDetailsOfDirectionDisposal();
+//        System.out.println(a);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -132,9 +138,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse populateText(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.detailsOfDirectionDefault(" ");
-        caseDataBuilder.detailsOfDirectionDisposal("will be disposal hearing provided text");
-        caseDataBuilder.detailsOfDirectionTrial("will be trial hearing provided text");
+
+        caseDataBuilder.detailsOfDirectionDisposal(DISPOSAL_TEXT);
+        caseDataBuilder.detailsOfDirectionTrial(TRIAL_TEXT);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
