@@ -39,7 +39,7 @@ public class GAHearingDetails {
     private final String supportRequirementSignLanguage;
     private final GAHearingType hearingPreferencesPreferredType;
     private final YesOrNo unavailableTrailRequiredYesOrNo;
-    private final String supportRequirementLanguageInterpreter;
+    private final String supportReqLanguageInterpreter;
 
     @JsonCreator
     GAHearingDetails(@JsonProperty("judgeName") String judgeName,
@@ -62,8 +62,8 @@ public class GAHearingDetails {
                      @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
                      @JsonProperty("HearingPreferencesPreferredType") GAHearingType hearingPreferencesPreferredType,
                      @JsonProperty("UnavailableTrailRequiredYesOrNo") YesOrNo unavailableTrailRequiredYesOrNo,
-                     @JsonProperty("SupportRequirementLanguageInterpreter")
-                         String supportRequirementLanguageInterpreter) {
+                     @JsonProperty("SupportReqLanguageInterpreter")
+                         String supportReqLanguageInterpreter) {
         this.judgeName = judgeName;
         this.hearingDate = hearingDate;
         this.trialDateFrom = trialDateFrom;
@@ -84,6 +84,6 @@ public class GAHearingDetails {
         this.supportRequirementSignLanguage = supportRequirementSignLanguage;
         this.hearingPreferencesPreferredType = hearingPreferencesPreferredType;
         this.unavailableTrailRequiredYesOrNo = unavailableTrailRequiredYesOrNo;
-        this.supportRequirementLanguageInterpreter = supportRequirementLanguageInterpreter;
+        this.supportReqLanguageInterpreter = supportReqLanguageInterpreter;
     }
 }

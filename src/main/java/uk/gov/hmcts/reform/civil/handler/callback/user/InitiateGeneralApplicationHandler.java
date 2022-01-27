@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
+    private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -49,6 +50,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::getPbaAccounts,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
+            callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -102,6 +104,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .errors(errors)
                 .build();
     }
+
+    private CallbackResponse gaValidateHearingScreen(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(Collections.emptyList())
+                .build();
+    }
+
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();

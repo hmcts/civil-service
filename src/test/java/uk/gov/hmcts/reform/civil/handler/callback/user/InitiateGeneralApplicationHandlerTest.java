@@ -127,7 +127,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                           .supportRequirementSignLanguage(STRING_CONSTANT)
                                           .hearingPreferencesPreferredType(IN_PERSON)
                                           .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                                          .supportReqLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .build();
     }
@@ -187,7 +187,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                         .supportRequirementSignLanguage(STRING_CONSTANT)
                         .hearingPreferencesPreferredType(IN_PERSON)
                         .unavailableTrailRequiredYesOrNo(YES)
-                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .supportReqLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .build();
     }

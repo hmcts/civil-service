@@ -99,7 +99,7 @@ class InitiateGeneralApplicationServiceTest {
                                           .supportRequirementSignLanguage(STRING_CONSTANT)
                                           .hearingPreferencesPreferredType(IN_PERSON)
                                           .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                                          .supportReqLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .build();
     }
@@ -158,7 +158,7 @@ class InitiateGeneralApplicationServiceTest {
                         .supportRequirementSignLanguage(STRING_CONSTANT)
                         .hearingPreferencesPreferredType(IN_PERSON)
                         .unavailableTrailRequiredYesOrNo(YES)
-                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .supportReqLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .build();
         return getTestCaseDataWithEmptyCollectionOfApps(caseData)
@@ -221,7 +221,7 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isNull();
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType()).isNull();
         assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isNull();
-        assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isNull();
+        assertThat(generalAppHearingDetails.getSupportReqLanguageInterpreter()).isNull();
     }
 
     private void assertCollectionPopulated(CaseData caseData) {
@@ -279,7 +279,7 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType())
             .isEqualTo(IN_PERSON);
         assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isEqualTo(YES);
-        assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
+        assertThat(generalAppHearingDetails.getSupportReqLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
     }
 }
