@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -16,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -26,10 +29,13 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE,
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC);
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC
+    );
 
     public static final String TASK_ID = "DefendantResponseFullDefenceNotifyApplicantSolicitor1";
     public static final String TASK_ID_CC = "DefendantResponseFullDefenceNotifyRespondentSolicitor1CC";
+    public static final String TASK_ID_CC_RESP2 = "DefendantResponseFullDefenceNotifyRespondentSolicitor2CC";
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -38,13 +44,24 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForDefendantResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForDefendantResponse,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifySolicitorsForDefendantResponse
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        switch (caseEvent) {
+            case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE:
+                return TASK_ID;
+            case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
+                return TASK_ID_CC;
+            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
+                return TASK_ID_CC_RESP2;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
     }
 
     @Override
@@ -67,6 +84,42 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        String respondentName = getPartyNameBasedOnType(caseData.getRespondent1());
+        String recipient;
+
+        //determine recipient for notification, based on Camunda Event ID
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        switch (caseEvent) {
+            case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE:
+                recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+                break;
+            case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
+                recipient = caseData.getRespondentSolicitor1EmailAddress();
+                break;
+            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
+                recipient = caseData.getRespondentSolicitor2EmailAddress();
+                respondentName = getPartyNameBasedOnType(caseData.getRespondent2());
+                break;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
+
+        sendNotificationToSolicitor(caseData, recipient, respondentName);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private void sendNotificationToSolicitor(CaseData caseData, String recipient, String respondentName) {
+        notificationService.sendMail(
+            recipient,
+            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
+            addPropertiesForMultiparty(caseData, respondentName),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
@@ -75,6 +128,14 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         );
     }
 
+    public Map<String, String> addPropertiesForMultiparty(CaseData caseData, String respondentName) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, respondentName
+        );
+    }
+
+    //used by existing production callback - non MP
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.name());
