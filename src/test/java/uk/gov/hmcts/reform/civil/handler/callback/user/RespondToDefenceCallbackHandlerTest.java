@@ -418,4 +418,45 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
     }
+
+    @Nested
+    class MidSetApplicantsProceedIntention {
+
+        @Test
+        void shouldSetToYes_whenApplicant1IntendToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ProceedWithClaim(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "set-applicants-proceed-intention");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicantsProceedIntention").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetToYes_whenApplicant2IntendToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant2ProceedWithClaim(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "set-applicants-proceed-intention");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicantsProceedIntention").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetToNo_whenApplicant1OrApplicant2DoNotIntendToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ProceedWithClaim(NO)
+                .applicant2ProceedWithClaim(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "set-applicants-proceed-intention");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicantsProceedIntention").isEqualTo("No");
+        }
+    }
 }

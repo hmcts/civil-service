@@ -150,6 +150,7 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
+    protected YesOrNo applicant2ProceedWithClaim;
     protected ResponseDocument applicant1DefenceResponseDocument;
     protected BusinessProcess businessProcess;
 
@@ -435,6 +436,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1ProceedWithClaim(YesOrNo yesOrNo) {
         this.applicant1ProceedWithClaim = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant2ProceedWithClaim(YesOrNo yesOrNo) {
+        this.applicant2ProceedWithClaim = yesOrNo;
         return this;
     }
 
@@ -1914,6 +1920,7 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeToApplicant2(respondent1ClaimResponseTypeToApplicant2)
             // Claimant Response
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
+            .applicant2ProceedWithClaim(applicant2ProceedWithClaim)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
 
             //Case procceds in Caseman
