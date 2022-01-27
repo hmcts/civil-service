@@ -257,4 +257,7 @@ public class CaseData implements MappableObject {
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
     private final String bothDefendants;
+    private final String detailsOfDirectionDefault;
+    private final String detailsOfDirectionDisposal;
+    private final String detailsOfDirectionTrial;
 }

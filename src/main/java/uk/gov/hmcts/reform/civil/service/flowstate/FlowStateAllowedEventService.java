@@ -91,7 +91,9 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+
+                DEFAULT_JUDGEMENT
             )
         ),
 
