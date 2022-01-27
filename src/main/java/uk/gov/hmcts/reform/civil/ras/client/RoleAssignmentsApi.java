@@ -11,7 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @FeignClient(name = "ras-api", url = "${role-assignment-service.api.url}")
-public interface RoleAssignmentApi {
+public interface RoleAssignmentsApi {
 
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 

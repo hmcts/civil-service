@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.RoleAssignmentService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 
 import static java.util.Collections.emptyList;
 @Api
@@ -32,7 +32,7 @@ public class CasesController {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final RoleAssignmentService roleAssignmentService;
+    private final RoleAssignmentsService roleAssignmentsService;
 
     @GetMapping(path = {
         "/{cid}",
@@ -72,7 +72,7 @@ public class CasesController {
                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                  @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization) {
         log.info( "Received ActorId: {}",actorId);
-        String response = roleAssignmentService.getRoleAssignments(actorId);
+        String response = roleAssignmentsService.getRoleAssignments(actorId);
         log.info("ActorId: {}", response);
         return response;
     }

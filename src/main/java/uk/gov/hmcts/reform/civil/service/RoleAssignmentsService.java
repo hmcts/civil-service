@@ -6,16 +6,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.TestUserConfiguration;
-import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentApi;
+import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 @Service
 @RequiredArgsConstructor
-public class RoleAssignmentService {
+public class RoleAssignmentsService {
 
-    Logger log = LoggerFactory.getLogger(RoleAssignmentService.class);
+    Logger log = LoggerFactory.getLogger(RoleAssignmentsService.class);
 
-    private final RoleAssignmentApi roleAssignmentApi;
+    private final RoleAssignmentsApi roleAssignmentApi;
     private final IdamClient idamClient;
     private final TestUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
