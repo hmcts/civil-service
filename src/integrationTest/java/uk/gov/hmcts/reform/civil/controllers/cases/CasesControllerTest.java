@@ -16,8 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class CasesControllerTest extends BaseIntegrationTest {
 
-    private static final String CLAIMS_URL = "/cases/{cid}";
-    private static final String CLAIMS_LIST_URL = "/cases/";
+    private static final String CASES_URL = "/cases/{cid}";
+    private static final String CASES_LIST_URL = "/cases/";
+    private static final String CASES_ACTOR_URL = "/cases/";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -38,14 +39,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenReturn(expectedCaseDetails);
         when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
             .thenReturn(expectedCaseData);
-        doGet(BEARER_TOKEN, CLAIMS_URL, 1L)
+        doGet(BEARER_TOKEN, CASES_URL, 1L)
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
     @Test
     @SneakyThrows
     public void shouldReturnOk() {
-        doGet(BEARER_TOKEN, CLAIMS_LIST_URL)
+        doGet(BEARER_TOKEN, CASES_LIST_URL)
             .andExpect(status().isOk());
     }
 
@@ -53,5 +54,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnRASAssignment() {
         when(roleAssignmentsService.getRoleAssignments(ACTOR_ID)).thenReturn(ACTOR_ROLE);
+        doGet(BEARER_TOKEN, CASES_ACTOR_URL, ACTOR_ID)
+            .andExpect(status().isOk());
     }
 }
