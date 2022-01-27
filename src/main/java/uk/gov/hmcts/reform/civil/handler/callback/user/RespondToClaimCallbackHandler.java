@@ -486,6 +486,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+        updatedData.isRespondent1(null);
 
         if (featureToggleService.isMultipartyEnabled()
             && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
@@ -495,7 +496,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
         }
-        updatedData.isRespondent1(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
