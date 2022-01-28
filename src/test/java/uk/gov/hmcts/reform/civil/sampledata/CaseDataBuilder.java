@@ -1640,7 +1640,7 @@ public class CaseDataBuilder {
         atStateClaimDetailsNotified();
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
-        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
 
@@ -1903,6 +1903,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2AgreedDeadlineExtension(respondentSolicitor2AgreedDeadlineExtension)
             // Acknowledge Claim
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
+            .respondent2ClaimResponseIntentionType(respondent2ClaimResponseIntentionType)
             // Defendant Response Defendant 1
             .respondent1ClaimResponseType(respondent1ClaimResponseType)
             .respondent1ClaimResponseDocument(respondent1ClaimResponseDocument)
