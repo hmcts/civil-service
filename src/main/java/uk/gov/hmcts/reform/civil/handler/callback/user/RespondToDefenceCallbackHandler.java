@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ClaimantResponseScenarioFlag;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -32,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -44,6 +49,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -53,7 +59,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::populateRespondent1ClaimResponseDocumentCopy,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
@@ -62,6 +68,49 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    private CallbackResponse populateRespondent1ClaimResponseDocumentCopy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder()
+                .respondent1ClaimResponseDocumentCopy(caseData.getRespondent1ClaimResponseDocument());
+
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
+        if (featureToggleService.isMultipartyEnabled()){
+            switch (multiPartyScenario) {
+                case TWO_V_ONE:
+                    updatedData
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.TWO_V_ONE)
+                        .build();
+                    break;
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                    updatedData
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_TWO_SAME_SOLICITOR)
+                        .build();
+                    break;
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    updatedData
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_TWO_DIFFERENT_SOLICITOR)
+                        .build();
+                    break;
+                case ONE_V_ONE:
+                    updatedData
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_ONE)
+                        .build();
+                    break;
+                default:
+                    updatedData
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.UNSPECIFIED_SCENARIO)
+                        .build();
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
@@ -118,7 +167,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(time.now());
 
-        if (caseData.getApplicant1ProceedWithClaim() == YES) {
+        if (YES.equals(caseData.getApplicant1ProceedWithClaim()) || YES.equals(caseData.getApplicant2ProceedWithClaim())) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()

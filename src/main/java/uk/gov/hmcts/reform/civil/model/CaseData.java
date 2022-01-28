@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimantResponseScenarioFlag;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -124,9 +125,14 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent2ClaimResponseType;
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
+    private final ResponseDocument respondent1ClaimResponseDocumentCopy;
     private final ResponseDocument respondent2ClaimResponseDocument;
 
     private final YesOrNo applicant1ProceedWithClaim;
+    private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant1ProceedWithClaimMultiParty1v2;
+    private final YesOrNo applicant2ProceedWithClaimMultiParty1v2;
     private final YesOrNo applicant1ProceedWithClaimRespondent2;
     private final YesOrNo applicant2ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
@@ -245,6 +251,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
     private YesOrNo applicantsProceedIntention;
+    private final ClaimantResponseScenarioFlag claimantResponseScenarioFlag;
 
     // dates
     private final LocalDateTime submittedDate;

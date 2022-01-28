@@ -131,9 +131,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-            .applicant(getApplicant(caseData))
-            .applicant2(TWO_V_ONE.equals(MultiPartyScenario
-                .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
+            .applicant(!isClaimantResponse(caseData) || YES.equals(caseData.getApplicant1ProceedWithClaim()) ? getApplicant(caseData) : null)
+            .applicant2((TWO_V_ONE.equals(MultiPartyScenario
+                .getMultiPartyScenario(caseData)) && !isClaimantResponse(caseData))
+                            || YES.equals(caseData.getApplicant2ProceedWithClaim()) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -147,6 +148,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
+    }
+
+    private boolean isClaimantResponse(CaseData caseData) {
+        if (caseData.getApplicant1ProceedWithClaim() == null &&  caseData.getApplicant2ProceedWithClaim() == null) {
+            return false;
+        }
+        return true;
     }
 
     private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
