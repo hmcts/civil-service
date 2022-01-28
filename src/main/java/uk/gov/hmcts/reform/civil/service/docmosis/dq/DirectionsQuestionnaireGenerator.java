@@ -59,6 +59,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
             .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+
+        if(TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+        && isMulitPartyClaimantResponseButOneProceeding(caseData)) {
+            templateId = N181;
+        }
+
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData,
@@ -157,6 +163,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return true;
     }
 
+    private boolean isMulitPartyClaimantResponseButOneProceeding(CaseData caseData) {
+        if((NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
+            || (NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()))) {
+            return true;
+        }
+        return false;
+    }
+
     private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
         DQ dq = caseData.getRespondent2DQ();
 
@@ -215,6 +231,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private Party getApplicant(CaseData caseData) {
         var applicant = caseData.getApplicant1();
+
+        if(TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && isMulitPartyClaimantResponseButOneProceeding(caseData)) {
+            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())){
+                applicant = caseData.getApplicant2();
+            }
+        }
+
         return Party.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())

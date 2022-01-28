@@ -127,7 +127,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             caseData.toBuilder().applicantsProceedIntention(NO);
 
         if(YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant2ProceedWithClaim())) {
+            || YES.equals(caseData.getApplicant2ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty1v2())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty1v2())) {
             updatedData.applicantsProceedIntention(YES);
         }
 
