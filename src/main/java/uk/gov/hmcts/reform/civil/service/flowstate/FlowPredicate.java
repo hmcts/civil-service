@@ -120,7 +120,8 @@ public class FlowPredicate {
             && hasNotifiedClaimDetailsToBoth.negate().test(caseData);
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
-        caseData.getRespondent1AcknowledgeNotificationDate() != null;
+        caseData.getRespondent1AcknowledgeNotificationDate() != null
+            || caseData.getRespondent2AcknowledgeNotificationDate() != null;
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
         (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)

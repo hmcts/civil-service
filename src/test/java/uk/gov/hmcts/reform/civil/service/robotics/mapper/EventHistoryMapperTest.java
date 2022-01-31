@@ -989,6 +989,51 @@ class EventHistoryMapperTest {
             );
 
         }
+
+        @Test
+        void shouldPrepareExpectedEvent_whenRespondent2AcknowledgesRespondent1NotAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+                .respondent1AcknowledgeNotificationDate(null)
+                .respondent1ResponseDeadline(null)
+                .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .build();
+
+            Event expectedAcknowledgementOfServiceReceived = Event.builder()
+                .eventSequence(1)
+                .eventCode("38")
+                .dateReceived(caseData.getRespondent2AcknowledgeNotificationDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .responseIntention(caseData.getRespondent2ClaimResponseIntentionType()
+                                                         .getLabel())
+                                  .build())
+                .eventDetailsText(format(
+                    "responseIntention: %s",
+                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                ))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
+                .containsExactly(expectedAcknowledgementOfServiceReceived);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+
+        }
     }
 
     @Nested

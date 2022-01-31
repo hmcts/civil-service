@@ -1637,7 +1637,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2() {
-        atStateClaimDetailsNotified();
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
