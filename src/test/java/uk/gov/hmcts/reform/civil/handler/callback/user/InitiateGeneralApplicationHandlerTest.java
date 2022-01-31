@@ -70,9 +70,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private UserService userService;
-
     @MockBean
     private InitiateGeneralApplicationService initiateGeneralAppService;
 

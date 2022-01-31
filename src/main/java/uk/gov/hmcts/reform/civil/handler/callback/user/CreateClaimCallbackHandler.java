@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -107,6 +108,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -201,8 +203,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .respondent2SameLegalRepresentative(NO);
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        // only default this to NO if respondent 1 isn't represented
+        if (callbackParams.getCaseData().getRespondent1Represented().equals(NO)) {
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -284,6 +290,37 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
+
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

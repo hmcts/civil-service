@@ -155,8 +155,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
+            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -257,7 +260,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         List<String> errors = new ArrayList<>();
-        if (isFullDefenceForBothDefendants(caseData)) {
+        if (isFullDefenceForBothDefendants(caseData) && respondent2HasSameLegalRep(caseData)) {
             errors.add(
                 "It is not possible to respond for both defendants with Reject all of the claim. "
                     + "Please go back and select single response option."
@@ -328,6 +331,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
+
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -336,6 +341,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         LocalDateTime responseDate = time.now();
@@ -425,13 +431,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.respondent1ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
-            if ((caseData.getAddRespondent2() != null && caseData.getAddRespondent2() == NO)
-                || caseData.getRespondent2ResponseDate() != null
-                || (caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES)) {
-                updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+            if (respondent2NotPresent(caseData)
+                || applicant2Present(caseData)
+                || caseData.getRespondent2ResponseDate() != null) {
+                updatedData.applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
             }
-
             // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
             if (ofNullable(caseData.getRespondent2()).isPresent()
                 && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -442,6 +446,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData
                     .respondent2(updatedRespondent2)
                     .respondent2Copy(null);
+                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
@@ -478,6 +483,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
+    }
+
+    private boolean applicant2Present(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
+    }
+
+    private boolean respondent2NotPresent(CaseData caseData) {
+        return caseData.getAddRespondent2() == null
+            || (caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2() == NO);
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
@@ -538,8 +553,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {
         if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
             && (caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(
             RespondentResponseType.FULL_DEFENCE))) {
