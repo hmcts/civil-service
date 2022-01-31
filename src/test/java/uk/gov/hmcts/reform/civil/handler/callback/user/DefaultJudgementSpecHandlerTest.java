@@ -101,12 +101,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String cprRequiredInfo = "<br />You can only request default judgment if:"
                 + "%n%n * The time for responding to the claim has expired. "
                 + "%n%n * The Defendant has not responded to the claim."
-                + "%n%n * There is no outstanding application by the Defendant to strike out the claim for " +
-                "summary judgment."
+                + "%n%n * There is no outstanding application by the Defendant to strike out the claim for "
+                + "summary judgment."
                 + "%n%n * The Defendant has not satisfied the whole claim, including costs."
                 + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-                + "%n%n You can make another default judgment request when you know all these statements " +
-                "have been met.";
+                + "%n%n You can make another default judgment request when you know all these statements "
+                + "have been met.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
