@@ -75,13 +75,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return format(CPR_REQUIRED_INFO);
     }
 
-
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getRespondent1ResponseDeadline()) &&
-            caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
+        if (nonNull(caseData.getRespondent1ResponseDeadline())
+            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
         }
@@ -102,8 +101,5 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
     }
-
-
 }
