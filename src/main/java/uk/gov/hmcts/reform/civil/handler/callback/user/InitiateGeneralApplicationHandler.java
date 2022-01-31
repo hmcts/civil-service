@@ -46,7 +46,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
     private final UserService userService;
-    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
