@@ -25,6 +25,7 @@ class UserServiceTest {
     private static final List<String> ROLES = Lists.newArrayList("citizen");
 
     private static final String AUTHORISATION = "Bearer I am a valid token";
+    private static final String PASSWORD = "User password";
 
     private static final UserInfo userInfo = UserInfo.builder()
         .sub(SUB)
@@ -44,6 +45,7 @@ class UserServiceTest {
     public void setup() {
         userService = new UserService(idamClient);
         when(idamClient.getUserInfo(AUTHORISATION)).thenReturn(userInfo);
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenReturn(AUTHORISATION);
     }
 
     @Test
@@ -56,5 +58,13 @@ class UserServiceTest {
         assertThat(found.getGivenName()).isEqualTo(GIVEN_NAME);
         assertThat(found.getFamilyName()).isEqualTo(FAMILY_NAME);
         assertThat(found.getRoles()).isEqualTo(ROLES);
+    }
+
+
+    @Test
+    void shouldReturnAccessToken_whenValidUserDetailsAreGiven() {
+        String accessToken = userService.getAccessToken(SUB, PASSWORD);
+
+        assertThat(accessToken).isEqualTo(AUTHORISATION);
     }
 }
