@@ -9,9 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -27,7 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
@@ -92,6 +94,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                       .applicantsPbaAccounts(PBA_ACCOUNTS)
                                       .pbaReference(STRING_CONSTANT)
                                       .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .id(STRING_CONSTANT)
+                                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                .organisationID(STRING_CONSTANT).build())
+                                              .orgPolicyReference(STRING_CONSTANT).build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppInformOtherParty(GAInformOtherParty.builder()
@@ -325,11 +339,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmit {
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid")
-                                                                      .givenName("testUser@gmail.com")
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                      .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserInfo.class)))
+                                                         any(CaseData.class), any(UserDetails.class)))
                 .thenCallRealMethod();
             CaseData caseData = getTestCaseData(CaseDataBuilder.builder().build());
 

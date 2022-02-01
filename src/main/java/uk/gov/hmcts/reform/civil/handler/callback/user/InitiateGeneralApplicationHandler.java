@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
@@ -45,7 +45,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
-    private final UserService userService;
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -114,13 +114,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService.buildCaseData(dataBuilder, caseData, userInfo).toMap(objectMapper))
+            .data(initiateGeneralApplicationService.buildCaseData(dataBuilder, caseData, userDetails)
+                      .toMap(objectMapper))
             .build();
     }
 
