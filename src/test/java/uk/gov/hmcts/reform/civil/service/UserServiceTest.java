@@ -44,12 +44,11 @@ class UserServiceTest {
     @BeforeEach
     public void setup() {
         userService = new UserService(idamClient);
-        when(idamClient.getUserInfo(AUTHORISATION)).thenReturn(userInfo);
-        when(idamClient.getAccessToken(SUB, PASSWORD)).thenReturn(AUTHORISATION);
     }
 
     @Test
     void shouldReturnUserInfo_whenValidAuthToken() {
+        when(idamClient.getUserInfo(AUTHORISATION)).thenReturn(userInfo);
         UserInfo found = userService.getUserInfo(AUTHORISATION);
 
         assertThat(found.getSub()).isEqualTo(SUB);
@@ -62,6 +61,7 @@ class UserServiceTest {
 
     @Test
     void shouldReturnAccessToken_whenValidUserDetailsAreGiven() {
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenReturn(AUTHORISATION);
         String accessToken = userService.getAccessToken(SUB, PASSWORD);
 
         assertThat(accessToken).isEqualTo(AUTHORISATION);
