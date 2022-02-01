@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
@@ -21,7 +20,7 @@ public class OrganisationService {
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final PrdAdminUserConfiguration userConfig;
 
     //WARNING! below function findOrganisation is being used by both damages and specified claims,
@@ -40,7 +39,7 @@ public class OrganisationService {
     //WARNING! below function findOrganisationById is being used by both damages and specified claims,
     // changes to this code may break one of the claim journeys, check with respective teams before changing it
     public Optional<Organisation> findOrganisationById(String id) {
-        String authToken = idamClient.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+        String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
         try {
             return ofNullable(organisationApi.findOrganisationById(authToken, authTokenGenerator.generate(), id));
         } catch (FeignException.NotFound ex) {
