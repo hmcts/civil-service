@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -117,17 +118,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                           .judgeRequiredYesOrNo(YES)
                                           .trialRequiredYesOrNo(YES)
                                           .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
-                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
+                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                                  .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                                  .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                           .reasonForPreferredHearingType(STRING_CONSTANT)
                                           .telephoneHearingPreferredType(STRING_CONSTANT)
                                           .supportRequirementSignLanguage(STRING_CONSTANT)
                                           .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportReqLanguageInterpreter(STRING_CONSTANT)
+                                          .unavailableTrialRequiredYesOrNo(YES)
+                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .build();
     }
@@ -177,17 +179,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
                         .hearingDetailsEmailID(STRING_CONSTANT)
-                        .unavailableTrailDateTo(APP_DATE_EPOCH)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
                         .hearingPreferredLocation(DynamicList.builder().build())
-                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
                         .supportRequirementSignLanguage(STRING_CONSTANT)
                         .hearingPreferencesPreferredType(IN_PERSON)
-                        .unavailableTrailRequiredYesOrNo(YES)
-                        .supportReqLanguageInterpreter(STRING_CONSTANT)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .build();
     }

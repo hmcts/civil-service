@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -89,17 +90,18 @@ class InitiateGeneralApplicationServiceTest {
                                           .judgeRequiredYesOrNo(YES)
                                           .trialRequiredYesOrNo(YES)
                                           .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
-                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
+                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                                  .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                                  .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                           .reasonForPreferredHearingType(STRING_CONSTANT)
                                           .telephoneHearingPreferredType(STRING_CONSTANT)
                                           .supportRequirementSignLanguage(STRING_CONSTANT)
                                           .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportReqLanguageInterpreter(STRING_CONSTANT)
+                                          .unavailableTrialRequiredYesOrNo(YES)
+                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .build();
     }
@@ -148,17 +150,18 @@ class InitiateGeneralApplicationServiceTest {
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
                         .hearingDetailsEmailID(STRING_CONSTANT)
-                        .unavailableTrailDateTo(APP_DATE_EPOCH)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
                         .hearingPreferredLocation(DynamicList.builder().build())
-                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
                         .supportRequirementSignLanguage(STRING_CONSTANT)
                         .hearingPreferencesPreferredType(IN_PERSON)
-                        .unavailableTrailRequiredYesOrNo(YES)
-                        .supportReqLanguageInterpreter(STRING_CONSTANT)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .build();
         return getTestCaseDataWithEmptyCollectionOfApps(caseData)
@@ -212,16 +215,15 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getJudgeRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getTrialRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getHearingDetailsEmailID()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateTo()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateFrom()).isNull();
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isNull();
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber()).isNull();
         assertThat(generalAppHearingDetails.getReasonForPreferredHearingType()).isNull();
         assertThat(generalAppHearingDetails.getTelephoneHearingPreferredType()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isNull();
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isNull();
-        assertThat(generalAppHearingDetails.getSupportReqLanguageInterpreter()).isNull();
+        assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isNull();
+        assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isNull();
     }
 
     private void assertCollectionPopulated(CaseData caseData) {
@@ -268,8 +270,10 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getJudgeRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getHearingDetailsEmailID()).isEqualTo(STRING_CONSTANT);
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateTo()).isEqualTo(APP_DATE_EPOCH);
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateFrom()).isEqualTo(APP_DATE_EPOCH);
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
+                .getUnavailableTrialDateFrom()).isEqualTo(APP_DATE_EPOCH);
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
+                .getUnavailableTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber())
                 .isEqualTo(STRING_NUM_CONSTANT);
@@ -278,8 +282,8 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType())
             .isEqualTo(IN_PERSON);
-        assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isEqualTo(YES);
-        assertThat(generalAppHearingDetails.getSupportReqLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
+        assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isEqualTo(YES);
+        assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
     }
 }
