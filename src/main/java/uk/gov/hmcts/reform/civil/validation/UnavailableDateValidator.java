@@ -82,17 +82,11 @@ public class UnavailableDateValidator implements
     }
 
     private boolean checkOneYearValidation(LocalDate localDate) {
-        if (localDate != null && localDate.isAfter(LocalDate.now().plusYears(1))) {
-            return true;
-        }
-        return false;
+        return localDate != null && localDate.isAfter(LocalDate.now().plusYears(1));
     }
 
     private boolean checkPastDateValidation(LocalDate localDate) {
-        if (localDate != null && localDate.isBefore(LocalDate.now())) {
-            return true;
-        }
-        return false;
+        return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
     private boolean isNullOrEmpty(Hearing hearing) {
@@ -115,7 +109,6 @@ public class UnavailableDateValidator implements
 
     private List<String> dateValidation(List<Element<UnavailableDateLRspec>> unavailabeDate) {
         List<String> errors = new ArrayList<>();
-        System.out.println("inside date validation ");
         unavailabeDate.forEach(element -> {
             UnavailableDateLRspec unavailableDateLRspecElement = element.getValue();
             if (SpecJourneyConstantLRSpec.SINGLE_DATE.equals(unavailableDateLRspecElement.getUnavailableDateType())
@@ -146,6 +139,15 @@ public class UnavailableDateValidator implements
                 errors.add("From Date should be less than To Date");
             }
         });
+        return errors;
+    }
+
+    public List<String> validateFuturePaymentDate(LocalDate paymentDate) {
+        List<String> errors = new ArrayList<>();
+
+        if (checkOneYearValidation(paymentDate) || checkPastDateValidation(paymentDate)) {
+            errors.add("Date of first payment must be today or within the next 12 months");
+        }
         return errors;
     }
 

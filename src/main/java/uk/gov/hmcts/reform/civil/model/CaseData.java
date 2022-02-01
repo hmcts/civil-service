@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
@@ -71,6 +73,7 @@ public class CaseData implements MappableObject {
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final DynamicList defendantDetailsSpec;
+    private final DynamicList defendantDetails;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
@@ -92,6 +95,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;
+
     private final Address respondentSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
@@ -150,18 +154,26 @@ public class CaseData implements MappableObject {
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
+    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    private final PaymentUponCourtOrder respondent1CourtOrderPayment;
+    private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
+    private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
+    private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
+    private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
     private final String responseClaimWitnesses;
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped
@@ -183,6 +195,9 @@ public class CaseData implements MappableObject {
 
     @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
+
+
+    private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -207,6 +222,9 @@ public class CaseData implements MappableObject {
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+
+
+
 
     // dates
     private final LocalDateTime submittedDate;
@@ -236,4 +254,8 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
 
     private final List<IdValue<Bundle>> caseBundles;
+
+    private final Respondent1DebtLRspec specDefendant1Debts;
+    private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+    private final String bothDefendants;
 }

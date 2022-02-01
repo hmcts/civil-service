@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -126,7 +127,9 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT
+
             )
         ),
 
@@ -142,7 +145,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT
             )
         ),
         entry(
@@ -156,7 +160,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT
             )
         ),
 
@@ -496,33 +501,26 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowedOnStateForSpec(String stateFullName, CaseEvent caseEvent) {
-
         return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC
             .getOrDefault(stateFullName, emptyList())
             .contains(caseEvent);
-
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
         if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
-            || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
+            || caseEvent.equals(CREATE_CLAIM_SPEC)) {
             StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
-            try {
-                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
-            } catch (Exception e) {
-                return false;
-            }
+            return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
         }
-
     }
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
-        if (caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
+        if (caseEvent.equals(CREATE_CLAIM_SPEC)) {
             return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(caseEvent))
                 .map(Map.Entry::getKey)
