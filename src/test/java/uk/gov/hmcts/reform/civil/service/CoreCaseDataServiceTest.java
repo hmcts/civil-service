@@ -74,7 +74,9 @@ class CoreCaseDataServiceTest {
         clearInvocations(authTokenGenerator);
         clearInvocations(userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
-        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
+        when(userService.getAccessToken(userConfig.getUserName(),
+                                        userConfig.getPassword()))
+            .thenReturn(USER_AUTH_TOKEN);
     }
 
     @Nested

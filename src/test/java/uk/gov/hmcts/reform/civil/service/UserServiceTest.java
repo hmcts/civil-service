@@ -60,7 +60,6 @@ class UserServiceTest {
         assertThat(found.getRoles()).isEqualTo(ROLES);
     }
 
-
     @Test
     void shouldReturnAccessToken_whenValidUserDetailsAreGiven() {
         String accessToken = userService.getAccessToken(SUB, PASSWORD);
