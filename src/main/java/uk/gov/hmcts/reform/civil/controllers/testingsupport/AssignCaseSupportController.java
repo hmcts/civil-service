@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ import java.util.Optional;
 public class AssignCaseSupportController {
 
     private final CoreCaseUserService coreCaseUserService;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final OrganisationService organisationService;
 
     @PostMapping(value = {"/assign-case/{caseId}", "/assign-case/{caseId}/{caseRole}"})
@@ -41,7 +41,7 @@ public class AssignCaseSupportController {
     public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                            @PathVariable("caseId") String caseId,
                            @PathVariable("caseRole") Optional<CaseRole> caseRole) {
-        String userId = idamClient.getUserInfo(authorisation).getUid();
+        String userId = userService.getUserInfo(authorisation).getUid();
 
         String organisationId = organisationService.findOrganisation(authorisation)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
