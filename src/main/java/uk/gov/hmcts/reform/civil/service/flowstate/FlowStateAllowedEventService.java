@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -148,7 +149,6 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT
             )
         ),
-
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
@@ -359,7 +359,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
-                WITHDRAW_CLAIM
+                WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
         entry(
@@ -372,7 +373,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -385,7 +387,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                DISMISS_CLAIM
+                DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 

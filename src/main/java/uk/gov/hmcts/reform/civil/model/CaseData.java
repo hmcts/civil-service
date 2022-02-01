@@ -72,6 +72,7 @@ public class CaseData implements MappableObject {
     private final Fee claimFee;
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
+    private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
