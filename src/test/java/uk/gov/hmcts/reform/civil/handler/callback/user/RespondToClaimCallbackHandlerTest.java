@@ -155,6 +155,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void setup() {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         }
 
         @Test
@@ -1340,9 +1341,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnError_WhenBothFullDefence() {
+        void shouldReturnError_WhenBothFullDefenceAndSameRespondent() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
                 .respondent2ClaimResponseType(FULL_DEFENCE)
+                .respondent2SameLegalRepresentative(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
