@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
+    private final InitiateGeneralApplicationServiceHelper helper;
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails) {
         List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userDetails),
@@ -49,7 +50,8 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
-        InitiateGeneralApplicationServiceHelper helper = new InitiateGeneralApplicationServiceHelper();
+        // InitiateGeneralApplicationServiceHelper helper = new InitiateGeneralApplicationServiceHelper();
+
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
             applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
@@ -60,38 +62,8 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isMultiParty(NO);
         }
 
-        boolean isGAApplicantSameAsParentCaseApplicant = helper.isGA_ApplicantSameAsPC_Applicant(caseData, userDetails);
-
-        boolean isGAApplicantSameAsParentCaseRespondent = helper
-            .isGA_ApplicantSameAsPC_Respondent(caseData, userDetails);
-
-        boolean isGAApplicantOrgSameAsPCRespondentOrg = helper
-            .isGA_ApplicantOrgSameAsPC_RespondentOrg(caseData, userDetails);
-
-        if (isGAApplicantSameAsParentCaseApplicant
-            && isGAApplicantSameAsParentCaseRespondent) {
-            throw new IllegalArgumentException("A General Application should have only one applicant");
-        }
-
-        if (!isGAApplicantSameAsParentCaseApplicant
-            && !isGAApplicantSameAsParentCaseRespondent) {
-            throw new IllegalArgumentException("A General Application should have only one applicant");
-        }
-
-        return applicationBuilder
+        GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
-            .applicantSolicitor1UserDetails(isGAApplicantSameAsParentCaseApplicant
-                                                ? caseData.getApplicantSolicitor1UserDetails()
-                                                : helper.constructRespondent1SolicitorUserDetails(userDetails))
-            .applicant1OrganisationPolicy(isGAApplicantSameAsParentCaseApplicant
-                                              ? caseData.getApplicant1OrganisationPolicy()
-                                              : caseData.getRespondent1OrganisationPolicy())
-            .respondent1OrganisationPolicy(isGAApplicantOrgSameAsPCRespondentOrg
-                                               ? caseData.getApplicant1OrganisationPolicy()
-                                               : caseData.getRespondent1OrganisationPolicy())
-            .respondentSolicitor1EmailAddress(isGAApplicantSameAsParentCaseRespondent
-                                                  ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                                                  : caseData.getRespondentSolicitor1EmailAddress())
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
@@ -102,6 +74,8 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .build();
+
+        return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,

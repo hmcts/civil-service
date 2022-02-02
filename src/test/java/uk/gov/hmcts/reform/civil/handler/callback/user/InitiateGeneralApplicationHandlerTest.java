@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -56,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -75,6 +77,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private InitiateGeneralApplicationService initiateGeneralAppService;
 
     @MockBean
+    private InitiateGeneralApplicationServiceHelper helper;
+
+    @MockBean
     private OrganisationService organisationService;
 
     private static final String STRING_CONSTANT = "this is a string";
@@ -87,6 +92,89 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                                               .hasAgreed(NO)
+                                               .build())
+            .generalAppPBADetails(GAPbaDetails.builder()
+                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
+                                      .pbaReference(STRING_CONSTANT)
+                                      .build())
+            .generalApplications(wrapElements(getGeneralApplication()))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .id(STRING_CONSTANT)
+                                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                .organisationID(STRING_CONSTANT).build())
+                                              .orgPolicyReference(STRING_CONSTANT).build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .generalAppDetailsOfOrder(STRING_CONSTANT)
+            .generalAppReasonsOfOrder(STRING_CONSTANT)
+            .generalAppInformOtherParty(GAInformOtherParty.builder()
+                                            .isWithNotice(NO)
+                                            .reasonsForWithoutNotice(STRING_CONSTANT)
+                                            .build())
+            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                                              .generalAppUrgency(YES)
+                                              .reasonsForUrgency(STRING_CONSTANT)
+                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                                              .build())
+            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                                            .name(STRING_CONSTANT)
+                                            .role(STRING_CONSTANT)
+                                            .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .generalAppHearingDetails(GAHearingDetails.builder()
+                                          .judgeName(STRING_CONSTANT)
+                                          .hearingDate(APP_DATE_EPOCH)
+                                          .trialDateFrom(APP_DATE_EPOCH)
+                                          .trialDateTo(APP_DATE_EPOCH)
+                                          .hearingYesorNo(YES)
+                                          .hearingDuration(HOUR_1)
+                                          .supportRequirement(singletonList(OTHER_SUPPORT))
+                                          .judgeRequiredYesOrNo(YES)
+                                          .trialRequiredYesOrNo(YES)
+                                          .hearingDetailsEmailID(STRING_CONSTANT)
+                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
+                                          .supportRequirementOther(STRING_CONSTANT)
+                                          .hearingPreferredLocation(DynamicList.builder().build())
+                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
+                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .reasonForPreferredHearingType(STRING_CONSTANT)
+                                          .telephoneHearingPreferredType(STRING_CONSTANT)
+                                          .supportRequirementSignLanguage(STRING_CONSTANT)
+                                          .hearingPreferencesPreferredType(IN_PERSON)
+                                          .unavailableTrailRequiredYesOrNo(YES)
+                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                                          .build())
+            .build();
+    }
+
+    private GeneralApplication getGeneralApplication() {
+        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+        return builder.generalAppType(GAApplicationType.builder()
+                                          .types(singletonList(SUMMARY_JUDGEMENT))
+                                          .build())
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                                               .hasAgreed(NO)
+                                               .build())
+            .generalAppInformOtherParty(GAInformOtherParty.builder()
+                                            .isWithNotice(YES)
+                                            .reasonsForWithoutNotice(STRING_CONSTANT)
+                                            .build())
+            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                                              .generalAppUrgency(NO)
+                                              .reasonsForUrgency(STRING_CONSTANT)
+                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                                              .build())
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .isMultiParty(NO)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO)
                                                .build())
@@ -344,7 +432,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                                                          any(CaseData.class), any(UserDetails.class)))
-                .thenCallRealMethod();
+                .thenReturn(getTestCaseData(CaseData.builder().build()));
+
+            when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
+                                                                any(CaseData.class), any(UserDetails.class)))
+                .thenReturn(getGeneralApplication());
+
             CaseData caseData = getTestCaseData(CaseDataBuilder.builder().build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -384,6 +477,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(application.getGeneralAppHearingDetails().getHearingPreferencesPreferredType())
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
+            assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
+                .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
+            assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+            assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
+            assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .isEqualTo(STRING_CONSTANT);
+            assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .isEqualTo(STRING_CONSTANT);
         }
     }
 
