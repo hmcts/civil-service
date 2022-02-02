@@ -1312,9 +1312,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1Only1FullDefence() {
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-
             CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
