@@ -10,9 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
+            callbackKey(MID, "claimPartialPayment"), this::partialPayment,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -102,4 +106,29 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
+
+    private CallbackResponse partialPayment(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue() + caseData.getTotalInterest().doubleValue();
+        List<String> errors = new ArrayList<>();
+
+        if(caseData.getPartialPayment() == YesOrNo.YES)
+        {
+            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
+            var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
+            if(partialPaymentPounds>totalIncludeInterest){
+                errors.add("The amount already paid exceeds the full claim amount");
+            }
+            System.out.println(totalIncludeInterest);
+            System.out.println(partialPaymentPennies);
+            System.out.println(partialPaymentPounds);
+            System.out.println(caseData.getPartialPayment());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+
+    }
+
 }

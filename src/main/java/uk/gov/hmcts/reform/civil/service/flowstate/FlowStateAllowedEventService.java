@@ -328,7 +328,10 @@ public class FlowStateAllowedEventService {
                 RESUBMIT_CLAIM,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+
+
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
