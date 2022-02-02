@@ -4,11 +4,15 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,8 +44,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     }
     @Test
     @SneakyThrows
-    public void shouldReturnOk() {
-        doGet(BEARER_TOKEN, CLAIMS_LIST_URL)
+    public void shouldReturnaListOfCasesHttp200() {
+        SearchResult expectedCaseDetails = SearchResult.builder().total(1).cases(Arrays.asList(CaseDetails.builder().id(1L).build())).build();
+        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
+
+        when(coreCaseDataService.searchCases(any()))
+            .thenReturn(expectedCaseDetails);
+
+        doPost(BEARER_TOKEN, CLAIMS_LIST_URL)
             .andExpect(status().isOk());
     }
 }
