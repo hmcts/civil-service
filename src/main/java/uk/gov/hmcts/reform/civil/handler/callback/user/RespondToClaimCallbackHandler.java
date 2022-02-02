@@ -154,12 +154,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         var isRespondent1 = YES;
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            //1V2 Different Solicitors + Respondent 2 only
             isRespondent1 = NO;
         }
 
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
-                .isRespondent1(isRespondent1);
+            .isRespondent1(isRespondent1);
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
@@ -262,12 +263,20 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData.CaseDataBuilder updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
+        var isRespondent1 = YES;
+        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            //1V2 Different Solicitors + Respondent 2 only
+            isRespondent1 = NO;
+        }
+
         if ((caseData.getRespondent1ClaimResponseType() != null
                 && caseData.getRespondent1ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE))
+                RespondentResponseType.FULL_DEFENCE)
+                && isRespondent1.equals(YES))
             || (caseData.getRespondent2ClaimResponseType() != null
                 && caseData.getRespondent2ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE))
+                RespondentResponseType.FULL_DEFENCE)
+                && isRespondent1.equals(NO))
             || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
                 && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
                 || RespondentResponseType.FULL_DEFENCE.equals(caseData
