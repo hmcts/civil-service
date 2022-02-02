@@ -35,17 +35,17 @@ public class CasesController {
     })
     @ApiOperation("get case by id from CCD")
 
-    public ResponseEntity<CaseData> getCaseById(
-        @PathVariable("caseId") Long claimId,
+    public ResponseEntity<CaseData> getCaseId(
+        @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
             "Received CaseId: {}",
-            claimId
+            caseId
         );
 
         var caseDataResponse = caseDetailsConverter
-            .toCaseData(coreCaseDataService.getCase(claimId, authorisation).getData());
+            .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
 
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }

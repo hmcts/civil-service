@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class CasesControllerTest extends BaseIntegrationTest {
 
-    private static final String CLAIMS_URL = "/cases/{caseId}";
+    private static final String CASES_URL = "/cases/{caseId}";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -33,7 +33,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenReturn(expectedCaseDetails);
         when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
             .thenReturn(expectedCaseData);
-        doGet(BEARER_TOKEN, CLAIMS_URL, 1L)
+        doGet(BEARER_TOKEN, CASES_URL, 1L)
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
