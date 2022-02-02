@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
@@ -82,23 +83,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAUrgencyRequirement generalAppUrgencyRequirement = caseData.getGeneralAppUrgencyRequirement();
-        List<String> errors = new ArrayList<>();
-        if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() == null) {
-            errors.add("Details of urgency consideration date required.");
-        }
-        if (generalAppUrgencyRequirement.getGeneralAppUrgency() == NO
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
-            errors.add("Urgency consideration date should not be provided for a non-urgent application.");
-        }
-
-        if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
-            LocalDate urgencyDate = generalAppUrgencyRequirement.getUrgentAppConsiderationDate();
-            if (LocalDate.now().isAfter(urgencyDate)) {
-                errors.add("The date entered cannot be in the past.");
-            }
-        }
+        List<String> errors = generalAppUrgencyRequirement != null
+                ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
+                : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -106,8 +93,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse gaValidateHearingScreen(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
+        List<String> errors = hearingDetails != null
+                ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
+                : Collections.emptyList();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(Collections.emptyList())
+                .errors(errors)
                 .build();
     }
 
