@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
+
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
     public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
             + "provided for a non-urgent application.";
