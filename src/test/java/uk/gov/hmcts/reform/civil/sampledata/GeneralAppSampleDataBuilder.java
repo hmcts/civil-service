@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import org.apache.tomcat.jni.Local;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
-import javax.swing.plaf.basic.BasicButtonUI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -270,7 +268,4 @@ public class GeneralAppSampleDataBuilder {
                 .generalApplications(wrapElements(application))
                 .build();
     }
-
-
-
 }
