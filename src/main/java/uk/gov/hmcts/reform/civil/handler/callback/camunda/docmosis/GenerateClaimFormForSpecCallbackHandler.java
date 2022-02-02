@@ -58,6 +58,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
+        System.out.println("generateClaimFormForSpec 1");
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
@@ -69,9 +70,11 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
+        System.out.println("generateClaimFormForSpec 2");
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim);
-        if (documentMetaDataList.size() > 1) {
+        System.out.println("generateClaimFormForSpec 3 " + documentMetaDataList.size());
+        if (documentMetaDataList.size() > 0) {
+            System.out.println("BEFORE CALLING STITICHING APIS");
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),

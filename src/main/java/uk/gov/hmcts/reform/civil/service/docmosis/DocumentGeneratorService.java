@@ -28,10 +28,12 @@ public class DocumentGeneratorService {
     private final ObjectMapper mapper;
 
     public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template) {
+        System.out.println(" DocumentGeneratorService generateDocmosisDocument method 1");
         return generateDocmosisDocument(templateData.toMap(mapper), template);
     }
 
     public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template) {
+        System.out.println(" DocumentGeneratorService generateDocmosisDocument method 2");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

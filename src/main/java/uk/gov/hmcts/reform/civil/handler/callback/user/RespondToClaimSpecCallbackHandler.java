@@ -279,6 +279,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
+        System.out.println(" SOT page ");
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -320,7 +321,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             formatLocalDateTime(responseDeadline, DATE),
             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
         );
-
+        System.out.println(" before submitting the page : buildConfirmation");
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
                 format("# You've submitted your response%n## Claim number: %s", claimNumber))

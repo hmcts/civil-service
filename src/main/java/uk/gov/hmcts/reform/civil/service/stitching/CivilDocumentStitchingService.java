@@ -38,6 +38,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String bundleFilename,
         CaseData caseData
     ) {
+        System.out.println("inside stitiching API class");
         CaseDocument caseDocument = null;
         CaseDetails payload =
             createBundlePayload(
