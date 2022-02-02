@@ -29,7 +29,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
         CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
 
-        when(coreCaseDataService.getCase(1L))
+        when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
         when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
             .thenReturn(expectedCaseData);
