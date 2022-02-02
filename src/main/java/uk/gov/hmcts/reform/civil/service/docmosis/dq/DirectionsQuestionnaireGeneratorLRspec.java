@@ -1,0 +1,217 @@
+package uk.gov.hmcts.reform.civil.service.docmosis.dq;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
+import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N182;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+
+@Service
+@RequiredArgsConstructor
+public class DirectionsQuestionnaireGeneratorLRspec implements TemplateDataGenerator<DirectionsQuestionnaireForm> {
+
+    private final DocumentManagementService documentManagementService;
+    private final DocumentGeneratorService documentGeneratorService;
+    private final StateFlowEngine stateFlowEngine;
+    private final RepresentativeService representativeService;
+
+    public CaseDocument generate(CaseData caseData, String authorisation) {
+        System.out.println(" DirectionsQuestionnaireGeneratorLRspec generate method ");
+        DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
+        System.out.println("after getTemplateData");
+
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N182);
+        System.out.println("Docmosis document is created ");
+        return documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.DIRECTIONS_QUESTIONNAIRE)
+        );
+    }
+
+    private String getFileName(CaseData caseData) {
+        String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
+        return String.format(N182.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
+    }
+
+    @Override
+    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
+        System.out.println("Inside getTemplateData method ");
+        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+        System.out.println(" DQ here getRespondent1DQ " +  caseData.getRespondent1DQ());
+        System.out.println(" DQ here getApplicant1DQ ");
+
+        return DirectionsQuestionnaireForm.builder()
+            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .referenceNumber(caseData.getLegacyCaseReference())
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+            .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
+            .applicant(getApplicant(caseData))
+            .respondents(getRespondents(caseData))
+            .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+           // .experts(getExperts(dq))   commented out at the moment, will need to figure out whats wrong with this method
+            //.witnesses(getWitnesses(dq))
+            //.hearing(getHearing(dq))
+            //.hearingSupport(getHearingSupport(dq))
+            //.furtherInformation(dq.getFurtherInformation())
+            //.welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            //.statementOfTruth(dq.getStatementOfTruth())
+            //.allocatedTrack(caseData.getAllocatedTrack())
+            .build();
+    }
+
+    private Boolean isRespondentState(CaseData caseData) {
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        return state.equals(FULL_DEFENCE.fullName());
+    }
+
+    private Party getApplicant(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        return Party.builder()
+            .name(applicant.getPartyName())
+            .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant1LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .build();
+    }
+
+    private List<Party> getRespondents(CaseData caseData) {
+        var respondent = caseData.getRespondent1();
+        return List.of(Party.builder()
+                           .name(respondent.getPartyName())
+                           .primaryAddress(respondent.getPrimaryAddress())
+                           .representative(representativeService.getRespondent1Representative(caseData))
+                           .litigationFriendName(
+                               ofNullable(caseData.getRespondent1LitigationFriend())
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
+    }
+
+    private Experts getExperts(DQ dq) {
+        var experts = dq.getExperts();
+        return Experts.builder()
+            .expertRequired(experts.getExpertRequired())
+            .expertReportsSent(
+                ofNullable(experts.getExpertReportsSent())
+                    .map(ExpertReportsSent::getDisplayedValue)
+                    .orElse(""))
+            .jointExpertSuitable(experts.getJointExpertSuitable())
+            .details(getExpertsDetails(dq))
+            .build();
+    }
+
+    private List<Expert> getExpertsDetails(DQ dq) {
+        return unwrapElements(dq.getExperts().getDetails())
+            .stream()
+            .map(expert -> Expert.builder()
+                .name(expert.getName())
+                .fieldOfExpertise(expert.getFieldOfExpertise())
+                .whyRequired(expert.getWhyRequired())
+                .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
+                .build())
+            .collect(toList());
+    }
+
+    private Witnesses getWitnesses(DQ dq) {
+        var witnesses = dq.getWitnesses();
+        return Witnesses.builder()
+            .witnessesToAppear(witnesses.getWitnessesToAppear())
+            .details(unwrapElements(witnesses.getDetails()))
+            .build();
+    }
+
+    private Hearing getHearing(DQ dq) {
+        var hearing = dq.getHearing();
+        return Hearing.builder()
+            .hearingLength(getHearingLength(dq))
+            .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
+            .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
+            .build();
+    }
+
+    private String getHearingLength(DQ dq) {
+        var hearing = dq.getHearing();
+        switch (hearing.getHearingLength()) {
+            case LESS_THAN_DAY:
+                return hearing.getHearingLengthHours() + " hours";
+            case ONE_DAY:
+                return "One day";
+            default:
+                return hearing.getHearingLengthDays() + " days";
+        }
+    }
+
+    private String getHearingSupport(DQ dq) {
+        var stringBuilder = new StringBuilder();
+        ofNullable(dq.getHearingSupport())
+            .map(HearingSupport::getRequirements)
+            .orElse(List.of())
+            .forEach(requirement -> {
+                var hearingSupport = dq.getHearingSupport();
+                stringBuilder.append(requirement.getDisplayedValue());
+                switch (requirement) {
+                    case SIGN_INTERPRETER:
+                        stringBuilder.append(" - ").append(hearingSupport.getSignLanguageRequired());
+                        break;
+                    case LANGUAGE_INTERPRETER:
+                        stringBuilder.append(" - ").append(hearingSupport.getLanguageToBeInterpreted());
+                        break;
+                    case OTHER_SUPPORT:
+                        stringBuilder.append(" - ").append(hearingSupport.getOtherSupport());
+                        break;
+                    default:
+                        break;
+                }
+                stringBuilder.append("\n");
+            });
+        return stringBuilder.toString().trim();
+    }
+
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
+        return WelshLanguageRequirements.builder()
+            .evidence(ofNullable(
+                welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
+            .court(ofNullable(
+                welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
+            .documents(ofNullable(
+                welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
+            .build();
+    }
+}
