@@ -39,7 +39,9 @@ public class CasesController {
             claimId
         );
 
-        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId, authorisation).getData());
+        var caseDataResponse = caseDetailsConverter
+            .toCaseData(coreCaseDataService
+                            .getCase(claimId, authorisation).getData());
 
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
