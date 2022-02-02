@@ -3,21 +3,19 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.*;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.*;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,11 +29,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
@@ -51,6 +51,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final PostcodeValidator postcodeValidator;
     private final Time time;
+
+    private final EventEmitterService eventEmitterService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -136,6 +140,17 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
+        log.info(time.now() + "Before saving data to CCD");
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate("1643739307139406", UPDATE_CASE_DATA);
+        BusinessProcess businessProcess = caseDataUpdated.getBusinessProcess();
+        coreCaseDataService.submitUpdate("1643739307139406", caseDataContent(startEventResponse, businessProcess));
+        log.info(time.now() + ": After saving data to CCD");
+
+        if (caseDataUpdated.getBusinessProcess() != null && caseDataUpdated.getBusinessProcess().getStatus() == READY) {
+            eventEmitterService.emitBusinessProcessCamundaEvent(caseDataUpdated, false);
+            log.info("Event emitted successfully");
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
@@ -161,13 +176,30 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
     }
 
+    private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
+        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        data.put("businessProcess", businessProcess);
+
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(data)
+            .build();
+    }
+
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        CaseData caseDataUpdated = caseData.toBuilder()
+            .respondent1AcknowledgeNotificationDate(time.now())
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
+            .build();
 
         String body = format(
             CONFIRMATION_SUMMARY,
