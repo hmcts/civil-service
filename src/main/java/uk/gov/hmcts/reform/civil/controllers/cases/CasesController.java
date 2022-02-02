@@ -30,18 +30,18 @@ public class CasesController {
         "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
+
     public ResponseEntity<CaseData> getCaseById(
         @PathVariable("caseId") Long claimId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
-        ) {
+    ) {
         log.info(
             "Received CaseId: {}",
             claimId
         );
 
         var caseDataResponse = caseDetailsConverter
-            .toCaseData(coreCaseDataService
-                            .getCase(claimId, authorisation).getData());
+            .toCaseData(coreCaseDataService.getCase(claimId, authorisation).getData());
 
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }

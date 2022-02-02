@@ -85,7 +85,6 @@ public class CoreCaseDataService {
         return coreCaseDataApi.getCase(authorisation, authTokenGenerator.generate(), caseId.toString());
     }
 
-
     private UserAuthContent getSystemUpdateUser() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
