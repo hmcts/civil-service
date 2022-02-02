@@ -72,6 +72,10 @@ public class CoreCaseDataService {
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 
+    public SearchResult searchCases(Query query, String authorization) {
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
+    }
+
     public SearchResult searchCases(Query query) {
         String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());

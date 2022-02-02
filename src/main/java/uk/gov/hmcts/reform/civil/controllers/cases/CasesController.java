@@ -49,14 +49,16 @@ public class CasesController {
         );
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
+
     @PostMapping(path = "/")
     @ApiOperation("Handles all callbacks from CCD")
+
     public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                 @RequestBody String searchString){
 
         log.info("Received callback from CCD getting claim list");
         Query query = new Query(QueryBuilders.wrapperQuery( searchString), emptyList(), 0);
-        SearchResult claims = coreCaseDataService.searchCases(query);
+        SearchResult claims = coreCaseDataService.searchCases(query, authorization);
 
         return new ResponseEntity<>(claims, HttpStatus.OK);
     }

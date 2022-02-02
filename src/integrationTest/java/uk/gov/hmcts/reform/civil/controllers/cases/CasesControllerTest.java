@@ -44,14 +44,21 @@ public class CasesControllerTest extends BaseIntegrationTest {
     }
     @Test
     @SneakyThrows
-    public void shouldReturnaListOfCasesHttp200() {
+    public void shouldReturnListOfCasesHttp200() {
         SearchResult expectedCaseDetails = SearchResult.builder().total(1).cases(Arrays.asList(CaseDetails.builder().id(1L).build())).build();
-        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
-
+        SearchResult expectedCaseData = SearchResult.builder().total(1).build();
+        String elasticsearch = "{\n" +
+            "\n" +
+            "    \"terms\": {\n" +
+            "          \"id\": [ \"1\"]\n" +
+            "\n" +
+            "    }   \n" +
+            "  \n" +
+            "}";
         when(coreCaseDataService.searchCases(any()))
             .thenReturn(expectedCaseDetails);
-
-        doPost(BEARER_TOKEN, CLAIMS_LIST_URL)
+        doPost(BEARER_TOKEN, elasticsearch, CLAIMS_URL, "")
+            .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
 }
