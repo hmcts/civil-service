@@ -275,5 +275,6 @@ public class CaseData implements MappableObject {
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
+    private final Respondent1DebtLRspec specDefendant1DebtsFullAdmission;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
 }
