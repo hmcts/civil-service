@@ -108,7 +108,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenRespondentRespondsAgain1v2SameLegalRep() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -125,7 +124,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenRespondentRespondsAgain1v2DifferentLegalRep() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -262,7 +260,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor2v1() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .addApplicant2(YES)

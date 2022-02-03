@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -54,7 +53,6 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -159,7 +157,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerError_WhenRespondent1HasAlreadySubmittedResponseAndTheyTryToSubmitAgain() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
 
@@ -179,7 +176,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerError_WhenRespondent2HasAlreadySubmittedResponseAndTheyTryToSubmitAgain() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
@@ -199,7 +195,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerError_WhenRespondent1TriesToSubmitResponseAfterDeadline() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
@@ -221,7 +216,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldTriggerError_WhenRespondent2TriesToSubmitResponseAfterDeadline() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -243,7 +237,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotTriggerError_WhenRespondent1TriesToSubmitResponseBeforeDeadline() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
@@ -263,7 +256,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotTriggerError_WhenRespondent2TriesToSubmitResponseBeforeDeadline() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -360,7 +352,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .thenReturn(true);
             Hearing hearing = Hearing.builder()
@@ -381,7 +372,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateExperts_whenDef2HasSameLRAndDiffResAndRespondent2DQHearingPresent() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .thenReturn(false);
             Hearing hearing = Hearing.builder()
@@ -495,10 +485,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolOneRole() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
                 .thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .respondent1DQ(Respondent1DQ
                                    .builder().respondent1DQExperts(Experts.builder()
                                                                        .expertRequired(NO)
@@ -514,10 +504,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2DQ(Respondent2DQ
                                    .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
                                    .build())
@@ -532,10 +522,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateExperts_whenMultipartyAndSameLRDiffResponseAndRespondent2DQExperts() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
                                    .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
                                    .build())
@@ -614,11 +604,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateWitness_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolOneRole() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
                 .thenReturn(true);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -630,11 +620,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateWitness_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(true);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -646,11 +636,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateWitness_whenMultipartyAndSameLRDiffResponseAndRespondent2DQWitness() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -664,7 +654,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenWitnessRequiredAndNullDetails() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
@@ -678,7 +667,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
@@ -693,7 +681,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
@@ -895,7 +882,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("respondent1ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
-            assertEquals(response.getState(), CaseState.AWAITING_APPLICANT_INTENTION.name());
+            assertThat(response.getState()).isNull();
         }
 
         @Test
@@ -916,7 +903,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("respondent2ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("respondent1ResponseDate").isNull();
-            assertEquals(response.getState(), CaseState.AWAITING_APPLICANT_INTENTION.name());
+            assertThat(response.getState()).isNull();
         }
 
         @Test
@@ -1070,8 +1057,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnConfirmationScreen_when1v2_andReceivedFirstResponse() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -1093,8 +1078,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnConfirmationScreen_when1v2_andReceivedBothResponses() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()

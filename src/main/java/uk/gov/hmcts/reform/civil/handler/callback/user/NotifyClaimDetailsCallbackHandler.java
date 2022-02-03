@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -61,7 +60,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -117,8 +115,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private SubmittedCallbackResponse buildConfirmationWithSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!featureToggleService.isMultipartyEnabled()
-            || caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null) {
+        if (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null) {
             return buildConfirmation(callbackParams);
         }
 

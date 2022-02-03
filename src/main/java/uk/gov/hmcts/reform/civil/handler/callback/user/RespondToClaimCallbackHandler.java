@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -80,7 +81,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final StateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -108,32 +108,30 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         LocalDateTime dateTime = LocalDateTime.now();
 
         // Show error message if defendant tries to submit response again
-        if (featureToggleService.isMultipartyEnabled()) {
-            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
-                && caseData.getRespondent1ResponseDate() != null)
-                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && caseData.getRespondent2ResponseDate() != null)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
-                    .build();
-            }
+        if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+            && caseData.getRespondent1ResponseDate() != null)
+            || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            && caseData.getRespondent2ResponseDate() != null)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
+                .build();
+        }
 
-            //Show error message if defendant tries to submit a response after deadline has passed
-            var respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
-            var respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        //Show error message if defendant tries to submit a response after deadline has passed
+        var respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        var respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
 
-            if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
-                && caseData.getRespondent1ResponseDate() == null
-                && respondent1ResponseDeadline != null
-                && dateTime.toLocalDate().isAfter(respondent1ResponseDeadline.toLocalDate()))
-                || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && caseData.getRespondent2ResponseDate() == null
-                && respondent2ResponseDeadline != null
-                && dateTime.toLocalDate().isAfter(respondent2ResponseDeadline.toLocalDate()))) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(List.of("You cannot submit a response now as you have passed your deadline"))
-                    .build();
-            }
+        if ((solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+            && caseData.getRespondent1ResponseDate() == null
+            && respondent1ResponseDeadline != null
+            && dateTime.toLocalDate().isAfter(respondent1ResponseDeadline.toLocalDate()))
+            || (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            && caseData.getRespondent2ResponseDate() == null
+            && respondent2ResponseDeadline != null
+            && dateTime.toLocalDate().isAfter(respondent2ResponseDeadline.toLocalDate()))) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("You cannot submit a response now as you have passed your deadline"))
+                .build();
         }
 
         var isRespondent1 = YES;
@@ -170,7 +168,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isMultipartyEnabled()) {
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
@@ -189,7 +187,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isMultipartyEnabled()) {
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
@@ -210,7 +208,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
 
-        if (featureToggleService.isMultipartyEnabled()) {
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 hearing = caseData.getRespondent2DQ().getHearing();
             } else if (respondent2HasSameLegalRep(caseData)) {
@@ -441,8 +439,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
 
-        if (featureToggleService.isMultipartyEnabled()
-            && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -482,8 +479,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         //catch scenario 1v2 Diff Sol - 1 Response Received
         //responseDeadline has not been set yet
-        if (featureToggleService.isMultipartyEnabled()
-            && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
             body = "Once the other defendant's legal representative has submitted their defence, we will send the "
                 + "claimant's legal representative a notification. You will receive a copy of this notification, "

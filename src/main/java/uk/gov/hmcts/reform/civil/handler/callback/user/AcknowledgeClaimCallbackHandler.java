@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -66,7 +65,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final StateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UserService userService;
@@ -96,8 +94,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
         }
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
-        if (featureToggleService.isMultipartyEnabled()
-            && (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
+        if ((solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1AcknowledgeNotificationDate() != null)
             || (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {

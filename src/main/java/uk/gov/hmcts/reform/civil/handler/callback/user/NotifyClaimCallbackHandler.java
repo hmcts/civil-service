@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
@@ -56,7 +57,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -98,7 +98,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> warnings = new ArrayList<>();
-        if (featureToggleService.isMultipartyEnabled()
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
             && !notifyBothRespondentSolicitors(caseData)) {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
@@ -143,7 +143,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
 
-        String confirmationText = notifyBothRespondentSolicitors(caseData)
+        String confirmationText = (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            || notifyBothRespondentSolicitors(caseData))
             ? CONFIRMATION_SUMMARY
             : CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY;
 

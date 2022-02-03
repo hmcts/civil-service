@@ -74,7 +74,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
         @BeforeEach
         private void setup() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
         }
 
@@ -272,121 +271,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Nested
-    class AboutToSubmitWithMultiPartyToggleOff {
-        private LocalDateTime localDateTime;
-
-        @BeforeEach
-        private void setup() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
-        }
-
-        @Test
-        void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
-
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-
-        }
-
-        @Test
-        void shouldTestGenericLitFriend_whenInvoked_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddLitigationFriend_1v2_SameSolicitor()
-                .addRespondent1LitigationFriend()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-            assertThat(response.getData()).extracting("respondent1LitigationFriend.fullName")
-                .isEqualTo("Mr Litigation Friend");
-
-        }
-
-        @Test
-        void shouldSetRespondent2_whenRespondent1OptionIsSelected_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
-                .selectLitigationFriend("Respondent One: Test Respondent 1")
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
-
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
-
-        }
-
-        @Test
-        void shouldUpdateBusinessProcessToReadyWithEvent_WhenRespondent1LitigationFriendIsSet() {
-            localDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
-            when(time.now()).thenReturn(localDateTime);
-
-            CaseData caseData = CaseDataBuilder.builder().addRespondent1LitigationFriend()
-                .setRespondent1LitigationFriendCreatedDate(localDateTime)
-                .setRespondent1LitigationFriendDate(localDateTime)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
-
-            assertThat(response.getData())
-                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
-            assertThat(response.getData())
-                .extracting("respondent1LitigationFriendCreatedDate").isNotNull();
-        }
-
-        @Test
-        void shouldSetBothRespondent_whenBothRespondentOptionIsSelected_WithMultiParty_1v2_SameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .addBothRespondent1LitigationFriend()
-                .selectLitigationFriend("Both")
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
-
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
-
-        }
-    }
-
-    @Nested
     class SubmittedCallback {
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {

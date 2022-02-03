@@ -242,11 +242,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 + "details sent to 1 Defendant legal representative only.%n%n"
                 + "Your claim will proceed offline.";
 
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-            }
-
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
