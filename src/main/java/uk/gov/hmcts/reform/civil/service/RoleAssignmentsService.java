@@ -6,8 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.TestUserConfiguration;
-import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
+import uk.gov.hmcts.reform.ras.client.RoleAssignmentsApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -16,31 +17,21 @@ public class RoleAssignmentsService {
     Logger log = LoggerFactory.getLogger(RoleAssignmentsService.class);
 
     private final RoleAssignmentsApi roleAssignmentApi;
-    private final IdamClient idamClient;
-    private final TestUserConfiguration userConfig;
-    private final AuthTokenGenerator authTokenGenerator;
 
-    public String getRoleAssignments(String actorId) {
+    public RoleAssignmentResponse getRoleAssignments(String actorId,
+                                                     String authorization,
+                                                     String serviceAuthorization) {
         if (log.isDebugEnabled()) {
             log.debug(actorId, "Getting Role assignments for actorId {0}");
         }
         return roleAssignmentApi.getRoleAssignments(
-            getUserToken(),
-            authTokenGenerator.generate(),
+            authorization,
+            serviceAuthorization,
             actorId
         );
     }
 
-    public String getRoleAssignments() {
-        return this.getRoleAssignments(getActorId());
-    }
 
 
-    private String getActorId() {
-        return idamClient.getUserDetails(getUserToken()).getId();
-    }
 
-    private String getUserToken() {
-        return idamClient.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
-    }
 }

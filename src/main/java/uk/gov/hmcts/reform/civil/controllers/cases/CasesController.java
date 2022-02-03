@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 import static java.util.Collections.emptyList;
 @Api
@@ -68,12 +69,12 @@ public class CasesController {
 
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
-    public String getCredentials(@PathVariable("actorId") String actorId,
+    public ResponseEntity<RoleAssignmentResponse> getCredentials(@PathVariable("actorId") String actorId,
                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                  @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization) {
         log.info( "Received ActorId: {}",actorId);
-        String response = roleAssignmentsService.getRoleAssignments(actorId);
-        log.info("ActorId: {}", response);
-        return response;
+        RoleAssignmentResponse roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization, serviceAuthorization);
+        log.info("ActorId: {}", roleAssignmentResponse);
+        return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }
 }
