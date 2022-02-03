@@ -152,6 +152,34 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 "defendant-response-case-handed-offline-respondent-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyDefendantSolicitor1_when1v2SameSolicitorCase() {
+            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                .thenReturn("template-id-multiparty");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimOneDefendantSolicitor()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .version(V_1)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id-multiparty",
+                getNotificationDataMapMultiparty(caseData),
+                "defendant-response-case-handed-offline-respondent-notification-000DC001"
+            );
+        }
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {

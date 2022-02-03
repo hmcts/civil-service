@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -84,7 +84,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         String templateID;
 
         //Use 1v1 Template
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+        if (is1v1Or2v1Case(caseData)) {
             recipient = caseData.getRespondentSolicitor1EmailAddress();
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
@@ -111,9 +111,13 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         );
     }
 
+    private boolean is1v1Or2v1Case(CaseData caseData) {
+        return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (!getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+        if (is1v1Or2v1Case(caseData)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
