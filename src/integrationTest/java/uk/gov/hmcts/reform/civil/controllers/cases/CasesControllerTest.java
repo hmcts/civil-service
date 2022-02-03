@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +22,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     private static final String CLAIMS_URL = "/cases/{cid}";
     private static final String CLAIMS_LIST_URL = "/cases/";
+    private static final String ELASTICSEARCH = "{\n" +
+        "\n" +
+        "    \"terms\": {\n" +
+        "          \"reference\": [ \"1643728683977521\", \"1643642899151591\" ]\n" +
+        "\n" +
+        "    }   \n" +
+        "  \n" +
+        "}";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -42,22 +51,27 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
+
     @Test
     @SneakyThrows
     public void shouldReturnListOfCasesHttp200() {
-        SearchResult expectedCaseDetails = SearchResult.builder().total(1).cases(Arrays.asList(CaseDetails.builder().id(1L).build())).build();
-        SearchResult expectedCaseData = SearchResult.builder().total(1).build();
-        String elasticsearch = "{\n" +
-            "\n" +
-            "    \"terms\": {\n" +
-            "          \"id\": [ \"1\"]\n" +
-            "\n" +
-            "    }   \n" +
-            "  \n" +
-            "}";
-        when(coreCaseDataService.searchCases(any()))
+        SearchResult expectedCaseDetails = SearchResult.builder()
+            .total(1)
+            .cases(Arrays
+                       .asList(CaseDetails
+                                   .builder()
+                                   .id(1L)
+                                   .build()))
+            .build();
+
+        SearchResult expectedCaseData = SearchResult.builder()
+            .total(1)
+            .cases(Arrays.asList(CaseDetails.builder().id(1L).build()))
+            .build();
+
+        when(coreCaseDataService.searchCases(any(), anyString()))
             .thenReturn(expectedCaseDetails);
-        doPost(BEARER_TOKEN, elasticsearch, CLAIMS_URL, "")
+        doPost(BEARER_TOKEN, ELASTICSEARCH, CLAIMS_LIST_URL, "")
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
