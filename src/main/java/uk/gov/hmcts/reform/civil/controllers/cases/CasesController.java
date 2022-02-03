@@ -14,20 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import static java.util.Collections.emptyList;
 
@@ -62,5 +55,20 @@ public class CasesController {
             .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
 
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/")
+    @ApiOperation("get list of the cases from CCD")
+
+    public ResponseEntity<SearchResult> getListCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                                @RequestBody String searchString) {
+
+        log.info("Received getListCase");
+
+        Query query = new Query(QueryBuilders
+                                    .wrapperQuery(searchString), emptyList(), 0);
+        SearchResult claims = coreCaseDataService.searchCases(query, authorization);
+
+        return new ResponseEntity<>(claims, HttpStatus.OK);
     }
 }
