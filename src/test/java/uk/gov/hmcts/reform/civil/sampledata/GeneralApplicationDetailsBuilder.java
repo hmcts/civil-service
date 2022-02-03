@@ -35,11 +35,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SuppressWarnings("unchecked")
 public class GeneralApplicationDetailsBuilder {
 
-    private static final String STRING_CONSTANT = "this is a string";
-    private static final String STRING_NUM_CONSTANT = "123456789";
-    private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
-    private static final LocalDate APP_DATE_EPOCH = EPOCH;
-    private static final DynamicList PBALIST = DynamicList.builder().build();
+    public static final String STRING_CONSTANT = "this is a string";
+    public static final String STRING_NUM_CONSTANT = "123456789";
+    public static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
+    public static final LocalDate APP_DATE_EPOCH = EPOCH;
+    public static final DynamicList PBALIST = DynamicList.builder().build();
 
     private final ObjectMapper mapper = new ObjectMapper()
         .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
