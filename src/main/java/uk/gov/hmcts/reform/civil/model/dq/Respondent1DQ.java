@@ -38,6 +38,9 @@ public class Respondent1DQ implements DQ {
     private final YesOrNo respondent1DQCarerAllowanceCredit;
     private final List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
     private final List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
+    private final YesOrNo respondent1DQCarerAllowanceCreditFullAdmission;
+    private final List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncomeFA;
+    private final List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpensesFA;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
