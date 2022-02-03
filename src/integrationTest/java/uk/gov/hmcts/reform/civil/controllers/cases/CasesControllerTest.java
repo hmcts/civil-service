@@ -22,14 +22,12 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     private static final String CLAIMS_URL = "/cases/{cid}";
     private static final String CLAIMS_LIST_URL = "/cases/";
-    private static final String ELASTICSEARCH = "{\n" +
-        "\n" +
-        "    \"terms\": {\n" +
-        "          \"reference\": [ \"1643728683977521\", \"1643642899151591\" ]\n" +
-        "\n" +
-        "    }   \n" +
-        "  \n" +
-        "}";
+    private static final String ELASTICSEARCH = "{\n"
+        + "\"terms\": {\n"
+        + "\"reference\": [ \"1643728683977521\", \"1643642899151591\" ]\n"
+        + "\n"
+        + " }\n"
+        + "}";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;

@@ -116,6 +116,7 @@ public abstract class BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
+
     @SneakyThrows
     protected <T> ResultActions doGet(String auth, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(get(urlTemplate)
