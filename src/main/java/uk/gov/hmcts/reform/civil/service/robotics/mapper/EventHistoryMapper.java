@@ -573,45 +573,9 @@ public class EventHistoryMapper {
 
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-        String responseIntentionType = null;
-
-        if ((dateAcknowledge == null) && (caseData.getRespondent2AcknowledgeNotificationDate() == null)) {
+        if (dateAcknowledge == null) {
             return;
         }
-
-        if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
-            dateAcknowledge = caseData.getRespondent2AcknowledgeNotificationDate();
-            responseIntentionType = caseData.getRespondent2ClaimResponseIntentionType().getLabel();
-        }
-
-        //finding acknowledged date for the correct respondent in a 1v2 different solicitor scenario
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                dateAcknowledge = caseData.getRespondent2AcknowledgeNotificationDate();
-                responseIntentionType = caseData.getRespondent2ClaimResponseIntentionType().getLabel();
-            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() == null)) {
-                dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-                responseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
-            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                if (caseData.getRespondent2AcknowledgeNotificationDate()
-                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                    dateAcknowledge = caseData.getRespondent2AcknowledgeNotificationDate();
-                    responseIntentionType = caseData.getRespondent2ClaimResponseIntentionType().getLabel();
-                } else {
-                    dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-                    responseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
-
-                }
-            }
-        } else {
-            dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-            responseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
-        }
-
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
@@ -635,11 +599,12 @@ public class EventHistoryMapper {
                         .dateReceived(dateAcknowledge)
                         .litigiousPartyID("002")
                         .eventDetails(EventDetails.builder()
-                                          .responseIntention(responseIntentionType)
+                                          .responseIntention(caseData.getRespondent1ClaimResponseIntentionType()
+                                                                 .getLabel())
                                           .build())
                         .eventDetailsText(format(
                             "responseIntention: %s",
-                            responseIntentionType
+                            caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                         ))
                         .build()
                 ));

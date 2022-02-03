@@ -1295,6 +1295,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
+        atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondent2ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2RespondToClaim(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondent2ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;

@@ -251,6 +251,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
+                .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)

@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -120,8 +121,24 @@ public class FlowPredicate {
             && hasNotifiedClaimDetailsToBoth.negate().test(caseData);
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
-        caseData.getRespondent1AcknowledgeNotificationDate() != null
-            || caseData.getRespondent2AcknowledgeNotificationDate() != null;
+        getPredicateForNotificationAcknowledged(caseData);
+
+    private static boolean getPredicateForNotificationAcknowledged(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return (caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2ResponseDate() != null)
+                    || (caseData.getRespondent2AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent1ResponseDate() != null)
+                    || (caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() != null);
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return (caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() != null);
+            default:
+                return caseData.getRespondent1AcknowledgeNotificationDate() != null;
+        }
+    }
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
         (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
