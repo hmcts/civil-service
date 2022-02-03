@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +26,11 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 @RequiredArgsConstructor
 public class CoreCaseDataService {
 
-    private final IdamClient idamClient;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final UserService userService;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -77,18 +76,22 @@ public class CoreCaseDataService {
     }
 
     public SearchResult searchCases(Query query) {
-        String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
     public CaseDetails getCase(Long caseId) {
-        String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
     }
 
+    public CaseDetails getCase(Long caseId, String authorisation) {
+        return coreCaseDataApi.getCase(authorisation, authTokenGenerator.generate(), caseId.toString());
+    }
+
     private UserAuthContent getSystemUpdateUser() {
-        String userToken = idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String userId = idamClient.getUserInfo(userToken).getUid();
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userId = userService.getUserInfo(userToken).getUid();
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 

@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class CasesControllerTest extends BaseIntegrationTest {
 
+    private static final String CASES_URL = "/cases/{caseId}";
     private static final String CLAIMS_URL = "/cases/{cid}";
     private static final String CLAIMS_LIST_URL = "/cases/";
     private static final String ELASTICSEARCH = "{\n"
@@ -41,35 +42,11 @@ public class CasesControllerTest extends BaseIntegrationTest {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
         CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
 
-        when(coreCaseDataService.getCase(1L))
+        when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
         when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
             .thenReturn(expectedCaseData);
-        doGet(BEARER_TOKEN, CLAIMS_URL, 1L)
-            .andExpect(content().json(toJson(expectedCaseData)))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @SneakyThrows
-    public void shouldReturnListOfCasesHttp200() {
-        SearchResult expectedCaseDetails = SearchResult.builder()
-            .total(1)
-            .cases(Arrays
-                       .asList(CaseDetails
-                                   .builder()
-                                   .id(1L)
-                                   .build()))
-            .build();
-
-        SearchResult expectedCaseData = SearchResult.builder()
-            .total(1)
-            .cases(Arrays.asList(CaseDetails.builder().id(1L).build()))
-            .build();
-
-        when(coreCaseDataService.searchCases(any(), anyString()))
-            .thenReturn(expectedCaseDetails);
-        doPost(BEARER_TOKEN, ELASTICSEARCH, CLAIMS_LIST_URL, "")
+        doGet(BEARER_TOKEN, CASES_URL, 1L)
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }

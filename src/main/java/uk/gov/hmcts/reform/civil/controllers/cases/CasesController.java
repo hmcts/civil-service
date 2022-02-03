@@ -11,6 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,37 +45,22 @@ public class CasesController {
     private final CaseDetailsConverter caseDetailsConverter;
 
     @GetMapping(path = {
-        "/{cid}",
+        "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
 
-    public ResponseEntity<CaseData> getClaimById(
-        @PathVariable("cid") Long claimId
+    public ResponseEntity<CaseData> getCaseId(
+        @PathVariable("caseId") Long caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
             "Received CaseId: {}",
-            claimId
+            caseId
         );
 
-        var caseDataResponse = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(claimId).getData());
-        log.info(
-            "CaseDataResponse : {}",
-            caseDataResponse
-        );
+        var caseDataResponse = caseDetailsConverter
+            .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
+
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
-    }
-
-    @PostMapping(path = "/")
-    @ApiOperation("Handles all callbacks from CCD")
-
-    public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                                @RequestBody String searchString) {
-
-        log.info("Received callback from CCD getting claim list");
-        Query query = new Query(QueryBuilders
-                                    .wrapperQuery(searchString), emptyList(), 0);
-        SearchResult claims = coreCaseDataService.searchCases(query, authorization);
-
-        return new ResponseEntity<>(claims, HttpStatus.OK);
     }
 }
