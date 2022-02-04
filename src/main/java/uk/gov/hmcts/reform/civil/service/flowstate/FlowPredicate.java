@@ -126,12 +126,6 @@ public class FlowPredicate {
     private static boolean getPredicateForNotificationAcknowledged(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2ResponseDate() != null)
-                    || (caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1ResponseDate() != null)
-                    || (caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null);
             case ONE_V_TWO_ONE_LEGAL_REP:
                 return (caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null);
