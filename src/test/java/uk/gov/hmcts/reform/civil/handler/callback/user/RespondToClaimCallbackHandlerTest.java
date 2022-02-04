@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -862,6 +864,40 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
+        }
+
+        @Test
+        void shouldSetDefendantResponseDocuments() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("defendantResponseDocuments");
+            assertEquals(4, docs.size());
+
+            assertThat(response.getData())
+                .extracting("defendantResponseDocuments")
+                .asString()
+                .contains("createdBy=Defendant")
+                .contains("documentName=defendant1-defence.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime")
+                .contains("documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
+                .contains("documentType=DEFENDANT_DEFENCE")
+                .contains("documentName=defendant2-defence.pdf")
+                .contains("documentName=defendant1-directions.pdf")
+                .contains("documentName=defendant2-directions.pdf")
+                .contains("createdBy=Defendant 2")
+                .contains("createdDatetime")
+                .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
         }
 
         @Test
