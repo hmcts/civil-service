@@ -30,8 +30,6 @@ import static java.util.Collections.emptyList;
 )
 public class CasesController {
 
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final RoleAssignmentsService roleAssignmentsService;
