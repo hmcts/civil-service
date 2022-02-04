@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -422,20 +421,15 @@ public class FlowPredicate {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
             case ONE_V_TWO_ONE_LEGAL_REP:
-                predicate = (caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == YES)
-                    || (caseData.getApplicant1ProceedWithClaimRespondent2() != null
-                    && caseData.getApplicant1ProceedWithClaimRespondent2() == YES);
+                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 break;
             case ONE_V_ONE:
-                predicate = caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == YES;
+                predicate =  YES.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case TWO_V_ONE:
-                predicate = (caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == YES)
-                    || (caseData.getApplicant2ProceedWithClaim() != null
-                    && caseData.getApplicant2ProceedWithClaim() == YES);
+                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
                 break;
             default:
                 break;
@@ -448,20 +442,15 @@ public class FlowPredicate {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
             case ONE_V_TWO_ONE_LEGAL_REP:
-                predicate = (caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == NO)
-                    && (caseData.getApplicant1ProceedWithClaimRespondent2() != null
-                    && caseData.getApplicant1ProceedWithClaimRespondent2() == NO);
+                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 break;
             case ONE_V_ONE:
-                predicate = caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == NO;
+                predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case TWO_V_ONE:
-                predicate = (caseData.getApplicant1ProceedWithClaim() != null
-                    && caseData.getApplicant1ProceedWithClaim() == NO)
-                    && (caseData.getApplicant2ProceedWithClaim() != null
-                    && caseData.getApplicant2ProceedWithClaim() == NO);
+                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
                 break;
             default:
                 break;

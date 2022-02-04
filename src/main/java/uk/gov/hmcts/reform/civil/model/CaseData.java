@@ -131,10 +131,9 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1ProceedWithClaim;
     private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
     private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
-    private final YesOrNo applicant1ProceedWithClaimMultiParty1v2;
-    private final YesOrNo applicant2ProceedWithClaimMultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
     private final YesOrNo applicant1ProceedWithClaimRespondent2;
-    private final YesOrNo applicant2ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final ResponseDocument applicant2DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;

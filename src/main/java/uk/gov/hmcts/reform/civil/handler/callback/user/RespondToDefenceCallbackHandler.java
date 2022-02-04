@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.ClaimantResponseScenarioFlag;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -127,11 +126,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             caseData.toBuilder().applicantsProceedIntention(NO);
 
         if(YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant2ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty1v2())
-            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty1v2())) {
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
             updatedData.applicantsProceedIntention(YES);
         }
 
@@ -171,7 +169,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(time.now());
 
-        if (YES.equals(caseData.getApplicant1ProceedWithClaim()) || YES.equals(caseData.getApplicant2ProceedWithClaim())) {
+        if(YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
