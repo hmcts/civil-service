@@ -64,6 +64,13 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
                 }
                 return data;
             default:
+                System.out.println("----------------CAMUNDAERROR -START------------------");
+                System.out.println("CAMUNDAERROR CaseId" + caseId);
+                System.out.println("CAMUNDAERROR CaseEvent" + caseEvent);
+                System.out.println("CAMUNDAERROR LegacyCaseReference" + data.getLegacyCaseReference());
+                System.out.println("CAMUNDAERROR AllocatedTrack" + data.getAllocatedTrack());
+                System.out.println("CAMUNDAERROR BusinessProcessStatus" + businessProcess.getStatusOrDefault());
+                System.out.println("----------------CAMUNDAERROR -END------------------");
                 throw new BpmnError("ABORT");
         }
     }
