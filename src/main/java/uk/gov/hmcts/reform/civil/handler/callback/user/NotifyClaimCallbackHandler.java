@@ -64,7 +64,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
-            callbackKey(SUBMITTED), this::buildConfirmation
+            callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
     }
 
@@ -140,6 +140,25 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+
+        String body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(String.format(
+                "# Notification of claim sent%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            ))
+            .confirmationBody(body)
+            .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmationWithSolicitorOptions(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        if (caseData.getDefendantSolicitorNotifyClaimOptions() == null) {
+            return buildConfirmation(callbackParams);
+        }
 
         String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
 
