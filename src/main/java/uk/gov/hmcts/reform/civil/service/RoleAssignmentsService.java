@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,18 +13,19 @@ import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoleAssignmentsService {
 
-    Logger log = LoggerFactory.getLogger(RoleAssignmentsService.class);
 
     private final RoleAssignmentsApi roleAssignmentApi;
 
     public RoleAssignmentResponse getRoleAssignments(String actorId,
                                                      String authorization,
                                                      String serviceAuthorization) {
-        if (log.isDebugEnabled()) {
-            log.debug(actorId, "Getting Role assignments for actorId {0}");
-        }
+
+       if (log.isDebugEnabled()) {
+           log.debug(actorId, "Getting Role assignments for actorId {0}");
+       }
         return roleAssignmentApi.getRoleAssignments(
             authorization,
             serviceAuthorization,

@@ -55,8 +55,10 @@ public class CasesController {
         );
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
+
     @GetMapping(path = "/")
     @ApiOperation("Handles all callbacks from CCD")
+
     public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
 
         log.info("Received callback from CCD getting claim list");
@@ -69,12 +71,13 @@ public class CasesController {
 
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
+
     public ResponseEntity<RoleAssignmentResponse> getCredentials(@PathVariable("actorId") String actorId,
                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                  @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization) {
+
         log.info( "Received ActorId: {}",actorId);
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization, serviceAuthorization);
-        log.info("ActorId: {}", roleAssignmentResponse);
         return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }
 }
