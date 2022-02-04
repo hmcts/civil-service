@@ -41,7 +41,6 @@ public class CasesController {
         "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
-
     public ResponseEntity<CaseData> getCaseId(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
@@ -59,7 +58,6 @@ public class CasesController {
 
     @PostMapping(path = "/")
     @ApiOperation("get list of the cases from CCD")
-
     public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                 @RequestBody String searchString) {
 
