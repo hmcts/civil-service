@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,7 +19,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -90,6 +93,48 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+        }
+    }
+
+    @Nested
+    class MidEventPartialPayment {
+
+        private static final String PAGE_ID = "claimPartialPayment";
+
+        @Test
+        void shouldReturnError_whenPartialPaymentLargerFullClaim() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .PartialPayment(YesOrNo.YES)
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .PartialPaymentAmount("3000000")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The amount already paid exceeds the full claim amount");
+        }
+
+        @Test
+        void shouldNotReturnError_whenPartialPaymentLessFullClaim() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .PartialPayment(YesOrNo.YES)
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .PartialPaymentAmount("3000")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();;
         }
     }
 

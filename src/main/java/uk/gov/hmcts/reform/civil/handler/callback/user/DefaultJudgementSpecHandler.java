@@ -116,13 +116,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         {
             var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
             var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
-            if(partialPaymentPounds>totalIncludeInterest){
+            if(partialPaymentPounds >= totalIncludeInterest){
                 errors.add("The amount already paid exceeds the full claim amount");
             }
-            System.out.println(totalIncludeInterest);
-            System.out.println(partialPaymentPennies);
-            System.out.println(partialPaymentPounds);
-            System.out.println(caseData.getPartialPayment());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
