@@ -19,7 +19,12 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
@@ -29,6 +34,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -40,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -487,7 +494,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
         updatedData.isRespondent1(null);
-
+        assembleResponseDocuments(caseData, updatedData);
         if (featureToggleService.isMultipartyEnabled()
             && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
@@ -501,6 +508,47 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
+    }
+
+    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                                      caseData.getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQDraftDirections)
+            .ifPresent(respondent1DQ -> defendantUploads.add(
+                buildElemCaseDocument(respondent1DQ, "Defendant",
+                                      caseData.getRespondent1ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        Optional.ofNullable(caseData.getRespondent2ClaimResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                      caseData.getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getRespondent2DQDraftDirections)
+            .ifPresent(respondent2DQ -> defendantUploads.add(
+                buildElemCaseDocument(respondent2DQ, "Defendant 2",
+                                      caseData.getRespondent2ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
+    }
+
+    private Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
+                                                        LocalDateTime createdAt, DocumentType type) {
+        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
+                       .documentLink(document)
+                       .documentName(document.getDocumentFileName())
+                       .documentType(type)
+                       .createdDatetime(createdAt)
+                       .createdBy(createdBy)
+                       .build()
+                );
     }
 
     private boolean applicant2Present(CaseData caseData) {
