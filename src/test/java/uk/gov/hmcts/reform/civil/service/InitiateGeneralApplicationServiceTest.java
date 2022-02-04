@@ -5,29 +5,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static java.time.LocalDate.EPOCH;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
+import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -35,137 +37,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     InitiateGeneralApplicationService.class,
     JacksonAutoConfiguration.class,
 })
-class InitiateGeneralApplicationServiceTest {
-
-    private static final String STRING_CONSTANT = "this is a string";
-    private static final String STRING_NUM_CONSTANT = "123456789";
-    private static final LocalDate APP_DATE_EPOCH = EPOCH;
-    private static final DynamicList PBALIST = DynamicList.builder().build();
+class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder {
 
     @Autowired
     private InitiateGeneralApplicationService service;
-
-    private CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
-        return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
-                                      .build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
-            .generalAppEvidenceDocument(wrapElements(Document.builder()
-                                                   .documentUrl(STRING_CONSTANT)
-                                                   .documentBinaryUrl(STRING_CONSTANT)
-                                                   .documentFileName(STRING_CONSTANT)
-                                                   .documentHash(STRING_CONSTANT)
-                                                   .build()))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(HOUR_1)
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
-            .build();
-    }
-
-    private CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
-        GeneralApplication application = GeneralApplication.builder()
-                .generalAppType(GAApplicationType.builder()
-                        .types(singletonList(EXTEND_TIME))
-                        .build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                        .hasAgreed(NO)
-                        .build())
-                .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
-                        .build())
-                .generalAppDetailsOfOrder(STRING_CONSTANT)
-                .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                        .isWithNotice(NO)
-                        .reasonsForWithoutNotice(STRING_CONSTANT)
-                        .build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                        .generalAppUrgency(YES)
-                        .reasonsForUrgency(STRING_CONSTANT)
-                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                        .build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                        .name(STRING_CONSTANT)
-                        .role(STRING_CONSTANT)
-                        .build())
-                .generalAppEvidenceDocument(wrapElements(Document.builder()
-                                .documentUrl(STRING_CONSTANT)
-                                .documentBinaryUrl(STRING_CONSTANT)
-                                .documentFileName(STRING_CONSTANT)
-                                .documentHash(STRING_CONSTANT)
-                                .build()))
-                .generalAppHearingDetails(GAHearingDetails.builder()
-                        .judgeName(STRING_CONSTANT)
-                        .hearingDate(APP_DATE_EPOCH)
-                        .trialDateFrom(APP_DATE_EPOCH)
-                        .trialDateTo(APP_DATE_EPOCH)
-                        .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
-                        .supportRequirement(singletonList(OTHER_SUPPORT))
-                        .judgeRequiredYesOrNo(YES)
-                        .trialRequiredYesOrNo(YES)
-                        .hearingDetailsEmailID(STRING_CONSTANT)
-                        .unavailableTrailDateTo(APP_DATE_EPOCH)
-                        .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
-                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                        .reasonForPreferredHearingType(STRING_CONSTANT)
-                        .telephoneHearingPreferredType(STRING_CONSTANT)
-                        .supportRequirementSignLanguage(STRING_CONSTANT)
-                        .hearingPreferencesPreferredType(IN_PERSON)
-                        .unavailableTrailRequiredYesOrNo(YES)
-                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                        .build())
-                .build();
-        return getTestCaseDataWithEmptyCollectionOfApps(caseData)
-                .toBuilder()
-                .generalApplications(wrapElements(application))
-                .build();
-    }
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
@@ -184,6 +59,293 @@ class InitiateGeneralApplicationServiceTest {
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
+        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
+                .generalAppUrgency(YES)
+                .urgentAppConsiderationDate(null)
+                .build();
+
+        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(URGENCY_DATE_REQUIRED);
+    }
+
+    @Test
+    void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
+        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
+                .generalAppUrgency(NO)
+                .urgentAppConsiderationDate(LocalDate.now())
+                .build();
+
+        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
+    }
+
+    @Test
+    void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
+        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
+                .generalAppUrgency(YES)
+                .urgentAppConsiderationDate(LocalDate.now().minusDays(1))
+                .build();
+
+        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(URGENCY_DATE_CANNOT_BE_IN_PAST);
+    }
+
+    @Test
+    void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
+        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
+                .generalAppUrgency(YES)
+                .urgentAppConsiderationDate(LocalDate.now())
+                .build();
+
+        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
+        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
+                .generalAppUrgency(NO)
+                .urgentAppConsiderationDate(null)
+                .build();
+
+        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
+
+        assertThat(errors).isEmpty();
+    }
+
+    //Trial Dates validations
+    @Test
+    void shouldReturnErrors_whenTrialIsScheduledButTrialDateFromIsNull() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(null)
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(TRIAL_DATE_FROM_REQUIRED);
+    }
+
+    @Test
+    void shouldReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToBeforeIt() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(LocalDate.now().minusDays(1))
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(INVALID_TRIAL_DATE_RANGE);
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithNullTrialDateTo() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToAfterIt() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(LocalDate.now().plusDays(1))
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedAndTrialDateToAreSame() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(LocalDate.now())
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenTrialIsNotScheduled() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(NO)
+                .trialDateFrom(null)
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(getValidUnavailableDateList())
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    //Unavailability Dates validations
+    @Test
+    void shouldReturnErrors_whenUnavailabilityIsSetButNullDateRangeProvided() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(null)
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(UNAVAILABLE_DATE_RANGE_MISSING);
+    }
+
+    @Test
+    void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasNullDateFrom() {
+        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                .unavailableTrialDateFrom(null)
+                .unavailableTrialDateTo(null)
+                .build();
+
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(wrapElements(range1))
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
+    }
+
+    @Test
+    void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasDateFromAfterDateTo() {
+        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
+                .unavailableTrialDateTo(LocalDate.now())
+                .build();
+
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(YES)
+                .generalAppUnavailableDates(wrapElements(range1))
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isNotEmpty();
+        assertThat(errors).contains(INVALID_UNAVAILABILITY_RANGE);
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenUnavailabilityIsNotSet() {
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(NO)
+                .trialDateFrom(null)
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(NO)
+                .generalAppUnavailableDates(null)
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithNullDateTo() {
+        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                .unavailableTrialDateFrom(LocalDate.now())
+                .unavailableTrialDateTo(null)
+                .build();
+
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(NO)
+                .generalAppUnavailableDates(wrapElements(range1))
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithSameDateTo() {
+        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                .unavailableTrialDateFrom(LocalDate.now())
+                .unavailableTrialDateTo(LocalDate.now())
+                .build();
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(NO)
+                .generalAppUnavailableDates(wrapElements(range1))
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsBeforeDateTo() {
+        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                .unavailableTrialDateFrom(LocalDate.now())
+                .unavailableTrialDateTo(LocalDate.now().plusDays(1))
+                .build();
+        GAHearingDetails hearingDetails = GAHearingDetails.builder()
+                .trialRequiredYesOrNo(YES)
+                .trialDateFrom(LocalDate.now())
+                .trialDateTo(null)
+                .unavailableTrialRequiredYesOrNo(NO)
+                .generalAppUnavailableDates(wrapElements(range1))
+                .build();
+
+        List<String> errors = service.validateHearingScreen(hearingDetails);
+
+        assertThat(errors).isEmpty();
     }
 
     private void assertCaseDateEntries(CaseData caseData) {
@@ -212,15 +374,14 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getJudgeRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getTrialRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getHearingDetailsEmailID()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateTo()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateFrom()).isNull();
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isNull();
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber()).isNull();
         assertThat(generalAppHearingDetails.getReasonForPreferredHearingType()).isNull();
         assertThat(generalAppHearingDetails.getTelephoneHearingPreferredType()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isNull();
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType()).isNull();
-        assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isNull();
+        assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isNull();
     }
 
@@ -262,14 +423,19 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getTrialDateFrom()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getHearingYesorNo()).isEqualTo(YES);
-        assertThat(generalAppHearingDetails.getHearingDuration()).isEqualTo(HOUR_1);
+        assertThat(generalAppHearingDetails.getHearingDuration()).isEqualTo(OTHER);
+        assertThat(generalAppHearingDetails.getGeneralAppHearingDays()).isEqualTo("1");
+        assertThat(generalAppHearingDetails.getGeneralAppHearingHours()).isEqualTo("2");
+        assertThat(generalAppHearingDetails.getGeneralAppHearingMinutes()).isEqualTo("30");
         assertThat(generalAppHearingDetails.getSupportRequirement()
                        .contains(OTHER_SUPPORT)).isTrue();
         assertThat(generalAppHearingDetails.getJudgeRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getHearingDetailsEmailID()).isEqualTo(STRING_CONSTANT);
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateTo()).isEqualTo(APP_DATE_EPOCH);
-        assertThat(generalAppHearingDetails.getUnavailableTrailDateFrom()).isEqualTo(APP_DATE_EPOCH);
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
+                .getUnavailableTrialDateFrom()).isEqualTo(APP_DATE_EPOCH);
+        assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
+                .getUnavailableTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber())
                 .isEqualTo(STRING_NUM_CONSTANT);
@@ -278,7 +444,7 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType())
             .isEqualTo(IN_PERSON);
-        assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isEqualTo(YES);
+        assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
     }

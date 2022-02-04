@@ -14,17 +14,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -35,8 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.time.LocalDate.EPOCH;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -47,11 +39,18 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
+import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -73,127 +72,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private OrganisationService organisationService;
 
-    private static final String STRING_CONSTANT = "this is a string";
-    private static final String STRING_NUM_CONSTANT = "123456789";
-    private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
-    private static final LocalDate APP_DATE_EPOCH = EPOCH;
-
-    private CaseData getTestCaseData(CaseData caseData) {
-        return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
-                                      .pbaReference(STRING_CONSTANT)
-                                      .build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
-            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(HOUR_1)
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
-            .build();
-    }
-
-    private CaseData getTestCaseDataForUrgencyCheckMidEvent(CaseData caseData, boolean isApplicationUrgent,
-                                                            LocalDate urgencyConsiderationDate) {
-        GAUrgencyRequirement.GAUrgencyRequirementBuilder urBuilder = GAUrgencyRequirement.builder();
-        if (isApplicationUrgent) {
-            urBuilder.generalAppUrgency(YES)
-                    .reasonsForUrgency(STRING_CONSTANT);
-        } else {
-            urBuilder.generalAppUrgency(NO);
-        }
-        urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
-        GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
-        return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
-                        .types(singletonList(EXTEND_TIME))
-                        .build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                        .hasAgreed(NO)
-                        .build())
-                .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
-                        .build())
-                .generalAppDetailsOfOrder(STRING_CONSTANT)
-                .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                        .isWithNotice(NO)
-                        .reasonsForWithoutNotice(STRING_CONSTANT)
-                        .build())
-                .generalAppUrgencyRequirement(gaUrgencyRequirement)
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                        .name(STRING_CONSTANT)
-                        .role(STRING_CONSTANT)
-                        .build())
-                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
-                .generalAppHearingDetails(GAHearingDetails.builder()
-                        .judgeName(STRING_CONSTANT)
-                        .hearingDate(APP_DATE_EPOCH)
-                        .trialDateFrom(APP_DATE_EPOCH)
-                        .trialDateTo(APP_DATE_EPOCH)
-                        .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
-                        .supportRequirement(singletonList(OTHER_SUPPORT))
-                        .judgeRequiredYesOrNo(YES)
-                        .trialRequiredYesOrNo(YES)
-                        .hearingDetailsEmailID(STRING_CONSTANT)
-                        .unavailableTrailDateTo(APP_DATE_EPOCH)
-                        .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
-                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                        .reasonForPreferredHearingType(STRING_CONSTANT)
-                        .telephoneHearingPreferredType(STRING_CONSTANT)
-                        .supportRequirementSignLanguage(STRING_CONSTANT)
-                        .hearingPreferencesPreferredType(IN_PERSON)
-                        .unavailableTrailRequiredYesOrNo(YES)
-                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                        .build())
-                .build();
-    }
-
     @Nested
-    class AboutToStartCallback {
+    class AboutToStartCallback extends GeneralAppSampleDataBuilder {
 
         private final Organisation organisation = Organisation.builder()
                 .paymentAccount(List.of("12345", "98765"))
@@ -249,57 +129,67 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventForUrgencyCheck {
+    class MidEventForUrgencyCheck extends GeneralAppSampleDataBuilder {
 
         private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
+
+        @Test
+        void shouldNotCauseAnyErrors_whenApplicationDetailsNotProvided() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
 
         @Test
         void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
             CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
                     true, null);
-
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains("Details of urgency consideration date required.");
+            assertThat(response.getErrors()).contains(URGENCY_DATE_REQUIRED);
         }
 
         @Test
         void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
             CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
                     false, LocalDate.now());
-
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).contains(
-                    "Urgency consideration date should not be provided for a non-urgent application.");
+                    URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
         }
 
         @Test
         void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
             CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
                     true, LocalDate.now().minusDays(1));
-
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(
-                    "The date entered cannot be in the past.");
+            assertThat(response.getErrors()).contains(URGENCY_DATE_CANNOT_BE_IN_PAST);
         }
 
         @Test
         void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
             CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
                     true, LocalDate.now());
-
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -310,8 +200,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
             CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
                     false, null);
-
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
+            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -320,7 +210,212 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmit {
+    class MidEventForHearingScreenValidation extends GeneralAppSampleDataBuilder {
+
+        private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
+
+        @Test
+        void shouldNotReturnErrors_whenHearingDataIsNotPresent() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        //Trial Dates validations
+        @Test
+        void shouldReturnErrors_whenTrialIsScheduledButTrialDateFromIsNull() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    null, null, true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(TRIAL_DATE_FROM_REQUIRED);
+        }
+
+        @Test
+        void shouldReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToBeforeIt() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), LocalDate.now().minusDays(1), true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(INVALID_TRIAL_DATE_RANGE);
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithNullTrialDateTo() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), null, true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToAfterIt() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), LocalDate.now().plusDays(1), true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedAndTrialDateToAreSame() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), LocalDate.now(), true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenTrialIsNotScheduled() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
+                    null, null, true, getValidUnavailableDateList());
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        //Unavailability Dates validations
+        @Test
+        void shouldReturnErrors_whenUnavailabilityIsSetButNullDateRangeProvided() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), null, true, null);
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(UNAVAILABLE_DATE_RANGE_MISSING);
+        }
+
+        @Test
+        void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasNullDateFrom() {
+            GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                    .unavailableTrialDateFrom(null)
+                    .unavailableTrialDateTo(null)
+                    .build();
+
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), null, true, wrapElements(range1));
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
+        }
+
+        @Test
+        void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasDateFromAfterDateTo() {
+            GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                    .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
+                    .unavailableTrialDateTo(LocalDate.now())
+                    .build();
+
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
+                    LocalDate.now(), null, true, wrapElements(range1));
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenUnavailabilityIsNotSet() {
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
+                    null, null, false, null);
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithNullDateTo() {
+            GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                    .unavailableTrialDateFrom(LocalDate.now())
+                    .unavailableTrialDateTo(null)
+                    .build();
+
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
+                    null, null, false, wrapElements(range1));
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithSameDateTo() {
+            GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                    .unavailableTrialDateFrom(LocalDate.now())
+                    .unavailableTrialDateTo(LocalDate.now())
+                    .build();
+
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
+                    null, null, false, wrapElements(range1));
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsBeforeDateTo() {
+            GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
+                    .unavailableTrialDateFrom(LocalDate.now())
+                    .unavailableTrialDateTo(LocalDate.now().plusDays(1))
+                    .build();
+
+            CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
+                    null, null, false, wrapElements(range1));
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
+            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class AboutToSubmit extends GeneralAppSampleDataBuilder {
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class), any(CaseData.class)))
@@ -360,7 +455,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(STRING_CONSTANT);
             assertThat(application.getGeneralAppHearingDetails().getSupportRequirement()
                            .contains(OTHER_SUPPORT)).isTrue();
-            assertThat(application.getGeneralAppHearingDetails().getHearingDuration()).isEqualTo(HOUR_1);
+            assertThat(application.getGeneralAppHearingDetails().getHearingDuration()).isEqualTo(OTHER);
+            assertThat(application.getGeneralAppHearingDetails().getGeneralAppHearingDays()).isEqualTo("1");
+            assertThat(application.getGeneralAppHearingDetails().getGeneralAppHearingHours()).isEqualTo("2");
+            assertThat(application.getGeneralAppHearingDetails().getGeneralAppHearingMinutes()).isEqualTo("30");
             assertThat(application.getGeneralAppHearingDetails().getHearingPreferencesPreferredType())
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
