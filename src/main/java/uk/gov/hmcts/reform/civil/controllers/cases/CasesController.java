@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.ras.model.RasResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 import static java.util.Collections.emptyList;
@@ -39,8 +40,7 @@ public class CasesController {
         "/{cid}",
     })
     @ApiOperation("get case by id from CCD")
-
-    public ResponseEntity<CaseData> getClaimById(
+   public ResponseEntity<CaseData> getClaimById(
         @PathVariable("cid") Long claimId
     ) {
         log.info(
@@ -58,7 +58,6 @@ public class CasesController {
 
     @GetMapping(path = "/")
     @ApiOperation("Handles all callbacks from CCD")
-
     public ResponseEntity<SearchResult> getList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
 
         log.info("Received callback from CCD getting claim list");
@@ -71,13 +70,12 @@ public class CasesController {
 
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
+    public ResponseEntity<RasResponse> getCredentials(@PathVariable("actorId") String actorId,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization)
+    {
 
-    public ResponseEntity<RoleAssignmentResponse> getCredentials(@PathVariable("actorId") String actorId,
-                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                 @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization) {
-
-        log.info( "Received ActorId: {}",actorId);
-        RoleAssignmentResponse roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization, serviceAuthorization);
+        log.info("Received ActorId: {}",actorId);
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
         return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }
 }

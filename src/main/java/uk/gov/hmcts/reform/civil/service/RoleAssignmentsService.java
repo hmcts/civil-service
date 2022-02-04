@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.TestUserConfiguration;
 import uk.gov.hmcts.reform.ras.client.RoleAssignmentsApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.ras.model.RasResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 @Service
@@ -18,17 +19,17 @@ public class RoleAssignmentsService {
 
 
     private final RoleAssignmentsApi roleAssignmentApi;
+    private final AuthTokenGenerator authTokenGenerator;
 
-    public RoleAssignmentResponse getRoleAssignments(String actorId,
-                                                     String authorization,
-                                                     String serviceAuthorization) {
+    public RasResponse getRoleAssignments(String actorId,
+                                          String authorization) {
 
        if (log.isDebugEnabled()) {
            log.debug(actorId, "Getting Role assignments for actorId {0}");
        }
         return roleAssignmentApi.getRoleAssignments(
             authorization,
-            serviceAuthorization,
+            authTokenGenerator.generate(),
             actorId
         );
     }
