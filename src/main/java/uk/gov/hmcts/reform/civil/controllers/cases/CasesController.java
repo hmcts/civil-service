@@ -60,10 +60,10 @@ public class CasesController {
     @PostMapping(path = "/")
     @ApiOperation("get list of the cases from CCD")
 
-    public ResponseEntity<SearchResult> getListCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+    public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                 @RequestBody String searchString) {
 
-        log.info("Received getListCase");
+        log.info("Received getCaseList");
 
         Query query = new Query(QueryBuilders
                                     .wrapperQuery(searchString), emptyList(), 0);
