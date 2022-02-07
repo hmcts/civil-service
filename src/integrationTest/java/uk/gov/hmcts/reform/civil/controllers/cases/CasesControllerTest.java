@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.ras.model.RasResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
