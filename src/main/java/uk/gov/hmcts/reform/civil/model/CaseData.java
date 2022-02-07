@@ -72,8 +72,6 @@ public class CaseData implements MappableObject {
     private final Fee claimFee;
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
-    private final DynamicList defendantDetailsSpec;
-    private final DynamicList defendantDetails;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
@@ -257,5 +255,11 @@ public class CaseData implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+
+    //default judgment
+    private final DynamicList defendantDetailsSpec;
+    private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String detailsOfDirectionDisposal;
+    private final String detailsOfDirectionTrial;
 }
