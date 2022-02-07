@@ -78,6 +78,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
+            callbackKey(MID, "solicitor-reference"), this::populateSolicitorReferenceCopy,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV2,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -103,7 +104,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
@@ -121,6 +121,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
 
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1AcknowledgeNotificationDate() != null) {
@@ -133,11 +134,23 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
+        updatedCaseData.solicitorReferencesCopy(caseData.getSolicitorReferences());
         updatedCaseData.isRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
 
+    }
+
+    private CallbackResponse populateSolicitorReferenceCopy(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder()
+            .solicitorReferencesCopy(caseData.getSolicitorReferences())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
@@ -214,6 +227,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
+                .solicitorReferencesCopy(null)
                 .build();
         }
         //for 2v1
@@ -224,6 +238,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
+                .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent1ClaimResponseIntentionTypeApplicant2(
                     caseData.getRespondent1ClaimResponseIntentionTypeApplicant2())
@@ -242,6 +257,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent2(updatedRespondent2)
                 .respondent1Copy(null)
                 .respondent2Copy(null)
+                .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .build();
@@ -252,11 +268,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1(updatedRespondent1)
+                .solicitorReferences(caseData.getSolicitorReferencesCopy())
                 .respondent2(caseData.getRespondent2Copy())
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .respondent1Copy(null)
+                .solicitorReferencesCopy(null)
                 .isRespondent1(null);
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
@@ -268,12 +286,14 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataUpdated
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent2(updatedRespondent2)
+                .solicitorReferences(caseData.getSolicitorReferencesCopy())
                 .respondent1Copy(null)
                 .respondent2Copy(null)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent2ResponseDeadline(newDeadlineRespondent2)
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .isRespondent1(null)
+                .solicitorReferencesCopy(null)
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

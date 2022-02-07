@@ -128,9 +128,10 @@ public abstract class BaseIntegrationTest {
 
     @SneakyThrows
     protected <T> ResultActions doGet(String auth, String urlTemplate, Object... uriVars) {
-        return mockMvc.perform(get(urlTemplate, uriVars)
-                                   .header(HttpHeaders.AUTHORIZATION, auth)
-                                   .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        return mockMvc.perform(
+            MockMvcRequestBuilders.get(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON));
     }
 
     protected String toJson(Object input) {
