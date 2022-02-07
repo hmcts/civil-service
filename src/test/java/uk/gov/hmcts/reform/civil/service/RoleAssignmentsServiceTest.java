@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ras.client.RoleAssignmentsApi;
-import uk.gov.hmcts.reform.ras.model.RasResponse;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 import java.util.List;
@@ -28,7 +28,7 @@ class RoleAssignmentsServiceTest {
     private static final String USER_AUTH_TOKEN = "Bearer caa-user-xyz";
     private static final String ACTORID = "1111111";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
-    private static RasResponse RAS_RESPONSE = RasResponse
+    private static RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
         .builder()
         .roleAssignmentResponse(
             List.of(RoleAssignmentResponse

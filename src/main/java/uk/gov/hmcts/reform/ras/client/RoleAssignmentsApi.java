@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.ras.model.RasResponse;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -21,7 +21,7 @@ public interface RoleAssignmentsApi {
         consumes = APPLICATION_JSON_VALUE,
         headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE
     )
-    RasResponse getRoleAssignments(
+    RoleAssignmentServiceResponse getRoleAssignments(
         @RequestHeader(AUTHORIZATION) String authorization,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @PathVariable(ACTOR_ID) String actorId);

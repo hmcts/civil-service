@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RasResponse {
+public class RoleAssignmentServiceResponse {
 
     private List<RoleAssignmentResponse> roleAssignmentResponse;
 

@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.ras.model.RasResponse;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnRASAssignment() {
-        var rasResponse = RasResponse
+        var rasResponse = RoleAssignmentServiceResponse
             .builder()
             .roleAssignmentResponse(
                 List.of(RoleAssignmentResponse
