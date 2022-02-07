@@ -55,8 +55,9 @@ public class CasesController {
 
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
-    public ResponseEntity<RoleAssignmentServiceResponse> getCredentials(@PathVariable("actorId") String actorId,
-                                                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    public ResponseEntity<RoleAssignmentServiceResponse>
+        getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
+                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
 
         log.info("Received ActorId: {}", actorId);
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
