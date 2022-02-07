@@ -257,6 +257,7 @@ public class CaseData implements MappableObject {
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
 
     //default judgment
+    private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
     private final String detailsOfDirectionDisposal;
