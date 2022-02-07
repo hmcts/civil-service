@@ -13,10 +13,8 @@ import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.anyString;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

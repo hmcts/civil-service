@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -77,7 +76,7 @@ public class CasesController {
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
     public ResponseEntity<RoleAssignmentServiceResponse>
-    getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
+        getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
 
         log.info("Received ActorId: {}", actorId);
