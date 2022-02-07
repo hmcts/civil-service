@@ -122,7 +122,7 @@ withPipeline(type, product, component) {
 
     //Uninstall helm after functional tests pass
     def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-    def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: aksSubscriptions.preview]
+    def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: new AKSSubscriptions(this).preview]
     def callbacks = new PipelineCallbacksConfig()
     helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
   }
