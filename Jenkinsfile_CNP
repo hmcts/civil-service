@@ -3,6 +3,8 @@
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.DockerImage
+import uk.gov.hmcts.pipeline.AKSSubscriptions
 
 def type = "java"
 def product = "civil"
@@ -55,7 +57,6 @@ def publishRpaContract() {
 }
 
 withPipeline(type, product, component) {
-  pipelineConf = config
   disableLegacyDeployment()
   enableAksStagingDeployment()
   enableSlackNotifications('#civil_notifications')
@@ -118,6 +119,12 @@ withPipeline(type, product, component) {
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+
+    //Uninstall helm after functional tests pass
+    def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+    def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: aksSubscriptions.preview]
+    helmUninstall(dockerImage, params, new PipelineCallbacksRunner(pipelineConf));
+    }
   }
 
   before('smoketest:aat') {
