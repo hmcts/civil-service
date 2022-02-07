@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationHandler.class,
