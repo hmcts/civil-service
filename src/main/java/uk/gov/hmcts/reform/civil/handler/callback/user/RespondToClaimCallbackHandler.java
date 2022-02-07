@@ -152,8 +152,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             }
         }
 
+        var isRespondent1 = YES;
+        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            isRespondent1 = NO;
+        }
+
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
+            .respondent1Copy(caseData.getRespondent1())
+                .isRespondent1(isRespondent1);
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
@@ -165,6 +171,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
@@ -469,6 +486,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+        updatedData.isRespondent1(null);
 
         if (featureToggleService.isMultipartyEnabled()
             && getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
