@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -18,6 +20,10 @@ public class GeneralApplication implements MappableObject {
 
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
+    private final IdamUserDetails applicantSolicitor1UserDetails;
+    private final OrganisationPolicy applicant1OrganisationPolicy;
+    private final OrganisationPolicy respondent1OrganisationPolicy;
+    private final String respondentSolicitor1EmailAddress;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
@@ -34,6 +40,10 @@ public class GeneralApplication implements MappableObject {
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
+                       @JsonProperty("applicantSolicitor1UserDetails") IdamUserDetails applicantSolicitor1UserDetails,
+                       @JsonProperty("applicant1OrganisationPolicy") OrganisationPolicy applicant1OrganisationPolicy,
+                       @JsonProperty("respondent1OrganisationPolicy") OrganisationPolicy respondent1OrganisationPolicy,
+                       @JsonProperty("respondentSolicitor1EmailAddress") String respondentSolicitor1EmailAddress,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
@@ -47,6 +57,10 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("caseLink") CaseLink caseLink) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
+        this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
+        this.applicant1OrganisationPolicy = applicant1OrganisationPolicy;
+        this.respondent1OrganisationPolicy = respondent1OrganisationPolicy;
+        this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         this.businessProcess = businessProcess;
         this.generalAppPBADetails = generalAppPBADetails;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;

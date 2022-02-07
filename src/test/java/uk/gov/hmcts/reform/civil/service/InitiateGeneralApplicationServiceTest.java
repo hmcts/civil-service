@@ -4,24 +4,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.time.LocalDate.EPOCH;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -42,11 +51,21 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Autowired
     private InitiateGeneralApplicationService service;
 
+    @MockBean
+    private InitiateGeneralApplicationServiceHelper helper;
+
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
-        CaseData caseData = getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
+                                                            any(CaseData.class), any(UserDetails.class)))
+            .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
@@ -54,9 +73,11 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
-        CaseData caseData = getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
@@ -438,7 +459,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .getUnavailableTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber())
-                .isEqualTo(STRING_NUM_CONSTANT);
+            .isEqualTo(STRING_NUM_CONSTANT);
         assertThat(generalAppHearingDetails.getReasonForPreferredHearingType()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getTelephoneHearingPreferredType()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isEqualTo(STRING_CONSTANT);
@@ -447,6 +468,14 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
+        assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
+            .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
+        assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+        assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
+        assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
+        assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
     }
 }
 

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,40 +34,43 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
+    private final InitiateGeneralApplicationServiceHelper helper;
 
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
     public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
-            + "provided for a non-urgent application.";
+        + "provided for a non-urgent application.";
     public static final String URGENCY_DATE_CANNOT_BE_IN_PAST = "The date entered cannot be in the past.";
     public static final String TRIAL_DATE_FROM_REQUIRED = "Please enter the Date from if the trial has been fixed";
     public static final String INVALID_TRIAL_DATE_RANGE = "Trial Date From cannot be after Trial Date to. "
-            + "Please enter valid range.";
+        + "Please enter valid range.";
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
-            + "cannot attend hearing within next 3 months.";
+        + "cannot attend hearing within next 3 months.";
     public static final String UNAVAILABLE_FROM_MUST_BE_PROVIDED = "If you selected option to be unavailable then "
-            + "you must provide at least one valid Date from";
+        + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
-            + "Unavailability Date to. Please enter valid range.";
+        + "Unavailability Date to. Please enter valid range.";
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
-        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData),
-                caseData.getGeneralApplications());
+    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails) {
+        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userDetails),
+                                                                        caseData.getGeneralApplications());
         return dataBuilder
-                .generalApplications(applications)
-                .generalAppType(GAApplicationType.builder().build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
-                .generalAppDetailsOfOrder(EMPTY)
-                .generalAppReasonsOfOrder(EMPTY)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-                .generalAppHearingDetails(GAHearingDetails.builder().build())
-                .generalAppEvidenceDocument(java.util.Collections.emptyList())
-                .build();
+            .generalApplications(applications)
+            .generalAppType(GAApplicationType.builder().build())
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
+            .generalAppPBADetails(GAPbaDetails.builder().build())
+            .generalAppDetailsOfOrder(EMPTY)
+            .generalAppReasonsOfOrder(EMPTY)
+            .generalAppInformOtherParty(GAInformOtherParty.builder().build())
+            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
+            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppHearingDetails(GAHearingDetails.builder().build())
+            .generalAppEvidenceDocument(java.util.Collections.emptyList())
+            .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
+        // InitiateGeneralApplicationServiceHelper helper = new InitiateGeneralApplicationServiceHelper();
+
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
             applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
@@ -77,18 +81,20 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isMultiParty(NO);
         }
 
-        return applicationBuilder
-                .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
-                .generalAppType(caseData.getGeneralAppType())
-                .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
-                .generalAppPBADetails(caseData.getGeneralAppPBADetails())
-                .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
-                .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
-                .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-                .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
-                .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
-                .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
-                .build();
+        GeneralApplication generalApplication = applicationBuilder
+            .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .generalAppType(caseData.getGeneralAppType())
+            .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
+            .generalAppPBADetails(caseData.getGeneralAppPBADetails())
+            .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
+            .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
+            .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+            .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
+            .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
+            .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .build();
+
+        return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,

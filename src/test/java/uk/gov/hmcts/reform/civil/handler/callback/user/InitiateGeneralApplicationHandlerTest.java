@@ -18,9 +18,12 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
@@ -29,8 +32,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDate.EPOCH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -39,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
@@ -70,7 +76,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private InitiateGeneralApplicationService initiateGeneralAppService;
 
     @MockBean
+    private InitiateGeneralApplicationServiceHelper helper;
+
+    @MockBean
     private OrganisationService organisationService;
+
+    private static final String STRING_CONSTANT = "this is a string";
+    private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
+    private static final LocalDate APP_DATE_EPOCH = EPOCH;
 
     @Nested
     class AboutToStartCallback extends GeneralAppSampleDataBuilder {
@@ -146,8 +159,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
-            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
-                    true, null);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                                                        true, null);
+
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
@@ -159,8 +174,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
-            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
-                    false, LocalDate.now());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                                                        false, LocalDate.now());
+
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
@@ -173,8 +190,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
-            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
-                    true, LocalDate.now().minusDays(1));
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                                                        true, LocalDate.now().minusDays(1));
+
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
@@ -186,8 +205,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
-            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
-                    true, LocalDate.now());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                                                        true, LocalDate.now());
+
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
@@ -198,8 +219,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
-            CaseData caseData = getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
-                    false, null);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForUrgencyCheckMidEvent(CaseDataBuilder.builder().build(),
+                                                        false, null);
+
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
@@ -418,9 +441,19 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmit extends GeneralAppSampleDataBuilder {
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class), any(CaseData.class)))
-                .thenCallRealMethod();
-            CaseData caseData = getTestCaseData(CaseDataBuilder.builder().build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseData.builder().build());
+
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                      .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                      .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                                                         any(CaseData.class), any(UserDetails.class)))
+                .thenReturn(caseData);
+
+            when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
+                                                                any(CaseData.class), any(UserDetails.class)))
+                .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -462,6 +495,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(application.getGeneralAppHearingDetails().getHearingPreferencesPreferredType())
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
+            assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
+                .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
+            assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+            assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
+            assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .isEqualTo(STRING_CONSTANT);
+            assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .isEqualTo(STRING_CONSTANT);
         }
     }
 
