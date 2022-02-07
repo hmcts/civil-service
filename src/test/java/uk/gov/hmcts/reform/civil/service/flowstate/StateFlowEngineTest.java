@@ -1077,6 +1077,38 @@ class StateFlowEngineTest {
             }
 
             @Test
+            //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .atStateNotificationAcknowledgedRespondent2()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(FULL_DEFENCE.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(10)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
+            }
+
+            @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()

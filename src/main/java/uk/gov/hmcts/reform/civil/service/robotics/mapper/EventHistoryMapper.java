@@ -572,6 +572,7 @@ public class EventHistoryMapper {
     }
 
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        //TODO Defendant 2 will be handled under RPA ticket [CMC-1677]
         LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
         if (dateAcknowledge == null) {
             return;
