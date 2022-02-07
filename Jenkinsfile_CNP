@@ -1,15 +1,15 @@
 #!groovy
 
 @Library("Infrastructure")
-import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.DockerImage
+import uk.gov.hmcts.contino.PipelineCallbacksConfig
+import uk.gov.hmcts.contino.PipelineCallbacksRunner
 import uk.gov.hmcts.pipeline.AKSSubscriptions
 
 def type = "java"
 def product = "civil"
 def component = "service"
-AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -123,7 +123,8 @@ withPipeline(type, product, component) {
     //Uninstall helm after functional tests pass
     def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
     def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: aksSubscriptions.preview]
-    helmUninstall(dockerImage, params, new PipelineCallbacksRunner(pipelineConf));
+    def callbacks = new PipelineCallbacksConfig()
+    helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
   }
 
   before('smoketest:aat') {
