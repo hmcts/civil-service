@@ -83,6 +83,8 @@ public class CaseData implements MappableObject {
     private final Party respondent1Copy;
     private final Party respondent2;
     private final Party respondent2Copy;
+    private final Party respondent1DetailsForClaimDetailsTab;
+    private final Party respondent2DetailsForClaimDetailsTab;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;

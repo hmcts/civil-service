@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.List;
 
@@ -28,9 +29,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
+    private final InitiateGeneralApplicationServiceHelper helper;
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
-        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData),
+    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails) {
+        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userDetails),
                                                                         caseData.getGeneralApplications());
         return dataBuilder
             .generalApplications(applications)
@@ -47,7 +49,9 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
+        // InitiateGeneralApplicationServiceHelper helper = new InitiateGeneralApplicationServiceHelper();
+
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
             applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
@@ -58,7 +62,7 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isMultiParty(NO);
         }
 
-        return applicationBuilder
+        GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .applicantSolicitor1UserDetails(caseData.getApplicantSolicitor1UserDetails())
             .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
@@ -74,6 +78,8 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .build();
+
+        return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,

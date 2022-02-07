@@ -4,32 +4,29 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 
 import static java.time.LocalDate.EPOCH;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
@@ -45,133 +42,21 @@ class InitiateGeneralApplicationServiceTest {
     @Autowired
     private InitiateGeneralApplicationService service;
 
-    private CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
-        return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
-                                      .build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
-            .generalAppEvidenceDocument(wrapElements(Document.builder()
-                                                   .documentUrl(STRING_CONSTANT)
-                                                   .documentBinaryUrl(STRING_CONSTANT)
-                                                   .documentFileName(STRING_CONSTANT)
-                                                   .documentHash(STRING_CONSTANT)
-                                                   .build()))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(HOUR_1)
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .unavailableTrailDateTo(APP_DATE_EPOCH)
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrailRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
-            .build();
-    }
-
-    private CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
-        GeneralApplication application = GeneralApplication.builder()
-                .generalAppType(GAApplicationType.builder()
-                        .types(singletonList(EXTEND_TIME))
-                        .build())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                        .hasAgreed(NO)
-                        .build())
-                .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
-                        .build())
-                .generalAppDetailsOfOrder(STRING_CONSTANT)
-                .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                        .isWithNotice(NO)
-                        .reasonsForWithoutNotice(STRING_CONSTANT)
-                        .build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                        .generalAppUrgency(YES)
-                        .reasonsForUrgency(STRING_CONSTANT)
-                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                        .build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                        .name(STRING_CONSTANT)
-                        .role(STRING_CONSTANT)
-                        .build())
-                .generalAppEvidenceDocument(wrapElements(Document.builder()
-                                .documentUrl(STRING_CONSTANT)
-                                .documentBinaryUrl(STRING_CONSTANT)
-                                .documentFileName(STRING_CONSTANT)
-                                .documentHash(STRING_CONSTANT)
-                                .build()))
-                .generalAppHearingDetails(GAHearingDetails.builder()
-                        .judgeName(STRING_CONSTANT)
-                        .hearingDate(APP_DATE_EPOCH)
-                        .trialDateFrom(APP_DATE_EPOCH)
-                        .trialDateTo(APP_DATE_EPOCH)
-                        .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
-                        .supportRequirement(singletonList(OTHER_SUPPORT))
-                        .judgeRequiredYesOrNo(YES)
-                        .trialRequiredYesOrNo(YES)
-                        .hearingDetailsEmailID(STRING_CONSTANT)
-                        .unavailableTrailDateTo(APP_DATE_EPOCH)
-                        .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
-                        .unavailableTrailDateFrom(APP_DATE_EPOCH)
-                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                        .reasonForPreferredHearingType(STRING_CONSTANT)
-                        .telephoneHearingPreferredType(STRING_CONSTANT)
-                        .supportRequirementSignLanguage(STRING_CONSTANT)
-                        .hearingPreferencesPreferredType(IN_PERSON)
-                        .unavailableTrailRequiredYesOrNo(YES)
-                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                        .build())
-                .build();
-        return getTestCaseDataWithEmptyCollectionOfApps(caseData)
-                .toBuilder()
-                .generalApplications(wrapElements(application))
-                .build();
-    }
+    @MockBean
+    private InitiateGeneralApplicationServiceHelper helper;
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
-        CaseData caseData = getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
+                                                            any(CaseData.class), any(UserDetails.class)))
+            .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
@@ -179,9 +64,11 @@ class InitiateGeneralApplicationServiceTest {
 
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
-        CaseData caseData = getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
@@ -272,7 +159,7 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getUnavailableTrailDateFrom()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber())
-                .isEqualTo(STRING_NUM_CONSTANT);
+            .isEqualTo(STRING_NUM_CONSTANT);
         assertThat(generalAppHearingDetails.getReasonForPreferredHearingType()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getTelephoneHearingPreferredType()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getSupportRequirementSignLanguage()).isEqualTo(STRING_CONSTANT);
@@ -281,6 +168,14 @@ class InitiateGeneralApplicationServiceTest {
         assertThat(generalAppHearingDetails.getUnavailableTrailRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
+        assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
+            .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
+        assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+        assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
+        assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
+        assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
     }
 }
 
