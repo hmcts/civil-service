@@ -10,7 +10,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
 @FeignClient(name = "am-role-assignment-service-api", url = "${role-assignment-service.api.url}")
 public interface RoleAssignmentsApi {
 

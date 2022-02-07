@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-
-import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.ras.model.RasResponse;
+
 @Api
 @Slf4j
 @RestController
@@ -57,10 +56,9 @@ public class CasesController {
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
     public ResponseEntity<RasResponse> getCredentials(@PathVariable("actorId") String actorId,
-                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization)
-    {
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
 
-        log.info("Received ActorId: {}",actorId);
+        log.info("Received ActorId: {}", actorId);
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
         return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }

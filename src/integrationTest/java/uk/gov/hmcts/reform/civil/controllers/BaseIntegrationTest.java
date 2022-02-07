@@ -35,8 +35,6 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.of;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
@@ -55,15 +53,6 @@ public abstract class BaseIntegrationTest {
         + "F2RO8CHuEVagF-SQdL37d-4pJPIMRChO0AmplBj1qMtVbuRd3WGNeUvoCtStdviFwlxvzRnLdHKwCi6AQHMaw1V9n9QyU9FxNSbwmNsCDt7"
         + "k02vLJDY9fLCsFYy5iWGCjb8lD1aX1NTv7jz2ttNNv7-smqp6L3LSSD_LCZMpf0h_3n5RXiv-N3vNpWe4ZC9u0AWQdHEE9QlKTZlsqwKSog"
         + "3yJWhyxAamdMepgW7Z8jQ";
-
-    protected static final String ACTOR_ROLE = "{\"roleAssignmentResponse\":[{\"id\":\"b034b492-d2e9-4920-8e72"
-        + "-6cac42e43dfc\",\"actorIdType\":\"IDAM\",\"actorId\":\"1d70e58a-73ab-4423-83b0-9cd82a810250\","
-        + "\"roleType\":\"ORGANISATION\",\"roleName\":\"senior-tribunal-caseworker\",\"classification\":\"PUBLIC\","
-        + "\"grantType\":\"STANDARD\",\"roleCategory\":\"LEGAL_OPERATIONS\",\"readOnly\":false,"
-        + "\"created\":\"2022-01-17T17:52:57.478732Z\",\"attributes\":{\"substantive\":\"Y\","
-        + "\"primaryLocation\":\"123999\",\"jurisdiction\":\"IA\"},\"authorisations\":[\"QA\"]}]}";
-
-    protected static final String ACTOR_ID = "1d70e58a-73ab-4423-83b0-9cd82a810250";
 
     private static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
