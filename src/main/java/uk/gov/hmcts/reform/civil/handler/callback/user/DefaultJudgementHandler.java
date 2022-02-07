@@ -84,9 +84,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
             isValidRange(hearingDatesElement);
 
-//        var a = caseData.getDetailsOfDirectionDisposal();
-//        System.out.println(a);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();

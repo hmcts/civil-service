@@ -142,6 +142,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnDisposalText_whenHearingTypeSelectionDisposal(){
             String DISPOSAL_TEXT = "will be disposal hearing provided text";
+            //text that will populate text area when the hearing type selected is disposal
+            //dummy text for now until proper text provided.
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -160,6 +162,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnTrialText_whenHearingTypeSelectionTrial(){
             String TRIAL_TEXT = "will be trial hearing provided text";
+            //text that will populate text area when the hearing type selected is trial
+            //dummy text for now until proper text provided.
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
