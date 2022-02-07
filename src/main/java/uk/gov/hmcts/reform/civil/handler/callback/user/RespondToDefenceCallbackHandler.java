@@ -78,7 +78,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (featureToggleService.isMultipartyEnabled()){
+        if (featureToggleService.isMultipartyEnabled()) {
             switch (multiPartyScenario) {
                 case TWO_V_ONE:
                     updatedData
@@ -120,7 +120,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData.CaseDataBuilder updatedData =
             caseData.toBuilder().applicantsProceedIntention(NO);
 
-        if(YES.equals(caseData.getApplicant1ProceedWithClaim())
+        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
             || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
@@ -164,7 +164,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(time.now());
 
-        if(YES.equals(caseData.getApplicant1ProceedWithClaim())
+        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
             || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())

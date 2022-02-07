@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -2023,8 +2022,10 @@ public class CaseDataBuilder {
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)
-            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
-            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(
+                applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
+            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
+                applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
             .build();
     }
 }

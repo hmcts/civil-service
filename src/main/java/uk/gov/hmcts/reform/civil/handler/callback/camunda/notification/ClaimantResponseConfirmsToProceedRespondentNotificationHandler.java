@@ -15,11 +15,11 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public static final String Task_ID_RespondentSol2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
-    private static final String NP_PROCEED_REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
+    private static final String NP_PROCEED_REFERENCE_TEMPLATE
+        = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -70,9 +71,9 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
-        if((isRespondentSolicitor2Notification(callbackParams)
+        if ((isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-        || (!isRespondentSolicitor2Notification(callbackParams)
+            || (!isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
             notificationService.sendMail(
                 recipient,
