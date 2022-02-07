@@ -124,7 +124,6 @@ withPipeline(type, product, component) {
     def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
     def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: aksSubscriptions.preview]
     helmUninstall(dockerImage, params, new PipelineCallbacksRunner(pipelineConf));
-    }
   }
 
   before('smoketest:aat') {
