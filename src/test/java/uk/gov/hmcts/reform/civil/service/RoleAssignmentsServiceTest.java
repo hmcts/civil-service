@@ -41,17 +41,15 @@ class RoleAssignmentsServiceTest {
             )
         )
         .build();
+
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
     private RoleAssignmentsApi roleAssignmentApi;
 
-
     @Autowired
     private RoleAssignmentsService roleAssignmentsService;
-
-
 
     @BeforeEach
     void init() {
@@ -62,8 +60,8 @@ class RoleAssignmentsServiceTest {
 
     @Test
     void shouldReturn() {
-
-
-
+        var roleAssignmentsExpected = roleAssignmentsService.getRoleAssignments(ACTORID, authTokenGenerator.generate());
+        assertEquals(roleAssignmentsExpected , RAS_RESPONSE);
+    }
 
 }
