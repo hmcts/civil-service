@@ -165,9 +165,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private boolean isClaimantResponse(CaseData caseData) {
         if (caseData.getApplicantsProceedIntention() != null) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean isMulitPartyClaimantResponseButOneProceeding(CaseData caseData) {
@@ -234,6 +234,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private Boolean isRespondentState(CaseData caseData) {
+        if (isClaimantResponse(caseData)) {
+            return false;
+        }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
         return state.equals(FULL_DEFENCE.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())

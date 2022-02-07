@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -150,7 +151,10 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
-    protected YesOrNo applicant2ProceedWithClaim;
+    protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    protected YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    protected YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    protected YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
     protected ResponseDocument applicant1DefenceResponseDocument;
     protected BusinessProcess businessProcess;
 
@@ -224,6 +228,7 @@ public class CaseDataBuilder {
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
+    private YesOrNo applicantsProceedIntention;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -439,8 +444,28 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant2ProceedWithClaim(YesOrNo yesOrNo) {
-        this.applicant2ProceedWithClaim = yesOrNo;
+    public CaseDataBuilder applicant1ProceedWithClaimMultiParty2v1(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimMultiParty2v1 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant2ProceedWithClaimMultiParty2v1(YesOrNo yesOrNo) {
+        this.applicant2ProceedWithClaimMultiParty2v1 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicantsProceedIntention(YesOrNo yesOrNo) {
+        this.applicantsProceedIntention = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = yesOrNo;
         return this;
     }
 
@@ -1920,7 +1945,8 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeToApplicant2(respondent1ClaimResponseTypeToApplicant2)
             // Claimant Response
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
-            .applicant2ProceedWithClaim(applicant2ProceedWithClaim)
+            .applicant1ProceedWithClaimMultiParty2v1(applicant1ProceedWithClaimMultiParty2v1)
+            .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
 
             //Case procceds in Caseman
@@ -1996,6 +2022,9 @@ public class CaseDataBuilder {
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
+            .applicantsProceedIntention(applicantsProceedIntention)
+            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
+            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
             .build();
     }
 }

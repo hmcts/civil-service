@@ -95,14 +95,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                         .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_TWO_DIFFERENT_SOLICITOR)
                         .build();
                     break;
-                case ONE_V_ONE:
-                    updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_ONE)
-                        .build();
-                    break;
                 default:
                     updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.UNSPECIFIED_SCENARIO)
+                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_ONE)
                         .build();
             }
         }

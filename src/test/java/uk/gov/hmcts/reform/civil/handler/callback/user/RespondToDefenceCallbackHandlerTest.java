@@ -13,12 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -29,9 +29,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -77,18 +75,92 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Nested
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateRespondedToClaim().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+        void shouldPopulateRespondent1ClaimResponseDocumentCopy_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("respondent1ClaimResponseDocumentCopy"))
+                .isEqualTo(response.getData().get("respondent1ClaimResponseDocument"));
+        }
+
+        @Test
+        void shouldSetClaimantResponseScenarioFlagTo1V1_WhenAboutToStartIsInvokedAndMulitPatyScenariois1V1() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("claimantResponseScenarioFlag"))
+                .isEqualTo("ONE_V_ONE");
+        }
+
+        @Test
+        void shouldSetClaimantResponseScenarioFlagTo2V1_WhenAboutToStartIsInvoked() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                .multiPartyClaimTwoApplicants()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("claimantResponseScenarioFlag"))
+                .isEqualTo("TWO_V_ONE");
+        }
+
+        @Test
+        void shouldSetClaimantResponseScenarioFlagTo1V2OneSol_WhenAboutToStartIsInvoked() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                .multiPartyClaimOneDefendantSolicitor()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("claimantResponseScenarioFlag"))
+                .isEqualTo("ONE_V_TWO_SAME_SOLICITOR");
+        }
+
+        @Test
+        void shouldSetClaimantResponseScenarioFlagTo1V2TwoSol_WhenAboutToStartIsInvoked() {
+            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("claimantResponseScenarioFlag"))
+                .isEqualTo("ONE_V_TWO_DIFFERENT_SOLICITOR");
         }
     }
 
@@ -437,7 +509,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetToYes_whenApplicant2IntendToProceed() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant2ProceedWithClaim(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "set-applicants-proceed-intention");
@@ -450,7 +522,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetToNo_whenApplicant1OrApplicant2DoNotIntendToProceed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ProceedWithClaim(NO)
-                .applicant2ProceedWithClaim(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "set-applicants-proceed-intention");
