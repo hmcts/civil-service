@@ -27,9 +27,9 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
-        for (CaseDetails aCase : cases) {
-            log.info("PolledcaseId ({})", aCase.getId());
-            CaseData caseData = caseDetailsConverter.toCaseData(aCase);
+        for (CaseDetails details : cases) {
+            log.info("PolledcaseId ({})", details.getId());
+            CaseData caseData = caseDetailsConverter.toCaseData(details);
             log.info("PolledcaseInfo ({}) businessproc ({}) ({}) ({})",
                      caseData.getLegacyCaseReference(), caseData.getBusinessProcess().getStatus(),
                      caseData.getBusinessProcess().getCamundaEvent(), caseData.getBusinessProcess().getActivityId());
