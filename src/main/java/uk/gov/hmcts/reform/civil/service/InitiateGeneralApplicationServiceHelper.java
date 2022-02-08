@@ -37,16 +37,34 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public IdamUserDetails constructRespondent1SolicitorUserDetails(UserDetails userDetails) {
-        IdamUserDetails applicantDetails = IdamUserDetails.builder().build();
-        applicantDetails.toBuilder().email(userDetails.getEmail()).id(userDetails.getId()).build();
+        IdamUserDetails respondentDetails = IdamUserDetails.builder().build();
+        respondentDetails.toBuilder().email(userDetails.getEmail()).id(userDetails.getId()).build();
 
-        return applicantDetails;
+        return respondentDetails;
+    }
+
+    public IdamUserDetails constructApplicant1SolicitorUserDetails(UserDetails userDetails) {
+        return IdamUserDetails.builder().email(userDetails.getEmail())
+            .id(userDetails.getId())
+            .build();
+    }
+
+    public boolean validateUserDetails(IdamUserDetails idamUserDetails) {
+
+        if (idamUserDetails.getEmail() != null
+            && idamUserDetails.getId() != null) {
+            return true;
+        }
+        return false;
     }
 
     public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,
                                                                       CaseData caseData, UserDetails userDetails) {
 
         boolean isGAApplicantSameAsParentCaseApplicant = isGA_ApplicantSameAsPC_Applicant(caseData, userDetails);
+
+        boolean isPCApplicantUserDetailsPresent = validateUserDetails(caseData
+                                                                          .getApplicantSolicitor1UserDetails());
 
         boolean isGAApplicantSameAsParentCaseRespondent = isGA_ApplicantSameAsPC_Respondent(caseData, userDetails);
 
@@ -62,7 +80,9 @@ public class InitiateGeneralApplicationServiceHelper {
 
         return generalApplication.toBuilder()
             .applicantSolicitor1UserDetails(isGAApplicantSameAsParentCaseApplicant
-                                                ? caseData.getApplicantSolicitor1UserDetails()
+                                                ? (isPCApplicantUserDetailsPresent
+                ? caseData.getApplicantSolicitor1UserDetails()
+                : constructApplicant1SolicitorUserDetails(userDetails))
                                                 : constructRespondent1SolicitorUserDetails(userDetails))
             .applicant1OrganisationPolicy(isGAApplicantSameAsParentCaseApplicant
                                               ? caseData.getApplicant1OrganisationPolicy()

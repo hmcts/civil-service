@@ -70,7 +70,6 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
-        // InitiateGeneralApplicationServiceHelper helper = new InitiateGeneralApplicationServiceHelper();
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
