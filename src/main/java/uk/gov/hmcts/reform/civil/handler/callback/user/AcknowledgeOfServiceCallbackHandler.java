@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -67,6 +68,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
+            callbackKey(V_2, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV2,
             callbackKey(SUBMITTED), this::buildConfirmation,
             callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress
         );
@@ -128,11 +130,38 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    //@After("execution(* uk.gov.hmcts.reform.civil.aspect.EventEmitterAspect.emitBusinessProcessEvent(..))")
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
+
+        CaseData caseDataUpdated = caseData.toBuilder()
+            .respondent1AcknowledgeNotificationDate(time.now())
+            .respondent1ResponseDeadline(newResponseDate)
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
+            .respondent1(updatedRespondent1)
+            .respondent1Copy(null)
+            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+    }
+
+
+    //@After("execution(* uk.gov.hmcts.reform.civil.aspect.EventEmitterAspect.emitBusinessProcessEvent(..))")
+    private CallbackResponse setNewResponseDeadlineV2(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        String caseId = callbackParams.getParams().get("case_id").toString();
 
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
@@ -144,14 +173,12 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
-        //TODO - These change would need to be moved to CCUI - /case/trigger/events calls to CCD
         log.info(time.now() + "Before saving data to CCD");
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate("1643989832161728", ACKNOWLEDGEMENT_OF_SERVICE);
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, ACKNOWLEDGEMENT_OF_SERVICE);
         BusinessProcess businessProcess = caseDataUpdated.getBusinessProcess();
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        coreCaseDataService.submitUpdate("1643989832161728", caseDataContent(startEventResponse, businessProcess));
+        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         log.info(time.now() + ": After saving data to CCD");
-        //TODO - These change would need to be moved to CCUI - /case/trigger/events calls to CCD
 
         //TODO: call EventEmitterAspect by mocking callBackParm as submitted
         if (caseDataUpdated.getBusinessProcess() != null && caseDataUpdated.getBusinessProcess().getStatus() == READY) {
