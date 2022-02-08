@@ -37,10 +37,9 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public IdamUserDetails constructRespondent1SolicitorUserDetails(UserDetails userDetails) {
-        IdamUserDetails respondentDetails = IdamUserDetails.builder().build();
-        respondentDetails.toBuilder().email(userDetails.getEmail()).id(userDetails.getId()).build();
-
-        return respondentDetails;
+        return IdamUserDetails.builder().email(userDetails.getEmail())
+            .id(userDetails.getId())
+            .build();
     }
 
     public IdamUserDetails constructApplicant1SolicitorUserDetails(UserDetails userDetails) {
