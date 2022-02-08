@@ -203,11 +203,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .respondent1AcknowledgeNotificationDate(time.now())
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .build();
-
         String body = format(
             CONFIRMATION_SUMMARY,
             formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
