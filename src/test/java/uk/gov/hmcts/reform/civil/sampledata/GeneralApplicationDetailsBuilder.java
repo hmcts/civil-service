@@ -29,8 +29,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -38,6 +36,8 @@ public class GeneralApplicationDetailsBuilder {
 
     public static final String STRING_CONSTANT = "this is a string";
     public static final String STRING_NUM_CONSTANT = "123456789";
+    public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
     public static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     public static final LocalDate APP_DATE_EPOCH = EPOCH;
     public static final DynamicList PBALIST = DynamicList.builder().build();

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
@@ -80,9 +81,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private OrganisationService organisationService;
 
+    @MockBean
+    protected IdamClient idamClient;
+
     private static final String STRING_CONSTANT = "this is a string";
     private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     private static final LocalDate APP_DATE_EPOCH = EPOCH;
+    public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     @Nested
     class AboutToStartCallback extends GeneralAppSampleDataBuilder {
