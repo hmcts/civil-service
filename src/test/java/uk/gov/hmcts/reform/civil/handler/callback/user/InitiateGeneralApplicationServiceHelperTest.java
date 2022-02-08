@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationServiceHelper.class,
@@ -60,7 +59,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                 .organisationID(STRING_CONSTANT).build())
                                               .orgPolicyReference(STRING_CONSTANT).build())
-            .generalApplications(wrapElements(getGeneralApplication()))
+            .generalApplications(ElementUtils.wrapElements(getGeneralApplication()))
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
