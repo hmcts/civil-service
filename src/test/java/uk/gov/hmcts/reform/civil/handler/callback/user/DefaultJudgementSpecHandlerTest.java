@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -57,7 +58,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -85,10 +86,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("NameUser SurnameUser")
-                                                 .build())
-                                      .build())
+                                          .value(DynamicListElement.builder()
+                                                     .label("NameUser SurnameUser")
+                                                     .build())
+                                          .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -134,7 +135,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();;
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
@@ -164,4 +165,39 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
     }
+
+    @Nested
+    class PaymentDateValidationCallback {
+
+        private static final String PAGE_ID = "claimPaymentDate";
+
+        @Test
+        void shouldReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .PartialPayment(YesOrNo.YES)
+                .paymentSetDate(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Payment Date cannot be past date");
+        }
+
+        @Test
+        void shouldNotReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .PartialPayment(YesOrNo.YES)
+                .paymentSetDate(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
+
 }

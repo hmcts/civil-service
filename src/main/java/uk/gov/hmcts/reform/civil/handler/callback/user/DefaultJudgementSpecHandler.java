@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
     public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
         + "%n%n * The time for responding to the claim has expired. "
@@ -44,7 +44,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         + "%n%n * The Defendant has not satisfied the whole claim, including costs."
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
-
+    private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
 
     @Override
@@ -53,6 +53,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
+            callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -64,18 +65,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationHeader(getHeader())
+            .confirmationBody(getBody())
             .build();
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
         return format("# You cannot request default judgment");
     }
 
-    private String getBody(CaseData caseData) {
+    private String getBody() {
         return format(CPR_REQUIRED_INFO);
     }
 
@@ -86,7 +87,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
-            errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
+            errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
         listData.add(caseData.getRespondent1().getIndividualFirstName() + " "
@@ -112,11 +113,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue() + caseData.getTotalInterest().doubleValue();
         List<String> errors = new ArrayList<>();
 
-        if(caseData.getPartialPayment() == YesOrNo.YES)
-        {
+        if (caseData.getPartialPayment() == YesOrNo.YES) {
             var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
             var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
-            if(partialPaymentPounds >= totalIncludeInterest){
+            if (partialPaymentPounds >= totalIncludeInterest) {
                 errors.add("The amount already paid exceeds the full claim amount");
             }
         }
@@ -125,6 +125,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .errors(errors)
             .build();
 
+    }
+
+    private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        /*Create Case field based on CIV-776 */
+        if (checkPastDateValidation(caseData.getPaymentSetDate())) {
+            errors.add("Payment Date cannot be past date");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
 }
