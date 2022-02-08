@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.aos.AcknowledgementOfClaimForm;
@@ -87,6 +88,7 @@ class AcknowledgementOfClaimGeneratorTest {
     @BeforeEach
     void setup() {
         when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
+        when(representativeService.getRespondent2Representative(any())).thenReturn(representative);
     }
 
     @Test
@@ -143,9 +145,37 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent2SameLegalRepresentative(YES)
             .build();
 
+        AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
+            .caseName("Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo")
+            .referenceNumber(LEGACY_CASE_REFERENCE)
+            .solicitorReferences(caseData.getSolicitorReferences())
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .respondent(new ArrayList<>(List.of(
+                Party.builder()
+                    .name(caseData.getRespondent1().getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent1LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build(), Party.builder()
+                    .name(caseData.getRespondent2().getPartyName())
+                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build()
+                )))
+            .build();
+
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_1V2);
-
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(expectedDocmosisData, N9_MULTIPARTY_SAME_SOL);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_1v2, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
@@ -167,9 +197,37 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent2SameLegalRepresentative(NO)
             .build();
 
+        AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
+            .caseName("Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo")
+            .referenceNumber(LEGACY_CASE_REFERENCE)
+            .solicitorReferences(caseData.getSolicitorReferences())
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .respondent(new ArrayList<>(List.of(
+                Party.builder()
+                    .name(caseData.getRespondent1().getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent1LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build(), Party.builder()
+                    .name(caseData.getRespondent2().getPartyName())
+                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build()
+            )))
+            .build();
+
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(expectedDocmosisData, N11);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
@@ -190,14 +248,40 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent1AcknowledgeNotificationDate(null)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
-            .respondent2ResponseDeadline(LocalDateTime.now())
+            .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
+            .respondentSolicitor2Reference("5678")
+            .solicitorReferences(SolicitorReferences.builder()
+                                     .applicantSolicitor1Reference("12345")
+                                     .respondentSolicitor1Reference(null)
+                                     .respondentSolicitor2Reference("5678")
+                                     .build())
+
+            .build();
+        AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
+            .caseName("Mr. John Rambo \nvs 1 Mr. Sole Trader T/A Sole Trader co & 2 Mr. John Rambo")
+            .referenceNumber(LEGACY_CASE_REFERENCE)
+            .solicitorReferences(caseData.getSolicitorReferences())
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .respondent(new ArrayList<>(List.of(
+                Party.builder()
+                    .name(caseData.getRespondent2().getPartyName())
+                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build()
+            )))
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(expectedDocmosisData, N11);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
