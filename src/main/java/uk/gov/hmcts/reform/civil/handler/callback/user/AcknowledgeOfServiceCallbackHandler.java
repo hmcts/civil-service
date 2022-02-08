@@ -138,18 +138,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
 
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .respondent1AcknowledgeNotificationDate(time.now())
-            .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null)
-            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
-            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
-            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
-            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
-            .build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
