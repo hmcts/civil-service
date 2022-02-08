@@ -62,15 +62,7 @@ withPipeline(type, product, component) {
 
   onPR {
     loadVaultSecrets(secrets)
-  }
-  onMaster {
-    loadVaultSecrets(secrets)
-  }
-  onDemo {
-    loadVaultSecrets(secrets)
-  }
-
-  onSuccess(
+    onSuccess(
       //Uninstall helm after functional tests pass
       withAksClient('nonprod', product) {
         def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
@@ -86,8 +78,14 @@ withPipeline(type, product, component) {
           } catch (ignored) {
             echo "Unable to uninstall this helm release."
           }
-      }
-  )
+      })
+  }
+  onMaster {
+    loadVaultSecrets(secrets)
+  }
+  onDemo {
+    loadVaultSecrets(secrets)
+  }
 
   after('checkout') {
     onMaster {
