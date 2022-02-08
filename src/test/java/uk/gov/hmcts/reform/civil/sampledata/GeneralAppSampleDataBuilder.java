@@ -21,7 +21,6 @@ import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
@@ -145,7 +144,10 @@ public class GeneralAppSampleDataBuilder {
                         .trialDateFrom(APP_DATE_EPOCH)
                         .trialDateTo(APP_DATE_EPOCH)
                         .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
                         .supportRequirement(singletonList(OTHER_SUPPORT))
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
@@ -244,7 +246,10 @@ public class GeneralAppSampleDataBuilder {
                         .trialDateFrom(APP_DATE_EPOCH)
                         .trialDateTo(APP_DATE_EPOCH)
                         .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
                         .supportRequirement(singletonList(OTHER_SUPPORT))
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
