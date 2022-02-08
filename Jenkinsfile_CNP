@@ -139,7 +139,7 @@ withPipeline(type, product, component) {
     sh """
       ls -lr
       ARE_FUNCTIONAL_TESTS_FAILED=$(cat pipeline.log | grep -c "script returned exit code 1")
-      if [ $ARE_FUNCTIONAL_TESTS_FAILED -eq 0 ]; then
+      if [ ARE_FUNCTIONAL_TESTS_FAILED -eq 0 ]; then
         echo "Functional Tests failed"
       else
         "Functional Tests passed"
