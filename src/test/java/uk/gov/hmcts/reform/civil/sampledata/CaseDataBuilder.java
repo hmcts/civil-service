@@ -359,6 +359,7 @@ public class CaseDataBuilder {
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
         return this;
     }
@@ -389,6 +390,7 @@ public class CaseDataBuilder {
             .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
+            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
             .build();
         return this;
     }
@@ -1288,7 +1290,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentFullDefence() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
             .build();
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now().minusDays(1);
@@ -1318,7 +1320,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .file(DocumentBuilder.builder().documentName("defendant2-defence.pdf").build())
             .build();
         respondent2DQ();
         return this;

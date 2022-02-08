@@ -20,4 +20,9 @@ public class UserService {
     public UserInfo getUserInfo(String bearerToken) {
         return idamClient.getUserInfo(bearerToken);
     }
+
+    @Cacheable(value = "accessTokenCache")
+    public String getAccessToken(String username, String password) {
+        return idamClient.getAccessToken(username, password);
+    }
 }

@@ -64,6 +64,7 @@ withNightlyPipeline(type, product, component) {
 
   after('fullFunctionalTest') {
     sh """ ./gradlew runRpaHandOffTests """
+    sh """ ./gradlew runNightlyMultipartyTests """
     archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
   }
