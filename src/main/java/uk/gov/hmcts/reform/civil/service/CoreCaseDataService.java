@@ -71,6 +71,10 @@ public class CoreCaseDataService {
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 
+    public SearchResult searchCases(Query query, String authorization) {
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
+    }
+
     public SearchResult searchCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
@@ -79,6 +83,10 @@ public class CoreCaseDataService {
     public CaseDetails getCase(Long caseId) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
+    }
+
+    public CaseDetails getCase(Long caseId, String authorisation) {
+        return coreCaseDataApi.getCase(authorisation, authTokenGenerator.generate(), caseId.toString());
     }
 
     private UserAuthContent getSystemUpdateUser() {
