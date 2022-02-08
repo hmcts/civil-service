@@ -70,6 +70,25 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
+  onSuccess(
+      //Uninstall helm after functional tests pass
+      withAksClient('nonprod', product) {
+        def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+          def subscription = env.SUBSCRIPTION_NAME
+          def namespace = env.TEAM_NAMESPACE
+          def kubectl = new Kubectl(this, subscription, namespace)
+          kubectl.login()
+          def helm = new Helm(this, "${product}-${component}")
+
+          try {
+            helm.delete(dockerImage.getImageTag(), namespace)
+            echo "Uninstalled release for ${dockerImage.getImageTag()}"
+          } catch (ignored) {
+            echo "Unable to uninstall this helm release."
+          }
+      }
+  )
+
   after('checkout') {
     onMaster {
       withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
@@ -135,38 +154,6 @@ withPipeline(type, product, component) {
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-
-    sh """
-      ls -lr
-      ARE_FUNCTIONAL_TESTS_FAILED=\$(cat pipeline.log | grep -c "script returned exit code 1")
-      if [ ARE_FUNCTIONAL_TESTS_FAILED -eq 0 ]; then
-        echo "Functional Tests failed"
-      else
-        "Functional Tests passed"
-      fi
-    """
-
-    //Uninstall helm after functional tests pass
-    withAksClient('nonprod', product) {
-      if (ARE_FUNCTIONAL_TESTS_FAILED == 0) {
-        return
-      }
-      if (ARE_FUNCTIONAL_TESTS_FAILED == 1) {
-        def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-        def subscription = env.SUBSCRIPTION_NAME
-        def namespace = env.TEAM_NAMESPACE
-        def kubectl = new Kubectl(this, subscription, namespace)
-        kubectl.login()
-        def helm = new Helm(this, "${product}-${component}")
-
-        try {
-          helm.delete(dockerImage.getImageTag(), namespace)
-          echo "Uninstalled release for ${dockerImage.getImageTag()}"
-        } catch (ignored) {
-          echo "Unable to uninstall this helm release."
-        }
-      }
-    }
   }
 
   before('smoketest:aat') {
