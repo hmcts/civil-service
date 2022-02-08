@@ -106,22 +106,10 @@ withPipeline(type, product, component) {
 
   after('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  before('functionalTest:preview') {
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.CIVIL_SERVICE_URL="http://civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-  }
-
-  after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
 
     //Uninstall helm after functional tests pass
     withAksClient('nonprod', product) {
-      def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+      def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
       def subscription = env.SUBSCRIPTION_NAME
       def namespace = env.TEAM_NAMESPACE
       def kubectl = new Kubectl(this, subscription, namespace)
@@ -135,6 +123,18 @@ withPipeline(type, product, component) {
         echo "Unable to uninstall this helm release."
       }
     }
+  }
+
+  before('functionalTest:preview') {
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_URL = "http://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.CIVIL_SERVICE_URL="http://civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+  }
+
+  after('functionalTest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
   }
 
   before('smoketest:aat') {
