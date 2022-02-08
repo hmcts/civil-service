@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.*;
 import uk.gov.hmcts.reform.civil.callback.Callback;
@@ -125,6 +128,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    //@After("execution(* uk.gov.hmcts.reform.civil.aspect.EventEmitterAspect.emitBusinessProcessEvent(..))")
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
@@ -140,12 +144,16 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
 
+        //TODO - These change would need to be moved to CCUI - /case/trigger/events calls to CCD
         log.info(time.now() + "Before saving data to CCD");
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate("1643739307139406", UPDATE_CASE_DATA);
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate("1643989832161728", ACKNOWLEDGEMENT_OF_SERVICE);
         BusinessProcess businessProcess = caseDataUpdated.getBusinessProcess();
-        coreCaseDataService.submitUpdate("1643739307139406", caseDataContent(startEventResponse, businessProcess));
+        CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        coreCaseDataService.submitUpdate("1643989832161728", caseDataContent(startEventResponse, businessProcess));
         log.info(time.now() + ": After saving data to CCD");
+        //TODO - These change would need to be moved to CCUI - /case/trigger/events calls to CCD
 
+        //TODO: call EventEmitterAspect by mocking callBackParm as submitted
         if (caseDataUpdated.getBusinessProcess() != null && caseDataUpdated.getBusinessProcess().getStatus() == READY) {
             eventEmitterService.emitBusinessProcessCamundaEvent(caseDataUpdated, false);
             log.info("Event emitted successfully");
@@ -175,7 +183,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
