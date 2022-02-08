@@ -2,16 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.*;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -58,7 +54,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
 
     private final EventEmitterService eventEmitterService;
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -134,22 +129,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
-            .build();
-    }
-
-
-    //@After("execution(* uk.gov.hmcts.reform.civil.aspect.EventEmitterAspect.emitBusinessProcessEvent(..))")
-    private CallbackResponse setNewResponseDeadlineV2(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        String caseId = callbackParams.getParams().get("case_id").toString();
 
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
@@ -160,19 +139,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
-
-        log.info(time.now() + "Before saving data to CCD");
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, ACKNOWLEDGEMENT_OF_SERVICE);
-        BusinessProcess businessProcess = caseDataUpdated.getBusinessProcess();
-        CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-        log.info(time.now() + ": After saving data to CCD");
-
-        //TODO: call EventEmitterAspect by mocking callBackParm as submitted
-        if (caseDataUpdated.getBusinessProcess() != null && caseDataUpdated.getBusinessProcess().getStatus() == READY) {
-            eventEmitterService.emitBusinessProcessCamundaEvent(caseDataUpdated, false);
-            log.info("Event emitted successfully");
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
@@ -198,6 +164,40 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
             .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
+    }
+
+    //@After("execution(* uk.gov.hmcts.reform.civil.aspect.EventEmitterAspect.emitBusinessProcessEvent(..))")
+    private CallbackResponse setNewResponseDeadlineV2(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        String caseId = callbackParams.getParams().get("id").toString();
+
+        CaseData caseDataUpdated = caseData.toBuilder()
+            .respondent1AcknowledgeNotificationDate(time.now())
+            .respondent1ResponseDeadline(newResponseDate)
+            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
+            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            .build();
+
+        log.info(time.now() + "Before saving data to CCD");
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, ACKNOWLEDGEMENT_OF_SERVICE);
+        BusinessProcess businessProcess = caseDataUpdated.getBusinessProcess();
+        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        log.info(time.now() + ": After saving data to CCD");
+
+        //TODO: call EventEmitterAspect by mocking callBackParm as submitted
+        if (caseDataUpdated.getBusinessProcess() != null && caseDataUpdated.getBusinessProcess().getStatus() == READY) {
+            eventEmitterService.emitBusinessProcessCamundaEvent(caseDataUpdated, false);
+            log.info("Event emitted successfully");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
