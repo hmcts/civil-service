@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
@@ -26,12 +27,15 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        for (CaseDetails aCase : cases) {
+            log.info("PolledcaseId ({})", aCase.getId());
+            CaseData caseData = caseDetailsConverter.toCaseData(aCase);
+            log.info("PolledcaseInfo ({}) businessproc ({}) ({}) ({})",
+                     caseData.getLegacyCaseReference(), caseData.getBusinessProcess().getStatus(),
+                     caseData.getBusinessProcess().getCamundaEvent(), caseData.getBusinessProcess().getActivityId());
+        }
         cases.stream()
-            .peek(caseDetails -> log.info("PolledcaseId ({})", caseDetails.getId()))
             .map(caseDetailsConverter::toCaseData)
-            .peek(caseData -> log.info("PolledcaseInfo ({}) businessproc ({}) ({}) ({})",
-                caseData.getLegacyCaseReference(), caseData.getBusinessProcess().getStatus(),
-                caseData.getBusinessProcess().getCamundaEvent(), caseData.getBusinessProcess().getActivityId()))
             .forEach(mappedCase -> eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true));
     }
 
