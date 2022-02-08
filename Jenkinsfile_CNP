@@ -3,9 +3,8 @@
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.DockerImage
-import uk.gov.hmcts.contino.PipelineCallbacksConfig
-import uk.gov.hmcts.contino.PipelineCallbacksRunner
-import uk.gov.hmcts.pipeline.AKSSubscriptions
+import uk.gov.hmcts.contino.Helm
+import uk.gov.hmcts.contino.Kubectl
 
 def type = "java"
 def product = "civil"
