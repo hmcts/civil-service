@@ -121,10 +121,21 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
 
     //Uninstall helm after functional tests pass
-    def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-    def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: new AKSSubscriptions(this).preview]
-    def callbacks = new PipelineCallbacksConfig()
-    helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
+    withAksClient('nonprod', product) {
+      def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+      def subscription = env.SUBSCRIPTION_NAME
+      def namespace = env.TEAM_NAMESPACE
+      def kubectl = new Kubectl(this, subscription, namespace)
+      kubectl.login()
+      def helm = new Helm(this, "${product}-${component}")
+
+      try {
+        helm.delete(dockerImage.getImageTag(), namespace)
+        echo "Uninstalled release for ${dockerImage.getImageTag()}"
+      } catch (ignored) {
+        echo "Unable to uninstall this helm release."
+      }
+    }
   }
 
   before('smoketest:aat') {
