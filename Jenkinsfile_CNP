@@ -5,6 +5,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.DockerImage
 import uk.gov.hmcts.contino.PipelineCallbacksConfig
 import uk.gov.hmcts.contino.PipelineCallbacksRunner
+import uk.gov.hmcts.contino.Subscription
 import uk.gov.hmcts.pipeline.AKSSubscriptions
 
 def type = "java"
@@ -153,11 +154,13 @@ withPipeline(type, product, component) {
   }
 
   onPR {
-    onSuccess {
-      def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-      def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: new AKSSubscriptions(this).preview]
-      def callbacks = new PipelineCallbacksConfig()
-      helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
+    withSubscriptionLogin(subscription.nonProdName) {
+      onSuccess {
+        def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+        def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: new AKSSubscriptions(this).preview]
+        def callbacks = new PipelineCallbacksConfig()
+        helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
+      }
     }
   }
 
