@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@Clear-Helm-Release-On-Success")
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.DockerImage
 import uk.gov.hmcts.contino.PipelineCallbacksConfig
@@ -60,6 +60,7 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   enableAksStagingDeployment()
   enableSlackNotifications('#civil_notifications')
+  enableCleanupOfHelmReleaseOnSuccess()
 
   onPR {
     loadVaultSecrets(secrets)
@@ -150,17 +151,6 @@ withPipeline(type, product, component) {
 
   after('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-  }
-
-  onPR {
-    onSuccess {
-      withSubscriptionLogin(env.SUBSCRIPTION_NAME) {
-        def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME.toLowerCase(), env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-        def params = [subscription: env.SUBSCRIPTION_NAME, product: product, component: component, aksSubscription: new AKSSubscriptions(this).preview]
-        def callbacks = new PipelineCallbacksConfig()
-        helmUninstall(dockerImage, params, new PipelineCallbacksRunner(callbacks));
-      }
-    }
   }
 
   onMaster() {
