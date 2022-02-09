@@ -60,10 +60,10 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   enableAksStagingDeployment()
   enableSlackNotifications('#civil_notifications')
-  enableCleanupOfHelmReleaseOnSuccess()
 
   onPR {
     loadVaultSecrets(secrets)
+    enableCleanupOfHelmReleaseOnSuccess()
   }
   onMaster {
     loadVaultSecrets(secrets)
