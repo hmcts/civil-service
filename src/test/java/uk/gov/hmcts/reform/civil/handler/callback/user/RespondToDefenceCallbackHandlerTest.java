@@ -162,7 +162,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("claimantResponseScenarioFlag"))
-                .isEqualTo("ONE_V_TWO_SAME_SOLICITOR");
+                .isEqualTo("ONE_V_TWO_ONE_LEGAL_REP");
         }
 
         @Test
@@ -179,7 +179,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("claimantResponseScenarioFlag"))
-                .isEqualTo("ONE_V_TWO_DIFFERENT_SOLICITOR");
+                .isEqualTo("ONE_V_TWO_TWO_LEGAL_REP");
         }
     }
 

@@ -56,15 +56,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private String currentDefendantFor1v2SingleSolIndividualResponse = null;
+    private MultiPartyScenario multiPartyScenario = null;
+    private boolean isMulitPartyClaimantResponseButOneProceeding = false;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
-
-        if (TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-             && isMulitPartyClaimantResponseButOneProceeding(caseData)) {
-            templateId = N181;
-        }
+        multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        isMulitPartyClaimantResponseButOneProceeding = isMulitPartyClaimantResponseButOneProceeding(caseData);
+        DocmosisTemplates templateId = TWO_V_ONE.equals(multiPartyScenario)
+            && !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
 
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
@@ -135,7 +134,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
         var applicant1 = getApplicant(caseData);
         if (isClaimantResponse(caseData)) {
-            if (isMulitPartyClaimantResponseButOneProceeding(caseData)
+            if (isMulitPartyClaimantResponseButOneProceeding
                 && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
                 applicant1 = getApplicant2(caseData);
             }
@@ -148,7 +147,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(applicant1)
             .applicant2((TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-                    && !isMulitPartyClaimantResponseButOneProceeding(caseData)) ? getApplicant2(caseData) : null)
+                    && !isMulitPartyClaimantResponseButOneProceeding) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -165,10 +164,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private boolean isClaimantResponse(CaseData caseData) {
-        if (caseData.getApplicantsProceedIntention() != null) {
-            return true;
-        }
-        return false;
+        return caseData.getApplicantsProceedIntention() != null;
     }
 
     private boolean isMulitPartyClaimantResponseButOneProceeding(CaseData caseData) {
@@ -249,10 +245,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var applicant = caseData.getApplicant1();
 
         if (TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            && isMulitPartyClaimantResponseButOneProceeding(caseData)) {
-            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
-                applicant = caseData.getApplicant2();
-            }
+            && isMulitPartyClaimantResponseButOneProceeding
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+            applicant = caseData.getApplicant2();
         }
 
         return Party.builder()
