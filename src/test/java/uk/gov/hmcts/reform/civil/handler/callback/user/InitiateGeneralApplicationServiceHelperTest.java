@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -20,10 +20,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationServiceHelper.class,
@@ -32,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class InitiateGeneralApplicationServiceHelperTest {
 
     private static final String TEST_USER_EMAILID = "test@gmail.com";
+    public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     @Autowired
     private InitiateGeneralApplicationServiceHelper helper;
@@ -60,7 +59,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                 .organisationID(STRING_CONSTANT).build())
                                               .orgPolicyReference(STRING_CONSTANT).build())
-            .generalApplications(wrapElements(getGeneralApplication()))
+            .generalApplications(ElementUtils.wrapElements(getGeneralApplication()))
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
