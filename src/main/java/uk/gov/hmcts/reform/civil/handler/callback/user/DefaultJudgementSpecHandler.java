@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -44,6 +45,21 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         + "%n%n * The Defendant has not satisfied the whole claim, including costs."
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
+    public static final String REPAYMENT_SUMMARY = "The judgment will order the defendant to pay £%s including the claim fee "
+        + "\n   and interest, if applicable, as shown."
+        + "%n%n  Claim amount"
+        + "%n%n  £%s"
+        + "%n%n  Fixed Cost"
+        + "%n%n  £%s"
+        + "%n%n  Claim fee amount"
+        + "%n%n  £%s"
+        + "%n%n  Sub total"
+        + "%n%n  £%s"
+        + "%n%n  Amount already paid "
+        +  "%n   £%s"
+        + "%n%n  Total still to pay"
+        +  "%n   £%s";
+
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
 
@@ -53,6 +69,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
+            callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
             callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -77,8 +94,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody() {
-        return format(CPR_REQUIRED_INFO);
-    }
+        return format(CPR_REQUIRED_INFO);}
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
@@ -103,6 +119,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -127,6 +144,24 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     }
 
+//    private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {
+//        var caseData = callbackParams.getCaseData();
+//        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+//        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue() + caseData.getTotalInterest().doubleValue();
+//
+//
+//        var a = ("£" + caseData.getTotalClaimAmount().toString());
+//        caseDataBuilder.repaymentTotal(a);
+//
+//
+//
+//
+//        return AboutToStartOrSubmitCallbackResponse.builder()
+//            .data(caseDataBuilder.build().toMap(objectMapper))
+//            .build();
+//
+//    }
+
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
@@ -141,6 +176,25 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+
+
+    private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //var a = (String.format(REPAYMENT_SUMMARY, caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount()));
+
+        caseDataBuilder.repaymentSummaryObject(REPAYMENT_SUMMARY);
+
+//      caseDataBuilder.repaymentSummaryObject(String.format(REPAYMENT_SUMMARY, caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+//                                                             caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+//                                                             caseData.getTotalClaimAmount(),caseData.getTotalClaimAmount()));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
 }

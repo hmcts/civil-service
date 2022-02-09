@@ -175,11 +175,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = caseData.getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
         caseDataBuilder.superClaimType(UNSPEC_CLAIM);
-        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getApplicant1().getPrimaryAddress().getPostCode());
-            caseDataBuilder.superClaimType(SPEC_CLAIM);
-        }
+//        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
+//            errors = postcodeValidator.validatePostCodeForDefendant(
+//                caseData.getApplicant1().getPrimaryAddress().getPostCode());
+//            caseDataBuilder.superClaimType(SPEC_CLAIM);
+//        }
+        caseDataBuilder.superClaimType(SPEC_CLAIM);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -433,11 +434,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+//        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+//            caseData.getRespondent1().getPrimaryAddress().getPostCode());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            //.errors(errors)
             .build();
 
     }
