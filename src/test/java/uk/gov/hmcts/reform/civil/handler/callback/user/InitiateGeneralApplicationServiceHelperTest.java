@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -9,10 +8,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.String;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -20,10 +20,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.APPLICANT_EMAIL_ID_CONSTANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest.RESPONDENT_EMAIL_ID_CONSTANT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationServiceHelper.class,
@@ -31,7 +28,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 public class InitiateGeneralApplicationServiceHelperTest {
 
-    private static final String TEST_USER_EMAILID = "test@gmail.com";
+    private static final java.lang.String TEST_USER_EMAILID = "test@gmail.com";
+    public static final java.lang.String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final java.lang.String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     @Autowired
     private InitiateGeneralApplicationServiceHelper helper;
@@ -42,7 +41,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
     CaseData caseData = GeneralApplicationDetailsBuilder.builder()
         .getTestCaseData(CaseData.builder().build());
 
-    public UserDetails getUserDetails(String email) {
+    public UserDetails getUserDetails(java.lang.String email) {
         return UserDetails.builder().id(STRING_CONSTANT)
             .email(email)
             .build();
@@ -50,7 +49,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     public CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
+            .generalAppType(String.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -60,7 +59,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                 .organisationID(STRING_CONSTANT).build())
                                               .orgPolicyReference(STRING_CONSTANT).build())
-            .generalApplications(wrapElements(getGeneralApplication()))
+            .generalApplications(ElementUtils.wrapElements(getGeneralApplication()))
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -71,7 +70,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     public GeneralApplication getGeneralApplication() {
         GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        return builder.generalAppType(GAApplicationType.builder()
+        return builder.generalAppType(String.builder()
                                           .types(singletonList(SUMMARY_JUDGEMENT))
                                           .build())
             .build();

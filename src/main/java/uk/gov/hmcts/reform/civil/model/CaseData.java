@@ -28,14 +28,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GATypeGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -57,20 +58,21 @@ public class CaseData implements MappableObject {
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
-    private final GAApplicationType generalAppType;
+    private final GATypeGAspec generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
-    private final String generalAppDetailsOfOrder;
-    private final String generalAppReasonsOfOrder;
+    private final java.lang.String generalAppDetailsOfOrder;
+    private final java.lang.String generalAppReasonsOfOrder;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final List<Element<GeneralApplication>> generalApplications;
+    private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
-    private final String respondentSolicitor2Reference;
+    private final java.lang.String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
     private final Party applicant2;
@@ -89,22 +91,22 @@ public class CaseData implements MappableObject {
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
     private final YesOrNo respondent2OrgRegistered;
-    private final String respondentSolicitor1EmailAddress;
-    private final String respondentSolicitor2EmailAddress;
+    private final java.lang.String respondentSolicitor1EmailAddress;
+    private final java.lang.String respondentSolicitor2EmailAddress;
     private final YesOrNo uploadParticularsOfClaim;
-    private final String detailsOfClaim;
+    private final java.lang.String detailsOfClaim;
     private final ClaimValue claimValue;
     private final Fee claimFee;
-    private final String paymentReference;
+    private final java.lang.String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
-    private final String claimTypeOther;
+    private final java.lang.String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
-    private final String personalInjuryTypeOther;
+    private final java.lang.String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     private final StatementOfTruth uiStatementOfTruth;
-    private final String legacyCaseReference;
+    private final java.lang.String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
@@ -159,32 +161,32 @@ public class CaseData implements MappableObject {
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
     private final BigDecimal breakDownInterestTotal;
-    private final String breakDownInterestDescription;
+    private final java.lang.String breakDownInterestDescription;
     private final InterestClaimFromType interestClaimFrom;
     private final InterestClaimUntilType interestClaimUntil;
     private final LocalDate interestFromSpecificDate;
-    private final String interestFromSpecificDateDescription;
-    private final String calculatedInterest;
-    private final String specRespondentSolicitor1EmailAddress;
+    private final java.lang.String interestFromSpecificDateDescription;
+    private final java.lang.String calculatedInterest;
+    private final java.lang.String specRespondentSolicitor1EmailAddress;
     private final YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private final Address specAoSApplicantCorrespondenceAddressdetails;
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final String specClaimResponseTimelineList;
+    private final java.lang.String specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
 
-    private final String detailsOfWhyDoesYouDisputeTheClaim;
+    private final java.lang.String detailsOfWhyDoesYouDisputeTheClaim;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
-    private final String defenceRouteRequired;
-    private final String responseClaimTrack;
+    private final java.lang.String defenceRouteRequired;
+    private final java.lang.String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
     /**
@@ -202,21 +204,21 @@ public class CaseData implements MappableObject {
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
-    private final String responseToClaimAdmitPartWhyNotPayLRspec;
+    private final java.lang.String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
-    private final String responseClaimWitnesses;
+    private final java.lang.String responseClaimWitnesses;
     private final YesOrNo smallClaimHearingInterpreterRequired;
-    private final String smallClaimHearingInterpreterDescription;
+    private final java.lang.String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
 
-    private final String additionalInformationForJudge;
+    private final java.lang.String additionalInformationForJudge;
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 
-    private final String caseNote;
+    private final java.lang.String caseNote;
     private final List<Element<CaseNote>> caseNotes;
 
     @Valid
@@ -255,7 +257,7 @@ public class CaseData implements MappableObject {
     private final DynamicList defendantSolicitorNotifyClaimOptions;
     private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
     private final DynamicList selectLitigationFriend;
-    private final String litigantFriendSelection;
+    private final java.lang.String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
 
@@ -285,7 +287,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
-    private final String claimAmountBreakupSummaryObject;
+    private final java.lang.String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
 

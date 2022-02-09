@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +19,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 
 public abstract class BaseCallbackHandlerTest {
 
-    public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
     public static final Long CASE_ID = 1594901956117591L;
     @MockBean
     protected AuthTokenGenerator authTokenGenerator;
     @MockBean
     protected UserService userService;
-    @MockBean
-    protected IdamClient idamClient;
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
         return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));

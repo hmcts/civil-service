@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.String;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -21,7 +21,6 @@ import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.HOUR_1;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
@@ -30,15 +29,15 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class GeneralAppSampleDataBuilder {
 
-    protected static final String STRING_CONSTANT = "this is a string";
-    protected static final String STRING_NUM_CONSTANT = "123456789";
+    protected static final java.lang.String STRING_CONSTANT = "this is a string";
+    protected static final java.lang.String STRING_NUM_CONSTANT = "123456789";
     protected static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
     protected static final DynamicList PBALIST = DynamicList.builder().build();
 
     protected CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+                .generalAppType(String.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -112,7 +111,7 @@ public class GeneralAppSampleDataBuilder {
         urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
         GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+                .generalAppType(String.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -145,7 +144,10 @@ public class GeneralAppSampleDataBuilder {
                         .trialDateFrom(APP_DATE_EPOCH)
                         .trialDateTo(APP_DATE_EPOCH)
                         .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
                         .supportRequirement(singletonList(OTHER_SUPPORT))
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
@@ -207,7 +209,7 @@ public class GeneralAppSampleDataBuilder {
 
     protected CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
         GeneralApplication application = GeneralApplication.builder()
-                .generalAppType(GAApplicationType.builder()
+                .generalAppType(String.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -244,7 +246,10 @@ public class GeneralAppSampleDataBuilder {
                         .trialDateFrom(APP_DATE_EPOCH)
                         .trialDateTo(APP_DATE_EPOCH)
                         .hearingYesorNo(YES)
-                        .hearingDuration(HOUR_1)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
                         .supportRequirement(singletonList(OTHER_SUPPORT))
                         .judgeRequiredYesOrNo(YES)
                         .trialRequiredYesOrNo(YES)
