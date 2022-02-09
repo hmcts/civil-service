@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -90,6 +91,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
+            .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
@@ -134,6 +136,37 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().build().toMap(objectMapper))
+            .build();
+    }
+
+    /**
+     * From the responseType, if we choose A, advance for a while, then backtrack and choose B, part of our responses
+     * in A stay in frontend and may influence screens that A and B have in common.
+     *
+     * <p>Why does that happen?
+     * Frontend keeps an object with the CaseData information.
+     * In mid callbacks frontend sends part of that object, which gets deserialized into an instance of CaseData.
+     * We can modify that caseData, but since where using objectMapper.setSerializationInclusion(Include.NON_EMPTY)
+     * we only send anything not empty, not null. That means we cannot signal frontend to "clean" info.
+     * What we can do, however, is change info.</p>
+     *
+     * <p>For instance, the field specDefenceFullAdmittedRequired is only accessible from FULL_ADMISSION.
+     * If the user went to full admission, checked specDefenceFullAdmittedRequired = yes
+     * and then went back and to part admit, a bunch of screens common to both options won't appear because their
+     * condition to show include that specDefenceFullAdmittedRequired != yes. So, if in this method we say that whenever
+     * responseType is not full admission, then specDefenceFullAdmittedRequired = No, since that is not empty, gets sent
+     * to frontend and frontend overwrites that field on its copy.</p>
+     *
+     * @param callbackParams parameters from frontend.
+     * @return caseData cleaned from backtracked paths.
+     */
+    private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
