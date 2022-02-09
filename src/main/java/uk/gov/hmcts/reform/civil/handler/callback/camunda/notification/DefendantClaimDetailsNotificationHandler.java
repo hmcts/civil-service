@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.List;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +46,6 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
-    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -81,7 +78,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String recipient = getRecipientEmail(caseData, caseEvent);
-        String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
+        String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty();
 
         notificationService.sendMail(
             recipient,
@@ -121,17 +118,14 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONSE_DEADLINE, formatLocalDate(caseData
-                                                                     .getRespondent1ResponseDeadline()
-                                                                     .toLocalDate(), DATE),
-            RESPONSE_DEADLINE_PLUS_28,
-            formatLocalDate(deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
-                                .toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getIssueDate(), DATE)
         );
     }
 
+    private boolean isCcNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC.name());
+    }
 }
