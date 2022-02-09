@@ -64,6 +64,8 @@ public class CaseData implements MappableObject {
     private final Party respondent1Copy;
     private final Party respondent2;
     private final Party respondent2Copy;
+    private final Party respondent1DetailsForClaimDetailsTab;
+    private final Party respondent2DetailsForClaimDetailsTab;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
@@ -123,6 +125,7 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;

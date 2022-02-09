@@ -104,7 +104,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
@@ -122,6 +121,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
 
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1AcknowledgeNotificationDate() != null) {
