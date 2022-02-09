@@ -14,18 +14,27 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -33,13 +42,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     ExitSurveyConfiguration.class,
-    ExitSurveyContentService.class
+    ExitSurveyContentService.class,
+    CaseDetailsConverter.class,
+    StateFlowEngine.class,
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -54,6 +66,12 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CoreCaseUserService coreCaseUserService;
+
+    @Autowired
+    private UserService userService;
 
     @Nested
     class AboutToStartCallback {
@@ -70,7 +88,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         }
 
         @Test
-        void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
+        void shouldSetSelectLitigationFriend_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateAddLitigationFriend_1v2_SameSolicitor()
                 .build();
@@ -80,6 +98,67 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertTrue(response.getData().containsKey("selectLitigationFriend"));
+        }
+
+        @Test
+        void shouldNotSetIsRespondent1_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddLitigationFriend_1v2_SameSolicitor()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertFalse(response.getData().containsKey("isRespondent1"));
+        }
+
+        @Test
+        void shouldNotSetSelectLitigationFriend_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_DiffSolicitor()
+                .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertFalse(response.getData().containsKey("selectLitigationFriend"));
+        }
+
+        @Test
+        void shouldSetIsRespondent1ToYes_whenInvokedAsRespondent1Solicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_DiffSolicitor()
+                .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertTrue(response.getData().get("isRespondent1").equals("Yes"));
+        }
+
+        @Test
+        void shouldSetIsRespondent1ToYes_whenInvokedAsRespondent2Solicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent2LitigationFriend_1v2_DiffSolicitor()
+                .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertTrue(response.getData().get("isRespondent1").equals("No"));
         }
     }
 
@@ -282,6 +361,52 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
+        }
+
+        @Test
+        void shouldSetRespondent1LF_WithMultiParty_1v2_DiffSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_DiffSolicitor()
+                .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+        }
+
+        @Test
+        void shouldSetRespondent2LF_WithMultiParty_1v2_DiffSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent2LitigationFriend_1v2_DiffSolicitor()
+                .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
         }
 
     }
