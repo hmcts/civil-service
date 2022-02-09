@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -73,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     CreateClaimSpecCallbackHandler.class,
     JacksonAutoConfiguration.class,
@@ -115,9 +120,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private IdamClient idamClient;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     private ValidateEmailService validateEmailService;
 
@@ -132,6 +134,16 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
+
+    @MockBean
+    private FeatureToggleService toggleService;
+
+    @org.junit.Test
+    public void ldBlock() {
+        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        Assert.assertTrue(handler.handledEvents().isEmpty());
+        Assert.assertFalse(handler.handledEvents().isEmpty());
+    }
 
     @Nested
     class AboutToStartCallback {
