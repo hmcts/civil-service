@@ -41,12 +41,12 @@ class SendGridClientTest {
         Map.of()
     );
     private static final EmailData EMAIL_DATA = EmailData.builder()
-        .to("to@server.net")
+        .to("indu.chaturvedi@version1.com")
         .subject("my email")
         .message("My email message")
         .attachments(List.of())
         .build();
-    private static final String EMAIL_FROM = "from@server.net";
+    private static final String EMAIL_FROM = "indu.chaturvedi@hmcts.net";
 
     @MockBean
     private SendGrid sendGrid;

@@ -220,7 +220,7 @@ rd_professional:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil+robotics@gmail.com
+    recipient: indu.chaturvedi@version1.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
 ---
 

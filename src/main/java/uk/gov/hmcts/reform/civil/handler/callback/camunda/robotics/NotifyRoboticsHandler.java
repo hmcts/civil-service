@@ -32,6 +32,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
+        System.out.println("Inside super class here ");
         RoboticsCaseData roboticsCaseData = null;
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;

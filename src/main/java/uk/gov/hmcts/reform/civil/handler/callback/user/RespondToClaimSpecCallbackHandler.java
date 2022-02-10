@@ -249,6 +249,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
+        System.out.println("ABOUT_TO_SUBMIT Call");
+        System.out.println("inside setApplicantResponseDeadline");
+
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -279,7 +282,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
-        System.out.println(" SOT page ");
+        System.out.println("V_1, ABOUT_TO_SUBMIT- Call");
+        System.out.println(" SOT page: inside setApplicantResponseDeadlineV1 ");
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -309,6 +313,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        System.out.println("SUBMITTED call");
+        System.out.println("inside buildConfirmation method ");
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         String claimNumber = caseData.getLegacyCaseReference();

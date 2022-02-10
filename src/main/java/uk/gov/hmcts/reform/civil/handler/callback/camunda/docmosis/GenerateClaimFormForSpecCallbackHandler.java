@@ -73,8 +73,9 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         System.out.println("generateClaimFormForSpec 2");
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim);
         System.out.println("generateClaimFormForSpec 3 " + documentMetaDataList.size());
-        if (documentMetaDataList.size() > 0) {
-            System.out.println("BEFORE CALLING STITICHING APIS");
+        System.out.println("BEFORE CALLING STITICHING APIS");
+        if (documentMetaDataList.size() > 1) {
+            System.out.println("AFTER CALLING STITICHING APIS");
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),

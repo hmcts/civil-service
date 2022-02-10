@@ -38,12 +38,16 @@ public class RoboticsNotificationService {
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
         requireNonNull(caseData);
+        System.out.println(" RoboticsNotificationService : inside notifyRobotics");
         EmailData emailData = !multiPartyScenario
             ? prepareEmailData(caseData) : prepareEmailDataMultiParty(caseData);
+        System.out.println(" after returrnig from prepareEmaildata");
+        System.out.println(" EmailData here " + emailData.toString());
         sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
     }
 
     private EmailData prepareEmailData(CaseData caseData) {
+        System.out.println(" RoboticsNotificationService : start of  prepareEmailData");
         RoboticsCaseData roboticsCaseData;
         RoboticsCaseDataSpec roboticsCaseDataSpec;
         byte[] roboticsJsonData;
@@ -57,6 +61,10 @@ public class RoboticsNotificationService {
             }
 
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
+            System.out.println("file name " + fileName);
+
+            System.out.println(" RoboticsNotificationService : end of  prepareEmailData");
+            System.out.println(" Receipient details " + roboticsEmailConfiguration.getRecipient());
 
             return EmailData.builder()
                 .message(String.format("Robotics case data JSON is attached for %s", caseData.getLegacyCaseReference()))

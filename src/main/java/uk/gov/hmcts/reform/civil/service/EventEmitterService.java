@@ -19,8 +19,10 @@ public class EventEmitterService {
     private final RuntimeService runtimeService;
 
     public void emitBusinessProcessCamundaEvent(CaseData caseData, boolean dispatchProcess) {
+        System.out.println("inside emitBusinessProcessCamundaEvent , Camunda class");
         var caseId = caseData.getCcdCaseReference();
         var businessProcess = caseData.getBusinessProcess();
+        System.out.println("Business Process name : " +  businessProcess);
         var camundaEvent = businessProcess.getCamundaEvent();
         log.info(format("Emitting %s camunda event for case: %d", camundaEvent, caseId));
         try {
