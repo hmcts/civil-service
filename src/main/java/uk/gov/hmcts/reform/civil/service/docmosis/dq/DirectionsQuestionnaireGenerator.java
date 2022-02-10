@@ -37,10 +37,12 @@ import java.util.Locale;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
@@ -74,6 +76,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
                     DocumentType.DIRECTIONS_QUESTIONNAIRE)
         );
+    }
+
+    private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return N181_MULTIPARTY_SAME_SOL;
+            case TWO_V_ONE:
+                return N181_2V1;
+            default:
+                return N181;
+        }
     }
 
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,

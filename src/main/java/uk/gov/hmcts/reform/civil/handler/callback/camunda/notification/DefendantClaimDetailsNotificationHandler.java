@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
@@ -48,13 +46,11 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimDetails,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimDetailsV1
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimDetails
         );
     }
 
@@ -80,27 +76,9 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
 
     private CallbackResponse notifyRespondentSolicitorForClaimDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-            : caseData.getRespondentSolicitor1EmailAddress();
-
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse notifyRespondentSolicitorForClaimDetailsV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String recipient = getRecipientEmail(caseData, caseEvent);
-        String emailTemplate = getEmailTemplate();
+        String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty();
 
         notificationService.sendMail(
             recipient,
@@ -112,12 +90,6 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
-    }
-
-    private String getEmailTemplate() {
-        return featureToggleService.isMultipartyEnabled()
-            ? notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty()
-            : notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
     }
 
     private String getRecipientEmail(CaseData caseData, CaseEvent caseEvent) {
