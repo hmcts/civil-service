@@ -22,15 +22,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -54,51 +53,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     @Nested
     class AboutToSubmitCallback {
 
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-applicant-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-applicant-notification-000DC001"
-            );
-        }
-
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "defendantName", "Mr. Sole Trader"
-            );
-        }
-    }
-
-    @Nested
-    class AboutToSubmitV1Callback {
-
         @Nested
         class OneVsOneScenario {
 
@@ -110,7 +64,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
                                  .build())
@@ -134,7 +87,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
                                  .build())
@@ -163,7 +115,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
                                  .build())
@@ -188,7 +139,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
                                  .build())
@@ -213,7 +163,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
                                  .build())
@@ -241,7 +190,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
                                  .build())
@@ -266,7 +214,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
-                    .version(V_1)
                     .request(CallbackRequest.builder()
                                  .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
                                  .build())
@@ -310,5 +257,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build()).build())).isEqualTo(TASK_ID_CC);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC").build()).build())).isEqualTo(TASK_ID_CC_RESP2);
     }
 }

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
@@ -47,8 +46,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForDefendantResponse,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifySolicitorsForDefendantResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifySolicitorsForDefendantResponse
         );
     }
 
@@ -70,21 +68,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse notifyApplicantSolicitorForDefendantResponse(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getRespondentSolicitor1EmailAddress()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
-
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
@@ -138,11 +121,5 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2()))
             );
         }
-    }
-
-    //used by existing production callback - non MP
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.name());
     }
 }

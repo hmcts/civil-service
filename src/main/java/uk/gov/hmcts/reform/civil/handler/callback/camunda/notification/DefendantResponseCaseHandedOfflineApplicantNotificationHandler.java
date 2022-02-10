@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -39,8 +38,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseHandedOffline,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseHandedOfflineV1
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorForCaseHandedOffline
         );
     }
 
@@ -56,24 +54,11 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private CallbackResponse notifyApplicantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    //Offline notification will point to a new MP template for displaying defendant responses
-    private CallbackResponse notifyApplicantSolicitorForCaseHandedOfflineV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         String templateID = is1v1Or2v1Case(caseData)
             ? notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()
+            //1v2 template expects different data
             : notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
 
         sendNotificationToSolicitor(caseData, recipient, templateID);

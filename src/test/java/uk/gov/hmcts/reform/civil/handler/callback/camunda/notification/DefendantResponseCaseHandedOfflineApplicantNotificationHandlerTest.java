@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -50,30 +48,6 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("template-id");
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentCounterClaimAfterNotifyDetails().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-case-handed-offline-applicant-notification-000DC001"
-            );
-        }
-    }
-
-    @Nested
-    class AboutToSubmitV1Callback {
-
         @Test
         void shouldNotifyApplicantSolicitor_when1v1Case() {
             when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
@@ -85,7 +59,6 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
                              .build())
@@ -113,7 +86,6 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
                              .build())
@@ -142,7 +114,6 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
                              .build())

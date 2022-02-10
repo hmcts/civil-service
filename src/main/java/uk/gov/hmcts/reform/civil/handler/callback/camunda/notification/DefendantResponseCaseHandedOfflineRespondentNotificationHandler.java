@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -44,8 +43,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseHandedOffline,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseHandedOfflineV1
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseHandedOffline
         );
     }
 
@@ -59,21 +57,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
     //Offline notification will point to a new MP template for displaying defendant responses
-    private CallbackResponse notifyRespondentSolicitorForCaseHandedOfflineV1(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient;
         String templateID;
