@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
 
@@ -85,7 +86,7 @@ public class PartyUtils {
     public static String buildPartiesReferences(CaseData caseData) {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
-        boolean hasRespondent2Reference = caseData.getRespondentSolicitor2Reference() != null;
+        boolean hasRespondent2Reference = defendantSolicitor2Reference.test(caseData);
 
         if (solicitorReferences.getApplicantSolicitor1Reference() != null) {
             stringBuilder.append("Claimant reference: ");
@@ -107,4 +108,7 @@ public class PartyUtils {
         }
         return stringBuilder.toString();
     }
+
+    private static final Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
+        .getRespondentSolicitor2Reference() != null;
 }

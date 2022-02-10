@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
@@ -176,12 +177,24 @@ class PartyUtilsTest {
     class PartyReferences {
 
         @Test
-        void shouldReturnReferences_whenNot1v2DiffSolicitorCase() {
+        void shouldReturnReferences_whenNot1v2DiffSolicitorAndBothRefAvailable() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
             assertEquals("Claimant reference: 12345\nDefendant reference: 6789", partyReferences);
+        }
+
+        @Test
+        void shouldReturnReferences_whenNot1v2DiffSolicitorAndOnlyClaimantRefAndSol2RefAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("App One").build())
+                .respondentSolicitor2Reference("Def Two")
+                .build();
+
+            String partyReferences = PartyUtils.buildPartiesReferences(caseData);
+
+            assertEquals("Claimant reference: App One\nDefendant 2 reference: Def Two", partyReferences);
         }
 
         @Test
