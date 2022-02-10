@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -439,6 +440,56 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventForSettingFee extends GeneralAppSampleDataBuilder {
+
+        private static final String SET_FEES_FOR_APPLICATION = "ga-set-application-fees";
+
+        @Test
+        void shouldSet108Fees_whenApplicationIsConsented() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                    CaseDataBuilder.builder().build(), true, false);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
+        }
+
+        @Test
+        void shouldSet108Fees_whenApplicationIsUnConsentedWithoutNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                    CaseDataBuilder.builder().build(), false, false);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
+        }
+
+        @Test
+        void shouldSet275Fees_whenApplicationIsUnConsentedWithNotice() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                    CaseDataBuilder.builder().build(), false, true);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+        }
+
+        private GAPbaDetails getPBADetails(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getGeneralAppPBADetails();
         }
     }
 
