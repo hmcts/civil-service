@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.applicationinsights.core.dependencies.apachecommons.lang3.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -45,23 +47,66 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         + "%n%n * The Defendant has not satisfied the whole claim, including costs."
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
-    public static final String REPAYMENT_SUMMARY = "The judgment will order the defendant to pay £%s including the claim fee "
-        + "\n   and interest, if applicable, as shown."
+    public static final String REPAYMENT_SUMMARY_BOTH_INTEREST_FIXED = "The judgment will order the defendant to pay £%s including the claim fee "
+        + "\n    and interest, if applicable, as shown."
+        + "%n%n  Claim amount"
+        + "%n%n  £%s"
+        + "%n%n  Claim interest"
+        + "%n%n  £%s"
+        + "%n%n  Fixed Cost"
+        + "%n%n  £%s"
+        + "%n%n  Claim fee amount"
+        + "%n%n  £%s"
+        + "%n%n  ## Subtotal"
+        + "%n%n  £%s"
+        + "%n%n  Amount already paid "
+        +  "%n   £%s"
+        + "%n%n  ## Total still owed"
+        +  "%n   £%s";
+    public static final String REPAYMENT_SUMMARY_NO_INTEREST_NO_FIXED = "The judgment will order the defendant to pay £%s including the claim fee "
+        + "\n    and interest, if applicable, as shown."
+        + "%n%n  Claim amount"
+        + "%n%n  £%s"
+        + "%n%n  Claim fee amount"
+        + "%n%n  £%s"
+        + "%n%n  ## Subtotal"
+        + "%n%n  £%s"
+        + "%n%n  Amount already paid "
+        +  "%n   £%s"
+        + "%n%n  ## Total still owed"
+        +  "%n   £%s";
+    public static final String REPAYMENT_SUMMARY_N0_INTEREST_FIXED = "The judgment will order the defendant to pay £%s including the claim fee "
+        + "\n    and interest, if applicable, as shown."
         + "%n%n  Claim amount"
         + "%n%n  £%s"
         + "%n%n  Fixed Cost"
         + "%n%n  £%s"
         + "%n%n  Claim fee amount"
         + "%n%n  £%s"
-        + "%n%n  Sub total"
+        + "%n%n  ## Subtotal"
         + "%n%n  £%s"
         + "%n%n  Amount already paid "
-        +  "%n   £%s"
-        + "%n%n  Total still to pay"
-        +  "%n   £%s";
+        + "%n%n  £%s"
+        + "%n%n  ## Total still owed"
+        + "%n%n  £%s";
+    public static final String REPAYMENT_SUMMARY_INTEREST_NO_FIXED = "The judgment will order the defendant to pay £%s including the claim fee "
+        + "\n    and interest, if applicable, as shown."
+        + "%n%n  Claim amount"
+        + "%n%n  £%s"
+        + "%n%n  Claim interest"
+        + "%n%n  £%s"
+        + "%n%n  Claim fee amount"
+        + "%n%n  £%s"
+        + "%n%n  ## Subtotal"
+        + "%n%n  £%s"
+        + "%n%n  Amount already paid "
+        + "%n%n  £%s"
+        + "%n%n  ## Total still owed"
+        + "%n%n  £%s";
 
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
+    private final InterestCalculator interestCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -127,6 +172,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue() + caseData.getTotalInterest().doubleValue();
         List<String> errors = new ArrayList<>();
 
@@ -181,16 +227,62 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
 
     private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        //var a = (String.format(REPAYMENT_SUMMARY, caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount()));
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        BigDecimal fixedCost = new BigDecimal(66);
+        var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
+        var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies);
 
-        caseDataBuilder.repaymentSummaryObject(REPAYMENT_SUMMARY);
+        // Interest and fixed costs claimed
+        if(caseData.getClaimInterest() == YesOrNo.YES && caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES){
+            caseDataBuilder
+                .repaymentSummaryObject(String.format(REPAYMENT_SUMMARY_BOTH_INTEREST_FIXED,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      interest, fixedCost,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      partialPaymentPounds, caseData.getTotalClaimAmount()));
 
-//      caseDataBuilder.repaymentSummaryObject(String.format(REPAYMENT_SUMMARY, caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
-//                                                             caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
-//                                                             caseData.getTotalClaimAmount(),caseData.getTotalClaimAmount()));
+        }
+        //No interest claimed, and fixed costs are claimed
+        if(caseData.getClaimInterest() == YesOrNo.NO && caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+            caseDataBuilder
+                .repaymentSummaryObject(String.format(REPAYMENT_SUMMARY_N0_INTEREST_FIXED,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      fixedCost,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      partialPaymentPounds, caseData.getTotalClaimAmount()));
+        }
+        //Interest and fixed costs both unclaimed
+        if(caseData.getClaimInterest() == YesOrNo.NO && caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.NO){
+            caseDataBuilder
+                .repaymentSummaryObject(String.format(REPAYMENT_SUMMARY_NO_INTEREST_NO_FIXED,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      partialPaymentPounds, caseData.getTotalClaimAmount()));
+
+        }
+        //Interest claimed, and no fixed costs
+        if(caseData.getClaimInterest() == YesOrNo.YES && caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.NO)
+            caseDataBuilder
+                .repaymentSummaryObject(String.format(REPAYMENT_SUMMARY_INTEREST_NO_FIXED,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      interest,
+                                                      caseData.getTotalClaimAmount(), caseData.getTotalClaimAmount(),
+                                                      partialPaymentPounds, caseData.getTotalClaimAmount()));
+
+
+
+
+
+
+//        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+//        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+
+//        String repaymentSummary = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
+//            + caseData.getTotalClaimAmount()
+//            + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+//        caseDataBuilder.repaymentSummaryObject(repaymentSummary);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

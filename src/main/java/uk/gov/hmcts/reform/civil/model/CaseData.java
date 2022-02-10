@@ -259,4 +259,5 @@ public class CaseData implements MappableObject {
     private final LocalDate paymentSetDate;
     private final String repaymentTotal;
     private final String repaymentSummaryObject;
+    private final YesOrNo paymentConfirmationDecisionSpec;
 }
