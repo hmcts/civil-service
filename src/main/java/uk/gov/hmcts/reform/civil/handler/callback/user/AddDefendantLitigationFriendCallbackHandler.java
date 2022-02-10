@@ -122,6 +122,9 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                     ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
                         .orElse(currentDateTime));
         }
+
+        caseDataUpdated.isRespondent1(null);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
