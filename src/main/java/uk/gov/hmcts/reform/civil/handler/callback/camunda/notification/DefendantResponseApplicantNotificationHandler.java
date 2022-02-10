@@ -18,6 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -53,14 +54,22 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     private CallbackResponse notifyApplicantSolicitorForDefendantResponse(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
+        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            emailTemplate = isCcNotification(callbackParams)
+                ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
+                : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+
+        }
         var recipient = isCcNotification(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         notificationService.sendMail(
             recipient,
-            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
+            emailTemplate,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
