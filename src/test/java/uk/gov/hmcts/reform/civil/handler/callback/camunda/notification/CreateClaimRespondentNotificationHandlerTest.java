@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_APP_SOL_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_SECOND_SOL;
@@ -54,9 +53,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate())
-                .thenReturn("non-multiparty-template-id");
-
             when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
                 .thenReturn("multiparty-template-id");
         }
@@ -71,7 +67,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -87,7 +83,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -108,7 +104,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE")
                              .build())
@@ -118,7 +113,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -131,7 +126,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE")
                              .build())
@@ -141,7 +135,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
-                "non-multiparty-template-id",
+                "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
             );
@@ -149,8 +143,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();

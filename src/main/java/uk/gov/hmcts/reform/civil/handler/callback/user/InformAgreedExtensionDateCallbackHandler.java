@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -70,11 +69,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::populateIsRespondent1Flag,
+            callbackKey(ABOUT_TO_START), this::populateIsRespondent1Flag,
             callbackKey(MID, "extension-date"), this::validateExtensionDate,
             callbackKey(ABOUT_TO_SUBMIT), this::setResponseDeadline,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setResponseDeadlineV1,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -137,23 +134,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-        LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
-            .atTime(END_OF_BUSINESS_DAY);
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
-            .respondent1TimeExtensionDate(time.now())
-            .respondent1ResponseDeadline(newDeadline)
-            .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse setResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
