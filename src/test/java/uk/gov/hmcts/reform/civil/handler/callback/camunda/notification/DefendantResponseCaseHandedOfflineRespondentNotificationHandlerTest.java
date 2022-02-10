@@ -22,13 +22,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -70,132 +73,179 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     @Nested
     class AboutToSubmitV1Callback {
 
-        @Test
-        void shouldNotifyDefendantSolicitor_when1v1Case() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
-                .thenReturn("template-id");
+        @Nested
+        class OneVsOneScenario {
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .build();
+            @Test
+            void shouldNotifyDefendantSolicitor1_when1v1Case() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
+                    .thenReturn("template-id");
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
-                .build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentCounterClaim()
+                    .build();
 
-            handler.handle(params);
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-case-handed-offline-respondent-notification-000DC001"
-            );
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
         }
 
-        @Test
-        void shouldNotifyDefendantSolicitor1_when1v2Case() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
-                .thenReturn("template-id-multiparty");
+        @Nested
+        class OneVsTwoScenario {
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .build();
+            @BeforeEach
+            void setup() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+            }
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
-                .build();
+            @Test
+            void shouldNotifyDefendantSolicitor1_when1v2Case() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
 
-            handler.handle(params);
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id-multiparty",
-                getNotificationDataMapMultiparty(caseData),
-                "defendant-response-case-handed-offline-respondent-notification-000DC001"
-            );
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2_when1v2Case() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor1_when1v2SameSolicitorCase() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
         }
 
-        @Test
-        void shouldNotifyDefendantSolicitor2_when1v2Case() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
-                .thenReturn("template-id-multiparty");
+        @Nested
+        class TwoVsOneScenario {
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .build();
+            @Test
+            void shouldNotifyDefendantSolicitor1_when2v1Case() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
+                    .thenReturn("template-id");
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
-                             .build())
-                .build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateRespondentCounterClaim()
+                    .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                    .build();
 
-            handler.handle(params);
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
-                "template-id-multiparty",
-                getNotificationDataMapMultiparty(caseData),
-                "defendant-response-case-handed-offline-respondent-notification-000DC001"
-            );
-        }
+                handler.handle(params);
 
-        @Test
-        void shouldNotifyDefendantSolicitor1_when1v2SameSolicitorCase() {
-            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
-                .thenReturn("template-id-multiparty");
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .multiPartyClaimOneDefendantSolicitor()
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id-multiparty",
-                getNotificationDataMapMultiparty(caseData),
-                "defendant-response-case-handed-offline-respondent-notification-000DC001"
-            );
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
         }
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
-        );
-    }
-
-    private Map<String, String> getNotificationDataMapMultiparty(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-            RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-            RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-            RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
-        );
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+            );
+        } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    .concat(" against " + caseData.getApplicant1().getPartyName())
+                    .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
+                    .concat(" against " + caseData.getApplicant2().getPartyName())
+            );
+        } else {
+            //1v2 template is used and expects different data
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+            );
+        }
     }
 }

@@ -21,6 +21,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -86,7 +89,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String respondentName = getPartyNameBasedOnType(caseData.getRespondent1());
         String recipient;
 
         //determine recipient for notification, based on Camunda Event ID
@@ -100,39 +102,42 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 break;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
-                respondentName = getPartyNameBasedOnType(caseData.getRespondent2());
                 break;
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
-        sendNotificationToSolicitor(caseData, recipient, respondentName);
+        sendNotificationToSolicitor(caseData, recipient);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void sendNotificationToSolicitor(CaseData caseData, String recipient, String respondentName) {
+    private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,
             notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
-            addPropertiesForMultiparty(caseData, respondentName),
+            addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> addPropertiesForMultiparty(CaseData caseData, String respondentName) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, respondentName
-        );
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            );
+        } else {
+            //if there are 2 respondents on the case, concatenate the names together for the template subject line
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME,
+                getPartyNameBasedOnType(caseData.getRespondent1())
+                    .concat(" and ")
+                    .concat(getPartyNameBasedOnType(caseData.getRespondent2()))
+            );
+        }
     }
 
     //used by existing production callback - non MP

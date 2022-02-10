@@ -23,11 +23,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
     DefendantResponseApplicantNotificationHandler.class,
@@ -95,93 +99,207 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     @Nested
     class AboutToSubmitV1Callback {
 
-        @Test
-        void shouldNotifyApplicantSolicitor_whenV1CallbackInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                .build();
+        @Nested
+        class OneVsOneScenario {
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                             .build())
-                .build();
+            @Test
+            void shouldNotifyApplicantSolicitorIn1v1Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
 
-            handler.handle(params);
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                                 .build())
+                    .build();
 
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-applicant-notification-000DC001"
-            );
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor1In1v1Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
         }
 
-        @Test
-        void shouldNotifyRespondentSolicitor1__whenV1CallbackInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                .build();
+        @Nested
+        class OneVsTwoScenario {
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                             .build())
-                .build();
+            @Test
+            void shouldNotifyApplicantSolicitorIn1v2Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .build();
 
-            handler.handle(params);
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                                 .build())
+                    .build();
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "defendant-response-applicant-notification-000DC001"
-            );
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor1In1v2Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor2In1v2Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
         }
 
-        @Test
-        void shouldNotifyRespondentSolicitor2__whenV1CallbackInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                .build();
+        @Nested
+        class TwoVsOneScenario {
+            @Test
+            void shouldNotifyApplicantSolicitorIn2v1Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateRespondentFullDefence()
+                    .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
-                             .build())
-                .build();
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                                 .build())
+                    .build();
 
-            handler.handle(params);
+                handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
-                "template-id",
-                getNotificationDataMapForMultiparty(caseData),
-                "defendant-response-applicant-notification-000DC001"
-            );
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor1In2v1Scenario_whenV1CallbackInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateRespondentFullDefence()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .version(V_1)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, "Mr. Sole Trader"
-            );
-        }
-
-        private Map<String, String> getNotificationDataMapForMultiparty(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, "Mr. John Rambo"
-            );
+            if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+                || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+                return Map.of(
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                );
+            } else {
+                //if there are 2 respondents on the case, concatenate the names together for the template subject line
+                return Map.of(
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME,
+                    getPartyNameBasedOnType(caseData.getRespondent1())
+                        .concat(" and ")
+                        .concat(getPartyNameBasedOnType(caseData.getRespondent2()))
+                );
+            }
         }
     }
 

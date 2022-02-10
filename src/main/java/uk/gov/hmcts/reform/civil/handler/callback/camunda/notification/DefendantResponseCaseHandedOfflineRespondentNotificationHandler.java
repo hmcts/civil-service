@@ -54,11 +54,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         return isRespondent1(callbackParams) ? TASK_ID_RESPONDENT1 : TASK_ID_RESPONDENT2;
     }
 
-    private Boolean isRespondent1(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
-    }
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
@@ -111,18 +106,32 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         );
     }
 
+    private Boolean isRespondent1(CallbackParams callbackParams) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        return caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
+    }
+
     private boolean is1v1Or2v1Case(CaseData caseData) {
         return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (is1v1Or2v1Case(caseData)) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
             );
+        } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    .concat(" against " + caseData.getApplicant1().getPartyName())
+                    .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
+                    .concat(" against " + caseData.getApplicant2().getPartyName())
+            );
         } else {
+            //1v2 template is used and expects different data
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
