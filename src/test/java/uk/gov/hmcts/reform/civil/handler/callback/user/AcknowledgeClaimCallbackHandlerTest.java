@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -133,8 +132,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent2Represented(YES)
-                .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -223,15 +220,12 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         private LocalDateTime newDeadline;
-        private LocalDateTime nextDeadline;
         private LocalDateTime acknowledgementDate;
 
         @BeforeEach
         void setup() {
             newDeadline = LocalDateTime.now().plusDays(14);
-            nextDeadline = LocalDateTime.now().plusDays(7);
-            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(newDeadline);
-            when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(newDeadline);
             acknowledgementDate = LocalDateTime.now();
             when(time.now()).thenReturn(acknowledgementDate);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -287,9 +281,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -316,9 +307,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -348,9 +336,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -383,9 +368,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -395,7 +377,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledgedRespondent2()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent2Represented(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
@@ -418,30 +399,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
-        }
-
-        @Test
-        void shouldSetCaseListDisplayDefendantSolicitorReferences() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledged()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
-                .solicitorReferencesCopy(SolicitorReferences.builder()
-                                             .respondentSolicitor1Reference("abc")
-                                             .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseListDisplayDefendantSolicitorReferences").isEqualTo("abc, 01234");
-
         }
     }
 
