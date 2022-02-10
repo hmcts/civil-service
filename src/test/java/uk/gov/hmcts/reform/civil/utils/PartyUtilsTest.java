@@ -192,11 +192,10 @@ class PartyUtilsTest {
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
-            assertEquals("Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: " +
-                             "defendant sol 2 this is a long long reference that cannot be contained",
+            assertEquals("Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: "
+                             + "defendant sol 2 this is a long long reference that cannot be contained",
                          partyReferences);
         }
-
 
     }
 }

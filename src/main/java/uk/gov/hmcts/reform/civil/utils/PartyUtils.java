@@ -82,7 +82,7 @@ public class PartyUtils {
             + party.getIndividualLastName();
     }
 
-    public static String buildPartiesReferences(CaseData caseData){
+    public static String buildPartiesReferences(CaseData caseData) {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
         boolean hasRespondent2Reference = caseData.getRespondentSolicitor2Reference() != null;
