@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.ClaimantResponseScenarioFlag;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -84,22 +83,22 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             switch (multiPartyScenario) {
                 case TWO_V_ONE:
                     updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.TWO_V_ONE)
+                        .claimantResponseScenarioFlag(MultiPartyScenario.TWO_V_ONE)
                         .build();
                     break;
                 case ONE_V_TWO_ONE_LEGAL_REP:
                     updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_TWO_SAME_SOLICITOR)
+                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .build();
                     break;
                 case ONE_V_TWO_TWO_LEGAL_REP:
                     updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_TWO_DIFFERENT_SOLICITOR)
+                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                         .build();
                     break;
                 default:
                     updatedData
-                        .claimantResponseScenarioFlag(ClaimantResponseScenarioFlag.ONE_V_ONE)
+                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_ONE)
                         .build();
             }
         }
