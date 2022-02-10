@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,5 +170,33 @@ class PartyUtilsTest {
 
             assertThat(PartyUtils.getDateOfBirth(party)).isEmpty();
         }
+    }
+
+    @Nested
+    class PartyReferences {
+
+        @Test
+        void shouldReturnReferences_whenNot1v2DiffSolicitorCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            String partyReferences = PartyUtils.buildPartiesReferences(caseData);
+
+            assertEquals("Claimant reference: 12345\nDefendant reference: 6789", partyReferences);
+        }
+
+        @Test
+        void shouldReturnReferences_when1v2DiffSolicitorCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .respondentSolicitor2Reference("defendant sol 2 this is a long long reference that cannot be contained")
+                .build();
+
+            String partyReferences = PartyUtils.buildPartiesReferences(caseData);
+
+            assertEquals("Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: " +
+                             "defendant sol 2 this is a long long reference that cannot be contained",
+                         partyReferences);
+        }
+
+
     }
 }

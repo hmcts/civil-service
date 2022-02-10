@@ -84,22 +84,26 @@ public class PartyUtils {
 
     public static String buildPartiesReferences(CaseData caseData){
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean hasRespondent2Reference = caseData.getRespondentSolicitor2Reference() != null;
 
         if (solicitorReferences.getApplicantSolicitor1Reference() != null) {
-            stringBuilder.append("Claimant Reference ");
+            stringBuilder.append("Claimant reference: ");
             stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
-            stringBuilder.append("\\n");
         }
         if (solicitorReferences.getRespondentSolicitor1Reference() != null) {
-            stringBuilder.append("Defendant Reference ");
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append(hasRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
             stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-            stringBuilder.append("\\n");
         }
-        if (solicitorReferences.getRespondentSolicitor2Reference() != null) {
-            stringBuilder.append("Defendant 2 Reference ");
-            stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference());
-            stringBuilder.append("\\n");
+        if (hasRespondent2Reference) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("Defendant 2 reference: ");
+            stringBuilder.append(caseData.getRespondentSolicitor2Reference());
         }
         return stringBuilder.toString();
     }
