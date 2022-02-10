@@ -64,8 +64,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     public CaseDocument generate(CaseData caseData, String authorisation) {
         multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(caseData);
         isMulitPartyClaimantResponseButOneProceeding = isMulitPartyClaimantResponseButOneProceeding(caseData);
-        DocmosisTemplates templateId = TWO_V_ONE.equals(multiPartyScenario)
-            && !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
+        DocmosisTemplates templateId = getDocmosisTemplate(caseData);
 
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
@@ -81,9 +80,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return N181_MULTIPARTY_SAME_SOL;
+                return !isClaimantResponse(caseData) ? N181_MULTIPARTY_SAME_SOL : N181;
             case TWO_V_ONE:
-                return N181_2V1;
+                return !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
             default:
                 return N181;
         }

@@ -117,7 +117,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetClaimantResponseScenarioFlagTo1V1_WhenAboutToStartIsInvokedAndMulitPatyScenariois1V1() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .build();
@@ -133,7 +132,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetClaimantResponseScenarioFlagTo2V1_WhenAboutToStartIsInvoked() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimTwoApplicants()
@@ -150,7 +148,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetClaimantResponseScenarioFlagTo1V2OneSol_WhenAboutToStartIsInvoked() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimOneDefendantSolicitor()
@@ -167,7 +164,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetClaimantResponseScenarioFlagTo1V2TwoSol_WhenAboutToStartIsInvoked() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimTwoDefendantSolicitors()
