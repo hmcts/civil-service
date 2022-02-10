@@ -116,8 +116,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
-                case FULL_DEFENCE:
-                    return "RPA testing this one";
                 default:
                     throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }

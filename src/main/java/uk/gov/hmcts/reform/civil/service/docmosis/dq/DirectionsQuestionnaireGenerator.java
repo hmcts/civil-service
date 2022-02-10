@@ -292,7 +292,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
             || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))) {
 
-            ArrayList<Party> respondents = new ArrayList<>();
+            List<Party> respondents = new ArrayList<>();
             if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent1().getPartyName())
