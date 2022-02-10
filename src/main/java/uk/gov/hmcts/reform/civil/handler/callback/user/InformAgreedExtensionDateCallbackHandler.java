@@ -127,7 +127,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
         //TODO: update to get correct deadline as a part of CMC-1346
         if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
-            var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
+            var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
                 .build();
