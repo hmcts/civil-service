@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 
 @Service
 public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHandler {
@@ -30,7 +29,8 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
-        RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE
+        RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
+        NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_SPEC
     );
     public static final String TASK_ID = "NotifyRoboticsOnCaseHandedOffline";
 
