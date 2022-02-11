@@ -109,6 +109,6 @@ public class PartyUtils {
         return stringBuilder.toString();
     }
 
-    private static final Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
+    private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 }
