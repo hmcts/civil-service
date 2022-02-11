@@ -29,6 +29,7 @@ public class SendGridClient {
 
     @Retryable(value = EmailSendFailedException.class, backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(String from, EmailData emailData) {
+        System.out.println("inside sendEmail method ");
         verifyData(from, emailData);
         try {
             Email sender = new Email(from);
