@@ -177,6 +177,15 @@ class PartyUtilsTest {
     class PartyReferences {
 
         @Test
+        void shouldReturnReferences_whenNoRefsAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            String partyReferences = PartyUtils.buildPartiesReferences(caseData);
+
+            assertEquals("", partyReferences);
+        }
+
+        @Test
         void shouldReturnReferences_whenNot1v2DiffSolicitorAndBothRefAvailable() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
