@@ -1231,6 +1231,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension_Defendent2() {
+        atStateClaimDetailsNotified();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineByStaff() {
         atStateClaimIssued();
         takenOfflineByStaff();

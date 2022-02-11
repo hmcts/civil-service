@@ -1224,6 +1224,70 @@ class StateFlowEngineTest {
         }
 
         @Test
+        //1v2 Different solicitor scenario-first response FullDefence received and with time extension
+        void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefenceAndTimeExtensionAfterAcknowledgeClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+            );
+        }
+
+        @Test
+        //1v2 Different solicitor scenario-first response FullDefence received and with time extension
+        void shouldBeInClaimDetailsNotifiedTimeExtensionState_1v2DiffSol_whenTimeExtensionWithoutAcknowledgeClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+            );
+        }
+
+        @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataIsCaseProceedsInCaseman() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
 
