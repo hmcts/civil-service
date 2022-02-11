@@ -88,17 +88,21 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
         boolean hasRespondent2Reference = defendantSolicitor2Reference.test(caseData);
 
-        if (solicitorReferences.getApplicantSolicitor1Reference() != null) {
-            stringBuilder.append("Claimant reference: ");
-            stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
-        }
-        if (solicitorReferences.getRespondentSolicitor1Reference() != null) {
-            if (stringBuilder.length() > 0) {
-                stringBuilder.append("\n");
-            }
-            stringBuilder.append(hasRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
-            stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-        }
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresent(ref -> {
+                stringBuilder.append("Claimant reference: ");
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            });
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+            .ifPresent(ref -> {
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append("\n");
+                }
+                stringBuilder.append(hasRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
+                stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
+            });
+
         if (hasRespondent2Reference) {
             if (stringBuilder.length() > 0) {
                 stringBuilder.append("\n");
