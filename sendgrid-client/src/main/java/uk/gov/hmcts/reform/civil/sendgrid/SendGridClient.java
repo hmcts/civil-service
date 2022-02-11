@@ -29,8 +29,10 @@ public class SendGridClient {
 
     @Retryable(value = EmailSendFailedException.class, backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(String from, EmailData emailData) {
+        System.out.println("Inside sendEmail method ");
         verifyData(from, emailData);
         try {
+            System.out.println("inside the try block ");
             Email sender = new Email(from);
             String subject = emailData.getSubject();
             Email recipient = new Email(emailData.getTo());
@@ -45,8 +47,11 @@ public class SendGridClient {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
 
+            System.out.println("before sendGrid.api(request) calling ");
             Response response = sendGrid.api(request);
+            System.out.println("Response here "+ response);
             if (!is2xxSuccessful(response)) {
+                System.out.println("inside    if (!is2xxSuccessful(response)) ");
                 throw new EmailSendFailedException(new HttpException(String.format(
                     "SendGrid returned a non-success response (%d); body: %s",
                     response.getStatusCode(),

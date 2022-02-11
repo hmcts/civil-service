@@ -53,9 +53,11 @@ public class RoboticsNotificationService {
         byte[] roboticsJsonData;
         try {
             if (null != caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+                System.out.println("in SPEC condition");
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
             } else {
+                System.out.println("NOT in SPEC condition");
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
