@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +66,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 }
