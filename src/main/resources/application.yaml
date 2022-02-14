@@ -224,7 +224,7 @@ rd_professional:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: civilmoneyclaimsdemo@gmail.com
+    recipient: hmcts.civil+robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
 ---
 

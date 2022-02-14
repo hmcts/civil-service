@@ -32,7 +32,6 @@ public class NotifyRoboticsOnContinuousFeedHandler extends NotifyRoboticsHandler
         RoboticsDataMapperForSpec roboticsDataMapperForSpec
     ) {
         super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec);
-
     }
 
     @Override
