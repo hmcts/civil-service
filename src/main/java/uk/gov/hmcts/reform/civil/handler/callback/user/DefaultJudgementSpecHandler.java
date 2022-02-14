@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.lang3.ObjectUtils;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -15,11 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.civil.service.FeesService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,10 +27,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -223,19 +217,19 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .append("\n").append("### Claim Amount \n £").append(caseData.getTotalClaimAmount());
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
-            repaymentBreakdown.append("\n ### Claim interest \n" + "£" + interest);
+            repaymentBreakdown.append("\n ### Claim interest \n").append("£").append(interest);
         }
 
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            repaymentBreakdown = repaymentBreakdown.append("\n ### Fixed costs \n" + "£" + fixedCost);
+            repaymentBreakdown.append("\n ### Fixed costs \n").append("£").append(fixedCost);
         }
 
         repaymentBreakdown.append("\n").append("### Claim fee \n £").append(claimFeePounds).append(
-                "\n ## Subttotal \n £").append(subTotal)
+                "\n ## Subtotal \n £").append(subTotal)
             .append("\n");
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
-            repaymentBreakdown = repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
+            repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
                 partialPaymentPounds);
         }
 
