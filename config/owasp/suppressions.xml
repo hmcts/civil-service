@@ -8,4 +8,12 @@
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
+  <suppress until="2030-01-01">
+    <notes><![CDATA[
+     Tomcat error
+   ]]></notes>
+    <gav regex="true">.*</gav>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+    <cve>CVE-2022-23181</cve>
+  </suppress>
 </suppressions>
