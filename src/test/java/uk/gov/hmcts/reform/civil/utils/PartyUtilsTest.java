@@ -186,7 +186,7 @@ class PartyUtilsTest {
         }
 
         @Test
-        void shouldReturnReferences_whenNot1v2DiffSolicitorAndBothRefAvailable() {
+        void shouldReturnReferences_whenCaseHasOneDefendantSolicitorAndBothRefsAvailable() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
@@ -195,7 +195,7 @@ class PartyUtilsTest {
         }
 
         @Test
-        void shouldReturnReferences_whenNot1v2DiffSolicitorAndOnlyClaimantRefAndSol2RefAvailable() {
+        void shouldReturnReferences_when1v2DiffSolicitorAndOnlyClaimantRefAndSol2RefAvailable() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("App One").build())
                 .respondentSolicitor2Reference("Def Two")
@@ -209,13 +209,13 @@ class PartyUtilsTest {
         @Test
         void shouldReturnReferences_when1v2DiffSolicitorCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .respondentSolicitor2Reference("defendant sol 2 this is a long long reference that cannot be contained")
+                .respondentSolicitor2Reference("defendant sol 2")
                 .build();
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
             assertEquals("Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: "
-                             + "defendant sol 2 this is a long long reference that cannot be contained",
+                             + "defendant sol 2",
                          partyReferences);
         }
 
