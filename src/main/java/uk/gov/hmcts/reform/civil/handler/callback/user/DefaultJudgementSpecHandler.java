@@ -180,14 +180,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         BigDecimal fixedCost = calculateFixedCosts(caseData);
-        BigDecimal partialPaymentPounds = new BigDecimal(0);
-
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             interest,
             claimFeePounds,
-            fixedCost,
-            partialPaymentPounds
+            fixedCost
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
@@ -198,8 +195,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost, BigDecimal partialPaymentPounds) {
-        partialPaymentPounds = getPartialPayment(caseData, partialPaymentPounds);
+                                                  BigDecimal fixedCost) {
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
 
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
@@ -237,7 +234,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return repaymentBreakdown;
     }
 
-    private BigDecimal getPartialPayment(CaseData caseData, BigDecimal partialPaymentPounds) {
+    private BigDecimal getPartialPayment(CaseData caseData) {
+        BigDecimal partialPaymentPounds = new BigDecimal(0);
         //Check if partial payment was selected by user, and assign value if so.
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
