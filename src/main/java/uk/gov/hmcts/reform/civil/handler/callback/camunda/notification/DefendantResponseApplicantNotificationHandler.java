@@ -11,9 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
@@ -35,6 +38,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,11 +61,12 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
         CaseData caseData = callbackParams.getCaseData();
         String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
+        Map<String, String> addProperties = addProperties(caseData);
         if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
             emailTemplate = isCcNotification(callbackParams)
                 ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
                 : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
-
+            addProperties = addPropertiesSpec(caseData, callbackParams);
         }
         var recipient = isCcNotification(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
@@ -70,7 +75,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         notificationService.sendMail(
             recipient,
             emailTemplate,
-            addProperties(caseData),
+            addProperties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -84,8 +89,26 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         );
     }
 
+    public Map<String, String> addPropertiesSpec(CaseData caseData, CallbackParams callbackParams) {
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, callbackParams),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.name());
+    }
+
+    private String getLegalOrganisationName(CaseData caseData, CallbackParams callbackParams) {
+        String organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        if (isCcNotification(callbackParams)) {
+            organisationID = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        }
+        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
