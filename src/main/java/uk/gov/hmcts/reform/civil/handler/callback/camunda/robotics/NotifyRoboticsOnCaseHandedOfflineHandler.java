@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
 
 @Service
 public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHandler {
@@ -25,7 +27,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
         RoboticsDataMapperForSpec roboticsDataMapperForSpec
     ) {
         super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec);
-        }
+    }
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
@@ -36,7 +38,6 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
 
     @Override
     protected Map<String, Callback> callbacks() {
-        System.out.println(" NotifyRoboticsOnCaseHandedOfflineHandler constructor callback ");
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::notifyRobotics
         );

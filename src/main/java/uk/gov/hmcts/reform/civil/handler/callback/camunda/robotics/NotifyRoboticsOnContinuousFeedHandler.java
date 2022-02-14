@@ -37,7 +37,7 @@ public class NotifyRoboticsOnContinuousFeedHandler extends NotifyRoboticsHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-       return Map.of(
+        return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::notifyRobotics
         );
     }
