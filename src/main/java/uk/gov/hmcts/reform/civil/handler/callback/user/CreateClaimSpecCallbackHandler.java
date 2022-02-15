@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -113,6 +114,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
+    private final OnBoardingOrganisationControlService onboardingOrganisationControlService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
@@ -160,7 +162,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
-        List<String> errors = new ArrayList<>();
+        String userBearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> errors = onboardingOrganisationControlService.validateOrganisation(userBearerToken);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -173,8 +176,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         List<String> errors = dateOfBirthValidator.validate(applicant);
         caseDataBuilder.superClaimType(UNSPEC_CLAIM);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getApplicant1().getPrimaryAddress().getPostCode());
+            errors = new ArrayList<>();
             caseDataBuilder.superClaimType(SPEC_CLAIM);
         }
 
@@ -430,8 +432,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+        List<String> errors = new ArrayList<>();
+//        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+//            caseData.getRespondent1().getPrimaryAddress().getPostCode());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -441,8 +444,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+        List<String> errors = new ArrayList<>();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -452,8 +454,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
+            List<String> errors = new ArrayList<>();
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -467,8 +468,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
+            List<String> errors = new ArrayList<>();
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
