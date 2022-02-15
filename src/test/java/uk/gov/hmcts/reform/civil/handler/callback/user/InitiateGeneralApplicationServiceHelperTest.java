@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
@@ -117,7 +119,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
-    void shouldReturnsApplicantAndRespondentDetails() {
+    void shouldReturnsApplicantAndRespondentDetailsWhenClaimantIsApplicant() {
 
         GeneralApplication result = helper
             .setApplicantAndRespondentDetailsIfExits(GeneralApplication.builder().build(),
@@ -125,10 +127,33 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                     getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
 
         assertThat(result).isNotNull();
+        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(YES);
         assertThat(result.getApplicantSolicitor1UserDetails()).isNotNull();
         assertThat(result.getApplicantSolicitor1UserDetails().getEmail()).isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
         assertThat(result.getRespondentSolicitor1EmailAddress()).isNotNull();
         assertThat(result.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+        assertThat(result.getRespondent1OrganisationPolicy()).isNotNull();
+        assertThat(result.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
+        assertThat(result.getApplicant1OrganisationPolicy()).isNotNull();
+        assertThat(result.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo(STRING_CONSTANT);
+    }
+
+    @Test
+    void shouldReturnsApplicantAndRespondentDetailsWhenDefendantIsApplicant() {
+
+        GeneralApplication result = helper
+            .setApplicantAndRespondentDetailsIfExits(GeneralApplication.builder().build(),
+                                                    getTestCaseData(CaseData.builder().build()),
+                                                    getUserDetails(RESPONDENT_EMAIL_ID_CONSTANT));
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(NO);
+        assertThat(result.getApplicantSolicitor1UserDetails()).isNotNull();
+        assertThat(result.getApplicantSolicitor1UserDetails().getEmail()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+        assertThat(result.getRespondentSolicitor1EmailAddress()).isNotNull();
+        assertThat(result.getRespondentSolicitor1EmailAddress()).isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
         assertThat(result.getRespondent1OrganisationPolicy()).isNotNull();
         assertThat(result.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
             .isEqualTo(STRING_CONSTANT);

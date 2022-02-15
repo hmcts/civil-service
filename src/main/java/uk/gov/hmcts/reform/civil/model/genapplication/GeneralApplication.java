@@ -34,6 +34,7 @@ public class GeneralApplication implements MappableObject {
     private final GAHearingDetails generalAppHearingDetails;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final YesOrNo isMultiParty;
+    private final YesOrNo isPCClaimantMakingApplication;
     private final CaseLink caseLink;
 
     @JsonCreator
@@ -54,6 +55,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
+                       @JsonProperty("isPCClaimantMakingApplication") YesOrNo isPCClaimantMakingApplication,
                        @JsonProperty("caseLink") CaseLink caseLink) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
@@ -71,6 +73,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppHearingDetails = generalAppHearingDetails;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
         this.isMultiParty = isMultiParty;
+        this.isPCClaimantMakingApplication = isPCClaimantMakingApplication;
         this.caseLink = caseLink;
     }
 }
