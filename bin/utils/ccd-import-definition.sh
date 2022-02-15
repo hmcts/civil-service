@@ -2,7 +2,7 @@
 
 #export IDAM_STUB_LOCALHOST=http://localhost:5555
 
-set -eu
+set -ex
 
 dir=$(dirname ${0})
 filepath=${1}
@@ -11,6 +11,8 @@ uploadFilename="$(date +"%Y%m%d-%H%M%S")-${filename}"
 
 userToken=$(${dir}/idam-lease-user-token.sh ${CCD_CONFIGURER_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${CCD_CONFIGURER_IMPORTER_PASSWORD:-Password12!})
 serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm toolbelt/oathtool --totp -b ${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}))
+
+echo "Uploading CCD_DEFINITION_STORE_API_BASE_URL : ${CCD_DEFINITION_STORE_API_BASE_URL}"
 
 uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
   ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/import \
