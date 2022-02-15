@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -124,14 +125,16 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 
     public Map<String, String> addPropertiesForMultiparty(CaseData caseData, String respondentName) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, respondentName
+            RESPONDENT_NAME, respondentName,
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 

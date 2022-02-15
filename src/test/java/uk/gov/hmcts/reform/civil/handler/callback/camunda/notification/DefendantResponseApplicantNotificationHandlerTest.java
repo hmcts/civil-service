@@ -26,8 +26,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     DefendantResponseApplicantNotificationHandler.class,
@@ -87,7 +89,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "defendantName", "Mr. Sole Trader"
+                RESPONDENT_NAME, "Mr. Sole Trader",
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }
@@ -173,14 +176,16 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, "Mr. Sole Trader"
+                RESPONDENT_NAME, "Mr. Sole Trader",
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
 
         private Map<String, String> getNotificationDataMapForMultiparty(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, "Mr. John Rambo"
+                RESPONDENT_NAME, "Mr. John Rambo",
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }

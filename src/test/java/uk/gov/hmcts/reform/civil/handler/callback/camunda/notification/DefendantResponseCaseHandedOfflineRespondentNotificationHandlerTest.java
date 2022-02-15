@@ -23,12 +23,14 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -185,7 +187,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 
@@ -195,7 +198,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-            RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+            RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 }
