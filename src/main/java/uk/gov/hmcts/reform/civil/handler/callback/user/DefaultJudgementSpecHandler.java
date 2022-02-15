@@ -211,26 +211,26 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
                 theOverallTotal).append(", including the claim fee and interest, if applicable, as shown:")
-            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount());
+            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
-            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest);
+            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost);
+            repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
         }
 
-        repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds).append(
-                "\n ## Subtotal \n £").append(subTotal)
+        repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
+                "\n ## Subtotal \n £").append(subTotal.setScale(2))
             .append("\n");
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
-                partialPaymentPounds);
+                partialPaymentPounds.setScale(2));
         }
 
-        repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal);
+        repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
         return repaymentBreakdown;
     }
 

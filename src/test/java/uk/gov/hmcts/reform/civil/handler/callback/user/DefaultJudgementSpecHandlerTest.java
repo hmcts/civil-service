@@ -242,11 +242,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and interest," +
                 " if applicable, as shown:\n" +
                 "### Claim amount \n" +
-                " £1010\n" +
+                " £1010.00\n" +
                 " ### Claim interest amount \n" +
-                "£100\n" +
+                "£100.00\n" +
                 " ### Fixed cost amount \n" +
-                "£112\n" +
+                "£112.00\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
                 " ## Subtotal \n" +
@@ -286,11 +286,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String test = "The judgment will order the defendant to pay £681.00, including the claim fee and interest, " +
                 "if applicable, as shown:\n" +
                 "### Claim amount \n" +
-                " £499\n" +
+                " £499.00\n" +
                 " ### Claim interest amount \n" +
-                "£100\n" +
+                "£100.00\n" +
                 " ### Fixed cost amount \n" +
-                "£82\n" +
+                "£82.00\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
                 " ## Subtotal \n" +
@@ -329,11 +329,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and interest," +
                 " if applicable, as shown:\n" +
                 "### Claim amount \n" +
-                " £999\n" +
+                " £999.00\n" +
                 " ### Claim interest amount \n" +
-                "£100\n" +
+                "£100.00\n" +
                 " ### Fixed cost amount \n" +
-                "£102\n" +
+                "£102.00\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
                 " ## Subtotal \n" +
@@ -373,7 +373,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and interest," +
                 " if applicable, as shown:\n" +
                 "### Claim amount \n" +
-                " £5001\n" +
+                " £5001.00\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
                 " ## Subtotal \n" +
