@@ -99,9 +99,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .superClaimType(SPEC_CLAIM)
                 .build();
-            CaseDataBuilder.builder().superClaimType(SPEC_CLAIM);
+            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
                 .build();
@@ -119,8 +118,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
             CaseData caseData = CaseDataBuilder.builder()
-                                .atStateNotificationAcknowledged()
-                                .superClaimType(SPEC_CLAIM).build();
+                                .atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build())
                 .build();
