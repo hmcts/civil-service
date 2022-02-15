@@ -68,15 +68,6 @@ class FeatureToggleServiceTest {
     }
 
     @Test
-    void shouldCallBoolVariation_whenIsMultipartyEnabledInvoked() {
-        var multipartyFeatureKey = "multiparty";
-        givenToggle(multipartyFeatureKey, true);
-
-        assertThat(featureToggleService.isMultipartyEnabled()).isTrue();
-        verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
-    }
-
-    @Test
     void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked() {
         var multipartyFeatureKey = "rpaContinuousFeed";
         givenToggle(multipartyFeatureKey, true);

@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import static java.util.Collections.emptyList;
 
@@ -34,6 +36,7 @@ import static java.util.Collections.emptyList;
 )
 public class CasesController {
 
+    private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -68,5 +71,16 @@ public class CasesController {
         SearchResult claims = coreCaseDataService.searchCases(query, authorization);
 
         return new ResponseEntity<>(claims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/actors/{actorId}")
+    @ApiOperation("Gets credentials for actorId from RAS")
+    public ResponseEntity<RoleAssignmentServiceResponse>
+        getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
+                                @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+
+        log.info("Received ActorId: {}", actorId);
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
+        return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }
 }

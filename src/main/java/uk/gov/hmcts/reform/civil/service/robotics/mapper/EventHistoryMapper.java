@@ -572,18 +572,11 @@ public class EventHistoryMapper {
     }
 
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        //TODO Defendant 2 will be handled under RPA ticket [CMC-1677]
         LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-        String responseIntentionType = caseData.getRespondent1ClaimResponseIntentionType().getLabel();
-
-        if ((dateAcknowledge == null) && (caseData.getRespondent2AcknowledgeNotificationDate() == null)) {
+        if (dateAcknowledge == null) {
             return;
         }
-
-        if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
-            dateAcknowledge = caseData.getRespondent2AcknowledgeNotificationDate();
-            responseIntentionType = caseData.getRespondent2ClaimResponseIntentionType().getLabel();
-        }
-
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
@@ -607,11 +600,12 @@ public class EventHistoryMapper {
                         .dateReceived(dateAcknowledge)
                         .litigiousPartyID("002")
                         .eventDetails(EventDetails.builder()
-                                          .responseIntention(responseIntentionType)
+                                          .responseIntention(caseData.getRespondent1ClaimResponseIntentionType()
+                                                                 .getLabel())
                                           .build())
                         .eventDetailsText(format(
                             "responseIntention: %s",
-                            responseIntentionType
+                            caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                         ))
                         .build()
                 ));
