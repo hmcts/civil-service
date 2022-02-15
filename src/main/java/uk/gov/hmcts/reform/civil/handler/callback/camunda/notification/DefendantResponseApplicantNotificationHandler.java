@@ -60,13 +60,16 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private CallbackResponse notifyApplicantSolicitorForDefendantResponse(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
-        Map<String, String> addProperties = addProperties(caseData);
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+        String emailTemplate;
+        Map<String, String> addProperties;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             emailTemplate = isCcNotification(callbackParams)
                 ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
                 : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
             addProperties = addPropertiesSpec(caseData, callbackParams);
+        } else {
+            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
+            addProperties = addProperties(caseData);
         }
         var recipient = isCcNotification(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
@@ -104,10 +107,10 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     //finding legal org name
     private String getLegalOrganisationName(CaseData caseData, CallbackParams callbackParams) {
-        String organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        if (isCcNotification(callbackParams)) {
-            organisationID = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-        }
+        String organisationID;
+        organisationID = isCcNotification(callbackParams)
+            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
