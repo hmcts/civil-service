@@ -240,12 +240,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and interest," +
-                " if applicable, as shown.\n" +
-                "### Claim Amount \n" +
+                " if applicable, as shown:\n" +
+                "### Claim amount \n" +
                 " £1010\n" +
-                " ### Claim interest \n" +
+                " ### Claim interest amount \n" +
                 "£100\n" +
-                " ### Fixed cost \n" +
+                " ### Fixed cost amount \n" +
                 "£112\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
@@ -284,12 +284,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order the defendant to pay £681.00, including the claim fee and interest, " +
-                "if applicable, as shown.\n" +
-                "### Claim Amount \n" +
+                "if applicable, as shown:\n" +
+                "### Claim amount \n" +
                 " £499\n" +
-                " ### Claim interest \n" +
+                " ### Claim interest amount \n" +
                 "£100\n" +
-                " ### Fixed cost \n" +
+                " ### Fixed cost amount \n" +
                 "£82\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
@@ -327,12 +327,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and interest," +
-                " if applicable, as shown.\n" +
-                "### Claim Amount \n" +
+                " if applicable, as shown:\n" +
+                "### Claim amount \n" +
                 " £999\n" +
-                " ### Claim interest \n" +
+                " ### Claim interest amount \n" +
                 "£100\n" +
-                " ### Fixed cost \n" +
+                " ### Fixed cost amount \n" +
                 "£102\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +
@@ -371,8 +371,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and interest," +
-                " if applicable, as shown.\n" +
-                "### Claim Amount \n" +
+                " if applicable, as shown:\n" +
+                "### Claim amount \n" +
                 " £5001\n" +
                 "### Claim fee amount \n" +
                 " £1.00\n" +

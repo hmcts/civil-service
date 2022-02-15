@@ -210,15 +210,15 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
-                theOverallTotal).append(", including the claim fee and interest, if applicable, as shown.")
-            .append("\n").append("### Claim Amount \n £").append(caseData.getTotalClaimAmount());
+                theOverallTotal).append(", including the claim fee and interest, if applicable, as shown:")
+            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount());
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
-            repaymentBreakdown.append("\n ### Claim interest \n").append("£").append(interest);
+            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest);
         }
 
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            repaymentBreakdown.append("\n ### Fixed cost \n").append("£").append(fixedCost);
+            repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost);
         }
 
         repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds).append(
