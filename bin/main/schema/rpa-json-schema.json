@@ -1,0 +1,1224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "description": "The root schema comprises the entire JSON document.",
+  "required": [
+    "header",
+    "litigiousParties",
+    "solicitors",
+    "particularsOfClaim",
+    "claimDetails",
+    "events"
+  ],
+  "properties": {
+    "header": {
+      "$id": "#/properties/header",
+      "type": "object",
+      "description": "This object contains the header section information in CASEMAN.",
+      "required": [
+        "caseNumber",
+        "owningCourtCode",
+        "owningCourtName",
+        "caseType",
+        "preferredCourtCode",
+        "preferredCourtName",
+        "caseAllocatedTo"
+      ],
+      "properties": {
+        "caseNumber": {
+          "$id": "#/properties/header/properties/caseNumber",
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 8,
+          "description": "The case reference number. It should be in CASEMAN format."
+        },
+        "owningCourtCode": {
+          "$id": "#/properties/header/properties/owningCourtCode",
+          "$ref": "#/definitions/courtCodeType",
+          "description": ""
+        },
+        "owningCourtName": {
+          "$id": "#/properties/header/properties/owningCourtName",
+          "type": ["string", "null"],
+          "description": "The court description. When not using owningCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
+        },
+        "caseType": {
+          "$id": "#/properties/header/properties/caseType",
+          "type": "string",
+          "enum": [
+            "PERSONAL INJURY",
+            "TBD2",
+            "TBD3",
+            ""
+          ],
+          "description": ""
+        },
+        "preferredCourtCode": {
+          "$id": "#/properties/header/properties/preferredCourtCode",
+          "$ref": "#/definitions/courtCodeType",
+          "description": ""
+        },
+        "preferredCourtName": {
+          "$id": "#/properties/header/properties/preferredCourtName",
+          "type": ["string", "null"],
+          "description": "The court description. When not using preferredCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
+        },
+        "caseAllocatedTo": {
+          "$id": "#/properties/header/properties/caseAllocatedTo",
+          "type": "string",
+          "enum": [
+            "FAST TRACK",
+            "MULTI TRACK",
+            "SMALL CLAIM TRACK",
+            ""
+          ],
+          "description": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "litigiousParties": {
+      "$id": "#/properties/litigiousParties",
+      "type": "array",
+      "description": "This section contains all of the claimant(s) and defendant(s) details.",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/properties/litigiousParties/items",
+        "type": "object",
+        "required": [
+          "ID",
+          "type",
+          "name",
+          "addresses",
+          "contactDX",
+          "contactTelephoneNumber",
+          "contactFaxNumber",
+          "contactEmailAddress",
+          "preferredMethodOfCommunication",
+          "welshTranslation",
+          "reference",
+          "dateOfService",
+          "lastDateForService",
+          "dateOfBirth",
+          "solicitorOrganisationID",
+          "solicitorID"
+        ],
+        "properties": {
+          "ID": {
+            "$id": "#/properties/litigiousParties/items/anyOf/0/properties/ID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "type": {
+            "$id": "#/properties/litigiousParties/items/anyOf/0/properties/type",
+            "type": "string",
+            "enum": [
+              "Claimant",
+              "Defendant"
+            ],
+            "description": "Indicates the litigant type used in CASEMAN."
+          },
+          "name": {
+            "$id": "#/properties/litigiousParties/items/properties/name",
+            "type": "string",
+            "description": "This attribute contains the full name of the litigant. Sole traders will be distinguishable from individuals. Company and oragnisation names will be here. Litigation friend information is also included."
+          },
+          "addresses": {
+            "$id": "#/properties/litigiousParties/items/properties/addresses",
+            "$ref": "#/definitions/addressesType",
+            "description": ""
+          },
+          "contactDX": {
+            "$id": "#/properties/litigiousParties/items/properties/contactDX",
+            "$ref": "#/definitions/contactDXType",
+            "description": ""
+          },
+          "contactTelephoneNumber": {
+            "$id": "#/properties/litigiousParties/items/properties/contactTelephoneNumber",
+            "$ref": "#/definitions/contactTelephoneNumberType",
+            "description": ""
+          },
+          "contactFaxNumber": {
+            "$id": "#/properties/litigiousParties/items/properties/contactFaxNumber",
+            "$ref": "#/definitions/contactFaxNumberType",
+            "description": ""
+          },
+          "contactEmailAddress": {
+            "$id": "#/properties/litigiousParties/items/properties/contactEmailAddress",
+            "$ref": "#/definitions/contactEmailAddressType",
+            "description": ""
+          },
+          "preferredMethodOfCommunication": {
+            "$id": "#/properties/litigiousParties/items/properties/preferredMethodOfCommunication",
+            "$ref": "#/definitions/preferredMethodOfCommunicationType",
+            "description": ""
+          },
+          "welshTranslation": {
+            "$id": "#/properties/litigiousParties/items/properties/welshTranslation",
+            "type": "boolean",
+            "default": false
+          },
+          "reference": {
+            "$id": "#/properties/litigiousParties/items/properties/reference",
+            "$ref": "#/definitions/referenceType",
+            "description": ""
+          },
+          "dateOfService": {
+            "$id": "#/properties/litigiousParties/items/properties/dateOfService",
+            "$ref": "#/definitions/formatDateOrNull",
+            "description": ""
+          },
+          "lastDateForService": {
+            "$id": "#/properties/litigiousParties/items/properties/lastDateForService",
+            "$ref": "#/definitions/formatDateOrNull",
+            "description": ""
+          },
+          "dateOfBirth": {
+            "$id": "#/properties/litigiousParties/items/properties/dateOfBirth",
+            "$ref": "#/definitions/formatDateOrNull",
+            "description": ""
+          },
+          "solicitorOrganisationID": {
+            "$id": "#/properties/litigiousParties/items/properties/solicitorOrganisationID",
+            "$ref": "#/definitions/solicitorOrganisationIDType",
+            "description": ""
+          },
+          "solicitorID": {
+            "$id": "#/properties/litigiousParties/items/properties/solicitorID",
+            "$ref": "#/definitions/solicitorIDType",
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "solicitors": {
+      "$id": "#/properties/solicitors",
+      "type": "array",
+      "description": "This section contains all of the solicitor(s) details.",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/properties/solicitors/items",
+        "type": "object",
+        "required": [
+          "ID",
+          "organisationID",
+          "name",
+          "addresses",
+          "contactDX",
+          "contactTelephoneNumber",
+          "contactFaxNumber",
+          "contactEmailAddress",
+          "preferredMethodOfCommunication",
+          "reference",
+          "isPayee"
+        ],
+        "properties": {
+          "ID": {
+            "$id": "#/properties/solicitors/items/anyOf/0/properties/ID",
+            "$ref": "#/definitions/solicitorIDType",
+            "description": ""
+          },
+          "organisationID": {
+            "$id": "#/properties/solicitors/items/properties/organisationID",
+            "$ref": "#/definitions/solicitorOrganisationIDType",
+            "description": ""
+          },
+          "name": {
+            "$id": "#/properties/solicitors/items/properties/name",
+            "type": ["string","null"],
+            "description": ""
+          },
+          "addresses": {
+            "$id": "#/properties/solicitors/items/properties/addresses",
+            "$ref": "#/definitions/addressesType",
+            "description": ""
+          },
+          "contactDX": {
+            "$id": "#/properties/solicitors/items/properties/contactDX",
+            "$ref": "#/definitions/contactDXType",
+            "description": ""
+          },
+          "contactTelephoneNumber": {
+            "$id": "#/properties/solicitors/items/properties/contactTelephoneNumber",
+            "$ref": "#/definitions/contactTelephoneNumberType",
+            "description": ""
+          },
+          "contactFaxNumber": {
+            "$id": "#/properties/solicitors/items/properties/contactFaxNumber",
+            "$ref": "#/definitions/contactFaxNumberType",
+            "description": ""
+          },
+          "contactEmailAddress": {
+            "$id": "#/properties/solicitors/items/properties/contactEmailAddress",
+            "$ref": "#/definitions/contactEmailAddressType",
+            "description": ""
+          },
+          "preferredMethodOfCommunication": {
+            "$id": "#/properties/solicitors/items/properties/preferredMethodOfCommunication",
+            "$ref": "#/definitions/preferredMethodOfCommunicationType",
+            "description": ""
+          },
+          "reference": {
+            "$id": "#/properties/solicitors/items/properties/reference",
+            "$ref": "#/definitions/referenceType",
+            "description": ""
+          },
+          "isPayee": {
+            "$id": "#/properties/solicitors/items/properties/isPayee",
+            "type": "boolean",
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "particularsOfClaim": {
+      "$id": "#/properties/particularsOfClaim",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000,
+      "description": "This attribute allows for additional information to be added to the case. This should only be populated for MCOL cases."
+    },
+    "claimDetails": {
+      "$id": "#/properties/claimDetails",
+      "type": "object",
+      "description": "This object contains basic details of the claim.",
+      "required": [
+        "caseRequestReceivedDate",
+        "caseIssuedDate",
+        "amountClaimed",
+        "courtFee"
+      ],
+      "properties": {
+        "caseRequestReceivedDate": {
+          "$id": "#/properties/claimDetails/properties/caseRequestReceivedDate",
+          "$ref": "#/definitions/formatDate",
+          "description": ""
+        },
+        "caseIssuedDate": {
+          "$id": "#/properties/claimDetails/properties/caseIssuedDate",
+          "$ref": "#/definitions/formatDateOrNull",
+          "description": ""
+        },
+        "amountClaimed": {
+          "$id": "#/properties/claimDetails/properties/amountClaimed",
+          "type": "number",
+          "maximum": 99999999999,
+          "description": ""
+        },
+        "courtFee": {
+          "$id": "#/properties/claimDetails/properties/courtFee",
+          "type": ["number", "null"],
+          "maxLength": 99999999999,
+          "description": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "events": {
+      "$id": "#/properties/events",
+      "type": "object",
+      "description": "This section contains the details of each event to be added to Caseman.",
+      "required": [
+        "miscellaneous",
+        "acknowledgementOfServiceReceived",
+        "consentExtensionFilingDefence",
+        "defenceFiled",
+        "defenceAndCounterClaim",
+        "receiptOfPartAdmission",
+        "receiptOfAdmission",
+        "replyToDefence",
+        "directionsQuestionnaireFiled"
+      ],
+      "properties": {
+        "miscellaneous": {
+          "$id": "#/properties/events/properties/miscellaneous",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/miscellaneousEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "acknowledgementOfServiceReceived": {
+          "$id": "#/properties/events/properties/acknowledgementOfServiceReceived",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/acknowledgementOfServiceReceivedEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "consentExtensionFilingDefence": {
+          "$id": "#/properties/events/properties/consentExtensionFilingDefence",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/consentExtensionFilingDefenceEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "defenceFiled": {
+          "$id": "#/properties/events/properties/defenceFiled",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/defenceFiledEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "defenceAndCounterClaim": {
+          "$id": "#/properties/events/properties/defenceAndCounterClaim",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/defenceAndCounterClaimEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "receiptOfPartAdmission": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/receiptOfPartAdmissionEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "receiptOfAdmission": {
+          "$id": "#/properties/events/properties/receiptOfAdmission",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/receiptOfAdmissionEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "replyToDefence": {
+          "$id": "#/properties/events/properties/replyToDefence",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/replyToDefenceEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "directionsQuestionnaireFiled": {
+          "$id": "#/properties/events/properties/directionsQuestionnaireFiled",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/directionsQuestionnaireFiledEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "formatDateOrNull": {
+      "$id": "#/definitions/formatDateOrNull",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "This attribute can take the format date or be null.",
+      "default": ""
+    },
+    "formatDate": {
+      "$id": "#/definitions/formatDate",
+      "type": "string",
+      "format": "date",
+      "description": "This attribute takes the format date.",
+      "default": ""
+    },
+    "litigiousPartyIDType": {
+      "$id": "#/definitions/litigiousPartyIDType",
+      "type": "string",
+      "description": "Identifies the litigant object in the json document.",
+      "default": ""
+    },
+    "solicitorIDType": {
+      "$id": "#/definitions/solicitorIDType",
+      "type": ["string",
+      "null"],
+      "description": "Identifies the solicitor object in the json document.",
+      "default": ""
+    },
+    "courtCodeType": {
+      "$id": "#/definitions/courtCodeType",
+      "type": ["string", "null"],
+      "pattern": "^(?:\\d{3}|)$",
+      "description": "The HMCTS 3 digit court location code."
+    },
+    "contactDXType": {
+      "$id": "#/definitions/contactDXType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 35,
+      "description": ""
+    },
+    "contactTelephoneNumberType": {
+      "$id": "#/definitions/contactTelephoneNumberType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 24,
+      "description": ""
+    },
+    "contactFaxNumberType": {
+      "$id": "#/definitions/contactFaxNumberType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 24,
+      "description": ""
+    },
+    "contactEmailAddressType": {
+      "$id": "#/definitions/contactEmailAddressType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$|^$",
+      "maxLength": 80,
+      "description": ""
+    },
+    "preferredMethodOfCommunicationType": {
+      "$id": "#/definitions/preferredMethodOfCommunicationType",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "referenceType": {
+      "$id": "#/definitions/referenceType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 24,
+      "description": ""
+    },
+    "solicitorOrganisationIDType": {
+      "$id": "#/definitions/solicitorOrganisationIDType",
+      "type": ["string", "null"],
+      "description": "Where a solicitor organisation is registered in HMCTS, the organisation ID will be provided here. This is not intended to match to any CASEMAN solicitor ID. Where a solicitor organisation is not registered, a system generated pseudo value will be provided. This identifier is used to indicate which solicitor firm represents which litigant. Links the solicitor object in the json document to the litigant object."
+    },
+    "addressLineType": {
+      "$id": "#/definitions/addressLineType",
+      "type": "string",
+      "maxLength": 60,
+      "description": ""
+    },
+    "addressLineOrNullType": {
+      "$id": "#/definitions/addressLineOrNullType",
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 60,
+      "description": ""
+    },
+    "postCodeType": {
+      "$id": "#/definitions/postCodeType",
+      "type": ["string", "null"],
+      "description": ""
+    },
+    "contactAddressType": {
+      "$id": "#/definitions/contactAddressType",
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "addressLine2",
+        "addressLine3",
+        "addressLine4",
+        "addressLine5",
+        "postCode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "$id": "#/definitions/contactAddressType/properties/addressLine1",
+          "$ref": "#/definitions/addressLineType",
+          "description": ""
+        },
+        "addressLine2": {
+          "$id": "#/definitions/contactAddressType/properties/addressLine2",
+          "$ref": "#/definitions/addressLineType",
+          "description": ""
+        },
+        "addressLine3": {
+          "$id": "#/definitions/contactAddressType/properties/addressLine3",
+          "$ref": "#/definitions/addressLineOrNullType",
+          "description": ""
+        },
+        "addressLine4": {
+          "$id": "#/definitions/contactAddressType/properties/addressLine4",
+          "$ref": "#/definitions/addressLineOrNullType",
+          "description": ""
+        },
+        "addressLine5": {
+          "$id": "#/definitions/contactAddressType/properties/addressLine5",
+          "$ref": "#/definitions/addressLineOrNullType",
+          "description": ""
+        },
+        "postCode": {
+          "$id": "#/definitions/contactAddressType/properties/postCode",
+          "$ref": "#/definitions/postCodeType",
+          "description": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "addressesType": {
+      "$id": "#/definitions/addressesType",
+      "type": ["object", "null"],
+      "required": [
+        "contactAddress"
+      ],
+      "properties": {
+        "contactAddress": {
+          "$id": "#/definitions/addressesType/properties/contactAddress",
+          "$ref": "#/definitions/contactAddressType",
+          "description": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "eventSequenceType": {
+      "$id": "#/definitions/eventSequenceType",
+      "type": "integer",
+      "description": "The order in which the events occurred."
+    },
+    "nullEventType": {
+      "$id": "#/definitions/nullEventType",
+      "type": "array",
+      "description": "This object is structured like an event but all attributes are null.",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/nullEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/nullEventType/items/properties/eventSequence",
+            "type": "null"
+          },
+          "eventCode": {
+            "$id": "#/definitions/nullEventType/items/properties/eventCode",
+            "type": "null"
+          },
+          "dateReceived": {
+            "$id": "#/definitions/nullEventType/items/properties/dateReceived",
+            "type": "null"
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/nullEventType/items/properties/litigiousPartyID",
+            "type": "null"
+          },
+          "eventDetails": {
+            "$id": "#/definitions/nullEventType/items/properties/eventDetails",
+            "type": "null"
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/nullEventType/items/properties/eventDetailsText",
+            "type": "null"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "miscellaneousEventType": {
+      "$id": "#/definitions/miscellaneousEventType",
+      "type": "array",
+      "description": "This event is usually populated where a specific event does not exist. It is also being used to provide the RPA trigger reason.",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/miscellaneousEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "999",
+            "description": "The CASEMAN code for the miscellaneous event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate"
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/litigiousPartyID",
+            "type": "null"
+          },
+          "eventDetails": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails",
+            "type": "object",
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetailsText",
+            "type": ["null", "string"],
+            "maxLength": 250
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "acknowledgementOfServiceReceivedEventType": {
+      "$id": "#/definitions/acknowledgementOfServiceReceivedEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "38",
+            "description": "The CASEMAN code for the acknowledgementOfServiceReceived event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails",
+            "type": "object",
+            "required": [
+              "responseIntention"
+            ],
+            "properties": {
+              "responseIntention": {
+                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/responseIntention",
+                "type": "string",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetailsText",
+            "type": [ "null", "string"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "consentExtensionFilingDefenceEventType": {
+      "$id": "#/definitions/consentExtensionFilingDefenceEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/consentExtensionFilingDefenceEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "45",
+            "description": "The CASEMAN code for the consentExtensionFilingDefence event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails",
+            "type": "object",
+            "required": [
+              "agreedExtensionDate"
+            ],
+            "properties": {
+              "agreedExtensionDate": {
+                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/agreedExtensionDate",
+                "type": "string",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defenceFiledEventType": {
+      "$id": "#/definitions/defenceFiledEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/defenceFiledEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "50",
+            "description": "The CASEMAN code for the defenceFiled event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defenceAndCounterClaimEventType": {
+      "$id": "#/definitions/defenceAndCounterClaimEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/defenceAndCounterClaimEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "52",
+            "description": "The CASEMAN code for the defenceAndCounterClaim event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "receiptOfPartAdmissionEventType": {
+      "$id": "#/definitions/receiptOfPartAdmissionEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/receiptOfPartAdmissionEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "60",
+            "description": "The CASEMAN code for the receiptOfPartAdmission event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "receiptOfAdmissionEventType": {
+      "$id": "#/definitions/receiptOfAdmissionEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/receiptOfAdmissionEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "40",
+            "description": "The CASEMAN code for the receiptOfAdmission event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "replyToDefenceEventType": {
+      "$id": "#/definitions/replyToDefenceEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/replyToDefenceEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "66",
+            "description": "The CASEMAN code for the replyToDefence event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "directionsQuestionnaireFiledEventType": {
+      "$id": "#/definitions/directionsQuestionnaireFiledEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/directionsQuestionnaireFiledEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "197",
+            "description": "The CASEMAN code for the directionsQuestionnaireFiled event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "stayClaim",
+              "preferredCourtCode",
+              "preferredCourtName"
+            ],
+            "properties": {
+              "stayClaim": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/stayClaim",
+                "type": "boolean",
+                "description": ""
+              },
+              "preferredCourtCode": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtCode",
+                "$ref": "#/definitions/courtCodeType",
+                "description": ""
+              },
+              "preferredCourtName": {
+                "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetails/properties/preferredCourtName",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": ""
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

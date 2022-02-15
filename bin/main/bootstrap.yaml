@@ -1,0 +1,26 @@
+spring:
+  cloud:
+    propertiesvolume:
+      enabled: true
+      prefixed: false
+      paths: /mnt/secrets/civil
+      aliases:
+        microservicekey-civil-service: idam.s2s-auth.totp_secret
+        system-update-user-password: CIVIL_SYSTEM_UPDATE_PASSWORD
+        system-update-user-username: CIVIL_SYSTEM_UPDATE_USERNAME
+        cross-access-user-password: CIVIL_CROSS_ACCESS_PASSWORD
+        cross-access-user-username: CIVIL_CROSS_ACCESS_USERNAME
+        prd-admin-user-password: CIVIL_PRD_ADMIN_PASSWORD
+        prd-admin-user-username: CIVIL_PRD_ADMIN_USERNAME
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        cmc-db-password-v11: CMC_DB_PASSWORD
+        docmosis-api-key: docmosis.tornado.key
+        civil-idam-client-secret: idam.client.secret
+        gov-notify-api-key: GOV_NOTIFY_API_KEY
+        sendgrid-api-key: SENDGRID_API_KEY
+        robotics-notification-sender: robotics.notification.sender
+        robotics-notification-recipient: robotics.notification.recipient
+        robotics-notification-multipartyrecipient: robotics.notification.multipartyrecipient
+        launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
+        ordnance-survey-api-key: OS_POSTCODE_LOOKUP_API_KEY
+

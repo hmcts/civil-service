@@ -8,9 +8,13 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationServiceHelper {
+
+    private final GADeadlinesCalculator deadlinesCalculator;
 
     public boolean isEmailIDSameAsUser(String email, UserDetails userDetails) {
 
@@ -57,6 +61,12 @@ public class InitiateGeneralApplicationServiceHelper {
         return false;
     }
 
+    public String getDeadline() {
+        return deadlinesCalculator
+            .calculateApplicantResponseDeadline(
+                LocalDateTime.now(), 5).toString();
+    }
+
     public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,
                                                                       CaseData caseData, UserDetails userDetails) {
 
@@ -94,5 +104,4 @@ public class InitiateGeneralApplicationServiceHelper {
                                                   : caseData.getRespondentSolicitor1EmailAddress()).build();
 
     }
-
 }

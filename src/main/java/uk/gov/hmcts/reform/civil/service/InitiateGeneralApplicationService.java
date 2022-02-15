@@ -92,6 +92,7 @@ public class InitiateGeneralApplicationService {
             .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppDeadlineNotification(helper.getDeadline())
             .build();
 
         return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
