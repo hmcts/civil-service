@@ -102,6 +102,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.name());
     }
 
+    //finding legal org name
     private String getLegalOrganisationName(CaseData caseData, CallbackParams callbackParams) {
         String organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         if (isCcNotification(callbackParams)) {
