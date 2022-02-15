@@ -359,6 +359,7 @@ public class CaseDataBuilder {
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
         return this;
     }
@@ -389,6 +390,7 @@ public class CaseDataBuilder {
             .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
+            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
             .build();
         return this;
     }
@@ -1288,10 +1290,28 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentFullDefence() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
             .build();
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
+        atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondent2ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2RespondToClaim(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondent2ClaimResponseType = respondentResponseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 
@@ -1300,7 +1320,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .file(DocumentBuilder.builder().documentName("defendant2-defence.pdf").build())
             .build();
         respondent2DQ();
         return this;
@@ -1637,10 +1657,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2() {
-        atStateClaimDetailsNotified();
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
-        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
         return this;
     }
 
@@ -1903,6 +1923,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2AgreedDeadlineExtension(respondentSolicitor2AgreedDeadlineExtension)
             // Acknowledge Claim
             .respondent1ClaimResponseIntentionType(respondent1ClaimResponseIntentionType)
+            .respondent2ClaimResponseIntentionType(respondent2ClaimResponseIntentionType)
             // Defendant Response Defendant 1
             .respondent1ClaimResponseType(respondent1ClaimResponseType)
             .respondent1ClaimResponseDocument(respondent1ClaimResponseDocument)

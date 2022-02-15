@@ -21,9 +21,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache
+    cache-names: userInfoCache, accessTokenCache
     caffeine:
-      spec: expireAfterAccess=3600s
+      spec: expireAfterWrite=3600s
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
@@ -84,10 +84,16 @@ civil:
   cross-access:
     username: ${CIVIL_CROSS_ACCESS_USERNAME:caseworker-caa@mailnesia.com}
     password: ${CIVIL_CROSS_ACCESS_PASSWORD:Password12!}
+  test-user:
+    username: ${TEST_USERNAME:test@example.com}
+    password: ${TEST_PASSWORD:Password12!}
 
 core_case_data:
   api:
     url: http://localhost:4452
+role-assignment-service:
+  api:
+    url: http://localhost:4096
 case_document_am:
   url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 reference:
@@ -97,9 +103,7 @@ reference:
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
-  respondentSolicitorClaimIssueEmailTemplate: "aca69f2f-cfc7-4e16-ab7a-76a7e25d3d01"
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "28f30511-e58d-4eac-b09c-e145ad42710a"
-  respondentSolicitorClaimDetailsEmailTemplate: "fcd7be87-5eae-4227-8bf5-c7c6962ec804"
   respondentSolicitorClaimDetailsEmailTemplateMultiParty: "5a03f1f4-9349-4217-8b6b-979685c9c671"
   solicitorDefendantResponseCaseTakenOffline: "513af1f3-e2be-49db-a463-b6f12641d13d"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "4b12fa48-4a93-4280-a361-f2f209cbdc72"
