@@ -14,7 +14,7 @@ serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm toolb
 
 echo "Uploading CCD_DEFINITION_STORE_API_BASE_URL : ${CCD_DEFINITION_STORE_API_BASE_URL}"
 
-uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
+uploadResponse=$(curl --insecure --fail -w "\n%{http_code}" --show-error -X POST \
   ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/import \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
@@ -28,7 +28,7 @@ if [[ "${upload_http_code}" == '504' ]]; then
   do
     sleep 5
     echo "Checking status of ${filename} (${uploadFilename}) upload (Try ${try})"
-    audit_response=$(curl --insecure --silent --show-error -X GET \
+    audit_response=$(curl --insecure --fail --show-error -X GET \
       ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/api/import-audits \
       -H "Authorization: Bearer ${userToken}" \
       -H "ServiceAuthorization: Bearer ${serviceToken}")
