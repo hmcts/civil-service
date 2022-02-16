@@ -17,8 +17,9 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataExceptio
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
-import java.util.List;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
@@ -70,8 +71,15 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailDataMultiParty(CaseData caseData) {
-        RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-        String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+        String triggerEvent;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+            triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+        } else {
+            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+            triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+        }
+
         return EmailData.builder()
             .message(String.format(
                 "Multiparty claim data for %s",
@@ -85,7 +93,7 @@ public class RoboticsNotificationService {
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
 
         List<Event> event = eventHistory.getMiscellaneous();
-        String triggerReason = event.get(event.size() - 1).getEventDetailsText();
+        String triggerReason = getLastDetailsText(event).orElse(null);
 
         triggerReason = updateTriggerReason(eventHistory.getAcknowledgementOfServiceReceived(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getConsentExtensionFilingDefence(), triggerReason);
@@ -99,10 +107,15 @@ public class RoboticsNotificationService {
         return triggerReason;
     }
 
-    public static String updateTriggerReason(List<Event> event, String triggerReason) {
-        if (event.get(event.size() - 1).getEventDetailsText() != null) {
-            triggerReason = event.get(event.size() - 1).getEventDetailsText();
+    private static Optional<String> getLastDetailsText(List<Event> events) {
+        if (events.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(events.get(events.size()-1).getEventDetailsText());
         }
-        return triggerReason;
+    }
+
+    private static String updateTriggerReason(List<Event> event, String triggerReason) {
+        return getLastDetailsText(event).orElse(triggerReason);
     }
 }
