@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-class GADeadlinesCalculator extends DeadlinesCalculator {
+public class GADeadlinesCalculator extends DeadlinesCalculator {
 
     public GADeadlinesCalculator(WorkingDayIndicator workingDayIndicator) {
         super(workingDayIndicator);

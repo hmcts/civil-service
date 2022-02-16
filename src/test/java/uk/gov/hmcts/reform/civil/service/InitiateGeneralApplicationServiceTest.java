@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -14,11 +15,14 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -45,12 +49,24 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
+    private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
 
     @Autowired
     private InitiateGeneralApplicationService service;
 
     @MockBean
     private InitiateGeneralApplicationServiceHelper helper;
+
+    @MockBean
+    private GADeadlinesCalculator calc;
+
+    @BeforeEach
+    public void setUp() throws IOException {
+        when(calc.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class),
+            anyInt()))
+            .thenReturn(weekdayDate);
+    }
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
@@ -365,6 +381,20 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
         assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldReturnDate_whenGeneralAppNotificationDeadlineIsInvoked() {
+        String givenDate = GeneralApplication.builder()
+            .generalAppDeadlineNotification(
+                weekdayDate.toString())
+            .build()
+            .getGeneralAppDeadlineNotification();
+
+        String actual = "2022-02-15T12:00";
+
+        assertThat(givenDate).isNotNull();
+        assertThat(givenDate).isEqualTo(actual);
     }
 
     private void assertCaseDateEntries(CaseData caseData) {
