@@ -854,6 +854,7 @@ class EventHistoryMapperTest {
             );
              **/
         }
+
     }
 
     @Nested

@@ -199,6 +199,7 @@ public class CaseData implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
