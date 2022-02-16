@@ -41,6 +41,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         + "%n%n * The Defendant has not filed an admission together with request for time to pay."
         + "%n%n You can make another default judgment request when you know all these statements have been met.";
     public static final String HEADER = "# You cannot request default judgment";
+    public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
+    public static final String TRIAL_TEXT = "will be trial hearing provided text";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
 
@@ -49,6 +51,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
+            callbackKey(MID, "hearingTypeSelection"), this::populateText,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -77,6 +80,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
         List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
             isValidRange(hearingDatesElement);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -119,6 +123,19 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
         }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+
+    }
+
+    private CallbackResponse populateText(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.detailsOfDirectionDisposal(DISPOSAL_TEXT);
+        caseDataBuilder.detailsOfDirectionTrial(TRIAL_TEXT);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
