@@ -1,15 +1,12 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.lang.Assert;
-import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.assertion.DayAssert;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidays;
 import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidaysApi;
@@ -17,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -59,9 +55,9 @@ public class GADeadlinesCalculatorTest {
 
         @Test
         void shouldReturnDeadlinePlus2Days_whenResponseDateIsWeekday() {
-            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12,0);
+            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(2).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate,2);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 2);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -70,9 +66,9 @@ public class GADeadlinesCalculatorTest {
 
         @Test
         void shouldReturnDeadlinePlus3Days_whenResponseDateIsWeekday() {
-            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12,0);
+            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(3).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate,3);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 3);
 
             assertThat(responseDeadline)
                 .isWeekday()
