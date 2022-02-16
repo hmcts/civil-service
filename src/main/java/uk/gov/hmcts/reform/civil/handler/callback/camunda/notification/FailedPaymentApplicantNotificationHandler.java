@@ -17,7 +17,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildClaimantReference;
+
 @Service
 @RequiredArgsConstructor
 public class FailedPaymentApplicantNotificationHandler extends CallbackHandler implements NotificationData {
@@ -63,7 +64,7 @@ public class FailedPaymentApplicantNotificationHandler extends CallbackHandler i
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            PARTY_REFERENCES, buildClaimantReference(caseData)
         );
     }
 }
