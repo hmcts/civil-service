@@ -83,7 +83,6 @@ public class CaseData implements MappableObject {
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
-
     private final OrganisationPolicy applicant1OrganisationPolicy;
     private final OrganisationPolicy applicant2OrganisationPolicy;
     private final OrganisationPolicy respondent1OrganisationPolicy;
@@ -93,7 +92,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;
-
     private final Address respondentSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
@@ -195,7 +193,7 @@ public class CaseData implements MappableObject {
     private final Applicant1DQ applicant1DQ;
 
 
-    private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -220,9 +218,6 @@ public class CaseData implements MappableObject {
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
-
-
-
 
     // dates
     private final LocalDateTime submittedDate;
@@ -255,11 +250,14 @@ public class CaseData implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
-
-    //default judgment
+    private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
+    private final String PartialPaymentAmount;
+    private final YesOrNo PartialPayment;
+    private final LocalDate paymentSetDate;
+    private final String repaymentTotal;
+    private final String repaymentSummaryObject;
+    private final YesOrNo paymentConfirmationDecisionSpec;
 }

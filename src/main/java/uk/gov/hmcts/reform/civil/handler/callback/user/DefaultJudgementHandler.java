@@ -66,15 +66,12 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getFormattedString(HEADER))
-            .confirmationBody(getFormattedString(CPR_REQUIRED_INFO))
+            .confirmationHeader(format(HEADER))
+            .confirmationBody(format(CPR_REQUIRED_INFO))
             .build();
     }
 
-    private String getFormattedString(String message) {
-        return format(message);
 
-    }
 
 
     private CallbackResponse validateDateValues(CallbackParams callbackParams) {
@@ -153,7 +150,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
             LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
-            errors.add(String.format(NOT_VALID_DJ, formattedDeadline));
+            errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
         listData.add(caseData.getRespondent1().getIndividualFirstName() + " " + caseData.getRespondent1().getIndividualLastName());
