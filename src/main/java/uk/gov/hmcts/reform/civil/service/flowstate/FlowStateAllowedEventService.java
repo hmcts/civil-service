@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -112,7 +113,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -127,7 +129,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -143,7 +146,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -159,7 +163,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
-                INFORM_AGREED_EXTENSION_DATE
+                INFORM_AGREED_EXTENSION_DATE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -175,7 +180,8 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -190,7 +196,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
-                INFORM_AGREED_EXTENSION_DATE
+                INFORM_AGREED_EXTENSION_DATE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -206,7 +213,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -222,7 +230,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -236,7 +245,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 TAKE_CASE_OFFLINE,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -248,7 +258,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -260,7 +271,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -272,7 +284,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -284,7 +297,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -296,21 +310,24 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(

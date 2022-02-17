@@ -134,5 +134,4 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 }
