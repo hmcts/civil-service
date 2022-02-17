@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
@@ -73,6 +74,8 @@ class RoboticsNotificationServiceTest {
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
+    @Autowired
+    RoboticsDataMapper roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
@@ -130,6 +133,22 @@ class RoboticsNotificationServiceTest {
 
         assertThrows(NullPointerException.class, () ->
             service.notifyRobotics(null, true));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowRoboticsDataException_whenRoboticsCaseDataCannotBeParsed() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        when(roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString()).thenThrow(RoboticsDataException.class);
+
+        assertThrows(RoboticsDataException.class, () ->
+            service.notifyRobotics(caseData, multiPartyScenario));
     }
 
     @Test
