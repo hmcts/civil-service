@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
+    private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
 
+    private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
     public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
         + "provided for a non-urgent application.";
@@ -80,6 +83,9 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
+        String deadline = deadlinesCalculator
+            .calculateApplicantResponseDeadline(
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
 
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
@@ -92,6 +98,7 @@ public class InitiateGeneralApplicationService {
             .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppDeadlineNotification(deadline)
             .build();
 
         return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
