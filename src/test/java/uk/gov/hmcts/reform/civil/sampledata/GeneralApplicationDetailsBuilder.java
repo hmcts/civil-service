@@ -114,6 +114,68 @@ public class GeneralApplicationDetailsBuilder {
 
     }
 
+    public CaseData getTestCaseDataForApplicationFee(CaseData caseData, boolean isConsented,
+                                                           boolean isWithNotice) {
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (!isConsented) {
+            caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
+                    .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
+                    .build());
+        } else {
+            caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
+                    .generalAppInformOtherParty(null);
+        }
+        return caseDataBuilder
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .applicantsPbaAccounts(PBA_ACCOUNTS)
+                        .pbaReference(STRING_CONSTANT)
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(YES)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
+
+    }
+
     public CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder()
