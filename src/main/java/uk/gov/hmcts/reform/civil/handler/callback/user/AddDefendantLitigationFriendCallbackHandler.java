@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -30,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 
 @Service
@@ -42,16 +40,13 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private final Time time;
     private final ObjectMapper objectMapper;
     private final ExitSurveyContentService exitSurveyContentService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
+            callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(MID, "get-litigation-friend"), this::getLitigationFriend,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmitMultiparty,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -73,65 +68,44 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         return EVENTS;
     }
 
-    //production uses this callback until CCD change is merged
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND))
-            .respondent1LitigationFriendDate(LocalDateTime.now())
-            .respondent1LitigationFriendCreatedDate(
-                ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
-                    .orElse(LocalDateTime.now()))
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse aboutToSubmitMultiparty(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = time.now();
 
-        //catches production
-        if (!featureToggleService.isMultipartyEnabled()) {
-            return aboutToSubmit(callbackParams);
-            //when CCD changes are merged
-        } else {
-            CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
-            String selectedOption = Optional.of(caseData).map(CaseData::getSelectLitigationFriend)
-                .map(DynamicList::getValue).map(DynamicListElement::getLabel).orElse("").split(":")[0];
-            if ("Both".equals(selectedOption)) {
-                caseDataUpdated
-                    .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
-                    .respondent1LitigationFriendDate(currentDateTime)
-                    .respondent1LitigationFriendCreatedDate(
-                        ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
-                            .orElse(currentDateTime))
-                    .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
-                    .respondent2LitigationFriendDate(currentDateTime)
-                    .respondent2LitigationFriendCreatedDate(
-                        ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
-                            .orElse(currentDateTime));
+        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
+        String selectedOption = Optional.of(caseData).map(CaseData::getSelectLitigationFriend)
+            .map(DynamicList::getValue).map(DynamicListElement::getLabel).orElse("").split(":")[0];
+        if ("Both".equals(selectedOption)) {
+            caseDataUpdated
+                .respondent1LitigationFriend(caseData.getGenericLitigationFriend())
+                .respondent1LitigationFriendDate(currentDateTime)
+                .respondent1LitigationFriendCreatedDate(
+                    ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                        .orElse(currentDateTime))
+                .respondent2LitigationFriend(caseData.getGenericLitigationFriend())
+                .respondent2LitigationFriendDate(currentDateTime)
+                .respondent2LitigationFriendCreatedDate(
+                    ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
+                        .orElse(currentDateTime));
 
-            } else if ("Defendant Two".equals(selectedOption)) {
-                caseDataUpdated
-                    .respondent2LitigationFriendDate(currentDateTime)
-                    .respondent2LitigationFriendCreatedDate(
-                        ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
-                            .orElse(currentDateTime));
+        } else if ("Defendant Two".equals(selectedOption)) {
+            caseDataUpdated
+                .respondent2LitigationFriendDate(currentDateTime)
+                .respondent2LitigationFriendCreatedDate(
+                    ofNullable(callbackParams.getCaseData().getRespondent2LitigationFriendCreatedDate())
+                        .orElse(currentDateTime));
 
-            } else if ("Defendant One".equals(selectedOption)) {
-                caseDataUpdated
-                    .respondent1LitigationFriendDate(currentDateTime)
-                    .respondent1LitigationFriendCreatedDate(
-                        ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
-                            .orElse(currentDateTime));
-            }
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataUpdated.build().toMap(objectMapper))
-                .build();
+        } else if ("Defendant One".equals(selectedOption)) {
+            caseDataUpdated
+                .respondent1LitigationFriendDate(currentDateTime)
+                .respondent1LitigationFriendCreatedDate(
+                    ofNullable(callbackParams.getCaseData().getRespondent1LitigationFriendCreatedDate())
+                        .orElse(currentDateTime));
         }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.build().toMap(objectMapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

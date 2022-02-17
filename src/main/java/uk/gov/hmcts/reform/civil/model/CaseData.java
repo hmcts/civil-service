@@ -125,6 +125,7 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
@@ -177,6 +178,7 @@ public class CaseData implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
