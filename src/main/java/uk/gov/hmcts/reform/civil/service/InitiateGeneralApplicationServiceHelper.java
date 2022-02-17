@@ -57,7 +57,6 @@ public class InitiateGeneralApplicationServiceHelper {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
         boolean isGAApplicantSameAsParentCaseApplicant = isGA_ApplicantSameAsPC_Applicant(caseData, userDetails);
-
         applicationBuilder.isPCClaimantMakingApplication(isGAApplicantSameAsParentCaseApplicant ? YES : NO);
 
         boolean isPCApplicantUserDetailsPresent = validateUserDetails(caseData
