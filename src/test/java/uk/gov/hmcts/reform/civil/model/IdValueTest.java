@@ -7,10 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class IdValueTest {
 
     private final String id = "1";
+    private final String id2 = "2";
     private final Integer value = 1234;
 
     private IdValue<Integer> addressUk = new IdValue<>(
-        id,
+        id2,
         value
     );
 
