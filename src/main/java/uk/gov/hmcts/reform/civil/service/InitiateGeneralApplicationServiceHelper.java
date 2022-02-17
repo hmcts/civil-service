@@ -23,20 +23,14 @@ public class InitiateGeneralApplicationServiceHelper {
 
     public boolean isGA_ApplicantSameAsPC_Applicant(CaseData caseData, UserDetails userDetails) {
 
-        if (caseData.getApplicantSolicitor1UserDetails() != null
+        return caseData.getApplicantSolicitor1UserDetails() != null
                 && caseData.getApplicant1OrganisationPolicy() != null
-                && isEmailIDSameAsUser(caseData.getApplicantSolicitor1UserDetails().getEmail(), userDetails)) {
-            return true;
-        }
-        return false;
+                && isEmailIDSameAsUser(caseData.getApplicantSolicitor1UserDetails().getEmail(), userDetails);
     }
 
     public boolean isGA_ApplicantSameAsPC_Respondent(CaseData caseData, UserDetails userDetails) {
-        if (caseData.getRespondentSolicitor1EmailAddress() != null
-                && isEmailIDSameAsUser(caseData.getRespondentSolicitor1EmailAddress(), userDetails)) {
-            return true;
-        }
-        return false;
+        return caseData.getRespondentSolicitor1EmailAddress() != null
+                && isEmailIDSameAsUser(caseData.getRespondentSolicitor1EmailAddress(), userDetails);
     }
 
     public IdamUserDetails constructRespondent1SolicitorUserDetails(UserDetails userDetails) {
@@ -53,11 +47,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
     public boolean validateUserDetails(IdamUserDetails idamUserDetails) {
 
-        if (idamUserDetails.getEmail() != null
-                && idamUserDetails.getId() != null) {
-            return true;
-        }
-        return false;
+        return idamUserDetails.getEmail() != null
+                && idamUserDetails.getId() != null;
     }
 
     public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,
@@ -85,7 +76,6 @@ public class InitiateGeneralApplicationServiceHelper {
         }
 
         return applicationBuilder
-                .isPCClaimantMakingApplication(isGAApplicantSameAsParentCaseApplicant ? YES : NO)
                 .applicantSolicitor1UserDetails(isGAApplicantSameAsParentCaseApplicant
                         ? (isPCApplicantUserDetailsPresent
                         ? caseData.getApplicantSolicitor1UserDetails()
