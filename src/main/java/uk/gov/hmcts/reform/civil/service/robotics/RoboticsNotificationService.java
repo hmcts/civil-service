@@ -70,16 +70,25 @@ public class RoboticsNotificationService {
     }
 
     private EmailData prepareEmailDataMultiParty(CaseData caseData) {
+        byte[] roboticsJsonData;
         RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-        String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
-        return EmailData.builder()
-            .message(String.format(
-                "Multiparty claim data for %s",
-                caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
-            .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
-                + " - " + caseData.getCcdState() + " - " + triggerEvent))
-            .to(roboticsEmailConfiguration.getMultipartyrecipient())
-            .build();
+        try {
+            roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            String triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+            String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
+
+            return EmailData.builder()
+                .message(String.format(
+                    "Multiparty claim data for %s",
+                    caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
+                .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
+                    + " - " + caseData.getCcdState() + " - " + triggerEvent))
+                .to(roboticsEmailConfiguration.getMultipartyrecipient())
+                .attachments(of(json(roboticsJsonData, fileName)))
+                .build();
+        } catch (JsonProcessingException e) {
+            throw new RoboticsDataException(e.getMessage(), e);
+        }
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
