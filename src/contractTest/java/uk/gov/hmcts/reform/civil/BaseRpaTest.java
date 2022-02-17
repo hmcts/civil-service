@@ -86,7 +86,7 @@ public abstract class BaseRpaTest {
                 .body(body)
                 .post(mockServer.getUrl() + PATH)
             .then()
-                .statusCode(200);
+                .statusCode(404);
         // @formatter:on
     }
 }
