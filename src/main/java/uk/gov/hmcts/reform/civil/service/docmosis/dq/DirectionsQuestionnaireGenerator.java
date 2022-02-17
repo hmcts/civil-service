@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -155,16 +157,25 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                  .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null);
         }
 
-        // TODO check the fields requested by the def res spec template in case any is missing and add it
         Witnesses witnesses = getWitnesses(dq);
-        int witnessesIncludingDefendants = YES.equals(witnesses.getWitnessesToAppear())
-            ? witnesses.getDetails().size() : 0;
-        MultiPartyScenario multiParty = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (multiParty == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
-            || multiParty == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            witnessesIncludingDefendants += 2;
+        int witnessesIncludingDefendants;
+        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
+            if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
+                && caseData.getResponseClaimWitnesses().matches("\\d+")) {
+                witnessesIncludingDefendants = Integer.parseInt(caseData.getResponseClaimWitnesses());
+            } else {
+                witnessesIncludingDefendants = 0;
+            }
         } else {
-            witnessesIncludingDefendants += 1;
+            witnessesIncludingDefendants = YES.equals(witnesses.getWitnessesToAppear())
+                ? witnesses.getDetails().size() : 0;
+            MultiPartyScenario multiParty = MultiPartyScenario.getMultiPartyScenario(caseData);
+            if (multiParty == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+                || multiParty == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+                witnessesIncludingDefendants += 2;
+            } else {
+                witnessesIncludingDefendants += 1;
+            }
         }
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
