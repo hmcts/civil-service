@@ -317,16 +317,14 @@ public class FlowStateAllowedEventService {
             CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE,
-                CHANGE_SOLICITOR_EMAIL
+                ADD_CASE_NOTE
             )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE,
-                CHANGE_SOLICITOR_EMAIL
+                ADD_CASE_NOTE
             )
         ),
         entry(

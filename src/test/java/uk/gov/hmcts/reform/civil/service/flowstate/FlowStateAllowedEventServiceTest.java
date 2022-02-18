@@ -362,16 +362,14 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE,
-                        CHANGE_SOLICITOR_EMAIL
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE,
-                        CHANGE_SOLICITOR_EMAIL
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
