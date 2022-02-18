@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +66,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 }
