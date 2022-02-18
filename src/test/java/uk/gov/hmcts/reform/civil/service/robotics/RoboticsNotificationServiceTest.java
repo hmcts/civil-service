@@ -137,34 +137,6 @@ class RoboticsNotificationServiceTest {
 
     @Test
     @SneakyThrows
-    void shouldThrowRoboticsDataException_whenRoboticsCaseDataCannotBeParsedFor1v1() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-
-        boolean multiPartyScenario = isMultiPartyScenario(caseData);
-        when(roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString()).thenThrow(RoboticsDataException.class);
-
-        assertThrows(RoboticsDataException.class, () ->
-            service.notifyRobotics(caseData, multiPartyScenario));
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldThrowRoboticsDataException_whenRoboticsCaseDataCannotBeParsedForMultiparty() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
-
-        boolean multiPartyScenario = isMultiPartyScenario(caseData);
-        when(roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString()).thenThrow(RoboticsDataException.class);
-
-        assertThrows(RoboticsDataException.class, () ->
-            service.notifyRobotics(caseData, multiPartyScenario));
-    }
-
-    @Test
-    @SneakyThrows
     void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent2(PartyBuilder.builder().individual().build())
