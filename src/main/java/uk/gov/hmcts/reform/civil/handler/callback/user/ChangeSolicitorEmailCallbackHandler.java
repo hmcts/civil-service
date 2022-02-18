@@ -116,14 +116,12 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
     private void buildPartyFlags(List<String> userRoles, CaseData.CaseDataBuilder caseDataBuilder) {
         caseDataBuilder.isApplicant1(userRoles.contains(CaseRole.APPLICANTSOLICITORONE.getFormattedName()) ? YES : NO)
-            .isApplicant2(userRoles.contains(CaseRole.APPLICANTSOLICITORTWO.getFormattedName()) ? YES : NO)
             .isRespondent1(userRoles.contains(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()) ? YES : NO)
             .isRespondent2(userRoles.contains(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()) ? YES : NO);
     }
 
     private void clearPartyFlags(CaseData.CaseDataBuilder caseDataBuilder) {
         caseDataBuilder.isApplicant1(null)
-            .isApplicant2(null)
             .isRespondent1(null)
             .isRespondent2(null);
     }
