@@ -38,8 +38,7 @@ public class RoboticsNotificationService {
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
         requireNonNull(caseData);
-        EmailData emailData = !multiPartyScenario
-            ? prepareEmailData(caseData) : prepareEmailDataMultiParty(caseData);
+        EmailData emailData = prepareEmailData(caseData);
         sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
     }
 
