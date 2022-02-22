@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.String;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -31,13 +31,12 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SuppressWarnings("unchecked")
 public class GeneralApplicationDetailsBuilder {
 
-    public static final java.lang.String STRING_CONSTANT = "this is a string";
-    public static final java.lang.String STRING_NUM_CONSTANT = "123456789";
-    public static final java.lang.String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    public static final java.lang.String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
+    public static final String STRING_CONSTANT = "this is a string";
+    public static final String STRING_NUM_CONSTANT = "123456789";
+    public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
     public static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     public static final LocalDate APP_DATE_EPOCH = EPOCH;
     public static final DynamicList PBALIST = DynamicList.builder().build();
@@ -61,7 +60,7 @@ public class GeneralApplicationDetailsBuilder {
         urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
         GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -114,9 +113,71 @@ public class GeneralApplicationDetailsBuilder {
 
     }
 
+    public CaseData getTestCaseDataForApplicationFee(CaseData caseData, boolean isConsented,
+                                                           boolean isWithNotice) {
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (!isConsented) {
+            caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
+                    .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
+                    .build());
+        } else {
+            caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
+                    .generalAppInformOtherParty(null);
+        }
+        return caseDataBuilder
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .applicantsPbaAccounts(PBA_ACCOUNTS)
+                        .pbaReference(STRING_CONSTANT)
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(YES)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
+
+    }
+
     public CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -187,7 +248,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -262,7 +323,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
         GeneralApplication application = GeneralApplication.builder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -341,7 +402,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public GeneralApplication getGeneralApplication() {
         GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        return builder.generalAppType(String.builder()
+        return builder.generalAppType(GAApplicationType.builder()
                         .types(singletonList(SUMMARY_JUDGEMENT))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -356,7 +417,7 @@ public class GeneralApplicationDetailsBuilder {
                         .reasonsForUrgency(STRING_CONSTANT)
                         .urgentAppConsiderationDate(APP_DATE_EPOCH)
                         .build())
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .isMultiParty(NO)

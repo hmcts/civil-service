@@ -19,7 +19,8 @@ public class GeneralApplicationsDetails implements MappableObject {
 
     @JsonCreator
     GeneralApplicationsDetails(@JsonProperty("generalApplicationType") String generalApplicationType,
-                               @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec,
+                               @JsonProperty("generalAppSubmittedDateGAspec")
+                                   LocalDateTime generalAppSubmittedDateGAspec,
                                @JsonProperty("caseLink") CaseLink caseLink,
                                @JsonProperty("caseState") String caseState) {
         this.generalApplicationType = generalApplicationType;

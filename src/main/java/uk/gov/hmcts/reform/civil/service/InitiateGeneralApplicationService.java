@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -6,7 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GATypeGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -16,10 +17,12 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
@@ -28,29 +31,35 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+
 @Service
 @RequiredArgsConstructor
 public class InitiateGeneralApplicationService {
+
     private final InitiateGeneralApplicationServiceHelper helper;
-    public static final java.lang.String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
-    public static final java.lang.String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
+    private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
+
+    private static final int NUMBER_OF_DEADLINE_DAYS = 5;
+    public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
+    public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
         + "provided for a non-urgent application.";
-    public static final java.lang.String URGENCY_DATE_CANNOT_BE_IN_PAST = "The date entered cannot be in the past.";
-    public static final java.lang.String TRIAL_DATE_FROM_REQUIRED = "Please enter the Date from if the trial has been fixed";
-    public static final java.lang.String INVALID_TRIAL_DATE_RANGE = "Trial Date From cannot be after Trial Date to. "
+    public static final String URGENCY_DATE_CANNOT_BE_IN_PAST = "The date entered cannot be in the past.";
+    public static final String TRIAL_DATE_FROM_REQUIRED = "Please enter the Date from if the trial has been fixed";
+    public static final String INVALID_TRIAL_DATE_RANGE = "Trial Date From cannot be after Trial Date to. "
         + "Please enter valid range.";
-    public static final java.lang.String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
+    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
         + "cannot attend hearing within next 3 months.";
-    public static final java.lang.String UNAVAILABLE_FROM_MUST_BE_PROVIDED = "If you selected option to be unavailable then "
+    public static final String UNAVAILABLE_FROM_MUST_BE_PROVIDED = "If you selected option to be unavailable then "
         + "you must provide at least one valid Date from";
-    public static final java.lang.String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
+    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
+
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails) {
         List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userDetails),
                                                                         caseData.getGeneralApplications());
         return dataBuilder
             .generalApplications(applications)
-            .generalAppType(GATypeGAspec.builder().build())
+            .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
             .generalAppPBADetails(GAPbaDetails.builder().build())
             .generalAppDetailsOfOrder(EMPTY)
@@ -62,7 +71,9 @@ public class InitiateGeneralApplicationService {
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
             .build();
     }
+
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
+
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
             applicationBuilder.generalAppEvidenceDocument(caseData.getGeneralAppEvidenceDocument());
@@ -72,6 +83,10 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
+        String deadline = deadlinesCalculator
+            .calculateApplicantResponseDeadline(
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
+
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
@@ -83,29 +98,35 @@ public class InitiateGeneralApplicationService {
             .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppDeadlineNotification(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
+
         return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
     }
+
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
                                                              List<Element<GeneralApplication>>
-                                                                 generalApplicationDetails) {
+                                                                     generalApplicationDetails) {
         List<Element<GeneralApplication>> newApplication = ofNullable(generalApplicationDetails).orElse(newArrayList());
         newApplication.add(element(application));
+
         return newApplication;
     }
-    public List<java.lang.String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
-        List<java.lang.String> errors = new ArrayList<>();
+
+    public List<String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
+        List<String> errors = new ArrayList<>();
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() == null) {
+                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() == null) {
             errors.add(URGENCY_DATE_REQUIRED);
         }
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == NO
-            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
+                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
             errors.add(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
         }
+
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
+                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
             LocalDate urgencyDate = generalAppUrgencyRequirement.getUrgentAppConsiderationDate();
             if (LocalDate.now().isAfter(urgencyDate)) {
                 errors.add(URGENCY_DATE_CANNOT_BE_IN_PAST);
@@ -113,15 +134,17 @@ public class InitiateGeneralApplicationService {
         }
         return errors;
     }
-    public List<java.lang.String> validateHearingScreen(GAHearingDetails hearingDetails) {
-        List<java.lang.String> errors = new ArrayList<>();
+
+    public List<String> validateHearingScreen(GAHearingDetails hearingDetails) {
+        List<String> errors = new ArrayList<>();
         validateTrialDate(errors, hearingDetails.getTrialRequiredYesOrNo(), hearingDetails.getTrialDateFrom(),
-                          hearingDetails.getTrialDateTo());
+                hearingDetails.getTrialDateTo());
         validateUnavailableDates(errors, hearingDetails.getUnavailableTrialRequiredYesOrNo(),
-                                 hearingDetails.getGeneralAppUnavailableDates());
+                hearingDetails.getGeneralAppUnavailableDates());
         return errors;
     }
-    private void validateTrialDate(List<java.lang.String> errors,
+
+    private void validateTrialDate(List<String> errors,
                                    YesOrNo isTrialScheduled,
                                    LocalDate trialDateFrom,
                                    LocalDate trialDateTo) {
@@ -133,7 +156,8 @@ public class InitiateGeneralApplicationService {
             }
         }
     }
-    private void validateUnavailableDates(List<java.lang.String> errors,
+
+    private void validateUnavailableDates(List<String> errors,
                                           YesOrNo isUnavailable,
                                           List<Element<GAUnavailabilityDates>> datesUnavailableList) {
         if (YES.equals(isUnavailable)) {

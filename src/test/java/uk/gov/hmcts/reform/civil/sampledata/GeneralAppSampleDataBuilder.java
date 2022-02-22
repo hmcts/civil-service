@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.String;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -29,15 +29,15 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class GeneralAppSampleDataBuilder {
 
-    protected static final java.lang.String STRING_CONSTANT = "this is a string";
-    protected static final java.lang.String STRING_NUM_CONSTANT = "123456789";
+    protected static final String STRING_CONSTANT = "this is a string";
+    protected static final String STRING_NUM_CONSTANT = "123456789";
     protected static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
     protected static final DynamicList PBALIST = DynamicList.builder().build();
 
     protected CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -111,7 +111,7 @@ public class GeneralAppSampleDataBuilder {
         urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
         GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -209,7 +209,7 @@ public class GeneralAppSampleDataBuilder {
 
     protected CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
         GeneralApplication application = GeneralApplication.builder()
-                .generalAppType(String.builder()
+                .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()

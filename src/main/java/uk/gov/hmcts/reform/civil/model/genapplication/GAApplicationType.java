@@ -12,12 +12,12 @@ import java.util.List;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class GATypeGAspec {
+public class GAApplicationType {
 
     private final List<GeneralApplicationTypes> types;
 
     @JsonCreator
-    GATypeGAspec(@JsonProperty("types") List<GeneralApplicationTypes> types) {
+    GAApplicationType(@JsonProperty("types") List<GeneralApplicationTypes> types) {
         this.types = types;
     }
 }
