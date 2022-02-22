@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -33,6 +32,7 @@ import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantSoTReset;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
@@ -58,11 +58,10 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Service
 @RequiredArgsConstructor
 public class RespondToClaimSpecCallbackHandler extends CallbackHandler
-    implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
+    implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator, DefendantSoTReset {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
-    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -258,18 +257,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
+        return resetStatementOfTruth(callbackParams, objectMapper);
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {

@@ -180,8 +180,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
 
         /* for 1v1 */
-        if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
-            && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
+        if (NO.equals(caseData.getAddApplicant2())
+            && NO.equals(caseData.getAddRespondent2())) {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
@@ -192,7 +192,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
         //for 2v1
-        if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
+        if (YES.equals(caseData.getAddApplicant2())) {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
@@ -223,9 +223,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .build();
-        } else if (caseData.getRespondent1() != null && caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2().equals(YES)
-            && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
+        } else if (caseData.getRespondent1() != null
+            && YES.equals(caseData.getAddRespondent2())
+            && YES.equals(respondent1Check)
+            && !respondent2HasSameLegalRep(caseData)) {
             //1v2 diff login 1
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
@@ -239,8 +240,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .solicitorReferencesCopy(null)
                 .isRespondent1(null);
 
-        } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
-            && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
+        } else if (YES.equals(caseData.getAddRespondent2())
+            && NO.equals(respondent1Check) && !respondent2HasSameLegalRep(caseData)) {
             var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();

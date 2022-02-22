@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantSoTReset;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -70,7 +71,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
+public class RespondToClaimCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator, DefendantSoTReset {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
 
@@ -259,17 +261,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         if ((caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent1ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(YES))
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(YES))
             || (caseData.getRespondent2ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(NO))
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(NO))
             || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
-                && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                || RespondentResponseType.FULL_DEFENCE.equals(caseData
-                .getRespondent1ClaimResponseTypeToApplicant2())))) {
+            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData
+                                                              .getRespondent1ClaimResponseTypeToApplicant2())))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
                 .build();
         }
@@ -289,18 +291,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
+        return resetStatementOfTruth(callbackParams, objectMapper);
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
@@ -501,13 +492,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
                                                         LocalDateTime createdAt, DocumentType type) {
         return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
-                       .documentLink(document)
-                       .documentName(document.getDocumentFileName())
-                       .documentType(type)
-                       .createdDatetime(createdAt)
-                       .createdBy(createdBy)
-                       .build()
-                );
+                                        .documentLink(document)
+                                        .documentName(document.getDocumentFileName())
+                                        .documentType(type)
+                                        .createdDatetime(createdAt)
+                                        .createdBy(createdBy)
+                                        .build()
+        );
     }
 
     private boolean applicant2Present(CaseData caseData) {
@@ -576,13 +567,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {
-        if ((caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
-            && (caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))) {
-            return true;
-        }
-        return false;
+        return ((RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
+            && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
     }
 }

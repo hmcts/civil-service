@@ -101,9 +101,9 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         Party respondent = callbackParams.getCaseData().getRespondent1();
         List<String> errors = dateOfBirthValidator.validate(respondent);
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired().equals(NO)) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecAoSRespondentCorrespondenceAddressdetails().getPostCode());
+        if (NO.equals(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
+            errors.addAll(postcodeValidator.validatePostCodeForDefendant(
+                caseData.getSpecAoSRespondentCorrespondenceAddressdetails().getPostCode()));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
