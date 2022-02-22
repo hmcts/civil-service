@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -37,6 +38,7 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo isMultiParty;
     private final YesOrNo isPCClaimantMakingApplication;
     private final CaseLink caseLink;
+    private final LocalDateTime generalAppSubmittedDateGAspec;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -58,7 +60,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
                        @JsonProperty("isPCClaimantMakingApplication") YesOrNo isPCClaimantMakingApplication,
-                       @JsonProperty("caseLink") CaseLink caseLink) {
+                       @JsonProperty("caseLink") CaseLink caseLink,
+                       @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
@@ -78,5 +81,6 @@ public class GeneralApplication implements MappableObject {
         this.isMultiParty = isMultiParty;
         this.isPCClaimantMakingApplication = isPCClaimantMakingApplication;
         this.caseLink = caseLink;
+        this.generalAppSubmittedDateGAspec = generalAppSubmittedDateGAspec;
     }
 }

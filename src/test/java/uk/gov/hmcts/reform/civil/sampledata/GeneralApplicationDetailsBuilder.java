@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SuppressWarnings("unchecked")
 public class GeneralApplicationDetailsBuilder {
 
     public static final String STRING_CONSTANT = "this is a string";

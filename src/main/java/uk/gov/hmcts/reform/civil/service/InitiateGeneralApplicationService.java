@@ -99,6 +99,7 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppDeadlineNotification(deadline)
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
 
         return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
