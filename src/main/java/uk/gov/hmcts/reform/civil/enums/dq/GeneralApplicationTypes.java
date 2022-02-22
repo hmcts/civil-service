@@ -10,7 +10,8 @@ public enum GeneralApplicationTypes {
     SUMMARY_JUDGEMENT("Summary Judgement"),
     STAY_THE_CLAIM("Stay the claim"),
     EXTEND_TIME("Extend Time"),
-    SET_ASIDE_JUDGEMENT("Set aside judgement");
+    AMEND_THE_STATEMENT_OF_CASE("Amend the statement of case"),
+    RELIEF_FROM_SANCTIONS("Relief from sanctions");
 
     private final String displayedValue;
 }
