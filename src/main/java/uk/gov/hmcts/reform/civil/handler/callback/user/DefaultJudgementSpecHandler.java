@@ -30,6 +30,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
@@ -54,6 +55,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
+    BigDecimal theOverallTotal;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,6 +64,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
             callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
+            callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
+            callbackKey(MID, "repaymentValidate"), this::repaymentValidate,
             callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -198,6 +202,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                                                   BigDecimal fixedCost) {
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
 
+
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
         var subTotal = caseData.getTotalClaimAmount()
@@ -206,7 +211,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             subTotal = subTotal.add(fixedCost);
         }
-        BigDecimal theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        theOverallTotal = subTotal.subtract(partialPaymentPounds);
+
 
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
@@ -243,4 +249,43 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         return partialPaymentPounds;
     }
+
+    private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //Set the hint date for repayment to be 30 days in the future
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        caseDataBuilder.currentDatebox(formattedDeadline);
+        //set the calculated repayment owed
+        caseDataBuilder.repaymentDue(theOverallTotal.toString());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse repaymentValidate(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        //Check repayment amount requested is less than the overall claim amount
+        var repay = new BigDecimal(caseData.getRepaymentDue());
+        var RegularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
+        var RegularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(RegularRepaymentAmountPennies);
+        if(RegularRepaymentAmountPounds.compareTo(repay) == 1){
+            errors.add("Regular payment cannot exceed the full claim amount");
+        }
+        //convert eligible date from localdatetime to datetime and compare to user provided repayment date
+        //return error if repayment date is before calculated eligible date
+        LocalDate eligibleDate = LocalDateTime.now().plusDays(30).toLocalDate();
+        if(caseData.getRepaymentDate().minusDays(1).isBefore(eligibleDate)){
+            errors.add("Selected date must be after " + eligibleDate);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
 }
+
+
+
