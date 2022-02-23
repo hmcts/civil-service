@@ -268,16 +268,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         //Check repayment amount requested is less than the overall claim amount
-        var repay = new BigDecimal(caseData.getRepaymentDue());
+        var repayment = new BigDecimal(caseData.getRepaymentDue());
         var RegularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
         var RegularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(RegularRepaymentAmountPennies);
-        if(RegularRepaymentAmountPounds.compareTo(repay) == 1){
+        System.out.println(repayment);
+        System.out.println(RegularRepaymentAmountPounds);
+        if(RegularRepaymentAmountPounds.compareTo(repayment) == 1){
             errors.add("Regular payment cannot exceed the full claim amount");
         }
         //convert eligible date from localdatetime to datetime and compare to user provided repayment date
         //return error if repayment date is before calculated eligible date
         LocalDate eligibleDate = LocalDateTime.now().plusDays(30).toLocalDate();
-        if(caseData.getRepaymentDate().minusDays(1).isBefore(eligibleDate)){
+        if(caseData.getRepaymentDate().isBefore(eligibleDate)){
             errors.add("Selected date must be after " + eligibleDate);
         }
 
