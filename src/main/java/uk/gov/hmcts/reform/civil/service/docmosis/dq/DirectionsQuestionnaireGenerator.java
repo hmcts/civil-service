@@ -326,15 +326,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private Experts getExperts(DQ dq) {
         var experts = dq.getExperts();
-        return Experts.builder()
-            .expertRequired(experts.getExpertRequired())
-            .expertReportsSent(
-                ofNullable(experts.getExpertReportsSent())
-                    .map(ExpertReportsSent::getDisplayedValue)
-                    .orElse(""))
-            .jointExpertSuitable(experts.getJointExpertSuitable())
-            .details(getExpertsDetails(dq))
-            .build();
+        if (null != experts) {
+            return Experts.builder()
+                .expertRequired(experts.getExpertRequired())
+                .expertReportsSent(
+                    ofNullable(experts.getExpertReportsSent())
+                        .map(ExpertReportsSent::getDisplayedValue)
+                        .orElse(""))
+                .jointExpertSuitable(experts.getJointExpertSuitable())
+                .details(getExpertsDetails(dq))
+                .build();
+        }
+        return Experts.builder().build();
     }
 
     private List<Expert> getExpertsDetails(DQ dq) {
@@ -352,19 +355,25 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private Witnesses getWitnesses(DQ dq) {
         var witnesses = dq.getWitnesses();
-        return Witnesses.builder()
-            .witnessesToAppear(witnesses.getWitnessesToAppear())
-            .details(unwrapElements(witnesses.getDetails()))
-            .build();
+        if (null != witnesses) {
+            return Witnesses.builder()
+                .witnessesToAppear(witnesses.getWitnessesToAppear())
+                .details(unwrapElements(witnesses.getDetails()))
+                .build();
+        }
+        return Witnesses.builder().build();
     }
 
     private Hearing getHearing(DQ dq) {
         var hearing = dq.getHearing();
-        return Hearing.builder()
-            .hearingLength(getHearingLength(dq))
-            .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-            .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-            .build();
+        if (null != hearing) {
+            return Hearing.builder()
+                .hearingLength(getHearingLength(dq))
+                .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
+                .build();
+        }
+        return Hearing.builder().build();
     }
 
     private String getHearingLength(DQ dq) {
@@ -407,13 +416,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-        return WelshLanguageRequirements.builder()
-            .evidence(ofNullable(
-                welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-            .court(ofNullable(
-                welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-            .documents(ofNullable(
-                welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-            .build();
+        if (null != welshLanguageRequirements) {
+            return WelshLanguageRequirements.builder()
+                .evidence(ofNullable(
+                    welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
+                .court(ofNullable(
+                    welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
+                .documents(ofNullable(
+                    welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
+                .build();
+        }
+        return WelshLanguageRequirements.builder().build();
     }
 }
