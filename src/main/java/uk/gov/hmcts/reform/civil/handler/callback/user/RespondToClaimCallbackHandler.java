@@ -264,8 +264,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 && isRespondent1.equals(YES))
             || (caseData.getRespondent2ClaimResponseType() != null
                 && caseData.getRespondent2ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(NO))
+                RespondentResponseType.FULL_DEFENCE))
             || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
                 && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
                 || RespondentResponseType.FULL_DEFENCE.equals(caseData
