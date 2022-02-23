@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.PredicateUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -672,33 +673,19 @@ public class EventHistoryMapper {
     }
 
     private void buildConsentExtensionFilingDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        // default set
         LocalDateTime dateReceived = caseData.getRespondent1TimeExtensionDate();
-        if (dateReceived == null) {
-            return;
-        }
-        // date and time check to find the login
         LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        String defendant = caseData.getRespondent1().getPartyName();
 
-        //finding extension date for the correct respondent in a 1v2 different solicitor scenario
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1TimeExtensionDate() == null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                dateReceived  = caseData.getRespondent2TimeExtensionDate();
-            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                if (caseData.getRespondent2TimeExtensionDate()
-                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
-                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent2TimeExtensionDate();
-                } else {
-                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent1TimeExtensionDate();
-
-                }
-            }
+        if (scenario == ONE_V_TWO_TWO_LEGAL_REP && PredicateUtils.defendant2Extension.test(caseData)) {
+            dateReceived = caseData.getRespondent2TimeExtensionDate();
+            extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+            defendant = caseData.getRespondent2().getPartyName();
         }
+        String extensionEventText = getExtensionEventText(scenario, extensionDate, defendant);
 
         builder.consentExtensionFilingDefence(
             List.of(
@@ -707,8 +694,7 @@ public class EventHistoryMapper {
                     .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
                     .dateReceived(dateReceived)
                     .litigiousPartyID("002")
-                    .eventDetailsText(format("agreedExtensionDate: %s", extensionDate
-                        .format(ISO_DATE)))
+                    .eventDetailsText(extensionEventText)
                     .eventDetails(EventDetails.builder()
                                       .agreedExtensionDate(extensionDate
                                                                .format(ISO_DATE))
@@ -716,5 +702,22 @@ public class EventHistoryMapper {
                     .build()
             )
         );
+    }
+
+    private String getExtensionEventText(MultiPartyScenario scenario, LocalDate extensionDate, String defendant) {
+        String defaultText;
+        switch (scenario) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                defaultText = format("RPA Reason: Defendant(s) have agreed extension: %s",
+                                            extensionDate.format(ISO_DATE));
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                defaultText = format("RPA Reason: Defendant: %s has agreed extension: %s", defendant,
+                                            extensionDate.format(ISO_DATE));
+                break;
+            default:
+                defaultText = format("agreedExtensionDate: %s", extensionDate.format(ISO_DATE));
+        }
+        return defaultText;
     }
 }

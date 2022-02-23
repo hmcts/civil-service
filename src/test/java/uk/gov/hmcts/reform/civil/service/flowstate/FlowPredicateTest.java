@@ -226,6 +226,17 @@ class FlowPredicateTest {
     }
 
     @Nested
+    class Respondent2OrgNotRegistered {
+        @Test
+        void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
+                .build();
+            assertTrue(respondent2OrgNotRegistered.test(caseData));
+        }
+    }
+
+    @Nested
     class PaymentFailed {
 
         @Test
@@ -1167,13 +1178,5 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
             assertFalse(claimDismissedByCamunda.test(caseData));
         }
-    }
-
-    @Test
-    void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
-            .build();
-        assertTrue(respondent2OrgNotRegistered.test(caseData));
     }
 }

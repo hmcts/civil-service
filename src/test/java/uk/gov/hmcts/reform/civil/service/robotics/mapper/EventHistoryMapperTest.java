@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -1622,7 +1624,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension() {
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension_1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
                 .build();
@@ -1659,6 +1661,138 @@ class EventHistoryMapperTest {
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension_1v2SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Barney")
+                                 .individualLastName("Stinson")
+                                 .build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(2)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent1TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("RPA Reason: Defendant(s) have agreed extension: %s", caseData
+                    .getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension_1v2Def2XtensionLater() {
+            LocalDate respondent2ExtensionDate = LocalDate.now().plusDays(3);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Barney")
+                                 .individualLastName("Stinson")
+                                 .build())
+                .respondent2TimeExtensionDate(LocalDateTime.of(respondent2ExtensionDate, LocalTime.NOON))
+                .respondentSolicitor2AgreedDeadlineExtension(respondent2ExtensionDate)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(2)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent2TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("RPA Reason: Defendant: %s has agreed extension: %s", caseData.getRespondent2()
+                    .getPartyName(), caseData.getRespondentSolicitor2AgreedDeadlineExtension().format(ISO_DATE)))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1741,7 +1875,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension() {
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension_1v1And2v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
                 .build();
@@ -1793,6 +1927,178 @@ class EventHistoryMapperTest {
                 .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
                     .format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
+                .containsExactly(expectedAcknowledgementOfServiceReceived);
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension_1v2SameSolicitor() {
+            LocalDate respondent2ExtensionDate = LocalDate.now().plusDays(3);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Barney")
+                                 .individualLastName("Stinson")
+                                 .build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2AcknowledgeNotificationDate((LocalDateTime.now()))
+                .respondent2TimeExtensionDate(LocalDateTime.of(respondent2ExtensionDate, LocalTime.NOON))
+                .respondentSolicitor2AgreedDeadlineExtension(respondent2ExtensionDate)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(4)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+            Event expectedAcknowledgementOfServiceReceived = Event.builder()
+                .eventSequence(2)
+                .eventCode("38")
+                .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .responseIntention(caseData.getRespondent1ClaimResponseIntentionType()
+                                                         .getLabel())
+                                  .build())
+                .eventDetailsText(format(
+                    "responseIntention: %s",
+                    caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                ))
+                .build();
+
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(3)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent1TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("RPA Reason: Defendant(s) have agreed extension: %s",
+                                         caseData.getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)))
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
+                .containsExactly(expectedAcknowledgementOfServiceReceived);
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension_1v2Def2XtnLater() {
+            LocalDate respondent2ExtensionDate = LocalDate.now().plusDays(3);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Barney")
+                                 .individualLastName("Stinson")
+                                 .build())
+                .respondent2AcknowledgeNotificationDate((LocalDateTime.now()))
+                .respondent2TimeExtensionDate(LocalDateTime.of(respondent2ExtensionDate, LocalTime.NOON))
+                .respondentSolicitor2AgreedDeadlineExtension(respondent2ExtensionDate)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(4)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+            Event expectedAcknowledgementOfServiceReceived = Event.builder()
+                .eventSequence(2)
+                .eventCode("38")
+                .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .responseIntention(caseData.getRespondent1ClaimResponseIntentionType()
+                                                         .getLabel())
+                                  .build())
+                .eventDetailsText(format(
+                    "responseIntention: %s",
+                    caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                ))
+                .build();
+
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(3)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent2TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("RPA Reason: Defendant: %s has agreed extension: %s",
+                                         caseData.getRespondent2().getPartyName(), caseData
+                                             .getRespondentSolicitor2AgreedDeadlineExtension()
+                                             .format(ISO_DATE)
+                ))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
