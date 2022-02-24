@@ -593,15 +593,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private boolean isSolicitor2AndRespondent2ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
         return caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE)
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
             && isRespondent1.equals(NO);
     }
 
     private boolean isSolicitor1AndRespondent1ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
         return caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE)
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
             && isRespondent1.equals(YES);
     }
 }
