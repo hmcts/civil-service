@@ -189,7 +189,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
                 LocalDate.now().plusMonths(2)).HearingUnavailableUntil(
                 LocalDate.now().plusMonths(1)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().HearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -212,7 +212,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
                 LocalDate.now().plusMonths(2)).HearingUnavailableUntil(
                 LocalDate.now().plusMonths(4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().HearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -235,7 +235,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
                 LocalDate.now().plusMonths(1)).HearingUnavailableUntil(
                 LocalDate.now().plusMonths(-4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().HearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -257,7 +257,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
                 LocalDate.now().plusMonths(1)).HearingUnavailableUntil(
                 LocalDate.now().plusMonths(2)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().HearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -279,7 +279,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().HearingDates(
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingDates(
                     null).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -306,7 +306,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().HearingDates(
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingDates(
                     null).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
