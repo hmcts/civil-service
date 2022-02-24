@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.assertion;
 
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
 import java.math.BigDecimal;
@@ -19,6 +20,10 @@ public class CustomAssertions {
 
     public static RoboticsCaseDataAssert assertThat(RoboticsCaseData roboticsCaseData) {
         return new RoboticsCaseDataAssert(roboticsCaseData);
+    }
+
+    public static RoboticsCaseDataSpecAssert assertThat(RoboticsCaseDataSpec roboticsCaseData) {
+        return new RoboticsCaseDataSpecAssert(roboticsCaseData);
     }
 
     public static ContactInformationAssert assertThat(List<ContactInformation> contactInformation) {

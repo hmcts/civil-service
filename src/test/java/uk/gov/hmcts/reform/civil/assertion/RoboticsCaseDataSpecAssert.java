@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
-import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -24,13 +24,13 @@ import static uk.gov.hmcts.reform.civil.assertion.CustomAssertions.assertThat;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_SOLICITOR_ID;
 
-public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert, RoboticsCaseData> {
+public class RoboticsCaseDataSpecAssert extends CustomAssert<RoboticsCaseDataSpecAssert, RoboticsCaseDataSpec> {
 
-    public RoboticsCaseDataAssert(RoboticsCaseData actual) {
-        super("RoboticsCaseData", actual, RoboticsCaseDataAssert.class);
+    public RoboticsCaseDataSpecAssert(RoboticsCaseDataSpec actual) {
+        super("RoboticsCaseData", actual, RoboticsCaseDataSpecAssert.class);
     }
 
-    public RoboticsCaseDataAssert isEqualTo(CaseData expected) {
+    public RoboticsCaseDataSpecAssert isEqualTo(CaseData expected) {
         isNotNull();
 
         CaseHeader header = actual.getHeader();
@@ -85,22 +85,22 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         );
         compare(
             "caseType",
-            "PERSONAL INJURY",
+            "SPECIFIED CLAIM",
             ofNullable(header.getCaseType())
         );
         compare(
             "owningCourtCode",
-            "390",
+            "",
             ofNullable(header.getOwningCourtCode())
         );
         compare(
             "owningCourtName",
-            "CCMCC",
+            "",
             ofNullable(header.getOwningCourtName())
         );
         compare(
             "preferredCourtCode",
-            expected.getCourtLocation().getApplicantPreferredCourt(),
+            "",
             ofNullable(header.getPreferredCourtCode())
         );
     }
@@ -122,7 +122,7 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
 
         compare(
             "amountClaimed",
-            expected.getClaimValue().toPounds(),
+            expected.getTotalClaimAmount(),
             ofNullable(actual.getAmountClaimed())
         );
 

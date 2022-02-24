@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -90,19 +89,6 @@ public class RoboticsDataMapperForSpec {
             .preferredCourtCode("")
             .caseAllocatedTo("")
             .build();
-    }
-
-    private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
-        switch (allocatedTrack) {
-            case FAST_CLAIM:
-                return "FAST TRACK";
-            case MULTI_CLAIM:
-                return "MULTI TRACK";
-            case SMALL_CLAIM:
-                return "SMALL CLAIM TRACK";
-            default:
-                return "";
-        }
     }
 
     private List<SolicitorSpec> buildSolicitors(CaseData caseData) {
