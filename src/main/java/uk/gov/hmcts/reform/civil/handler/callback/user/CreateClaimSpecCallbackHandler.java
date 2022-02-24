@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,49 +13,31 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimConfirmationBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimFeeCalculator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimSharedDataExtractor;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -62,16 +45,15 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class CreateClaimSpecCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
+@Slf4j
+public class CreateClaimSpecCallbackHandler extends CallbackHandler
+    implements ParticularsOfClaimValidator {
 
-    private static final List<CaseEvent> EVENTS = Arrays.asList(
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(
         CaseEvent.CREATE_CLAIM_SPEC
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
@@ -104,20 +86,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
-    private final ClaimIssueConfiguration claimIssueConfiguration;
-    private final ExitSurveyContentService exitSurveyContentService;
-    private final ReferenceNumberRepository referenceNumberRepository;
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final FeesService feesService;
-    private final OrganisationService organisationService;
-    private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
-    private final Time time;
     private final ValidateEmailService validateEmailService;
     private final PostcodeValidator postcodeValidator;
-    private final InterestCalculator interestCalculator;
+    private final CreateClaimFeeCalculator createClaimFeeCalculator;
+    private final CreateClaimSharedDataExtractor createClaimSharedDataExtractor;
+    private final CreateClaimConfirmationBuilder createClaimConfirmationBuilder;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -218,7 +195,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = new ArrayList<String>();
+            List<String> errors = new ArrayList<>();
             if (caseData.getInterestFromSpecificDate() != null) {
                 if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
                     errors.add("Correct the date. You can’t use a future date.");
@@ -235,7 +212,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
             timelineOfEvent.forEach(timelineOfEvents -> {
@@ -262,37 +239,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return createClaimFeeCalculator.calculateFee(callbackParams);
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return createClaimSharedDataExtractor.getIdamEmail(callbackParams);
     }
 
     //WARNING! below function getPbaAccounts is being used by both damages and specified claims,
@@ -317,12 +268,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
             .build();
-    }
-
-    private List<String> getPbaAccounts(String authToken) {
-        return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
@@ -360,72 +305,18 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
-        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        if (applicantSolicitor1CheckEmail.isCorrect()) {
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
-        } else {
-            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
-        }
-
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.submittedDate(time.now());
-
+        CaseData.CaseDataBuilder dataBuilder = createClaimSharedDataExtractor.getSharedData(callbackParams);
         if (null != callbackParams.getRequest().getEventId()) {
-            System.out.println(" inside if condition ");
+            log.debug(" inside if condition ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }
-
-        //set check email field to null for GDPR
-        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (null != callbackParams.getRequest().getEventId()
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getSpecHeader(caseData))
-                .confirmationBody(getSpecBody(caseData))
-                .build();
-        } else {
-            return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeader(caseData))
-                .confirmationBody(getBody(caseData))
-                .build();
-        }
-    }
-
-    private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
-        }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
-    }
-
-    private String getBody(CaseData caseData) {
-        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
-        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
-        return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? LIP_CONFIRMATION_BODY
-                : CONFIRMATION_SUMMARY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
+        return createClaimConfirmationBuilder.buildSpecConfirmation(callbackParams
+        );
     }
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
@@ -483,28 +374,25 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        var ref = new Object() {
-            BigDecimal totalClaimAmount = new BigDecimal(0);
-        };
+        BigDecimal totalClaimAmount = new BigDecimal(0);
         List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
         String totalAmount = " | Description | Amount | \n |---|---| \n | ";
         StringBuilder stringBuilder = new StringBuilder();
-        claimAmountBreakups.stream().forEach(
-            claimAmountBreakup -> {
-                ref.totalClaimAmount =
-                    ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
+        for (ClaimAmountBreakup claimAmountBreakup : claimAmountBreakups) {
+            totalClaimAmount =
+                totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
-                stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append("£ "
-                                         + MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue()
-                                                                                   .getClaimAmount()) + " |\n ");
-            }
-        );
+            stringBuilder.append(claimAmountBreakup.getValue().getClaimReason())
+                .append(" | ")
+                .append("£ ")
+                .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
+                .append(" |\n ");
+        }
         totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
+        if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
             errors.add("Total Claim Amount cannot exceed £ 25,000");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -513,10 +401,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
-            MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
+            MonetaryConversions.penniesToPounds(totalClaimAmount));
 
         totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
-            .penniesToPounds(ref.totalClaimAmount) + " | ");
+            .penniesToPounds(totalClaimAmount) + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 
@@ -527,20 +415,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     //calculate interest for specified claim
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
-
-        String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount()
-            + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
-        caseDataBuilder.calculatedInterest(calculatedInterest);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return createClaimFeeCalculator.calculateInterest(callbackParams);
     }
 
     private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
@@ -560,50 +435,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     //calculate fee for specified claim
     private CallbackResponse calculateSpecFee(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
-            .totalInterest(interest);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private String getSpecHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
-        }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
-    }
-
-    private String getSpecBody(CaseData caseData) {
-        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
-        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
-        return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? SPEC_LIP_CONFIRMATION_BODY
-                : SPEC_CONFIRMATION_SUMMARY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
+        return createClaimFeeCalculator.calculateFee(callbackParams, true);
     }
 
     private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {

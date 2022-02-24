@@ -17,7 +17,9 @@ public class AssignCaseToUserForSpecHandler extends AbstractAssignCaseToUserHand
     private static final List<CaseEvent> EVENTS = List.of(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1ForSpec";
 
-    public AssignCaseToUserForSpecHandler(CoreCaseUserService coreCaseUserService, CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper) {
+    public AssignCaseToUserForSpecHandler(CoreCaseUserService coreCaseUserService,
+                                          CaseDetailsConverter caseDetailsConverter,
+                                          ObjectMapper objectMapper) {
         super(coreCaseUserService, caseDetailsConverter, objectMapper);
     }
 
@@ -30,6 +32,4 @@ public class AssignCaseToUserForSpecHandler extends AbstractAssignCaseToUserHand
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
-
 }

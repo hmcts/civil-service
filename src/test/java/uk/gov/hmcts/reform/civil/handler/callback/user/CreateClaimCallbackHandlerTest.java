@@ -19,6 +19,9 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimConfirmationBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimFeeCalculator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimSharedDataExtractor;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -71,8 +74,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -90,7 +91,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     PostcodeValidator.class,
     InterestCalculator.class,
     StateFlowEngine.class,
-    ValidateEmailService.class},
+    ValidateEmailService.class,
+    CreateClaimFeeCalculator.class,
+    CreateClaimSharedDataExtractor.class,
+    CreateClaimConfirmationBuilder.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -934,8 +938,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String body = format(
                     LIP_CONFIRMATION_BODY,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                    responsePackLink,
-                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                    responsePackLink
                 ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
@@ -990,8 +993,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String body = format(
                     LIP_CONFIRMATION_BODY,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                    responsePackLink,
-                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                    responsePackLink
                 ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
@@ -1044,8 +1046,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String body = format(
                     LIP_CONFIRMATION_BODY,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                    responsePackLink,
-                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                    responsePackLink
                 ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(

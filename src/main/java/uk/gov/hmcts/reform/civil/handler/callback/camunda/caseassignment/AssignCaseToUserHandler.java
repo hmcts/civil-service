@@ -17,7 +17,9 @@ public class AssignCaseToUserHandler extends AbstractAssignCaseToUserHandler {
     private static final List<CaseEvent> EVENTS = List.of(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
 
-    public AssignCaseToUserHandler(CoreCaseUserService coreCaseUserService, CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper) {
+    public AssignCaseToUserHandler(CoreCaseUserService coreCaseUserService,
+                                   CaseDetailsConverter caseDetailsConverter,
+                                   ObjectMapper objectMapper) {
         super(coreCaseUserService, caseDetailsConverter, objectMapper);
     }
 
