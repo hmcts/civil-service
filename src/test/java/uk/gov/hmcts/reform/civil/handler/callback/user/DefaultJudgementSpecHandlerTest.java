@@ -157,10 +157,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "repaymentValidate";
 
         @Test
-        void shouldNotReturnError_whenRepaymentAmountLessThanAmountDue() {
+        void shouldNotReturnError_whenRepaymentAmountLessThanOrEqualAmountDue() {
             var testDate = LocalDate.now().plusDays(35);
             String due = "1000"; //in pounds
-            String suggest = "100000"; //in pennies
+            String suggest = "99999"; // 999 pound in pennies
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .repaymentDue(due)
@@ -169,19 +169,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             System.out.println("due" + caseData.getRepaymentDue());
             System.out.println("suggest" + caseData.getRepaymentSuggestion());
-
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
-
         }
 
         @Test
-        void shouldReturnError_whenRepaymentAmountLessThanAmountDue() {
+        void shouldReturnError_whenRepaymentAmountGreaterThanAmountDue() {
             var testDate = LocalDate.now().plusDays(35);
             String due = "1000"; //in pounds
-            String suggest = "120000"; //in pennies
+            String suggest = "110000"; // 1100 pound in pennies
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .repaymentDue(due)
@@ -194,7 +191,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Regular payment cannot exceed the full claim amount");
-
         }
 
         @Test
@@ -202,7 +198,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             //eligible date is 30 days in future.
             var testDate = LocalDate.now().plusDays(31);
             String due = "1000"; //in pounds
-            String suggest = "10000"; //in pennies
+            String suggest = "10000"; // 100 pound in pennies
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .repaymentDue(due)
@@ -219,9 +215,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenDateInPastAndNotEligible() {
             //eligible date is 30 days in future
             LocalDate eligibleDate = LocalDate.now().plusDays(30);
-            var testDate = LocalDate.now().plusDays(25);
+            var testDate = LocalDate.now().plusDays(29);
             String due = "1000"; //in pounds
-            String suggest = "10000"; //in pennies
+            String suggest = "10000"; // 100 pound in pennies
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .repaymentDue(due)
@@ -233,7 +229,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + eligibleDate);
         }
-
 
     @Nested
     class SubmittedCallback {

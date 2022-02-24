@@ -271,8 +271,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var repayment = new BigDecimal(caseData.getRepaymentDue());
         var RegularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
         var RegularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(RegularRepaymentAmountPennies);
-        System.out.println(repayment);
-        System.out.println(RegularRepaymentAmountPounds);
         if(RegularRepaymentAmountPounds.compareTo(repayment) == 1){
             errors.add("Regular payment cannot exceed the full claim amount");
         }
@@ -282,7 +280,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if(caseData.getRepaymentDate().isBefore(eligibleDate)){
             errors.add("Selected date must be after " + eligibleDate);
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
