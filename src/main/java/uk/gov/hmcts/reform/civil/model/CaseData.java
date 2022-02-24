@@ -256,10 +256,15 @@ public class CaseData implements MappableObject {
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
-    private final String PartialPaymentAmount;
-    private final YesOrNo PartialPayment;
+    private final String partialPaymentAmount;
+    private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
-    private final String repaymentTotal;
     private final String repaymentSummaryObject;
     private final YesOrNo paymentConfirmationDecisionSpec;
+    private final String repaymentDue;
+    private final String repaymentSuggestion;
+    private final String currentDatebox;
+    private final LocalDate repaymentDate;
+
+
 }

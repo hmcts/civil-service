@@ -121,10 +121,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
-                .PartialPaymentAmount("3000000")
+                .partialPaymentAmount("3000000")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -139,10 +139,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
-                .PartialPaymentAmount("3000")
+                .partialPaymentAmount("3000")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -150,6 +150,85 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEmpty();
         }
     }
+
+    @Nested
+    class MidEventRepaymentAndDateValidate {
+
+        private static final String PAGE_ID = "repaymentValidate";
+
+        @Test
+        void shouldNotReturnError_whenRepaymentAmountLessThanOrEqualAmountDue() {
+            var testDate = LocalDate.now().plusDays(35);
+            String due = "1000"; //in pounds
+            String suggest = "99999"; // 999 pound in pennies
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .repaymentDue(due)
+                .repaymentSuggestion(suggest)
+                .repaymentDate(testDate)
+                .build();
+            System.out.println("due" + caseData.getRepaymentDue());
+            System.out.println("suggest" + caseData.getRepaymentSuggestion());
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenRepaymentAmountGreaterThanAmountDue() {
+            var testDate = LocalDate.now().plusDays(35);
+            String due = "1000"; //in pounds
+            String suggest = "110000"; // 1100 pound in pennies
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .repaymentDue(due)
+                .repaymentSuggestion(suggest)
+                .repaymentDate(testDate)
+                .build();
+            System.out.println("due" + caseData.getRepaymentDue());
+            System.out.println("suggest" + caseData.getRepaymentSuggestion());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Regular payment cannot exceed the full claim amount");
+        }
+
+        @Test
+        void shouldNotReturnError_whenDateNotInPastAndEligible() {
+            //eligible date is 30 days in future.
+            var testDate = LocalDate.now().plusDays(31);
+            String due = "1000"; //in pounds
+            String suggest = "10000"; // 100 pound in pennies
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .repaymentDue(due)
+                .repaymentSuggestion(suggest)
+                .repaymentDate(testDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenDateInPastAndNotEligible() {
+            //eligible date is 30 days in future
+            LocalDate eligibleDate = LocalDate.now().plusDays(30);
+            var testDate = LocalDate.now().plusDays(29);
+            String due = "1000"; //in pounds
+            String suggest = "10000"; // 100 pound in pennies
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .repaymentDue(due)
+                .repaymentSuggestion(suggest)
+                .repaymentDate(testDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + eligibleDate);
+        }
 
     @Nested
     class SubmittedCallback {
@@ -188,7 +267,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -201,7 +280,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -229,12 +308,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
-                .PartialPaymentAmount("100")
+                .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(1010))
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
 
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -273,12 +352,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
-                .PartialPaymentAmount("100")
+                .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(499))
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
 
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -317,12 +396,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
-                .PartialPaymentAmount("100")
+                .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
 
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -360,9 +439,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .PartialPayment(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
-                .PartialPaymentAmount("100")
+                .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(5001))
 
 
@@ -386,6 +465,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
 
-
     }
 }
+}
+
