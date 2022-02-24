@@ -142,9 +142,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
-
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
