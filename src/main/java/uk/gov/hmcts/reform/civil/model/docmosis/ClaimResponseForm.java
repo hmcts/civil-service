@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +29,9 @@ public class ClaimResponseForm implements MappableObject {
     private final Party respondent;
 
     private final String defendantResponse;
+    private final BigDecimal poundsPaid;
+    private final LocalDate paymentDate;
+    private final String paymentMethod;
     private final String whyDisputeTheClaim;
     private final List<TimelineOfEventDetails> defendantTimeline;
     private final String commentsAboutClaimantTimeline;

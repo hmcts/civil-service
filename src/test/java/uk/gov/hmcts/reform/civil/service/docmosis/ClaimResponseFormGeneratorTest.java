@@ -12,11 +12,15 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentMethod;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.ClaimResponseForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -69,10 +73,93 @@ public class ClaimResponseFormGeneratorTest {
         Assert.assertEquals(respondent.getPrimaryAddress(), form.getRespondent().getPrimaryAddress());
         Assert.assertEquals(representative, form.getRespondent().getRepresentative());
         Assert.assertEquals(litigationFriend.getFullName(), form.getRespondent().getLitigationFriendName());
-        Assert.assertEquals(caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue(),
-                            form.getDefendantResponse());
+        Assert.assertEquals(
+            caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue(),
+            form.getDefendantResponse()
+        );
         Assert.assertEquals(form.getWhyDisputeTheClaim(), caseData.getDetailsOfWhyDoesYouDisputeTheClaim());
         Assert.assertEquals(form.getStatementOfTruth(), caseData.getUiStatementOfTruth());
+
+        Mockito.verify(representativeService).getRespondent1Representative(caseData);
+    }
+
+    @Test
+    public void whenPaid_thenIncludeAmountWhenAndHow() throws IOException {
+
+        Party respondent = Party.builder()
+            .partyName("Party name")
+            .primaryAddress(Address.builder().build())
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(respondent)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(1500000))
+                                .howWasThisAmountPaid(PaymentMethod.OTHER)
+                                .howWasThisAmountPaidOther("Long explanation")
+                                .whenWasThisAmountPaid(LocalDate.now())
+                                .build())
+            .build();
+
+        Representative representative = Mockito.mock(Representative.class);
+        Mockito.when(representativeService.getRespondent1Representative(caseData))
+            .thenReturn(representative);
+
+        ClaimResponseForm form = generator.getTemplateData(caseData);
+
+        Assert.assertEquals(
+            MonetaryConversions.penniesToPounds(caseData.getRespondToClaim().getHowMuchWasPaid()),
+            form.getPoundsPaid()
+        );
+        Assert.assertEquals(
+            caseData.getRespondToClaim().getHowWasThisAmountPaidOther(),
+            form.getPaymentMethod()
+        );
+        Assert.assertEquals(
+            caseData.getRespondToClaim().getWhenWasThisAmountPaid(),
+            form.getPaymentDate()
+        );
+
+        Mockito.verify(representativeService).getRespondent1Representative(caseData);
+    }
+
+    @Test
+    public void whenPaid_thenIncludeAmountWhenAndStdHow() throws IOException {
+
+        Party respondent = Party.builder()
+            .partyName("Party name")
+            .primaryAddress(Address.builder().build())
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(respondent)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(1500000))
+                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                .whenWasThisAmountPaid(LocalDate.now())
+                                .build())
+            .build();
+
+        Representative representative = Mockito.mock(Representative.class);
+        Mockito.when(representativeService.getRespondent1Representative(caseData))
+            .thenReturn(representative);
+
+        ClaimResponseForm form = generator.getTemplateData(caseData);
+
+        Assert.assertEquals(
+            MonetaryConversions.penniesToPounds(caseData.getRespondToClaim().getHowMuchWasPaid()),
+            form.getPoundsPaid()
+        );
+        Assert.assertEquals(
+            caseData.getRespondToClaim().getHowWasThisAmountPaid().getHumanFriendly(),
+            form.getPaymentMethod()
+        );
+        Assert.assertEquals(
+            caseData.getRespondToClaim().getWhenWasThisAmountPaid(),
+            form.getPaymentDate()
+        );
 
         Mockito.verify(representativeService).getRespondent1Representative(caseData);
     }

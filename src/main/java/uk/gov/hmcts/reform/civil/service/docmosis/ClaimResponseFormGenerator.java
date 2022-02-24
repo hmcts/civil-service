@@ -7,11 +7,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Evidence;
 import uk.gov.hmcts.reform.civil.model.EvidenceDetails;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.docmosis.ClaimResponseForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -43,8 +45,19 @@ public class ClaimResponseFormGenerator implements TemplateDataGenerator<ClaimRe
             .submittedOn(isRespondent2
                              ? caseData.getRespondent2ResponseDate()
                              : caseData.getRespondent1ResponseDate())
-            .respondent(formRespondent)
-        ;
+            .respondent(formRespondent);
+
+        if (caseData.getRespondToClaim() != null) {
+            builder.poundsPaid(Optional.ofNullable(caseData.getRespondToClaim().getHowMuchWasPaid())
+                                   .map(MonetaryConversions::penniesToPounds)
+                                   .orElse(null))
+                .paymentDate(caseData.getRespondToClaim().getWhenWasThisAmountPaid());
+            if (PaymentMethod.OTHER.equals(caseData.getRespondToClaim().getHowWasThisAmountPaid())) {
+                builder.paymentMethod(caseData.getRespondToClaim().getHowWasThisAmountPaidOther());
+            } else if (caseData.getRespondToClaim().getHowWasThisAmountPaid() != null) {
+                builder.paymentMethod(caseData.getRespondToClaim().getHowWasThisAmountPaid().getHumanFriendly());
+            }
+        }
 
         return builder.build();
     }
@@ -124,6 +137,7 @@ public class ClaimResponseFormGenerator implements TemplateDataGenerator<ClaimRe
 
         return Party.builder()
             .name(caseDataRespondent.getPartyName())
+            .dateOfBirth(caseDataRespondent.getIndividualDateOfBirth())
             .primaryAddress(caseDataRespondent.getPrimaryAddress())
             .representative(representative)
             .litigationFriendName(litigationFriend
