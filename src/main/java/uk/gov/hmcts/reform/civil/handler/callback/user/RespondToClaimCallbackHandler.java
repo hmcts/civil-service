@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -258,17 +259,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
-        if ((caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent1ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(YES))
-            || (caseData.getRespondent2ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE))
-            || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
-                && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                || RespondentResponseType.FULL_DEFENCE.equals(caseData
-                .getRespondent1ClaimResponseTypeToApplicant2())))) {
+        if (isSolicitor1AndRespondent1ResponseIsFullDefence(caseData, isRespondent1)
+            || isSolicitor2AndRespondent2ResponseIsFullDefence(caseData, isRespondent1)
+            || isSameSolicitorAndAnyRespondentResponseIsFullDefence(caseData)
+            || is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(caseData)) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
                 .build();
         }
@@ -583,5 +577,31 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             return true;
         }
         return false;
+    }
+
+    private boolean is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(CaseData caseData) {
+        return TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
+    }
+
+    private boolean isSameSolicitorAndAnyRespondentResponseIsFullDefence(CaseData caseData) {
+        return respondent2HasSameLegalRep(caseData)
+            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
+    }
+
+    private boolean isSolicitor2AndRespondent2ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+        return caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(NO);
+    }
+
+    private boolean isSolicitor1AndRespondent1ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+        return caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(
+            RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(YES);
     }
 }
