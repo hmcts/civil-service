@@ -35,7 +35,8 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentsCallbackHandler extends CallbackHandler {
+public class PaymentsCallbackHandler extends CallbackHandler
+    implements PaymentCallbackErrorHandler, PbaPayer {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
@@ -123,21 +124,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
-            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder)
-                .orElse(PaymentDetails.builder())
-                .status(SUCCESS)
-                .reference(paymentReference)
-                .errorCode(null)
-                .errorMessage(null)
-                .build();
-
-            caseData = caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .paymentSuccessfulDate(time.now())
-                .build();
-
+            caseData = updateWithCreditAccountPayment(caseData, authToken, time, paymentsService);
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
@@ -179,18 +166,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
 
     private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
         try {
-            var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
-            var statusHistory = paymentDto.getStatusHistories()[0];
-            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
-                .status(FAILED)
-                .errorCode(statusHistory.getErrorCode())
-                .errorMessage(statusHistory.getErrorMessage())
-                .build();
-
-            return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .build();
+            return updateWithBusinessError(caseData, e, objectMapper);
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());
             log.error(String.format("Unknown payment error for case: %s, response body: %s",

@@ -16,14 +16,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
@@ -34,7 +32,8 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentsForSpecCallbackHandler extends CallbackHandler {
+public class PaymentsForSpecCallbackHandler extends CallbackHandler
+    implements PaymentCallbackErrorHandler, PbaPayer {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT_SPEC);
     private static final String ERROR_MESSAGE = "Technical error occurred";
@@ -106,21 +105,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
-            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder)
-                .orElse(PaymentDetails.builder())
-                .status(SUCCESS)
-                .reference(paymentReference)
-                .errorCode(null)
-                .errorMessage(null)
-                .build();
-
-            caseData = caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .paymentSuccessfulDate(time.now())
-                .build();
-
+            caseData = updateWithCreditAccountPayment(caseData, authToken, time, paymentsService);
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
@@ -143,15 +128,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
 
     private CaseData updateWithBusinessErrorBackwardsCompatible(CaseData caseData, FeignException e) {
         try {
-            var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
-            var statusHistory = paymentDto.getStatusHistories()[0];
-            return caseData.toBuilder()
-                .paymentDetails(PaymentDetails.builder()
-                                    .status(FAILED)
-                                    .errorCode(statusHistory.getErrorCode())
-                                    .errorMessage(statusHistory.getErrorMessage())
-                                    .build())
-                .build();
+            return updateWithBusinessErrorBackwardsCompatible(caseData, e, objectMapper);
         } catch (JsonProcessingException jsonException) {
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.contentUTF8()
@@ -162,18 +139,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
 
     private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
         try {
-            var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
-            var statusHistory = paymentDto.getStatusHistories()[0];
-            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
-                .status(FAILED)
-                .errorCode(statusHistory.getErrorCode())
-                .errorMessage(statusHistory.getErrorMessage())
-                .build();
-
-            return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .build();
+            return updateWithBusinessError(caseData, e, objectMapper);
         } catch (JsonProcessingException jsonException) {
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.contentUTF8()
