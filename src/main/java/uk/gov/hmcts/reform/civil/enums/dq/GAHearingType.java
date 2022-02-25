@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum GAHearingType {
     IN_PERSON("In person"),
-    WITHOUT_HEARING("Without a hearing"),
     VIDEO("Video conference hearing"),
-    TELEPHONE("Telephone hearing");
+    TELEPHONE("Telephone hearing"),
+    WITHOUT_HEARING("Without a hearing");
 
     private final String displayedValue;
 }

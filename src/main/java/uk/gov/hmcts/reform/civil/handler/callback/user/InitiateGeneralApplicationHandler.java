@@ -13,23 +13,20 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -38,7 +35,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -46,26 +44,23 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
-    private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
-    private static final String POUND_SYMBOL = "£";
+    private static final String SET_FEES_FOR_APPLICATION = "ga-set-application-fees";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
-    private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
-            + "respondent solicitor are assigned to the case.";
+    private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
+
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
-    private final GeneralAppFeesService feesService;
-    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
+            callbackKey(ABOUT_TO_START), this::getPbaAccounts,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
-            callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitApplication,
+            callbackKey(MID, SET_FEES_FOR_APPLICATION), this::setApplicationFees,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -75,119 +70,94 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse aboutToStartValidattionAndSetup(CallbackParams callbackParams) {
-
+    private CallbackResponse getPbaAccounts(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
-            errors.add(RESP_NOT_ASSIGNED_ERROR);
-        }
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        caseDataBuilder
-                .generalAppHearingDetails(
-                    GAHearingDetails
-                        .builder()
-                        .hearingPreferredLocation(fromList(locationRefDataService.getCourtLocations(authToken)))
-                        .build());
+        caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
+                .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers)).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
     private List<String> getPbaAccounts(String authToken) {
         return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
+                .map(Organisation::getPaymentAccount)
+                .orElse(emptyList());
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAUrgencyRequirement generalAppUrgencyRequirement = caseData.getGeneralAppUrgencyRequirement();
         List<String> errors = generalAppUrgencyRequirement != null
-            ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
-            : Collections.emptyList();
+                ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
+                : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private CallbackResponse gaValidateHearingScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
         List<String> errors = hearingDetails != null
-            ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
-            : Collections.emptyList();
+                ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
+                : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        Fee feeForGA = feesService.getFeeForGA(caseData);
-        caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .applicantsPbaAccounts(fromList(pbaNumbers))
-                .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
-                .fee(feeForGA)
-                .build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .errors(errors)
                 .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
+    private CallbackResponse setApplicationFees(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        Fee applicationFees = Fee.builder().code("FEE0210").build();
+        boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
+                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                && caseData.getGeneralAppInformOtherParty() != null
+                && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+
+        if (isNotified) {
+            applicationFees.setCalculatedAmountInPence(getFeeInPence(275));
+        } else {
+            applicationFees.setCalculatedAmountInPence(getFeeInPence(108));
+        }
+
+        caseDataBuilder.generalAppPBADetails(pbaDetails.toBuilder().fee(applicationFees).build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .errors(Collections.emptyList())
+                .build();
+    }
+
+    private BigDecimal getFeeInPence(int fee) {
+        return BigDecimal.valueOf(fee).multiply(PENCE_PER_POUND)
+                .setScale(0, RoundingMode.UNNECESSARY);
+    }
+
+    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         return caseData.toBuilder();
     }
 
-    private CallbackResponse submitApplication(CallbackParams callbackParams) {
+    private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
-
-        if (caseData.getGeneralAppPBADetails().getFee() == null) {
-            Fee feeForGA = feesService.getFeeForGA(caseData);
-            GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeForGA).build();
-            CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
-            caseData = newCaseData;
-        }
-
-        if ((caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null)) {
-            List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
-                                                               .getHearingPreferredLocation()
-                                                               .getValue().getLabel());
-            DynamicList dynamicLocationList = fromList(applicationLocationList);
-            Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
-                .filter(l -> l.getLabel().equals(applicationLocationList.get(0))).findFirst();
-            first.ifPresent(dynamicLocationList::setValue);
-            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
-                .hearingPreferredLocation(dynamicLocationList).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
-            caseData = updatedCaseData;
-        } else {
-            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
-                .hearingPreferredLocation(DynamicList.builder().build()).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
-            caseData = updatedCaseData;
-        }
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService
-                      .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                          .toString()).toMap(objectMapper)).build();
+            .data(initiateGeneralApplicationService.buildCaseData(dataBuilder, caseData, userDetails)
+                      .toMap(objectMapper))
+            .build();
     }
 
     /**

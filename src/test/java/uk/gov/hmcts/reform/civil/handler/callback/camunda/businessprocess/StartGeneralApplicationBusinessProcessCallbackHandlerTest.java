@@ -175,7 +175,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(((List)(response.getData().get("generalApplications"))).size()).isZero();
+        assertThat(response.getErrors()).contains("Concurrency Error");
     }
 
     @Test
