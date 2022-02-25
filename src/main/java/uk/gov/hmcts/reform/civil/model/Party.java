@@ -49,10 +49,7 @@ public class Party {
     }
 
     public String getPartyName() {
-        if (partyName == null) {
-            return getPartyNameBasedOnType(this);
-        }
-        return partyName;
+        return getPartyNameBasedOnType(this);
     }
 
     public String getPartyTypeDisplayValue() {
