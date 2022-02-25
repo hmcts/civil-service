@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class HearingDates {
+
     private final LocalDate hearingUnavailableFrom;
     private final LocalDate hearingUnavailableUntil;
 }

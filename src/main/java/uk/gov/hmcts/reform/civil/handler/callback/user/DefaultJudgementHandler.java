@@ -24,7 +24,10 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -32,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
+
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
     public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
         + "%n%n * The time for responding to the claim has expired. "
@@ -71,9 +75,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .build();
     }
 
-
-
-
     private CallbackResponse validateDateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
@@ -84,17 +85,18 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-
     }
 
     private List<String> isValidRange(List<Element<HearingDates>> hearingDatesElement) {
         List<String> errors = new ArrayList<>();
         hearingDatesElement.forEach(element -> {
             HearingDates hearingDates = element.getValue();
-            if (checkPastDateValidation(hearingDates.getHearingUnavailableFrom()) || checkPastDateValidation(
+            if (checkPastDateValidation(hearingDates.getHearingUnavailableFrom())
+                || checkPastDateValidation(
                 hearingDates.getHearingUnavailableUntil())) {
                 errors.add("Unavailable Date cannot be past date");
-            } else if (checkThreeMonthsValidation(hearingDates.getHearingUnavailableFrom()) || checkThreeMonthsValidation(
+            } else if (checkThreeMonthsValidation(hearingDates.getHearingUnavailableFrom())
+                || checkThreeMonthsValidation(
                 hearingDates.getHearingUnavailableUntil())) {
                 errors.add("Unavailable Dates must be within the next 3 months.");
             } else if (hearingDates.getHearingUnavailableFrom()
@@ -114,10 +116,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return localDate != null && localDate.isAfter(LocalDate.now().plusMonths(3));
     }
 
-
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
@@ -153,9 +153,11 @@ public class DefaultJudgementHandler extends CallbackHandler {
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
-        listData.add(caseData.getRespondent1().getIndividualFirstName() + " " + caseData.getRespondent1().getIndividualLastName());
+        listData.add(caseData.getRespondent1().getIndividualFirstName() +
+                         " " + caseData.getRespondent1().getIndividualLastName());
         if (nonNull(caseData.getRespondent2())) {
-            listData.add(caseData.getRespondent2().getIndividualFirstName() + " " + caseData.getRespondent2().getIndividualLastName());
+            listData.add(caseData.getRespondent2().getIndividualFirstName() +
+                             " " + caseData.getRespondent2().getIndividualLastName());
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
         }

@@ -27,11 +27,12 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -125,7 +126,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue() + caseData.getTotalInterest().doubleValue();
+        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
+            + caseData.getTotalInterest().doubleValue();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
@@ -141,7 +143,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .build();
 
     }
-
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
@@ -201,8 +202,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
                                                   BigDecimal fixedCost) {
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
-
-
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
         var subTotal = caseData.getTotalClaimAmount()
@@ -212,8 +211,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             subTotal = subTotal.add(fixedCost);
         }
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
-
-
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
                 theOverallTotal).append(", including the claim fee and interest, if applicable, as shown:")
@@ -226,7 +223,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
         }
-
         repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
                 "\n ## Subtotal \n £").append(subTotal.setScale(2))
             .append("\n");
@@ -251,6 +247,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
@@ -264,22 +261,26 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse repaymentValidate(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         //Check repayment amount requested is less than the overall claim amount
         var repayment = new BigDecimal(caseData.getRepaymentDue());
-        var RegularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
-        var RegularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(RegularRepaymentAmountPennies);
-        if(RegularRepaymentAmountPounds.compareTo(repayment) == 1){
+        var regularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
+        var regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+
+        if (regularRepaymentAmountPounds.compareTo(repayment) == 1) {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
         //convert eligible date from localdatetime to datetime and compare to user provided repayment date
         //return error if repayment date is before calculated eligible date
         LocalDate eligibleDate = LocalDateTime.now().plusDays(30).toLocalDate();
-        if(caseData.getRepaymentDate().isBefore(eligibleDate)){
+
+        if (caseData.getRepaymentDate().isBefore(eligibleDate)) {
             errors.add("Selected date must be after " + eligibleDate);
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();

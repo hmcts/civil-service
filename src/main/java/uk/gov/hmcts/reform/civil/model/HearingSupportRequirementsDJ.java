@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class HearingSupportRequirementsDJ {
+
     private final String hearingType;
     private final String hearingTypeTelephoneHearing;
     private final String hearingPreferredLocation;
