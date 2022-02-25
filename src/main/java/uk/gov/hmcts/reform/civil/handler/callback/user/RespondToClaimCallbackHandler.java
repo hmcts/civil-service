@@ -515,9 +515,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean respondent2NotPresent(CaseData caseData) {
-        return caseData.getAddRespondent2() == null
-            || (caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2() == NO);
+        return caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2() == NO;
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
