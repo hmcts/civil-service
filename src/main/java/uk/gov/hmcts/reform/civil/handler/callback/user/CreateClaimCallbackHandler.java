@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.OnBoardingOrganisationControlService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -87,7 +86,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
-    private final OnBoardingOrganisationControlService onboardingOrganisationControlService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
@@ -96,11 +94,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
+            .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
@@ -116,14 +114,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
-        String userBearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<String> errors = onboardingOrganisationControlService.validateOrganisation(userBearerToken);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
@@ -210,6 +200,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        // only default this to NO if respondent 1 isn't represented
+        if (callbackParams.getCaseData().getRespondent1Represented().equals(NO)) {
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse validateClaimantRepEmail(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -252,15 +255,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+
+            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
+                .organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
+        }
+    }
+
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
             && caseData.getRespondent1Represented() == YES
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
-
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
             dataBuilder.respondent2OrgRegistered(YES);
@@ -271,6 +288,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

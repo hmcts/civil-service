@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N9_MULTIPARTY_SAME_SOL;
 
 @Service
@@ -37,9 +38,9 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     private final RepresentativeService representativeService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        AcknowledgementOfClaimForm templateData = getTemplateData(caseData);
+        AcknowledgementOfClaimForm templateData = getTemplateDataForAcknowldgeClaim(caseData);
         DocmosisTemplates docmosisTemplate =
-            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N9;
+            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N11;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
@@ -84,19 +85,61 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                         .map(LitigationFriend::getFullName)
                         .orElse(""))
                 .build()));
-
-        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP || multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+        if ((multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP)) {
             var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
                                       .representative(representativeService.getRespondent2Representative(caseData))
                                       .litigationFriendName(
-                                          ofNullable(caseData.getRespondent1LitigationFriend())
+                                          ofNullable(caseData.getRespondent2LitigationFriend())
                                               .map(LitigationFriend::getFullName)
                                               .orElse(""))
                                       .build());
+
+        }
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                respondentParties.remove(0);
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    respondentParties.remove(0);
+                } else {
+                    respondentParties.remove(1);
+                }
+            }
         }
         return respondentParties;
+    }
+
+    public AcknowledgementOfClaimForm getTemplateDataForAcknowldgeClaim(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    responseDeadline = caseData.getRespondent2ResponseDeadline().toLocalDate();
+                } else {
+                    responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+                }
+            }
+        }
+        return AcknowledgementOfClaimForm.builder()
+                .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                .referenceNumber(caseData.getLegacyCaseReference())
+                .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData))
+                .issueDate(caseData.getIssueDate())
+                .responseDeadline(responseDeadline)
+                .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
+                .build();
+
     }
 }

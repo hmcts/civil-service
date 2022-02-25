@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,6 +91,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
+            .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
@@ -121,6 +125,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
+        if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
+            BigDecimal valuePounds = MonetaryConversions
+                .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
+            caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
+                .build();
+        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
@@ -129,27 +139,61 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
+    /**
+     * From the responseType, if we choose A, advance for a while, then backtrack and choose B, part of our responses
+     * in A stay in frontend and may influence screens that A and B have in common.
+     *
+     * <p>Why does that happen?
+     * Frontend keeps an object with the CaseData information.
+     * In mid callbacks frontend sends part of that object, which gets deserialized into an instance of CaseData.
+     * We can modify that caseData, but since where using objectMapper.setSerializationInclusion(Include.NON_EMPTY)
+     * we only send anything not empty, not null. That means we cannot signal frontend to "clean" info.
+     * What we can do, however, is change info.</p>
+     *
+     * <p>For instance, the field specDefenceFullAdmittedRequired is only accessible from FULL_ADMISSION.
+     * If the user went to full admission, checked specDefenceFullAdmittedRequired = yes
+     * and then went back and to part admit, a bunch of screens common to both options won't appear because their
+     * condition to show include that specDefenceFullAdmittedRequired != yes. So, if in this method we say that whenever
+     * responseType is not full admission, then specDefenceFullAdmittedRequired = No, since that is not empty, gets sent
+     * to frontend and frontend overwrites that field on its copy.</p>
+     *
+     * @param callbackParams parameters from frontend.
+     * @return caseData cleaned from backtracked paths.
+     */
+    private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) < 0) {
-            caseData = caseData.toBuilder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
-        } else if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(caseData.getDefenceRouteRequired())
-            && caseData.getRespondToClaim().getHowMuchWasPaid() != null
-            && caseData.getRespondToClaim().getHowMuchWasPaid().compareTo(caseData.getTotalClaimAmount()) >= 0) {
-            caseData = caseData.toBuilder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+            && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
+            // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
+            int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
+            if (comparison < 0) {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+            } else {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+            }
         }
         return caseData;
     }
 
     private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                         null);
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
+            caseData.getTotalClaimAmount(),
+            null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
             .build();
@@ -302,16 +346,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = format(
-            "<br /> The Claimant legal representative will get a notification to confirm you have provided the "
-                + "Defendant defence. You will be CC'ed.%n"
-                + "The Claimant has until %s to discontinue or proceed with this claim",
-            formatLocalDateTime(responseDeadline, DATE)
-        )
-            + exitSurveyContentService.respondentSurvey();
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                + "We will let you know when they respond."
+                + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+            formatLocalDateTime(responseDeadline, DATE),
+            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+        );
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
-                format("# You have submitted the Defendant's defence%n## Claim number: %s", claimNumber))
+                format("# You've submitted your response%n## Claim number: %s", claimNumber))
             .confirmationBody(body)
             .build();
     }

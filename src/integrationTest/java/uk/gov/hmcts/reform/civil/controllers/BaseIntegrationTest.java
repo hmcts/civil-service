@@ -115,6 +115,14 @@ public abstract class BaseIntegrationTest {
                 .content(toJson(content)));
     }
 
+    @SneakyThrows
+    protected <T> ResultActions doGet(String auth, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.get(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
     protected String toJson(Object input) {
         try {
             return objectMapper.writeValueAsString(input);

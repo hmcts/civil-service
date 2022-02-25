@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -47,6 +50,7 @@ public class CaseData implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final SolicitorReferences solicitorReferences;
+    private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
@@ -60,6 +64,8 @@ public class CaseData implements MappableObject {
     private final Party respondent1Copy;
     private final Party respondent2;
     private final Party respondent2Copy;
+    private final Party respondent1DetailsForClaimDetailsTab;
+    private final Party respondent2DetailsForClaimDetailsTab;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
@@ -108,19 +114,25 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
     private final RespondentResponseType respondent1ClaimResponseType;
     private final RespondentResponseType respondent2ClaimResponseType;
+    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
-    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
+    /**
+     * money amount in pounds.
+     */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
     private final YesOrNo claimInterest;
@@ -155,7 +167,17 @@ public class CaseData implements MappableObject {
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
+    /**
+     * money amount in pence.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    /**
+     * money amount in pounds.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
@@ -190,6 +212,9 @@ public class CaseData implements MappableObject {
     private final Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
+    private final Respondent2DQ respondent2DQ;
+
+    @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
 
 
@@ -201,6 +226,7 @@ public class CaseData implements MappableObject {
             || businessProcess.getStatus() == FINISHED;
     }
 
+    private final LitigationFriend genericLitigationFriend;
     private final LitigationFriend respondent1LitigationFriend;
     private final LitigationFriend respondent2LitigationFriend;
 
@@ -212,12 +238,14 @@ public class CaseData implements MappableObject {
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
     private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
-
+    private final DynamicList selectLitigationFriend;
+    private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+    private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -233,19 +261,21 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
-    private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDate;
+    private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime applicant1ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
+    private final LocalDateTime respondent2LitigationFriendDate;
+
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
-
+    private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final YesOrNo isRespondent1;
-
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
