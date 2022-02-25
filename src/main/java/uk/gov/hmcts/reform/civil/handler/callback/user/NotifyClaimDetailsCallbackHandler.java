@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -42,7 +41,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
+public class NotifyClaimDetailsCallbackHandler extends CallbackHandler
+    implements ParticularsOfClaimValidator, DefendantSolicitorOptionsPreparer {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS);
     private static final String CONFIRMATION_SUMMARY = "<br />The defendant legal representative's organisation has"
@@ -152,22 +152,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        List<String> dynamicListOptions = new ArrayList<>();
-        dynamicListOptions.add("Both");
-        dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
-
-        if (nonNull(caseData.getRespondent2())) {
-            dynamicListOptions.add("Defendant Two: " + caseData.getRespondent2().getPartyName());
-        }
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return prepareDefendantSolicitorOptions(callbackParams,
+                                                CaseData.CaseDataBuilder::defendantSolicitorNotifyClaimDetailsOptions,
+                                                objectMapper);
     }
 
     private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {

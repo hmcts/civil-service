@@ -18,12 +18,10 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -33,7 +31,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 
 @Service
 @RequiredArgsConstructor
-public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler {
+public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
+    implements DefendantSolicitorOptionsPreparer {
 
     private static final List<CaseEvent> EVENTS = List.of(ADD_DEFENDANT_LITIGATION_FRIEND);
 
@@ -116,23 +115,9 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        List<String> dynamicListOptions = new ArrayList<>();
-        dynamicListOptions.add("Both");
-        dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
-
-        if (nonNull(caseData.getRespondent2())) {
-            dynamicListOptions.add("Defendant Two: " + caseData.getRespondent2().getPartyName());
-        }
-
-        //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.selectLitigationFriend(DynamicList.fromList(dynamicListOptions));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return prepareDefendantSolicitorOptions(callbackParams,
+                                                CaseData.CaseDataBuilder::selectLitigationFriend,
+                                                objectMapper);
     }
 
 }

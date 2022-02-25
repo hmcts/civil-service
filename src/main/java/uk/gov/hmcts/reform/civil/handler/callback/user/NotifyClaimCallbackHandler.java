@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -39,7 +37,8 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 
 @Service
 @RequiredArgsConstructor
-public class NotifyClaimCallbackHandler extends CallbackHandler {
+public class NotifyClaimCallbackHandler extends CallbackHandler
+    implements DefendantSolicitorOptionsPreparer {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_DEFENDANT_OF_CLAIM);
 
@@ -75,23 +74,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     //The field `defendantSolicitorNotifyClaimOptions` will only show when both defendants are represented
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        List<String> dynamicListOptions = new ArrayList<>();
-        dynamicListOptions.add("Both");
-        dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
-
-        if (nonNull(caseData.getRespondent2())) {
-            dynamicListOptions.add("Defendant Two: " + caseData.getRespondent2().getPartyName());
-        }
-
-        //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return prepareDefendantSolicitorOptions(callbackParams,
+                                                CaseData.CaseDataBuilder::defendantSolicitorNotifyClaimOptions,
+                                                objectMapper);
     }
 
     private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {
