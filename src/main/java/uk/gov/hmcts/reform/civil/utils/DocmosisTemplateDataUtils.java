@@ -102,45 +102,13 @@ public class DocmosisTemplateDataUtils {
             //case where respondent 2 acknowledges first
             if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
                 && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                if (null == caseData.getRespondentSolicitor2Reference()) {
-                    return SolicitorReferences
-                        .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
-                        .applicantSolicitor1Reference(
-                            ofNullable(caseData.getSolicitorReferences())
-                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .build();
-                }
-                return SolicitorReferences
-                    .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
-                    .applicantSolicitor1Reference(
-                        ofNullable(caseData.getSolicitorReferences())
-                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                            .orElse(REFERENCE_NOT_PROVIDED))
-                    .build();
-
+                return solicitorReferencesWhen2WasFirst(caseData);
             } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
                 && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
                 //case where resp 1 acknowledges first
                 if (caseData.getRespondent2AcknowledgeNotificationDate()
                     .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                    if (null == caseData.getRespondentSolicitor2Reference()) {
-                        return SolicitorReferences
-                            .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
-                            .applicantSolicitor1Reference(
-                                ofNullable(caseData.getSolicitorReferences())
-                                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                    .orElse(REFERENCE_NOT_PROVIDED))
-                            .build();
-                    }
-                    return SolicitorReferences
-                        .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
-                        .applicantSolicitor1Reference(
-                            ofNullable(caseData.getSolicitorReferences())
-                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .build();
-
+                    return solicitorReferencesWhen2WasFirst(caseData);
                 } else { //case where resp 2 acknowledges first
                     return SolicitorReferences
                         .builder()
@@ -181,5 +149,24 @@ public class DocmosisTemplateDataUtils {
                 .build();
         }
 
+    }
+
+    private static SolicitorReferences solicitorReferencesWhen2WasFirst(CaseData caseData) {
+        if (null == caseData.getRespondentSolicitor2Reference()) {
+            return SolicitorReferences
+                .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
+                .applicantSolicitor1Reference(
+                    ofNullable(caseData.getSolicitorReferences())
+                        .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                        .orElse(REFERENCE_NOT_PROVIDED))
+                .build();
+        }
+        return SolicitorReferences
+            .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+            .applicantSolicitor1Reference(
+                ofNullable(caseData.getSolicitorReferences())
+                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                    .orElse(REFERENCE_NOT_PROVIDED))
+            .build();
     }
 }
