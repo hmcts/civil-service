@@ -100,7 +100,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         // Show error message if defendant tries to extend date again ONE_V_TWO_TWO_LEGAL_REP
         if ((!solicitorRepresentsOnlyRespondent2(callbackParams) && caseData.getRespondent1TimeExtensionDate() != null)
             || (solicitorRepresentsOnlyRespondent2(callbackParams)
-            && caseData.getRespondent2TimeExtensionDate() != null)) {
+                && caseData.getRespondent2TimeExtensionDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))
                 .build();
