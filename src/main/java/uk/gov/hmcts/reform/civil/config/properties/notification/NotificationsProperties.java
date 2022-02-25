@@ -77,4 +77,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String solicitorLitigationFriendAdded;
+
+    @NotEmpty
+    private String sdoOrdered;
 }
