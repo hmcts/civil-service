@@ -39,6 +39,12 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifyDefendantSolicitor2";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
+    private static final CaseEventToCamundaActivityIdMapper CASE_EVENT_TO_CAMUNDA_ACTIVITY_ID_MAPPER
+        = new CaseEventToCamundaActivityIdMapper(Map.of(
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE, TASK_ID_EMAIL_FIRST_SOL,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC, TASK_ID_EMAIL_APP_SOL_CC,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE, TASK_ID_EMAIL_SECOND_SOL
+    ));
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -53,17 +59,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        switch (caseEvent) {
-            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE:
-                return TASK_ID_EMAIL_FIRST_SOL;
-            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC:
-                return TASK_ID_EMAIL_APP_SOL_CC;
-            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE:
-                return TASK_ID_EMAIL_SECOND_SOL;
-            default:
-                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
-        }
+        return CASE_EVENT_TO_CAMUNDA_ACTIVITY_ID_MAPPER.camundaActivityId(callbackParams);
     }
 
     @Override
@@ -138,10 +134,5 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             CLAIM_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
         );
-    }
-
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
     }
 }
