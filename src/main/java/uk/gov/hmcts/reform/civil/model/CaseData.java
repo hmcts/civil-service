@@ -217,9 +217,6 @@ public class CaseData implements MappableObject {
     @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
 
-
-
-
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
             || businessProcess.getStatus() == null
