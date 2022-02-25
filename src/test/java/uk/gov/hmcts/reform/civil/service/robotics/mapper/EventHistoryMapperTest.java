@@ -2351,7 +2351,7 @@ class EventHistoryMapperTest {
     }
 
     @Nested
-    class Respondent1LitigationFriendRpaContinuousFeed {
+    class RespondentLitigationFriendRpaContinuousFeed {
 
         @BeforeEach
         void setup() {
@@ -2362,7 +2362,7 @@ class EventHistoryMapperTest {
         void shouldPrepareMiscellaneousEvent_whenRespondent1LitigationFriend() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
-                .addRespondentLitigationFriend()
+                .addRespondent1LitigationFriend()
                 .build();
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -2399,6 +2399,60 @@ class EventHistoryMapperTest {
                 .extracting("miscellaneous")
                 .asList()
                 .containsExactly(claimIssuedEvent, claimNotifiedEvent, respondent1LitigationFriendEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenRespondent2LitigationFriend() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .addRespondent2LitigationFriend()
+                .build();
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getClaimNotificationDate())
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event respondent2LitigationFriendEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent2LitigationFriendDate())
+                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Litigation friend added for respondent.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, respondent2LitigationFriendEvent);
             assertEmptyEvents(
                 eventHistory,
                 "acknowledgementOfServiceReceived",
