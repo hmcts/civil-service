@@ -112,41 +112,30 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
-
-        if (isRespondent2(caseData)) {
-            dq = caseData.getRespondent2DQ();
-            return DirectionsQuestionnaireForm.builder()
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder =
+            DirectionsQuestionnaireForm.builder()
                 .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
                 .referenceNumber(caseData.getLegacyCaseReference())
                 .solicitorReferences(DocmosisTemplateDataUtils
                                          .fetchSolicitorReferences(caseData.getSolicitorReferences()))
-                .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
                 .applicant(getApplicant(caseData))
                 .respondents(getRespondents(caseData))
-                .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-                .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
-                .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-                .experts(getExperts(dq))
-                .witnesses(getWitnesses(dq))
-                .hearing(getHearing(dq))
-                .hearingSupport(getHearingSupport(dq))
-                .furtherInformation(dq.getFurtherInformation())
-                .welshLanguageRequirements(getWelshLanguageRequirements(dq))
-                .statementOfTruth(dq.getStatementOfTruth())
-                .allocatedTrack(caseData.getAllocatedTrack())
-                .build();
+                .allocatedTrack(caseData.getAllocatedTrack());
+
+        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+
+        if (isRespondent2(caseData)) {
+            dq = caseData.getRespondent2DQ();
+            builder = builder
+                .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
+        } else {
+            builder = builder
+                .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
+                .applicant2(TWO_V_ONE.equals(MultiPartyScenario
+                                                 .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null);
         }
 
-        return DirectionsQuestionnaireForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
-            .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-            .applicant(getApplicant(caseData))
-            .applicant2(TWO_V_ONE.equals(MultiPartyScenario
-                .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
-            .respondents(getRespondents(caseData))
+        return builder
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
@@ -157,7 +146,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
-            .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
 
@@ -242,15 +230,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private boolean isRespondent2(CaseData caseData) {
-        if (caseData.getRespondent2ResponseDate() != null && caseData.getRespondent1ResponseDate() == null) {
-            return true;
-        } else if ((caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent2ResponseDate() != null)) {
-            if (caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())) {
-                return true;
-            }
-        }
-        return false;
+        return caseData.getRespondent2ResponseDate() != null
+            && (
+            caseData.getRespondent1ResponseDate() == null
+                || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
+            );
     }
 
     private List<Party> getRespondents(CaseData caseData) {
