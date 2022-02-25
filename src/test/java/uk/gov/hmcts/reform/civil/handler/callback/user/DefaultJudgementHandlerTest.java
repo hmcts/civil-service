@@ -183,11 +183,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventHearingSupportCallback {
         private static final String PAGE_ID = "HearingSupportRequirementsDJ";
-
         @Test
         void shouldReturnError_whenDateFromDateGreaterThanDateToProvided() {
-            HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
-                LocalDate.now().plusMonths(2)).HearingUnavailableUntil(
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(1)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
@@ -209,8 +208,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenDateFromDateGreaterThreeMonthsProvided() {
-            HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
-                LocalDate.now().plusMonths(2)).HearingUnavailableUntil(
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(4)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
@@ -232,8 +231,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenDateFromPastDatedProvided() {
 
-            HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
-                LocalDate.now().plusMonths(1)).HearingUnavailableUntil(
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(-4)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
@@ -254,8 +253,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_whenValidDateRangeProvided() {
-            HearingDates hearingDates = HearingDates.builder().HearingUnavailableFrom(
-                LocalDate.now().plusMonths(1)).HearingUnavailableUntil(
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(2)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
                 wrapElements(hearingDates)).build();
