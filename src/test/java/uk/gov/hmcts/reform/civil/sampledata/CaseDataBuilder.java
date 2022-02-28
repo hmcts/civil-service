@@ -1212,7 +1212,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
         multiPartyClaimOneDefendantSolicitor();
-        addRespondentLitigationFriend();
+        addRespondent1LitigationFriend();
         return this;
     }
 
@@ -1223,11 +1223,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_DiffSolicitor() {
+        return atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
+            .respondent2SameLegalRepresentative(NO);
+    }
+
+    public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_DiffSolicitor() {
+        return atStateAddRespondent2LitigationFriend_1v2_SameSolicitor()
+            .respondent2SameLegalRepresentative(NO);
+    }
+
     public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension() {
         atStateClaimDetailsNotified();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension_Defendent2() {
+        atStateClaimDetailsNotified();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
         return this;
     }
 
@@ -1726,15 +1744,16 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder addRespondentLitigationFriend() {
+    public CaseDataBuilder addRespondent1LitigationFriend() {
         this.respondent1LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
             .primaryAddress(AddressBuilder.defaults().build())
             .hasSameAddressAsLitigant(YES)
             .certificateOfSuitability(List.of())
             .build();
-        this.respondent1LitigationFriendDate = claimNotificationDate.plusDays(1);
-        this.respondent1LitigationFriendCreatedDate = claimNotificationDate.plusDays(1);
+        LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
+        this.respondent1LitigationFriendDate = tomrrowsDateTime;
+        this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
         return this;
     }
 
@@ -1745,17 +1764,16 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder addRespondent1LitigationFriend() {
-        this.respondent1LitigationFriend = LitigationFriend.builder()
-            .fullName("Mr Litigation Friend")
-            .build();
-        return this;
-    }
-
     public CaseDataBuilder addRespondent2LitigationFriend() {
         this.respondent2LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
+            .primaryAddress(AddressBuilder.defaults().build())
+            .hasSameAddressAsLitigant(YES)
+            .certificateOfSuitability(List.of())
             .build();
+        LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
+        this.respondent2LitigationFriendDate = tomrrowsDateTime;
+        this.respondent2LitigationFriendCreatedDate = tomrrowsDateTime;
         return this;
     }
 
