@@ -27,10 +27,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
 
@@ -270,7 +267,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var regularRepaymentAmountPennies = new BigDecimal(caseData.getRepaymentSuggestion());
         var regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
-        if (regularRepaymentAmountPounds.compareTo(repayment) == 1) {
+        if (regularRepaymentAmountPounds.compareTo(repayment) > 0) {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
         //convert eligible date from localdatetime to datetime and compare to user provided repayment date

@@ -24,10 +24,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -143,8 +140,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
 
+        var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
@@ -153,11 +150,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
-        listData.add(caseData.getRespondent1().getIndividualFirstName() +
-                         " " + caseData.getRespondent1().getIndividualLastName());
+        listData.add(caseData.getRespondent1().getIndividualFirstName()
+                         + " "
+                         + caseData.getRespondent1().getIndividualLastName());
         if (nonNull(caseData.getRespondent2())) {
-            listData.add(caseData.getRespondent2().getIndividualFirstName() +
-                             " " + caseData.getRespondent2().getIndividualLastName());
+            listData.add(caseData.getRespondent2().getIndividualFirstName()
+                             + " "
+                             + caseData.getRespondent2().getIndividualLastName());
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
         }
