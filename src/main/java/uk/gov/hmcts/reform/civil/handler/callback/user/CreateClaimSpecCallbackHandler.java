@@ -152,6 +152,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 this::validateCorrespondenceRespondentAddress
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
+            .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .build();
     }
 
@@ -602,6 +603,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
             .build();
     }
 
