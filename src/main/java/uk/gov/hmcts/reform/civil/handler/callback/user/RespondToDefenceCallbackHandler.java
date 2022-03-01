@@ -79,28 +79,26 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (featureToggleService.isMultipartyEnabled()) {
-            switch (multiPartyScenario) {
-                case TWO_V_ONE:
-                    updatedData
-                        .claimantResponseScenarioFlag(MultiPartyScenario.TWO_V_ONE)
-                        .build();
-                    break;
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                    updatedData
-                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-                        .build();
-                    break;
-                case ONE_V_TWO_TWO_LEGAL_REP:
-                    updatedData
-                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
-                        .build();
-                    break;
-                default:
-                    updatedData
-                        .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_ONE)
-                        .build();
-            }
+        switch (multiPartyScenario) {
+            case TWO_V_ONE:
+                updatedData
+                    .claimantResponseScenarioFlag(MultiPartyScenario.TWO_V_ONE)
+                    .build();
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                updatedData
+                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .build();
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                updatedData
+                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                    .build();
+                break;
+            default:
+                updatedData
+                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_ONE)
+                    .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -57,8 +57,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
-                .thenReturn("non-multiparty-template-id");
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty())
                 .thenReturn("multi-party-template-id");
         }
@@ -73,7 +71,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multi-party-template-id",
                 getNotificationDataMap(),
                 REFERENCE
             );
@@ -89,7 +87,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multi-party-template-id",
                 getNotificationDataMap(),
                 REFERENCE
             );
@@ -119,7 +117,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
+                "multi-party-template-id",
                 getNotificationDataMap(),
                 REFERENCE
             );
@@ -142,7 +140,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
-                "non-multiparty-template-id",
+                "multi-party-template-id",
                 getNotificationDataMap(),
                 REFERENCE
             );
@@ -150,8 +148,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();

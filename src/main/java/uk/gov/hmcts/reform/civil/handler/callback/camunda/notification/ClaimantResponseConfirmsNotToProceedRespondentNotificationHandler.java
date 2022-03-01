@@ -31,7 +31,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC);
 
     public static final String TASK_ID = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor1";
-    public static final String Task_ID_RespondentSol2 = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor2";
+    public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsNotToProceedNotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
@@ -48,7 +48,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         if (isRespondentSolicitor2Notification(callbackParams)) {
-            return Task_ID_RespondentSol2;
+            return Task_ID_RESPONDENT_SOL2;
         }
         return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }

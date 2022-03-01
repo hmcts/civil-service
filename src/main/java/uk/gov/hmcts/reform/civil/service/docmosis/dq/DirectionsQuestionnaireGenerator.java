@@ -37,10 +37,12 @@ import java.util.Locale;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
@@ -62,8 +64,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     public CaseDocument generate(CaseData caseData, String authorisation) {
         multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(caseData);
         isMulitPartyClaimantResponseButOneProceeding = isMulitPartyClaimantResponseButOneProceeding(caseData);
-        DocmosisTemplates templateId = TWO_V_ONE.equals(multiPartyScenario)
-            && !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
+        DocmosisTemplates templateId = getDocmosisTemplate(caseData);
 
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
@@ -74,6 +75,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
                     DocumentType.DIRECTIONS_QUESTIONNAIRE)
         );
+    }
+
+    private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return !isClaimantResponse(caseData) ? N181_MULTIPARTY_SAME_SOL : N181;
+            case TWO_V_ONE:
+                return !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
+            default:
+                return N181;
+        }
     }
 
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
@@ -292,7 +304,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
             || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))) {
 
-            ArrayList<Party> respondents = new ArrayList<>();
+            List<Party> respondents = new ArrayList<>();
             if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent1().getPartyName())

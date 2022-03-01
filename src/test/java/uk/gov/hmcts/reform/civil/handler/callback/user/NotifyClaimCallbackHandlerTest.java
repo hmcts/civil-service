@@ -78,7 +78,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -95,7 +95,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitorAndMultipartyToggleOn() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
@@ -108,23 +107,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotThrowWarning_whenNotifyingOnlyOneRespondentSolicitorAndMultipartyToggleOff() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getWarnings()).isEmpty();
-        }
-
-        @Test
         void shouldNotThrowWarning_whenNotifyingBothRespondentSolicitors() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
@@ -264,11 +247,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         public static final String CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim sent to "
             + "1 Defendant legal representative only.%n%n"
             + "Your claim will proceed offline.";
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
