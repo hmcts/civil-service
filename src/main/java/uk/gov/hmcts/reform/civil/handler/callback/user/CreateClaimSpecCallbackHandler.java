@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -429,20 +430,21 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ) + exitSurveyContentService.applicantSurvey();
     }
 
-    private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        return validatePostCode(caseData.getRespondent1().getPrimaryAddress().getPostCode());
-    }
-
-    private CallbackResponse validateRespondent2Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent2().getPrimaryAddress().getPostCode());
+    private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
+        CaseData caseData = params.getCaseData();
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
 
+    private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent1);
+    }
+
+    private CallbackResponse validateRespondent2Address(CallbackParams callbackParams) {
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent2);
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
