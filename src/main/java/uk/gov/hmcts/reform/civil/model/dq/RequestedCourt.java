@@ -5,7 +5,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class RequestedCourt {
 
     private final YesOrNo requestHearingAtSpecificCourt;
