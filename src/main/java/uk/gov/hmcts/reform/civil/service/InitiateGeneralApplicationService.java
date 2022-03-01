@@ -86,18 +86,25 @@ public class InitiateGeneralApplicationService {
         String deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
-
+        if (caseData.getGeneralAppRespondentAgreement() != null
+                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
+            applicationBuilder
+                    .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                    .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+        } else {
+            applicationBuilder
+                    .generalAppInformOtherParty(GAInformOtherParty.builder().build())
+                    .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+        }
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
-            .generalAppPBADetails(caseData.getGeneralAppPBADetails())
+            .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
-            .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-            .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
-            .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppDeadlineNotification(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
