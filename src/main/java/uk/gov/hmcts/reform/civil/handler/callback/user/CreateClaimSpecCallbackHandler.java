@@ -432,11 +432,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
         CaseData caseData = params.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return validatePostCode(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
     }
 
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
