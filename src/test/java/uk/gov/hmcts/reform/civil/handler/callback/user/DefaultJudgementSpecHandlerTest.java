@@ -33,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
@@ -323,8 +322,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and interest,"
-                    + " if applicable, as shown:\n"
+                String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £1010.00\n"
                     + " ### Claim interest amount \n"
@@ -367,8 +366,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £681.00, including the claim fee and interest, "
-                    + "if applicable, as shown:\n"
+                String test = "The judgment will order the defendant to pay £681.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £499.00\n"
                     + " ### Claim interest amount \n"
@@ -410,8 +409,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-                String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and interest,"
-                    + " if applicable, as shown:\n"
+                String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £999.00\n"
                     + " ### Claim interest amount \n"
@@ -449,13 +448,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .partialPaymentAmount("100")
                     .totalClaimAmount(BigDecimal.valueOf(5001))
 
-
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and interest,"
-                    + " if applicable, as shown:\n"
+                String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £5001.00\n"
                     + "### Claim fee amount \n"
@@ -469,7 +467,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + " £5001.00";
                 assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
             }
-
         }
     }
 }
