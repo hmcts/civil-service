@@ -9,26 +9,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +39,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,11 +49,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(
-            callbackParams,
-            NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE
-        ) ? TASK_ID_RESPONDENT1
-            : TASK_ID_RESPONDENT2;
+        return isRespondent1(callbackParams) ? TASK_ID_RESPONDENT1 : TASK_ID_RESPONDENT2;
     }
 
     @Override
@@ -71,7 +59,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     //Offline notification will point to a new MP template for displaying defendant responses
     private CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
         String recipient;
         String templateID;
@@ -82,39 +69,15 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
             //Use Multiparty Template as there are 2 defendant responses
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
-                && !RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                && !RespondentResponseTypeSpec.COUNTER_CLAIM
-                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
-            } else {
-                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-            }
-            if (isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)) {
+            templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+            if (isRespondent1(callbackParams)) {
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
             } else {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
             }
-
-            if (null == recipient && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-                recipient = caseData.getRespondentSolicitor1EmailAddress();
-            }
         }
 
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
-                sendNotificationToSolicitorSpecCounterClaim(caseData, recipient, caseEvent);
-            } else if (MultiPartyScenario.getMultiPartyScenario(caseData)
-                .equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
-                && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null
-                || caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE))) {
-                sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
-            }
-        } else {
-            sendNotificationToSolicitor(caseData, recipient, templateID);
-        }
+        sendNotificationToSolicitor(caseData, recipient, templateID);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -128,54 +91,39 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         );
     }
 
+    private Boolean isRespondent1(CallbackParams callbackParams) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        return caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
+    }
+
+    private boolean is1v1Or2v1Case(CaseData caseData) {
+        return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
-    }
-
-    private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData,
-                                                             String recipient, CaseEvent caseEvent) {
-        String emailTemplate = notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addPropertiesSpec(caseData, caseEvent),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-    }
-
-    private void sendNotificationToSolicitorSpec(CaseData caseData,
-                                                 String recipient, CaseEvent caseEvent) {
-        String emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addPropertiesSpec1v2DiffSol(caseData, caseEvent),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-    }
-
-    public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
-        return Map.of(
-            DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-        );
-    }
-
-    public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData, CaseEvent caseEvent) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-        );
-    }
-
-    private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
-        String organisationID;
-        organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)
-            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+            );
+        } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    .concat(" against " + caseData.getApplicant1().getPartyName())
+                    .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
+                    .concat(" against " + caseData.getApplicant2().getPartyName())
+            );
+        } else {
+            //1v2 template is used and expects different data
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+            );
+        }
     }
 }
