@@ -186,8 +186,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        YesOrNo proceeding = caseData.getApplicant1ProceedWithClaim();
-
+        YesOrNo proceeding = NO;
+        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
+            proceeding = YES;
+        }
         String claimNumber = caseData.getLegacyCaseReference();
         String title = getTitle(proceeding);
 
@@ -205,12 +211,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     }
 
     private String getBody(YesOrNo proceeding) {
-        String dqLink = "http://www.google.com";
 
         if (proceeding == YES) {
             return format(
-                "<br />We will review the case and contact you to tell you what to do next.%n%n"
-                    + "[Download directions questionnaire](%s)", dqLink)
+                "<br />We will review the case and contact you to tell you what to do next.%n%n")
                 + exitSurveyContentService.applicantSurvey();
         }
         return exitSurveyContentService.applicantSurvey();
