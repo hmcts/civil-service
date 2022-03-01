@@ -158,6 +158,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
 
         Witnesses witnesses = getWitnesses(dq);
+        int witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+
+        builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+            .experts(getExperts(dq))
+            .witnesses(witnesses)
+            .witnessesIncludingDefendants(witnessesIncludingDefendants)
+            .hearing(getHearing(dq))
+            .hearingSupport(getHearingSupport(dq))
+            .furtherInformation(getFurtherInformation(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .statementOfTruth(dq.getStatementOfTruth())
+            .disclosureReport(getDisclosureReport(dq))
+            .requestedCourt(getRequestedCourt(dq));
+
+        return builder.build();
+    }
+
+    private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
         int witnessesIncludingDefendants;
         if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
             if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
@@ -177,22 +197,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 witnessesIncludingDefendants += 1;
             }
         }
-
-        builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
-            .witnesses(witnesses)
-            .witnessesIncludingDefendants(witnessesIncludingDefendants)
-            .hearing(getHearing(dq))
-            .hearingSupport(getHearingSupport(dq))
-            .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
-            .statementOfTruth(dq.getStatementOfTruth())
-            .disclosureReport(getDisclosureReport(dq))
-            .requestedCourt(getRequestedCourt(dq));
-
-        return builder.build();
+        return witnessesIncludingDefendants;
     }
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
@@ -225,6 +230,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
         return FurtherInformation.builder()
             .futureApplications(wantMore)
+            .intentionToMakeFutureApplications(wantMore)
             .reasonForFutureApplications(whatMoreFor)
             .otherInformationForJudge(furtherJudgeInfo)
             .build();
