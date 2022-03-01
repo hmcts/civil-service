@@ -24,7 +24,10 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -49,6 +52,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
+
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
@@ -73,6 +77,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateValues(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
 
         List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
@@ -85,6 +90,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private List<String> isValidRange(List<Element<HearingDates>> hearingDatesElement) {
+
         List<String> errors = new ArrayList<>();
         hearingDatesElement.forEach(element -> {
             HearingDates hearingDates = element.getValue();
@@ -114,6 +120,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
@@ -127,6 +134,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse populateText(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 

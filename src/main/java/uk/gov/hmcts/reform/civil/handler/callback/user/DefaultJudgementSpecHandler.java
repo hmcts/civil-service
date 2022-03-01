@@ -27,9 +27,14 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +97,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
@@ -112,6 +118,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
@@ -121,6 +128,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
 
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
@@ -142,6 +150,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
+
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         /*Create Case field based on CIV-776 */
@@ -158,6 +167,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private BigDecimal calculateFixedCosts(CaseData caseData) {
+
         int fixedCost = 0;
         int totalClaimAmount = caseData.getTotalClaimAmount().intValue();
         if (totalClaimAmount > 25 && totalClaimAmount <= 5000) {
@@ -176,6 +186,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
@@ -198,6 +209,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
                                                   BigDecimal fixedCost) {
+
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
@@ -234,6 +246,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private BigDecimal getPartialPayment(CaseData caseData) {
+
         BigDecimal partialPaymentPounds = new BigDecimal(0);
         //Check if partial payment was selected by user, and assign value if so.
         if (caseData.getPartialPayment() == YesOrNo.YES) {
