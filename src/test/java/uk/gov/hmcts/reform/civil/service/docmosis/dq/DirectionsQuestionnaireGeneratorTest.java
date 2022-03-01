@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -31,6 +32,9 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
+import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
+import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -41,8 +45,10 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -323,6 +329,148 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 assertThat(templateData.getRequestedCourt()).isNotNull()
                     .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+            }
+
+            @Test
+            void whenExperts_includeDetails() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
+                    uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
+                    .name("Expert 1")
+                    .fieldOfExpertise("expertise 1")
+                    .whyRequired("Explanation")
+                    .estimatedCost(BigDecimal.valueOf(10000))
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
+                                                                 .expertRequired(YES)
+                                                                 .expertReportsSent(ExpertReportsSent.NOT_OBTAINED)
+                                                                 .jointExpertSuitable(YES)
+                                                                 .details(ElementUtils.wrapElements(expert1))
+                                                                 .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                Expert extracted = templateData.getExperts().getDetails().get(0);
+                assertThat(extracted.getName()).isEqualTo(expert1.getName());
+                assertThat(extracted.getFieldOfExpertise()).isEqualTo(expert1.getFieldOfExpertise());
+                assertThat(extracted.getWhyRequired()).isEqualTo(expert1.getWhyRequired());
+                assertThat(extracted.getFormattedCost()).isEqualTo("£100.00");
+            }
+
+            @Test
+            void whenDisclosureReport_include() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+                assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
+                assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            }
+
+            @Test
+            void whenFurtherInformation_include() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFutureApplications(
+                                           FutureApplications.builder()
+                                               .intentionToMakeFutureApplications(YES)
+                                               .whatWillFutureApplicationsBeMadeFor("Reason for future apps")
+                                               .build()
+                                       )
+                                       .respondent1DQFurtherInformation(FurtherInformation.builder()
+                                                                            .otherInformationForJudge("other info")
+                                                                            .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                FurtherInformation extracted = templateData.getFurtherInformation();
+                assertThat(extracted.getFutureApplications()).isEqualTo(YES);
+                assertThat(extracted.getIntentionToMakeFutureApplications()).isEqualTo(YES);
+                assertThat(extracted.getOtherInformationForJudge()).isEqualTo("other info");
+            }
+
+            @Test
+            public void whenNoWelsh_build() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQLanguage(null)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getWelshLanguageRequirements()).isNotNull();
+            }
+
+            @Test
+            void whenSmallClaimAndNoWitness() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(uk.gov.hmcts.reform.civil.model.dq.Hearing.builder()
+                                                                 .hearingLength(null)
+                                                                 .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(0);
+            }
+
+            @Test
+            void whenSmallClaimAndWitnesses() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(witnessesIncludingDefendant);
             }
 
             private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
