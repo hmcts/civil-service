@@ -967,25 +967,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetApplicantResponseDeadlineAndBusinessProcess_when1ResponseAndNotMultiparty() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
-        }
-
-        @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneDefendantRepAnsweringToTwoApplicants() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
 
