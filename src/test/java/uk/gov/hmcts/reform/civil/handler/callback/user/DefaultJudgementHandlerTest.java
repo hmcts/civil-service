@@ -43,7 +43,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private DefaultJudgementHandler handler;
 
-
     @Nested
     class AboutToStartCallback {
 
@@ -58,11 +57,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotEmpty();
         }
 
-
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedOneDefendants() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().
-                respondent1ResponseDeadline(
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1ResponseDeadline(
                     LocalDateTime.now().minusDays(15)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -92,6 +90,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventShowCertifyConditionCallback {
+
         private static final String PAGE_ID = "showcertifystatement";
 
         @Test
@@ -137,10 +136,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventHearingTypeSelection {
+
         private static final String PAGE_ID = "hearingTypeSelection";
 
         @Test
-        void shouldReturnDisposalText_whenHearingTypeSelectionDisposal(){
+        void shouldReturnDisposalText_whenHearingTypeSelectionDisposal() {
             String DISPOSAL_TEXT = "will be disposal hearing provided text";
             //text that will populate text area when the hearing type selected is disposal
             //dummy text for now until proper text provided.
@@ -160,7 +160,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnTrialText_whenHearingTypeSelectionTrial(){
+        void shouldReturnTrialText_whenHearingTypeSelectionTrial() {
+
             String TRIAL_TEXT = "will be trial hearing provided text";
             //text that will populate text area when the hearing type selected is trial
             //dummy text for now until proper text provided.
@@ -182,13 +183,16 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventHearingSupportCallback {
+
         private static final String PAGE_ID = "HearingSupportRequirementsDJ";
+
         @Test
         void shouldReturnError_whenDateFromDateGreaterThanDateToProvided() {
             HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
                 LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(1)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+                .hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -211,10 +215,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
                 LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                .builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -234,10 +240,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
                 LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(-4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                .builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
@@ -256,7 +264,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
                 LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(2)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder().hearingDates(
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                .builder().hearingDates(
                 wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -293,9 +302,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
+
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-          String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
+            String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
                 + "%n%n * The time for responding to the claim has expired. "
                 + "%n%n * The Defendant has not responded to the claim."
                 + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."

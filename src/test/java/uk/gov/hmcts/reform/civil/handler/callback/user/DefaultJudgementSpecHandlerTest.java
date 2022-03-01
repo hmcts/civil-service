@@ -32,7 +32,10 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -95,7 +98,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnDefendantDetails_whenShowCertifyStatementSpecIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
@@ -119,7 +123,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
                 .totalClaimAmount(claimAmount)
@@ -230,242 +235,242 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + eligibleDate);
         }
 
-    @Nested
-    class SubmittedCallback {
+        @Nested
+        class SubmittedCallback {
 
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            String cprRequiredInfo = "<br />You can only request default judgment if:"
-                + "%n%n * The time for responding to the claim has expired. "
-                + "%n%n * The Defendant has not responded to the claim."
-                + "%n%n * There is no outstanding application by the Defendant to strike out the claim for "
-                + "summary judgment."
-                + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-                + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-                + "%n%n You can make another default judgment request when you know all these statements "
-                + "have been met.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You cannot request default judgment")
-                    .confirmationBody(format(cprRequiredInfo))
-                    .build());
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
+                String cprRequiredInfo = "<br />You can only request default judgment if:"
+                    + "%n%n * The time for responding to the claim has expired. "
+                    + "%n%n * The Defendant has not responded to the claim."
+                    + "%n%n * There is no outstanding application by the Defendant to strike out the claim for "
+                    + "summary judgment."
+                    + "%n%n * The Defendant has not satisfied the whole claim, including costs."
+                    + "%n%n * The Defendant has not filed an admission together with request for time to pay."
+                    + "%n%n You can make another default judgment request when you know all these statements "
+                    + "have been met.";
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader("# You cannot request default judgment")
+                        .confirmationBody(format(cprRequiredInfo))
+                        .build());
+            }
+        }
+
+        @Nested
+        class PaymentDateValidationCallback {
+
+            private static final String PAGE_ID = "claimPaymentDate";
+
+            @Test
+            void shouldReturnError_whenPastPaymentDate() {
+
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors().get(0)).isEqualTo("Payment Date cannot be past date");
+            }
+
+            @Test
+            void shouldNotReturnError_whenPastPaymentDate() {
+
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+        }
+
+        @Nested
+        class RepaymentBreakdownCallback {
+
+            private static final String PAGE_ID = "repaymentBreakdown";
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountLessthan5000() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(100)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(1010))
+                    .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                    .partialPayment(YesOrNo.YES)
+
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and interest,"
+                    + " if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £1010.00\n"
+                    + " ### Claim interest amount \n"
+                    + "£100.00\n"
+                    + " ### Fixed cost amount \n"
+                    + "£112.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £1223.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £1222.00";
+
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountLessthan500() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(100)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(499))
+                    .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                    .partialPayment(YesOrNo.YES)
+
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                String test = "The judgment will order the defendant to pay £681.00, including the claim fee and interest, "
+                    + "if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £499.00\n"
+                    + " ### Claim interest amount \n"
+                    + "£100.00\n"
+                    + " ### Fixed cost amount \n"
+                    + "£82.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £682.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £681.00";
+
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountLessthan1000AndGreaterThan500() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(100)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(999))
+                    .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                    .partialPayment(YesOrNo.YES)
+
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and interest,"
+                    + " if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £999.00\n"
+                    + " ### Claim interest amount \n"
+                    + "£100.00\n"
+                    + " ### Fixed cost amount \n"
+                    + "£102.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £1202.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £1201.00";
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountGreaterthan5000() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(0)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(5001))
+
+
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and interest,"
+                    + " if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £5001.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £5002.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £5001.00";
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
         }
     }
-
-    @Nested
-    class PaymentDateValidationCallback {
-
-        private static final String PAGE_ID = "claimPaymentDate";
-
-        @Test
-        void shouldReturnError_whenPastPaymentDate() {
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Payment Date cannot be past date");
-        }
-
-        @Test
-        void shouldNotReturnError_whenPastPaymentDate() {
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-    }
-
-    @Nested
-    class RepaymentBreakdownCallback {
-
-        private static final String PAGE_ID = "repaymentBreakdown";
-
-        @Test
-        void shouldReturnFixedAmount_whenClaimAmountLessthan5000() {
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and interest," +
-                " if applicable, as shown:\n" +
-                "### Claim amount \n" +
-                " £1010.00\n" +
-                " ### Claim interest amount \n" +
-                "£100.00\n" +
-                " ### Fixed cost amount \n" +
-                "£112.00\n" +
-                "### Claim fee amount \n" +
-                " £1.00\n" +
-                " ## Subtotal \n" +
-                " £1223.00\n" +
-                "\n" +
-                " ### Amount already paid \n" +
-                "£1.00\n" +
-                " ## Total still owed \n" +
-                " £1222.00";
-
-            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-        }
-
-        @Test
-        void shouldReturnFixedAmount_whenClaimAmountLessthan500() {
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(499))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String test = "The judgment will order the defendant to pay £681.00, including the claim fee and interest, " +
-                "if applicable, as shown:\n" +
-                "### Claim amount \n" +
-                " £499.00\n" +
-                " ### Claim interest amount \n" +
-                "£100.00\n" +
-                " ### Fixed cost amount \n" +
-                "£82.00\n" +
-                "### Claim fee amount \n" +
-                " £1.00\n" +
-                " ## Subtotal \n" +
-                " £682.00\n" +
-                "\n" +
-                " ### Amount already paid \n" +
-                "£1.00\n" +
-                " ## Total still owed \n" +
-                " £681.00";
-
-            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-        }
-
-        @Test
-        void shouldReturnFixedAmount_whenClaimAmountLessthan1000AndGreaterThan500() {
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and interest," +
-                " if applicable, as shown:\n" +
-                "### Claim amount \n" +
-                " £999.00\n" +
-                " ### Claim interest amount \n" +
-                "£100.00\n" +
-                " ### Fixed cost amount \n" +
-                "£102.00\n" +
-                "### Claim fee amount \n" +
-                " £1.00\n" +
-                " ## Subtotal \n" +
-                " £1202.00\n" +
-                "\n" +
-                " ### Amount already paid \n" +
-                "£1.00\n" +
-                " ## Total still owed \n" +
-                " £1201.00";
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-        }
-
-        @Test
-        void shouldReturnFixedAmount_whenClaimAmountGreaterthan5000() {
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(0)
-                );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5001))
-
-
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and interest," +
-                " if applicable, as shown:\n" +
-                "### Claim amount \n" +
-                " £5001.00\n" +
-                "### Claim fee amount \n" +
-                " £1.00\n" +
-                " ## Subtotal \n" +
-                " £5002.00\n" +
-                "\n" +
-                " ### Amount already paid \n" +
-                "£1.00\n" +
-                " ## Total still owed \n" +
-                " £5001.00";
-            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-        }
-
-    }
-}
 }
 
