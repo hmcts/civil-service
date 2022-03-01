@@ -120,7 +120,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
@@ -134,10 +133,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse populateText(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
         caseDataBuilder.detailsOfDirectionDisposal(DISPOSAL_TEXT);
         caseDataBuilder.detailsOfDirectionTrial(TRIAL_TEXT);
 
@@ -148,7 +145,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
