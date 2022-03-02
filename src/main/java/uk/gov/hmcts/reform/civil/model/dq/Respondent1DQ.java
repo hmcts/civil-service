@@ -6,12 +6,17 @@ import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Setter
@@ -24,7 +29,6 @@ public class Respondent1DQ implements DQ {
     private final DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
     private final DisclosureReport respondent1DQDisclosureReport;
     private final Experts respondent1DQExperts;
-    private final ExpertDetails respondToClaimExperts;
     private final Witnesses respondent1DQWitnesses;
     private final Hearing respondent1DQHearing;
     private final SmallClaimHearing respondent1DQHearingSmallClaim;
@@ -34,7 +38,6 @@ public class Respondent1DQ implements DQ {
     private final HearingSupport respondent1DQHearingSupport;
     private final FurtherInformation respondent1DQFurtherInformation;
     private final WelshLanguageRequirements respondent1DQLanguage;
-    private final WelshLanguageRequirements respondent1DQLanguageLRspec;
     private final StatementOfTruth respondent1DQStatementOfTruth;
     private final FutureApplications respondent1DQFutureApplications;
     private final List<Element<AccountSimple>> respondent1BankAccountList;
@@ -44,7 +47,6 @@ public class Respondent1DQ implements DQ {
     private final List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
     private final YesOrNo responseClaimCourtLocationRequired;
     private final RequestedCourt respondToCourtLocation;
-    private final VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -76,11 +78,6 @@ public class Respondent1DQ implements DQ {
         return getExperts(respondent1DQExperts);
     }
 
-    @JsonProperty("respondToClaimExperts")
-    public ExpertDetails getSmallClaimExperts() {
-        return respondToClaimExperts;
-    }
-
     @Override
     @JsonProperty("respondent1DQWitnesses")
     public Witnesses getWitnesses() {
@@ -93,17 +90,46 @@ public class Respondent1DQ implements DQ {
         if (respondent1DQHearing != null) {
             return getHearing(respondent1DQHearing);
         }
-        DQUtil util = new DQUtil();
-
         if (respondent1DQHearingFastClaim != null) {
-            return util.buildFastTrackHearing(respondent1DQHearingFastClaim);
+            return Hearing.builder()
+                .hearingLength(respondent1DQHearingFastClaim.getHearingLength())
+                .hearingLengthDays(respondent1DQHearingFastClaim.getHearingLengthDays())
+                .hearingLengthHours(respondent1DQHearingFastClaim.getHearingLengthHours())
+                .unavailableDatesRequired(respondent1DQHearingFastClaim.getUnavailableDatesRequired())
+                .unavailableDates(mapDates(respondent1DQHearingFastClaim.getUnavailableDatesLRspec()))
+                .build();
         }
         if (respondent1DQHearingSmallClaim != null) {
             SmallClaimHearing small = getSmallClaimHearing();
-            return util.buildSmallClaimHearing(small);
+            return Hearing.builder()
+                .unavailableDatesRequired(small.getUnavailableDatesRequired())
+                .unavailableDates(mapDates(small.getSmallClaimUnavailableDate()))
+                .build();
         }
 
         return null;
+    }
+
+    private List<Element<UnavailableDate>> mapDates(List<Element<UnavailableDateLRspec>> lrDates) {
+        if (lrDates == null) {
+            return Collections.emptyList();
+        } else {
+            return lrDates.stream().map(Element::getValue)
+                .map(this::mapDate)
+                .map(ElementUtils::element)
+                .collect(Collectors.toList());
+        }
+    }
+
+    private UnavailableDate mapDate(UnavailableDateLRspec lrSpec) {
+        UnavailableDate.UnavailableDateBuilder builder = UnavailableDate.builder()
+            .who(lrSpec.getWho());
+        if (lrSpec.getDate() != null) {
+            builder.date(lrSpec.getDate());
+        } else {
+            builder.fromDate(lrSpec.getFromDate()).toDate(lrSpec.getToDate());
+        }
+        return builder.build();
     }
 
     @Override
@@ -177,17 +203,5 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQFutureApplications")
     public FutureApplications getFutureApplications() {
         return respondent1DQFutureApplications;
-    }
-
-    @Override
-    @JsonProperty("respondent1DQLanguageLRspec")
-    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
-        return respondent1DQLanguageLRspec;
-    }
-
-    @Override
-    @JsonProperty("respondent1DQVulnerabilityQuestions")
-    public VulnerabilityQuestions getVulnerabilityQuestions() {
-        return respondent1DQVulnerabilityQuestions;
     }
 }
