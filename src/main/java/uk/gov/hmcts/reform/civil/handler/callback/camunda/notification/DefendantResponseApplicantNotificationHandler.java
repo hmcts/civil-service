@@ -12,9 +12,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
@@ -23,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -42,6 +46,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -89,8 +94,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
-
-        sendNotificationToSolicitor(caseData, recipient);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
+        } else {
+            sendNotificationToSolicitor(caseData, recipient);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -100,6 +108,19 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             recipient,
             notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
             addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
+    private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
+        String emailTemplate;
+        emailTemplate = caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)
+            ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
+            : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+        notificationService.sendMail(
+            recipient,
+            emailTemplate,
+            addPropertiesSpec(caseData, caseEvent),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
@@ -116,5 +137,24 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
+    }
+
+    public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    //finding legal org name
+    private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
+        String organisationID;
+        organisationID = caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)
+            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
