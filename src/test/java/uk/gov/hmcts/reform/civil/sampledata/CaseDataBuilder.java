@@ -1355,6 +1355,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence() {
+        atStateRespondentFullDefence();
+        respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
     public CaseDataBuilder atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
