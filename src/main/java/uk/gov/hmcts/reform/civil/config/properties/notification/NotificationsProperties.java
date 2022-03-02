@@ -80,4 +80,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String solicitorLitigationFriendAdded;
+
+    @NotEmpty
+    private String claimantSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorDefendantResponseForSpec;
 }
