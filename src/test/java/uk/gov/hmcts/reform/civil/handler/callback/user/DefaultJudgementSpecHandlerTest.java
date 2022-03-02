@@ -285,7 +285,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                     .partialPayment(YesOrNo.YES)
-                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .paymentSetDate(LocalDate.now().plusDays(15))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
