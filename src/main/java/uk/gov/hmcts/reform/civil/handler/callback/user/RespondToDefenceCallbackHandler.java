@@ -15,18 +15,26 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -38,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
 @RequiredArgsConstructor
@@ -179,9 +188,35 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
 
+        assembleResponseDocuments(caseData, builder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+        List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
+        Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant1())
+            .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
+                buildElemCaseDocument(claimDocument, "Claimant",
+                                      updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant2())
+            .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
+                buildElemCaseDocument(claimDocument, "Claimant",
+                                      updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQDraftDirections)
+            .ifPresent(document -> claimantUploads.add(
+                buildElemCaseDocument(document, "Claimant",
+                                      updatedCaseData.build().getApplicant1ResponseDate(),
+                                      DocumentType.CLAIMANT_DRAFT_DIRECTIONS
+                )));
+        if (!claimantUploads.isEmpty()) {
+            updatedCaseData.claimantResponseDocuments(claimantUploads);
+        }
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

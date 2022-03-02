@@ -67,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
 @RequiredArgsConstructor
@@ -498,17 +499,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
     }
 
-    private Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
-                                                        LocalDateTime createdAt, DocumentType type) {
-        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
-                       .documentLink(document)
-                       .documentName(document.getDocumentFileName())
-                       .documentType(type)
-                       .createdDatetime(createdAt)
-                       .createdBy(createdBy)
-                       .build()
-                );
-    }
+
 
     private boolean applicant2Present(CaseData caseData) {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
