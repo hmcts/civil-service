@@ -255,6 +255,8 @@ public class CaseData implements MappableObject {
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
     private YesOrNo applicantsProceedIntention;
     private final MultiPartyScenario claimantResponseScenarioFlag;
+    private YesOrNo claimantResponseDocumentToDefendant2Flag;
+    private YesOrNo claimant2ResponseFlag;
 
     // dates
     private final LocalDateTime submittedDate;

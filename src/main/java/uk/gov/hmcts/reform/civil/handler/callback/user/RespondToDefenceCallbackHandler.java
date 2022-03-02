@@ -42,6 +42,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -124,11 +127,25 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse setApplicantsProceedIntention(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
         CaseData.CaseDataBuilder updatedData =
-            caseData.toBuilder().applicantsProceedIntention(NO);
+            caseData.toBuilder()
+                .applicantsProceedIntention(NO)
+                .claimantResponseDocumentToDefendant2Flag(NO)
+                .claimant2ResponseFlag(NO);
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             updatedData.applicantsProceedIntention(YES);
+        }
+
+        if((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
+        || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()) && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
+            updatedData.claimantResponseDocumentToDefendant2Flag(YES);
+        }
+
+        if(multiPartyScenario == TWO_V_ONE && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())){
+            updatedData.claimant2ResponseFlag(YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
