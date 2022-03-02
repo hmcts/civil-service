@@ -171,7 +171,6 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
                 INFORM_AGREED_EXTENSION_DATE,
-                INFORM_AGREED_EXTENSION_DATE,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
