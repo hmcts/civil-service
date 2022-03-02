@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -448,7 +449,11 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .file(DocumentBuilder.builder().documentName("claimant-response-def2.pdf").build())
                         .build())
                 .applicant1DQ(Applicant1DQ.builder()
-                        .applicant1DQDraftDirections(DocumentBuilder.builder().documentName("claimant-draft-dir.pdf")
+                        .applicant1DQDraftDirections(DocumentBuilder.builder().documentName("claimant-1-draft-dir.pdf")
+                                                         .build())
+                        .build())
+                .applicant2DQ(Applicant2DQ.builder()
+                        .applicant2DQDraftDirections(DocumentBuilder.builder().documentName("claimant-2-draft-dir.pdf")
                                                          .build())
                         .build())
                 .build();
@@ -458,7 +463,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -470,7 +475,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentType=CLAIMANT_DEFENCE")
                 .contains("documentName=claimant-response-def1.pdf")
                 .contains("documentName=claimant-response-def2.pdf")
-                .contains("documentName=claimant-draft-dir.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentName=claimant-2-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
         }
 

@@ -20,13 +20,14 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,9 +71,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1ClaimResponseDocumentCopy,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
+            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -116,10 +117,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     }
 
     private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (YES.equals(caseData.getClaimant2ResponseFlag())) {
+            return validateWitnesses(callbackParams.getCaseData().getApplicant2DQ());
+        }
         return validateWitnesses(callbackParams.getCaseData().getApplicant1DQ());
     }
 
     private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (YES.equals(caseData.getClaimant2ResponseFlag())) {
+            return validateExperts(callbackParams.getCaseData().getApplicant2DQ());
+        }
         return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
     }
 
@@ -165,7 +174,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Hearing hearing = caseData.getApplicant1DQ().getHearing();
+        Hearing hearing;
+        if (YES.equals(caseData.getClaimant2ResponseFlag())) {
+            hearing = caseData.getApplicant2DQ().getHearing();
+        } else {
+            hearing = caseData.getApplicant1DQ().getHearing();
+        }
         List<String> errors = unavailableDateValidator.validate(hearing);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -190,18 +204,37 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDateTime currentTime = time.now();
+
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
-            .applicant1ResponseDate(time.now());
+            .applicant1ResponseDate(currentTime);
+
+        if (multiPartyScenario == TWO_V_ONE) {
+            builder.applicant2ResponseDate(currentTime);
+        }
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                .applicant1DQStatementOfTruth(statementOfTruth)
-                .build();
 
-            builder.applicant1DQ(dq);
+            if (caseData.getApplicant1DQ() != null) {
+                Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
+                    .applicant1DQStatementOfTruth(statementOfTruth)
+                    .build();
+
+                builder.applicant1DQ(dq);
+            }
+
+            if (caseData.getApplicant2DQ() != null) {
+                Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
+                    .applicant2DQStatementOfTruth(statementOfTruth)
+                    .build();
+
+                builder.applicant2DQ(dq);
+            }
+
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
@@ -230,6 +263,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .ifPresent(document -> claimantUploads.add(
                 buildElemCaseDocument(document, "Claimant",
                                       updatedCaseData.build().getApplicant1ResponseDate(),
+                                      DocumentType.CLAIMANT_DRAFT_DIRECTIONS
+                )));
+        Optional.ofNullable(caseData.getApplicant2DQ())
+            .map(Applicant2DQ::getApplicant2DQDraftDirections)
+            .ifPresent(document -> claimantUploads.add(
+                buildElemCaseDocument(document, "Claimant",
+                                      updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         if (!claimantUploads.isEmpty()) {
