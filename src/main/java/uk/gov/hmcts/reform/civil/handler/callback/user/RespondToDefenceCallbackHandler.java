@@ -21,8 +21,6 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -139,12 +137,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             updatedData.applicantsProceedIntention(YES);
         }
 
-        if((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-        || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()) && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
+        if ((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
+                && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
+            || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP
+                && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
             updatedData.claimantResponseDocumentToDefendant2Flag(YES);
         }
 
-        if(multiPartyScenario == TWO_V_ONE && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())){
+        if (multiPartyScenario == TWO_V_ONE && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
             updatedData.claimant2ResponseFlag(YES);
         }
 

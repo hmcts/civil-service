@@ -21,9 +21,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -40,12 +43,14 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -430,6 +435,43 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .claimantDefenceResDocToDefendant1(ResponseDocument.builder()
+                        .file(DocumentBuilder.builder().documentName("claimant-response-def1.pdf").build())
+                        .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                        .file(DocumentBuilder.builder().documentName("claimant-response-def2.pdf").build())
+                        .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                        .applicant1DQDraftDirections(DocumentBuilder.builder().documentName("claimant-draft-dir.pdf")
+                                                         .build())
+                        .build())
+                .build();
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(3, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
         }
 
         @Nested
