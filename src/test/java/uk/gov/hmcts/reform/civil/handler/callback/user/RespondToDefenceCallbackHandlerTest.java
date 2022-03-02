@@ -467,43 +467,231 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
 
-        @Test
-        void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        @Nested
+        class OneVOne {
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
-                    .confirmationBody(format(
-                        "<br />We will review the case and contact you to tell you what to do next.%n%n"
-                            + "[Download directions questionnaire](http://www.google.com)"
-                    ) + exitSurveyContentService.applicantSurvey())
-                    .build());
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceed()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
+                                                       + " 000DC001"))
+                        .confirmationBody(
+                            "<br />If you do want to proceed you need to do it within:"
+                                + "<ul><li>14 days if the claim is allocated to a small claims track</li>"
+                                + "<li>28 days if the claim is allocated to a fast or multi track</li></ul>"
+                                + "<p>The case will be stayed if you do not proceed within the allowed "
+                                + "timescale.</p>" + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
         }
 
-        @Test
-        void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaim() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .applicant1ProceedWithClaim(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        @Nested
+        class OneVTwo {
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantsIsProceedingWithClaimAgainstBothDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
-                                                   + " 000DC001"))
-                    .confirmationBody(exitSurveyContentService.applicantSurvey())
-                    .build());
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantIsNotProceedingWithClaimAgainstBothDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceed_1v2()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
+                                                       + " 000DC001"))
+                        .confirmationBody(
+                            "<br />If you do want to proceed you need to do it within:"
+                                + "<ul><li>14 days if the claim is allocated to a small claims track</li>"
+                                + "<li>28 days if the claim is allocated to a fast or multi track</li></ul>"
+                                + "<p>The case will be stayed if you do not proceed within the allowed "
+                                + "timescale.</p>" + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaimAgainstFirstDefendantOnly() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim against one defendant only%n"
+                                + "## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaimAgainstSecondDefendantOnly() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim against one defendant only%n"
+                                + "## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
         }
+
+        @Nested
+        class TwoVOne {
+            @Test
+            void shouldReturnExpectedResponse_whenBothApplicantsAreProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim%n## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenBothApplicantAreNotProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# You have chosen not to proceed with the claim%n## Claim number:"
+                                                       + " 000DC001"))
+                        .confirmationBody(
+                            "<br />If you do want to proceed you need to do it within:"
+                                + "<ul><li>14 days if the claim is allocated to a small claims track</li>"
+                                + "<li>28 days if the claim is allocated to a fast or multi track</li></ul>"
+                                + "<p>The case will be stayed if you do not proceed within the allowed "
+                                + "timescale.</p>" + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenOnlyFirstApplicantIsProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .applicant1ProceedWithClaimMultiParty2v1(YES)
+                    .applicant2ProceedWithClaimMultiParty2v1(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim against one defendant only%n"
+                                + "## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedResponse_whenOnlySecondApplicantIsProceedingWithClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .applicant1ProceedWithClaimMultiParty2v1(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# You have chosen to proceed with the claim against one defendant only%n"
+                                + "## Claim number: 000DC001"))
+                        .confirmationBody(format(
+                            "<br />We will review the case and contact you to tell you what to do next.%n%n"
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+        }
+
     }
 
     @Nested

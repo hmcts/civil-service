@@ -1650,6 +1650,54 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = YES;
+        //TODO: Add applicant2 information here!
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = NO;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
+        //TODO: Add applicant2 information here!
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+        //TODO: Add applicant2 information here!
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant2ProceedWithClaimMultiParty2v1 = NO;
+        //TODO: Add applicant2 information here!
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledged1v2SameSolicitor() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;

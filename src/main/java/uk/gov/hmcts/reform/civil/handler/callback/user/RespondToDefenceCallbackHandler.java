@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -128,17 +127,21 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData.CaseDataBuilder updatedData =
             caseData.toBuilder().applicantsProceedIntention(NO);
 
-        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
+        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             updatedData.applicantsProceedIntention(YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean anyApplicantDecidesToProceedWithClaim(CaseData caseData) {
+        return YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -172,11 +175,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(time.now());
 
-        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
+        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
@@ -221,37 +220,49 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        YesOrNo proceeding = NO;
-        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
-            proceeding = YES;
-        }
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String claimNumber = caseData.getLegacyCaseReference();
-        String title = getTitle(proceeding);
+        String title;
+        String body = format("<br />We will review the case and contact you to tell you what to do next.%n%n");
+
+        switch (multiPartyScenario) {
+            case TWO_V_ONE:
+                //XOR: If they are the opposite of each other - Divergent response
+                if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    ^ YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+                    title = "# You have chosen to proceed with the claim against one defendant only%n"
+                        + "## Claim number: %s";
+                    break;
+                }
+                // FALL-THROUGH
+            case ONE_V_TWO_ONE_LEGAL_REP: // FALL-THROUGH
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                //XOR: If they are the opposite of each other - Divergent response
+                if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
+                    title = "# You have chosen to proceed with the claim against one defendant only%n"
+                        + "## Claim number: %s";
+                    break;
+                }
+                // FALL-THROUGH
+            default: {
+                //Non-divergent and there is at least one yes to proceed with claim
+                if (anyApplicantDecidesToProceedWithClaim(caseData)) {
+                    title = "# You have chosen to proceed with the claim%n## Claim number: %s";
+                    break;
+                }
+                //All applicants chose not to proceed
+                title = "# You have chosen not to proceed with the claim%n## Claim number: %s";
+                body = "<br />If you do want to proceed you need to do it within:"
+                    + "<ul><li>14 days if the claim is allocated to a small claims track</li>"
+                    + "<li>28 days if the claim is allocated to a fast or multi track</li></ul>"
+                    + "<p>The case will be stayed if you do not proceed within the allowed timescale.</p>";
+            }
+        }
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format(title, claimNumber))
-            .confirmationBody(getBody(proceeding))
+            .confirmationBody(body + exitSurveyContentService.applicantSurvey())
             .build();
-    }
-
-    private String getTitle(YesOrNo proceeding) {
-        if (proceeding == YES) {
-            return "# You have chosen to proceed with the claim%n## Claim number: %s";
-        }
-        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
-    }
-
-    private String getBody(YesOrNo proceeding) {
-
-        if (proceeding == YES) {
-            return format(
-                "<br />We will review the case and contact you to tell you what to do next.%n%n")
-                + exitSurveyContentService.applicantSurvey();
-        }
-        return exitSurveyContentService.applicantSurvey();
     }
 }
