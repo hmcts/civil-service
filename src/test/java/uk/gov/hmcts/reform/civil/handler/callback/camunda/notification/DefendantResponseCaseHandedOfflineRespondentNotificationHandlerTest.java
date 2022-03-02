@@ -26,11 +26,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -198,7 +200,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
@@ -206,7 +209,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
-                    .concat(" against " + caseData.getApplicant2().getPartyName())
+                    .concat(" against " + caseData.getApplicant2().getPartyName()),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else {
             //1v2 template is used and expects different data
@@ -215,7 +219,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }

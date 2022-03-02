@@ -35,8 +35,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.De
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -289,11 +291,13 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                    PARTY_REFERENCES, buildPartiesReferences(caseData)
                 );
             } else {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    PARTY_REFERENCES, buildPartiesReferences(caseData)
                 );
             }
         }
