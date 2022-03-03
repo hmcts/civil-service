@@ -174,6 +174,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
+    private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final String specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
