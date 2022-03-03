@@ -65,6 +65,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
             builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getConsentExtensionFilingDefence())) {
+            builder.consentExtensionFilingDefence(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }

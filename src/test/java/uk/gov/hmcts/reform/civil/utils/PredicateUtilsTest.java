@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -22,6 +23,7 @@ public class PredicateUtilsTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .respondent1TimeExtensionDate(LocalDateTime.now())
+                .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now().plusDays(3))
                 .build();
             assertTrue(defendant1ExtensionExists.test(caseData));
         }
@@ -31,6 +33,7 @@ public class PredicateUtilsTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .respondent2TimeExtensionDate(LocalDateTime.now())
+                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now().plusDays(3))
                 .build();
             assertTrue(defendant2ExtensionExists.test(caseData));
         }
