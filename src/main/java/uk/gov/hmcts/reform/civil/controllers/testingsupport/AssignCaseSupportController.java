@@ -53,4 +53,23 @@ public class AssignCaseSupportController {
             caseRole.orElse(CaseRole.RESPONDENTSOLICITORONE)
         );
     }
+
+    @PostMapping(value = {"/unassign-case/{caseId}", "/unassign-case/{caseId}"})
+    @ApiOperation("Unassign user from case")
+    public void unAssignUserFromCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+                           @PathVariable("caseId") String caseId) {
+        String userId = userService.getUserInfo(authorisation).getUid();
+
+        String organisationId = organisationService.findOrganisation(authorisation)
+            .map(Organisation::getOrganisationIdentifier).orElse(null);
+
+        coreCaseUserService.getUserCaseRoles(caseId, userId).forEach(
+            role -> coreCaseUserService.removeCaseRoleAssignment(
+                caseId,
+                userId,
+                organisationId,
+                CaseRole.valueOf(role.substring(1, role.length() - 1))
+            )
+        );
+    }
 }
