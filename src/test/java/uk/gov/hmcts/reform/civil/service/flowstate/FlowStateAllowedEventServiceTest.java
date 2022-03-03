@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
@@ -140,7 +141,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_SUBMITTED,
                     new CaseEvent[]{
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -150,13 +152,15 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
                     new CaseEvent[]{
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -170,7 +174,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -184,7 +189,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -199,7 +205,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -214,13 +221,13 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        INFORM_AGREED_EXTENSION_DATE
+                        INFORM_AGREED_EXTENSION_DATE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
-                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -229,7 +236,8 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -243,7 +251,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        INFORM_AGREED_EXTENSION_DATE
+                        INFORM_AGREED_EXTENSION_DATE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -258,7 +267,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -273,7 +283,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -286,7 +297,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         TAKE_CASE_OFFLINE,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -297,7 +309,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -308,7 +321,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -319,7 +333,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -330,7 +345,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -341,21 +357,24 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -368,14 +387,16 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -436,7 +457,6 @@ class FlowStateAllowedEventServiceTest {
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                    NOTIFICATION_ACKNOWLEDGED.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),

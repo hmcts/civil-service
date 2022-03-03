@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -39,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
@@ -370,6 +373,16 @@ class FlowPredicateTest {
                 Predicate<CaseData> predicate =
                     fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
                 assertFalse(predicate.test(caseData));
+            }
+
+            @Test
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterClaimNotifiedSpec() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .build();
+                assertTrue(fullDefenceSpec.test(caseData));
             }
         }
 

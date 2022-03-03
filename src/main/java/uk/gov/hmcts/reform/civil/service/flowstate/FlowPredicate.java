@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -10,12 +11,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -93,7 +96,8 @@ public class FlowPredicate {
             && caseData.getRespondent2OrgRegistered() != NO;
 
     public static final Predicate<CaseData> claimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getClaimNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
             || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
 
@@ -120,7 +124,18 @@ public class FlowPredicate {
             && hasNotifiedClaimDetailsToBoth.negate().test(caseData);
 
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
-        caseData.getRespondent1AcknowledgeNotificationDate() != null;
+        getPredicateForNotificationAcknowledged(caseData);
+
+    private static boolean getPredicateForNotificationAcknowledged(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return (caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() != null);
+            default:
+                return caseData.getRespondent1AcknowledgeNotificationDate() != null;
+        }
+    }
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
         (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
@@ -411,6 +426,11 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
+
+    public static final Predicate<CaseData> fullDefenceSpec = caseData ->
+        SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
 
     private FlowPredicate() {
         //Utility class

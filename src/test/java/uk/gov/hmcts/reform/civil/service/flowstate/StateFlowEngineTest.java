@@ -935,12 +935,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(8)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -966,12 +966,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(8)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -983,8 +983,8 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //1v2 Different solicitor scenario-first response NOT FullDefence received
-            void shouldGenerateDQ_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
+            //1v2 Different solicitor scenario-first response FullDefence received
+            void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .multiPartyClaimTwoDefendantSolicitors()
@@ -997,12 +997,44 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(8)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
+            }
+
+            @Test
+            //1v2 Different solicitor scenario-first party acknowledges, not responds
+            // second party submits response FullDefence
+            void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefenceRespondent2()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(8)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1018,6 +1050,38 @@ class StateFlowEngineTest {
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(FULL_DEFENCE.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(9)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
+            }
+
+            @Test
+            //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .atStateNotificationAcknowledgedRespondent2()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
 
@@ -1059,12 +1123,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(10)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1080,6 +1144,7 @@ class StateFlowEngineTest {
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
+                    .atStateNotificationAcknowledged1v2SameSolicitor()
                     .multiPartyClaimOneDefendantSolicitor()
                     .build();
 
@@ -1120,12 +1185,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(10)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1151,12 +1216,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(FULL_ADMISSION.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(10)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1221,6 +1286,72 @@ class StateFlowEngineTest {
             verify(featureToggleService).isRpaContinuousFeedEnabled();
             assertThat(stateFlow.getFlags()).hasSize(2).containsExactly(entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                                                         entry("RPA_CONTINUOUS_FEED", true));
+        }
+
+        @Test
+        //1v2 Different solicitor scenario-first response FullDefence received and with time extension
+        void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAndTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(9)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+            );
+        }
+
+        @Test
+        //1v2 Different solicitor scenario-first response FullDefence received and with time extension
+        void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAfterAcknowledgeClaimAndTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+            );
         }
 
         @Test

@@ -419,7 +419,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
         void shouldGeneratePact_whenAddRespondentLitigationFriendAndContinuousFeedEnabled() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE)
-                .addRespondentLitigationFriend()
+                .addRespondent1LitigationFriend()
                 .legacyCaseReference("100DC019")
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
