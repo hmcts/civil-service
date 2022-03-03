@@ -219,7 +219,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
 
-            if (caseData.getApplicant1DQ() != null) {
+            if (caseData.getApplicant1DQ() != null
+                && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
                 Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
                     .applicant1DQStatementOfTruth(statementOfTruth)
                     .build();
@@ -227,7 +228,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 builder.applicant1DQ(dq);
             }
 
-            if (caseData.getApplicant2DQ() != null) {
+            if (caseData.getApplicant2DQ() != null
+                && caseData.getApplicant2DQ().getApplicant2DQFileDirectionsQuestionnaire() != null) {
                 Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
                     .applicant2DQStatementOfTruth(statementOfTruth)
                     .build();
@@ -286,7 +288,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         switch (multiPartyScenario) {
             case TWO_V_ONE:
-                //XOR: If they are the opposite of each other - Divergent response
+                // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
                     ^ YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
                     title = "# You have chosen to proceed with the claim against one defendant only%n"
@@ -294,9 +296,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     break;
                 }
                 // FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP: // FALL-THROUGH
+            case ONE_V_TWO_ONE_LEGAL_REP:
             case ONE_V_TWO_TWO_LEGAL_REP:
-                //XOR: If they are the opposite of each other - Divergent response
+                // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
                     title = "# You have chosen to proceed with the claim against one defendant only%n"

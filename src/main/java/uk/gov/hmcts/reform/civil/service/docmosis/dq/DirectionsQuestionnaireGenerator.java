@@ -58,14 +58,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private String currentDefendantFor1v2SingleSolIndividualResponse = null;
-    private MultiPartyScenario multiPartyScenario = null;
-    private boolean isMulitPartyClaimantResponseButOneProceeding = false;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        isMulitPartyClaimantResponseButOneProceeding = isMulitPartyClaimantResponseButOneProceeding(caseData);
         DocmosisTemplates templateId = getDocmosisTemplate(caseData);
-
         DirectionsQuestionnaireForm templateData = getTemplateData(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData,
@@ -80,9 +75,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return !isClaimantResponse(caseData) ? N181_MULTIPARTY_SAME_SOL : N181;
+                if(!isClaimantResponse(caseData)){
+                    return N181_MULTIPARTY_SAME_SOL;
+                }
+                //FALL-THROUGH
             case TWO_V_ONE:
-                return !isMulitPartyClaimantResponseButOneProceeding ? N181_2V1 : N181;
+                if(!isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)){
+                    return N181_2V1;
+                }
+                //FALL-THROUGH
             default:
                 return N181;
         }
@@ -144,12 +145,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 .build();
         }
 
-        var applicant1 = getApplicant(caseData);
-        if (isClaimantResponse(caseData)) {
-            if (isMulitPartyClaimantResponseButOneProceeding
-                && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
-                applicant1 = getApplicant2(caseData);
-            }
+        if (onlyApplicant2IsProceeding(caseData)) {
+            dq = caseData.getApplicant2DQ();
         }
 
         return DirectionsQuestionnaireForm.builder()
@@ -157,9 +154,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-            .applicant(applicant1)
-            .applicant2((TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-                    && !isMulitPartyClaimantResponseButOneProceeding) ? getApplicant2(caseData) : null)
+            .applicant(getApplicant(caseData))
+            .applicant2(TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null)
             .respondents(getRespondents(caseData))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -176,22 +172,39 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private boolean isClaimantResponse(CaseData caseData) {
-        return caseData.getApplicantsProceedIntention() != null;
+        return caseData.getApplicant1ResponseDate() != null;
     }
 
-    private boolean isMulitPartyClaimantResponseButOneProceeding(CaseData caseData) {
-        if ((NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
-            || (NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            && YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()))) {
-            return true;
-        } else if ((NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-            && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-            || (NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-            && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
-            return true;
+    private boolean isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(CaseData caseData) {
+        if (isClaimantResponse(caseData) == false) {
+            return false;
         }
-        return false;
+
+        switch (getMultiPartyScenario(caseData)) {
+            case TWO_V_ONE:
+                // XOR: If they are the opposite of each other - Divergent response
+                if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    ^ YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+                    return true;
+                }
+                // FALL-THROUGH
+            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                // XOR: If they are the opposite of each other - Divergent response
+                if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
+                    return false;
+                }
+                // FALL-THROUGH
+            default: {
+                return false;
+            }
+        }
+    }
+
+    private boolean onlyApplicant2IsProceeding(CaseData caseData) {
+        return isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
     private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
@@ -256,9 +269,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private Party getApplicant(CaseData caseData) {
         var applicant = caseData.getApplicant1();
 
-        if (TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            && isMulitPartyClaimantResponseButOneProceeding
-            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+        if (onlyApplicant2IsProceeding(caseData)) {
             applicant = caseData.getApplicant2();
         }
 
@@ -273,6 +284,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private Party getApplicant2(CaseData caseData) {
+        if (onlyApplicant2IsProceeding(caseData)) {
+            return null;
+        }
+
         var applicant = caseData.getApplicant2();
         return Party.builder()
             .name(applicant.getPartyName())
@@ -300,8 +315,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var respondent = caseData.getRespondent1();
         var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
 
-        if (isClaimantResponse(caseData) && (YES
-            .equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+        if (isClaimantResponse(caseData) &&
+            (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
             || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))) {
 
             List<Party> respondents = new ArrayList<>();
