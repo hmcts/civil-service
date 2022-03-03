@@ -638,8 +638,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         // only default this to NO if respondent 1 isn't represented
         if (callbackParams.getCaseData().getSpecRespondent1Represented().equals(NO)) {
-            //TODO refactor needed as part of CIV-761
-            //caseDataBuilder.respondent2SameLegalRepresentative(NO);
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
