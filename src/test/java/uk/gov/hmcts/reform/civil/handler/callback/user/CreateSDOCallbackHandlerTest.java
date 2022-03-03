@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
-import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -38,21 +35,18 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
-    ExitSurveyConfiguration.class,
-    ExitSurveyContentService.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
-
-    public static final String REFERENCE_NUMBER = "000DC001";
 
     @MockBean
     private Time time;
@@ -62,12 +56,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CreateSDOCallbackHandler handler;
-
-    @Autowired
-    private ExitSurveyContentService exitSurveyContentService;
-
-    @Value("${civil.response-pack-url}")
-    private String responsePackLink;
 
     @Nested
     class AboutToStartCallback {
@@ -92,7 +80,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private String userId;
 
         private static final String EMAIL = "example@email.com";
-        private static final String DIFFERENT_EMAIL = "other_example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
@@ -128,15 +115,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String body = format(
                 CONFIRMATION_SUMMARY,
-                format("/cases/case-details/%s#CaseDocuments", CASE_ID)
-            ) + exitSurveyContentService.applicantSurvey();
+                "Mr. John Rambo",
+                "Mr. Sole Trader"
+            );
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# Your claim has been received%n## Claim number: %s",
-                        REFERENCE_NUMBER
-                    ))
+                    .confirmationHeader(CONFIRMATION_HEADER)
                     .confirmationBody(body)
                     .build());
         }

@@ -11,13 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,24 +23,20 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
+    public static final String CONFIRMATION_HEADER = "# Your order has been issued #";
+    public static final String CONFIRMATION_SUMMARY = "<br/>The Directions Order has been sent to:"
+        + "<br/>%n%n<strong>Claimant 1</strong>%n"
+        + "<br/>%s"
+        + "<br/>%n%n<strong>Defendant 1</strong>%n"
+        + "<br/>%s"
+        + "<br/>%n%nThe other party has also been notified.";
 
-    public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the Defendant legal "
-        + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
-        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
-        + "when you first notify the Defendant legal representative of the claim.";
-
-    private final ClaimIssueConfiguration claimIssueConfiguration;
-    private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -82,24 +74,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader())
             .confirmationBody(getBody(caseData))
             .build();
     }
 
-    private String getHeader(CaseData caseData) {
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+    private String getHeader() {
+        return CONFIRMATION_HEADER;
     }
 
     private String getBody(CaseData caseData) {
-        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
-        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
+        String applicantName = caseData.getApplicant1().getPartyName();
+        String respondentName = caseData.getRespondent1().getPartyName();
 
         return format(
             CONFIRMATION_SUMMARY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
+            applicantName,
+            respondentName
+        );
     }
 }
