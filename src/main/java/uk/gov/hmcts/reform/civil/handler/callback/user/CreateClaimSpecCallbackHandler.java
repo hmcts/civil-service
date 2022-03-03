@@ -124,7 +124,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
-            .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
+            .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
             .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
@@ -168,7 +168,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {
+    private CallbackResponse validateClaimant1Details(CallbackParams callbackParams) {
         return validateClaimantDetails(callbackParams, CaseData::getApplicant1);
     }
 

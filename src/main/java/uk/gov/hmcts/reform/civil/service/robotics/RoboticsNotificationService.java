@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataExceptio
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
@@ -83,7 +83,8 @@ public class RoboticsNotificationService {
         return EmailData.builder()
             .message(String.format(
                 "Multiparty claim data for %s",
-                caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
+                caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()
+            ))
             .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
                 + " - " + caseData.getCcdState() + " - " + triggerEvent))
             .to(roboticsEmailConfiguration.getMultipartyrecipient())
@@ -111,7 +112,7 @@ public class RoboticsNotificationService {
         if (events.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(events.get(events.size()-1).getEventDetailsText());
+            return Optional.ofNullable(events.get(events.size() - 1).getEventDetailsText());
         }
     }
 
