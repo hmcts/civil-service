@@ -10,14 +10,9 @@ public class PredicateUtils {
         //NO-OP
     }
 
-    private static final Predicate<CaseData> defendant2ExtensionOnly = caseData ->
-        caseData.getRespondent1TimeExtensionDate() == null && caseData.getRespondent2TimeExtensionDate() != null;
+    public static final Predicate<CaseData> defendant1ExtensionExists = caseData ->
+        caseData.getRespondent1TimeExtensionDate() != null;
 
-    private static final Predicate<CaseData> defendant2ExtensionAfterDefendant1 = caseData ->
-        caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2TimeExtensionDate()
-            .isAfter(caseData.getRespondent1TimeExtensionDate());
-
-    public static final Predicate<CaseData> defendant2Extension = caseData ->
-        (defendant2ExtensionOnly.or(defendant2ExtensionAfterDefendant1)).test(caseData);
+    public static final Predicate<CaseData> defendant2ExtensionExists = caseData ->
+        caseData.getRespondent2TimeExtensionDate() != null;
 }
