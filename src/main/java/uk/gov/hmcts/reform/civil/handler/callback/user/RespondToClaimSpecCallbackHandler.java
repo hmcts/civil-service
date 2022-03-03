@@ -222,6 +222,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .respondent2Copy(caseData.getRespondent2())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
