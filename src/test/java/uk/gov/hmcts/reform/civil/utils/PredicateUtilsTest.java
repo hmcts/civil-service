@@ -9,30 +9,30 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2Extension;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 
 public class PredicateUtilsTest {
 
     @Nested
-    class Defendant2Extension {
+    class DefendantExtension {
 
         @Test
-        void shouldReturnTrue_whenDefendant2ExtensionOnly() {
+        void shouldReturnTrue_whenDefendant1ExtensionExists() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .respondent2TimeExtensionDate(LocalDateTime.now())
+                .respondent1TimeExtensionDate(LocalDateTime.now())
                 .build();
-            assertTrue(defendant2Extension.test(caseData));
+            assertTrue(defendant1ExtensionExists.test(caseData));
         }
 
         @Test
-        void shouldReturnTrue_whenDefendant2ExtensionAfterDefendant1() {
+        void shouldReturnTrue_whenDefendant2ExtensionExists() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .respondent1TimeExtensionDate(LocalDateTime.now().minusSeconds(1))
                 .respondent2TimeExtensionDate(LocalDateTime.now())
                 .build();
-            assertTrue(defendant2Extension.test(caseData));
+            assertTrue(defendant2ExtensionExists.test(caseData));
         }
 
         @Test
@@ -40,7 +40,7 @@ public class PredicateUtilsTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotifiedTimeExtension()
                 .build();
-            assertFalse(defendant2Extension.test(caseData));
+            assertFalse(defendant2ExtensionExists.test(caseData));
         }
 
         @Test
@@ -48,27 +48,7 @@ public class PredicateUtilsTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateAddLitigationFriend_1v2_SameSolicitor()
                 .build();
-            assertFalse(defendant2Extension.test(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenOnlyDefendant1Extension() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .respondent1TimeExtensionDate(LocalDateTime.now())
-                .build();
-            assertFalse(defendant2Extension.test(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenDefendant2ExtensionNotAfterDefendant1() {
-            var extensionDate = LocalDateTime.now();
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .respondent1TimeExtensionDate(extensionDate)
-                .respondent2TimeExtensionDate(extensionDate)
-                .build();
-            assertFalse(defendant2Extension.test(caseData));
+            assertFalse(defendant2ExtensionExists.test(caseData));
         }
     }
 }
