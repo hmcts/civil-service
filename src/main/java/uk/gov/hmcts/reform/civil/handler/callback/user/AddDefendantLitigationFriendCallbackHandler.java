@@ -176,5 +176,4 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             RESPONDENTSOLICITORTWO
         );
     }
-
 }

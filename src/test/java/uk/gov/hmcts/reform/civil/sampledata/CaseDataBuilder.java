@@ -303,6 +303,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
+        this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2EmailAddress(String respondentSolicitor2EmailAddress) {
+        this.respondentSolicitor2EmailAddress = respondentSolicitor2EmailAddress;
+        return this;
+    }
+
     public CaseDataBuilder isRespondent1(YesOrNo isRespondent1) {
         this.isRespondent1 = isRespondent1;
         return this;
