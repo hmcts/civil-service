@@ -46,10 +46,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -70,7 +71,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class CreateClaimSpecCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
-    private static final List<CaseEvent> EVENTS = Arrays.asList(
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(
         CaseEvent.CREATE_CLAIM_SPEC
     );
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
@@ -123,8 +124,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
-            .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
-            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
+            .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
@@ -137,8 +138,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .put(callbackKey(MID, "respondentSolicitor1"), this::validateRespondentSolicitorAddress)
+            .put(callbackKey(MID, "respondentSolicitor2"), this::validateRespondentSolicitor2Address)
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
             .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
@@ -167,29 +170,29 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse validateClaimantDetails(CallbackParams callbackParams) {
+    private CallbackResponse validateClaimant1Details(CallbackParams callbackParams) {
+        return validateClaimantDetails(callbackParams, CaseData::getApplicant1);
+    }
+
+    private CallbackResponse validateClaimant2Details(CallbackParams callbackParams) {
+        return validateClaimantDetails(callbackParams, CaseData::getApplicant2);
+    }
+
+    private CallbackResponse validateClaimantDetails(CallbackParams callbackParams,
+                                                     Function<CaseData, Party> getApplicant) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        Party applicant = caseData.getApplicant1();
+        Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getApplicant1().getPrimaryAddress().getPostCode());
+                applicant.getPrimaryAddress().getPostCode());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.size() == 0
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
-            .build();
-    }
-
-    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
-        Party applicant = callbackParams.getCaseData().getApplicant2();
-        List<String> errors = dateOfBirthValidator.validate(applicant);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
             .build();
     }
 
@@ -217,7 +220,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = new ArrayList<String>();
+            List<String> errors = new ArrayList<>();
             if (caseData.getInterestFromSpecificDate() != null) {
                 if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
                     errors.add("Correct the date. You can’t use a future date.");
@@ -234,7 +237,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
             timelineOfEvent.forEach(timelineOfEvents -> {
@@ -427,21 +430,31 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ) + exitSurveyContentService.applicantSurvey();
     }
 
+    private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
+        CaseData caseData = params.getCaseData();
+        return validatePostCode(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
+    }
+
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent1);
+    }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-
+    private CallbackResponse validateRespondent2Address(CallbackParams callbackParams) {
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent2);
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+        return validatePostCode(caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+    }
+
+    private CallbackResponse validateRespondentSolicitor2Address(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return validatePostCode(caseData.getRespondentSolicitor2OrganisationDetails().getAddress().getPostCode());
+    }
+
+    private CallbackResponse validatePostCode(String postCode) {
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -451,12 +464,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            return validatePostCode(caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
@@ -466,12 +474,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            return validatePostCode(caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
@@ -482,28 +485,27 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        var ref = new Object() {
-            BigDecimal totalClaimAmount = new BigDecimal(0);
-        };
+
+        BigDecimal totalClaimAmount = new BigDecimal(0);
+
         List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
         String totalAmount = " | Description | Amount | \n |---|---| \n | ";
         StringBuilder stringBuilder = new StringBuilder();
-        claimAmountBreakups.stream().forEach(
-            claimAmountBreakup -> {
-                ref.totalClaimAmount =
-                    ref.totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
+        for (ClaimAmountBreakup claimAmountBreakup : claimAmountBreakups) {
+            totalClaimAmount =
+                totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
-                stringBuilder.append(claimAmountBreakup.getValue().getClaimReason() + " | ");
-                stringBuilder.append("£ "
-                                         + MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue()
-                                                                                   .getClaimAmount()) + " |\n ");
-            }
-        );
+            stringBuilder.append(claimAmountBreakup.getValue().getClaimReason())
+                .append(" | ")
+                .append("£ ")
+                .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
+                .append(" |\n ");
+        }
         totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(ref.totalClaimAmount).doubleValue() > 25000) {
+        if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
             errors.add("Total Claim Amount cannot exceed £ 25,000");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -512,10 +514,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
-            MonetaryConversions.penniesToPounds(ref.totalClaimAmount));
+            MonetaryConversions.penniesToPounds(totalClaimAmount));
 
         totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
-            .penniesToPounds(ref.totalClaimAmount) + " | ");
+            .penniesToPounds(totalClaimAmount) + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 
@@ -635,8 +637,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         // only default this to NO if respondent 1 isn't represented
         if (callbackParams.getCaseData().getSpecRespondent1Represented().equals(NO)) {
-            //TODO refactor needed as part of CIV-761
-            //caseDataBuilder.respondent2SameLegalRepresentative(NO);
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
