@@ -79,7 +79,6 @@ public class RoboticsNotificationService {
 
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                roboticsCaseData.toJsonString().getBytes();
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             } else {
