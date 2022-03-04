@@ -16,8 +16,10 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,11 +47,14 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
     private final Experts experts;
     private final Witnesses witnesses;
+    private final Integer witnessesIncludingDefendants;
     private final Hearing hearing;
     private final String hearingSupport;
     private final FurtherInformation furtherInformation;
     private final WelshLanguageRequirements welshLanguageRequirements;
     private final StatementOfTruth statementOfTruth;
     private final AllocatedTrack allocatedTrack;
+    private final DisclosureReport disclosureReport;
+    private final RequestedCourt requestedCourt;
 
 }
