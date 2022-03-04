@@ -86,4 +86,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String sdoOrdered;
 }
