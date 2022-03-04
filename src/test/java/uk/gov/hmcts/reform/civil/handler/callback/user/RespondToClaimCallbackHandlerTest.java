@@ -869,6 +869,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetDefendantResponseDocuments() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -890,14 +891,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("createdBy=Defendant")
                 .contains("documentName=defendant1-defence.pdf")
                 .contains("documentSize=0")
-                .contains("createdDatetime")
+                .contains("createdDatetime=2022-02-18T12:10:55")
                 .contains("documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
                 .contains("documentType=DEFENDANT_DEFENCE")
                 .contains("documentName=defendant2-defence.pdf")
                 .contains("documentName=defendant1-directions.pdf")
                 .contains("documentName=defendant2-directions.pdf")
                 .contains("createdBy=Defendant 2")
-                .contains("createdDatetime")
                 .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
         }
 
