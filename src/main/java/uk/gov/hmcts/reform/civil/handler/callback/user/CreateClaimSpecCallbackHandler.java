@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -62,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -124,7 +124,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimantDetails)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -140,19 +140,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .put(callbackKey(MID, "respondentSolicitor1"), this::validateRespondentSolicitorAddress)
+            .put(callbackKey(MID, "respondentSolicitor2"), this::validateRespondentSolicitor2Address)
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
             .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
             .put(callbackKey(MID, "ValidateClaimTimelineDate"), this::specValidateClaimTimelineDate)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+            .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(
                 callbackKey(MID, "specRespondentCorrespondenceAddress"),
                 this::validateCorrespondenceRespondentAddress
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
+            .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .build();
     }
 
@@ -177,11 +181,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = caseData.getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
-        caseDataBuilder.superClaimType(UNSPEC_CLAIM);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getApplicant1().getPrimaryAddress().getPostCode());
-            caseDataBuilder.superClaimType(SPEC_CLAIM);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -434,21 +436,31 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ) + exitSurveyContentService.applicantSurvey();
     }
 
+    private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
+        CaseData caseData = params.getCaseData();
+        return validatePostCode(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
+    }
+
     private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondent1().getPrimaryAddress().getPostCode());
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent1);
+    }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-
+    private CallbackResponse validateRespondent2Address(CallbackParams callbackParams) {
+        return validateRespondentAddress(callbackParams, CaseData::getRespondent2);
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-            caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+        return validatePostCode(caseData.getRespondentSolicitor1OrganisationDetails().getAddress().getPostCode());
+    }
+
+    private CallbackResponse validateRespondentSolicitor2Address(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return validatePostCode(caseData.getRespondentSolicitor2OrganisationDetails().getAddress().getPostCode());
+    }
+
+    private CallbackResponse validatePostCode(String postCode) {
+        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -458,12 +470,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            return validatePostCode(caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
@@ -473,12 +480,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            return validatePostCode(caseData.getSpecApplicantCorrespondenceAddressdetails().getPostCode());
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
@@ -617,6 +619,36 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.superClaimType(SPEC_CLAIM);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        // only default this to NO if respondent 1 isn't represented
+        if (callbackParams.getCaseData().getSpecRespondent1Represented().equals(NO)) {
+            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
