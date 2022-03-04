@@ -313,7 +313,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
 
