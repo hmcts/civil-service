@@ -711,7 +711,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenBothDefendantsRespondedWithFullAdmission() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                        .atStateFullAdmission_1v2_BothRespondentSolicitorsSubmitFullAdmissionResponse()
                         .build();
 
                     assertTrue(fullAdmission.test(caseData));

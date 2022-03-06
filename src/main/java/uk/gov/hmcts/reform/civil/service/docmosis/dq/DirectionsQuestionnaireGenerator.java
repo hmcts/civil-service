@@ -98,25 +98,29 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
+        DocmosisTemplates templateId = N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if(!isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)) {
-                    return N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
+                if(isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
+                    templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
+                break;
                 //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
-                if(!isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)) {
-                    return N181_MULTIPARTY_SAME_SOL;
+                if(!isClaimantResponse(caseData)
+                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
+                    templateId = N181_MULTIPARTY_SAME_SOL;
                 }
-                //FALL-THROUGH
+                break;
             case TWO_V_ONE:
-                if(!isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)) {
-                    return N181_2V1;
+                if(!isClaimantResponse(caseData)
+                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
+                    templateId = N181_2V1;
                 }
-                //FALL-THROUGH
+                break;
             default:
-                return N181;
         }
+        return templateId;
     }
 
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
@@ -339,35 +343,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                               .orElse(null));
     }
 
-    private boolean isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(CaseData caseData) {
-        if (!isClaimantResponse(caseData)) {
-            return false;
-        }
-
-        switch (getMultiPartyScenario(caseData)) {
-            case TWO_V_ONE:
-                // XOR: If they are the opposite of each other - Divergent response
-                if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    ^ YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
-                    return true;
-                }
-                // FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                // XOR: If they are the opposite of each other - Divergent response
-                if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {
-                    return true;
-                }
-                // FALL-THROUGH
-            default: {
-                return false;
-            }
-        }
+    private boolean isClaimantMultipartyProceed(CaseData caseData) {
+        return (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) // 2v1 scenario
+            || (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()) // 1v2 scenario
+                    && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()));
     }
 
     private boolean onlyApplicant2IsProceeding(CaseData caseData) {
-        return isMultipartyClaimantResponseAndProceedingWithOnlyOneClaim(caseData)
+        return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
@@ -454,12 +438,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        var respondent = caseData.getRespondent1();
-        var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
-
         if (isClaimantResponse(caseData)) {
-            //(YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-           // || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))) {
 
             List<Party> respondents = new ArrayList<>();
             if (isProceedingAgainstRespondent1(caseData)) {
@@ -506,14 +485,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                         .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                         .representative(representativeService.getRespondent2Representative(caseData))
                         .litigationFriendName(
-                            ofNullable(caseData.getRespondent1LitigationFriend())
+                            ofNullable(caseData.getRespondent2LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
                         .build()
                 );
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if ("ONE".equals(defendantIdentifier)) {
-                    // TODO remove the variable use as class variable and add specific test to check below party
+                    // TODO add specific test to check below party
                     return List.of(Party.builder()
                                        .name(caseData.getRespondent1().getPartyName())
                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
@@ -529,25 +508,27 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                                        .representative(representativeService.getRespondent1Representative(caseData))
                                        .litigationFriendName(
-                                           ofNullable(caseData.getRespondent1LitigationFriend())
+                                           ofNullable(caseData.getRespondent2LitigationFriend())
                                                .map(LitigationFriend::getFullName)
                                                .orElse(""))
                                        .build());
                 }
             }
         }
-
+        var respondent = caseData.getRespondent1();
+        var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
         if (isRespondent2(caseData)) {
             respondent = caseData.getRespondent2();
             respondentRepresentative = representativeService.getRespondent2Representative(caseData);
+            litigationFriend = caseData.getRespondent2LitigationFriend();
         }
-
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(respondentRepresentative)
                            .litigationFriendName(
-                               ofNullable(caseData.getRespondent1LitigationFriend())
+                               ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
                            .build());

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -264,11 +265,13 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
+            void whenCaseStateIsFullDefence1v1ApplicantProceeds_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build()
                     .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .build();
@@ -277,6 +280,79 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes1_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes2Only_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent2Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence2v1Applicant1Proceeds_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence2v1Applicant2Proceeds_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant2DQ(), caseData);
             }
 
             @Test
@@ -669,7 +745,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
@@ -963,9 +1043,11 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicantsProceedIntention(YesOrNo.YES)
-                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
                 .build();
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -987,9 +1069,13 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
                 .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.YES)
+                .applicant2ResponseDate(LocalDateTime.now())
+                .applicant2DQ()
                 .build();
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -1011,6 +1097,8 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
@@ -1035,6 +1123,8 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
@@ -1050,8 +1140,9 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstBothDefendant() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
-                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
+                                                                   eq(N181_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N181_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
@@ -1059,6 +1150,8 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
@@ -1069,7 +1162,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                eq(N181_MULTIPARTY_SAME_SOL));
         }
     }
 
