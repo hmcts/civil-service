@@ -369,6 +369,7 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
+  testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.4'
   testCompile 'com.github.hmcts:fortify-client:1.2.2'
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
