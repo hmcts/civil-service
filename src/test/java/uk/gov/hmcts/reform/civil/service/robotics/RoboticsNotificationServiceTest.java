@@ -77,6 +77,8 @@ class RoboticsNotificationServiceTest {
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
+    @Autowired
+    RoboticsDataMapper roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
@@ -152,6 +154,7 @@ class RoboticsNotificationServiceTest {
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
         String message = format(
             "Multiparty claim data for %s",
             reference + " - " + caseData.getCcdState()
@@ -161,7 +164,11 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
     }
 
     @Test
