@@ -35,6 +35,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -199,7 +201,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_whenDateNotInPastAndEligible() {
-            //eligible date is 30 days in future.
+            //eligible date is 31 days in the future
             var testDate = LocalDate.now().plusDays(31);
             String due = "1000"; //in pounds
             String suggest = "10000"; // 100 pound in pennies
@@ -217,9 +219,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenDateInPastAndNotEligible() {
-            //eligible date is 30 days in future
+            //eligible date is 31 days in the future, but as text says "after", we set text to one day previous i.e.
+            //If 7th is the eligible date, text will say "after the 6th".
             LocalDate eligibleDate = LocalDate.now().plusDays(30);
-            var testDate = LocalDate.now().plusDays(29);
+            var testDate = LocalDate.now().plusDays(25);
             String due = "1000"; //in pounds
             String suggest = "10000"; // 100 pound in pennies
 
@@ -231,7 +234,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + eligibleDate);
+            assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }
 
         @Nested
