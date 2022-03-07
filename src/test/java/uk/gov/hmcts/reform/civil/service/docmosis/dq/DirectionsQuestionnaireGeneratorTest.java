@@ -159,7 +159,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .atStateApplicantRespondToDefenceAndProceed().build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
@@ -298,24 +301,6 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
-            }
-
-            @Test
-            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes2Only_shouldGetRespondentDQData() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
-                    .build()
-                    .toBuilder()
-                    .businessProcess(BusinessProcess.builder()
-                                         .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .build();
-
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-
-                verify(representativeService).getRespondent2Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
             }
 
@@ -768,7 +753,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .build();
@@ -782,7 +767,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -798,6 +783,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -865,6 +851,24 @@ class DirectionsQuestionnaireGeneratorTest {
                     eq(N181));
             }
 
+            @Test
+            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes2Only_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent2Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
             private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq,
                                                       CaseData caseData) {
                 Assertions.assertAll(
@@ -907,7 +911,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .name(respondent.getPartyName())
                                    .primaryAddress(respondent.getPrimaryAddress())
                                    .representative(defendant2Representative)
-                                   .litigationFriendName("respondent LF")
+                                   .litigationFriendName("respondent 2 LF")
                                    .build());
             }
 
@@ -924,7 +928,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .name(respondent2.getPartyName())
                                    .primaryAddress(respondent2.getPrimaryAddress())
                                    .representative(defendant2Representative)
-                                   .litigationFriendName("respondent LF")
+                                   .litigationFriendName("respondent 2 LF")
                                    .build());
             }
 
