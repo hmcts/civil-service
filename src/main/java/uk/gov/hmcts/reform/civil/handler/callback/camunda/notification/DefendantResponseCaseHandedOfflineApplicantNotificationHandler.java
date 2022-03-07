@@ -17,7 +17,11 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +30,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
 
-    public static final String TASK_ID = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
+    public static final String TASK_ID_APPLICANT1 = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -41,7 +45,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return TASK_ID_APPLICANT1;
     }
 
     @Override
@@ -51,23 +55,58 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private CallbackResponse notifyApplicantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        String templateID = is1v1Or2v1Case(caseData)
+            ? notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()
+            //1v2 template expects different data
+            : notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+
+        sendNotificationToSolicitor(caseData, recipient, templateID);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private boolean is1v1Or2v1Case(CaseData caseData) {
+        return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
+    }
+
+    private void sendNotificationToSolicitor(CaseData caseData, String recipient, String templateID) {
+        notificationService.sendMail(
+            recipient,
+            templateID,
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
+            );
+        } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    .concat(" against " + caseData.getApplicant1().getPartyName())
+                    .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
+                    .concat(" against " + caseData.getApplicant2().getPartyName()),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
+            );
+        } else {
+            //1v2 template is used and expects different data
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
+            );
+        }
     }
 }
