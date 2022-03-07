@@ -126,8 +126,4 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         );
     }
 
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC.name());
-    }
 }

@@ -141,9 +141,4 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
-
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
-    }
 }
