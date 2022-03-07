@@ -857,6 +857,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                     .build()
                     .toBuilder()
+                    .respondent2(PartyBuilder.builder().company().build())
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())

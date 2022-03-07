@@ -1039,7 +1039,6 @@ public class CaseDataBuilder {
             .build();
         applicant1 = PartyBuilder.builder().individual().build();
         respondent1 = PartyBuilder.builder().soleTrader().build();
-        respondent2 = PartyBuilder.builder().company().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
