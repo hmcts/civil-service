@@ -13,11 +13,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -65,12 +70,22 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler impleme
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .build();
+        if (caseData.getRespondent1SpecDefenceResponseDocument() == null) {
+            Optional<CaseDocument> dqForm = ElementUtils.unwrapElements(
+                    caseData.getSystemGeneratedCaseDocuments())
+                .stream().filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+                .findFirst();
+            if (dqForm.isPresent()) {
+                caseData = caseData.toBuilder()
+                    .respondent1SpecDefenceResponseDocument(new ResponseDocument(
+                        dqForm.get().getDocumentLink()
+                    ))
+                    .build();
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
