@@ -442,7 +442,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssembleClaimantResponseDocuments() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .claimantDefenceResDocToDefendant1(ResponseDocument.builder()
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
                         .file(DocumentBuilder.builder().documentName("claimant-response-def1.pdf").build())
                         .build())
                 .claimantDefenceResDocToDefendant2(ResponseDocument.builder()

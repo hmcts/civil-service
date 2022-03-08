@@ -251,7 +251,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
-        Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant1())
+        Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
                 buildElemCaseDocument(claimDocument, "Claimant",
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE

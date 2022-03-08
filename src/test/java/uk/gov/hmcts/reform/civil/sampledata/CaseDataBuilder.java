@@ -2123,7 +2123,7 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
             .applicant1ProceedWithClaimMultiParty2v1(applicant1ProceedWithClaimMultiParty2v1)
             .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
-            .claimantDefenceResDocToDefendant1(applicant1DefenceResponseDocument)
+            .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
 
             //Case procceds in Caseman
