@@ -869,6 +869,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetDefendantResponseDocuments() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -890,14 +891,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("createdBy=Defendant")
                 .contains("documentName=defendant1-defence.pdf")
                 .contains("documentSize=0")
-                .contains("createdDatetime")
+                .contains("createdDatetime=2022-02-18T12:10:55")
                 .contains("documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
                 .contains("documentType=DEFENDANT_DEFENCE")
                 .contains("documentName=defendant2-defence.pdf")
                 .contains("documentName=defendant1-directions.pdf")
                 .contains("documentName=defendant2-directions.pdf")
                 .contains("createdBy=Defendant 2")
-                .contains("createdDatetime")
                 .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
         }
 
@@ -964,25 +964,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
-        }
-
-        @Test
-        void shouldSetApplicantResponseDeadlineAndBusinessProcess_when1ResponseAndNotMultiparty() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
         @Test
@@ -1171,6 +1152,26 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
                 .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_when1v2SameSolicitorsAndRespondent2IsFullDefence() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence()
+                .multiPartyClaimOneDefendantSolicitor()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

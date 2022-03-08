@@ -27,10 +27,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cr
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_SECOND_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     CreateClaimRespondentNotificationHandler.class,
@@ -93,7 +95,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
-                "claimNotificationDeadline", formatLocalDate(NOTIFICATION_DEADLINE.toLocalDate(), DATE)
+                "claimNotificationDeadline", formatLocalDate(NOTIFICATION_DEADLINE.toLocalDate(), DATE),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
 
