@@ -14,6 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,7 +23,8 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -96,13 +99,14 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class ValidateUnavailableDates {
 
         @Test
-        void shouldCheckDates_whenPresent() {
+        void shouldCheckDates_whenFastClaim() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .build().toBuilder()
                 .ccdState(AWAITING_APPLICANT_INTENTION)
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                 .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearing(Hearing.builder()
-                                                           .build())
+                                  .applicant1DQHearingLRspec(HearingLRspec.builder()
+                                                                 .build())
                                   .build())
                 .build();
 
@@ -110,12 +114,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .pageId("validate-unavailable-dates")
                 .build();
 
-            Mockito.when(unavailableDateValidator.validate(caseData.getApplicant1DQ().getHearing()))
+            Mockito.when(unavailableDateValidator.validateFastClaimHearing(
+                    caseData.getApplicant1DQ().getApplicant1DQHearingLRspec()))
                 .thenReturn(Collections.emptyList());
 
             handler.handle(params);
 
-            Mockito.verify(unavailableDateValidator).validate(caseData.getApplicant1DQ().getHearing());
+            Mockito.verify(unavailableDateValidator).validateFastClaimHearing(
+                caseData.getApplicant1DQ().getApplicant1DQHearingLRspec());
+        }
+
+        @Test
+        void shouldCheckDates_whenSmallClaim() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .build().toBuilder()
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQSmallClaimHearing(SmallClaimHearing.builder()
+                                                                 .build())
+                                  .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(MID, caseData)
+                .pageId("validate-unavailable-dates")
+                .build();
+
+            Mockito.when(unavailableDateValidator.validateSmallClaimsHearing(
+                    caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing()))
+                .thenReturn(Collections.emptyList());
+
+            handler.handle(params);
+
+            Mockito.verify(unavailableDateValidator).validateSmallClaimsHearing(
+                caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing());
         }
     }
 }

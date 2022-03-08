@@ -5,11 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -48,9 +50,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Hearing hearing = caseData.getApplicant1DQ().getHearing();
 
-        List<String> errors = unavailableDateValidator.validate(hearing);
+        List<String> errors;
+        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            SmallClaimHearing smallClaimHearing = caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing();
+            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+        } else {
+            HearingLRspec hearingLRspec = caseData.getApplicant1DQ().getApplicant1DQHearingLRspec();
+            errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
