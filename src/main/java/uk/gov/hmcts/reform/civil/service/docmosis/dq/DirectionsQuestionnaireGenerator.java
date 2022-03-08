@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Case;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -44,8 +43,8 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -101,19 +100,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisTemplates templateId = N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if(isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
+                if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
                 //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
-                if(!isClaimantResponse(caseData)
+                if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = N181_MULTIPARTY_SAME_SOL;
                 }
                 break;
             case TWO_V_ONE:
-                if(!isClaimantResponse(caseData)
+                if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = N181_2V1;
                 }
@@ -387,6 +386,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
+            .respondent2SubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())

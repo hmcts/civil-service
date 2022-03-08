@@ -49,7 +49,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-
         if (respondent2HasSameLegalRep(caseData) && NO == caseData.getRespondentResponseIsSame()) {
             if (isDefendant1DQResponse(caseData)) {
                 generateAndSet1V2SameSolDivergentResponsesDQ(callbackParams, caseData, caseDataBuilder, "ONE");

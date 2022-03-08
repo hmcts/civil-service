@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+
 @Setter
 @Data
 @Builder(toBuilder = true)
