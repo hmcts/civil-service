@@ -95,7 +95,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
-                "claimDetailsNotificationDeadline", formatLocalDate(NOTIFICATION_DEADLINE.toLocalDate(), DATE),
+                "claimNotificationDeadline", formatLocalDate(NOTIFICATION_DEADLINE.toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
