@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
 
@@ -79,4 +82,37 @@ public class PartyUtils {
             + " "
             + party.getIndividualLastName();
     }
+
+    public static String buildPartiesReferences(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean hasRespondent2Reference = defendantSolicitor2Reference.test(caseData);
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresent(ref -> {
+                stringBuilder.append("Claimant reference: ");
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            });
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+            .ifPresent(ref -> {
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append("\n");
+                }
+                stringBuilder.append(hasRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
+                stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
+            });
+
+        if (hasRespondent2Reference) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("Defendant 2 reference: ");
+            stringBuilder.append(caseData.getRespondentSolicitor2Reference());
+        }
+        return stringBuilder.toString();
+    }
+
+    private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
+        .getRespondentSolicitor2Reference() != null;
 }

@@ -39,7 +39,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate submittedOn;
-    private final LocalDate respondent2SubmittedOn;
     private final Party applicant;
     private final Party applicant2;
     private final List<Party> respondents;
