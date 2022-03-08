@@ -314,6 +314,7 @@ public class CaseData implements MappableObject {
     private final String repaymentSuggestion;
     private final String currentDatebox;
     private final LocalDate repaymentDate;
+    private final List<Element<CaseDocument>> defaultJudgmentDocuments;
 
 
 }

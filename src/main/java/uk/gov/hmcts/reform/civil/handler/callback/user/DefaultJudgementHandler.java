@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,31 +26,27 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
-    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
-        + "%n%n * The time for responding to the claim has expired. "
-        + "%n%n * The Defendant has not responded to the claim."
-        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."
-        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-        + "%n%n You can make another default judgment request when you know all these statements have been met.";
-    public static final String HEADER = "# You cannot request default judgment";
+    public static final String CPR_REQUIRED_INFO = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
+        + "%n%nJudgment has been entered and your case will be referred to a judge for directions.";
+    public static final String HEADER = "# Judgment for damages to be decided Granted";
     public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
     public static final String TRIAL_TEXT = "will be trial hearing provided text";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
+    private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -58,7 +56,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
             callbackKey(MID, "hearingTypeSelection"), this::populateText,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -69,10 +67,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format(HEADER))
-            .confirmationBody(format(CPR_REQUIRED_INFO))
+            .confirmationBody(format(CPR_REQUIRED_INFO, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            )))
+
             .build();
     }
 
@@ -173,4 +176,24 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .build();
     }
 
-}
+
+
+    private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generate(
+            callbackParams.getCaseData(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
+        if (caseDocuments.size() > 1)
+            systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
+        caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    }
