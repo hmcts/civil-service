@@ -564,7 +564,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenApplicantsIsProceedingWithClaimAgainstBothDefendants() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                     .multiPartyClaimOneDefendantSolicitor()
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -607,7 +607,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaimAgainstFirstDefendantOnly() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                     .multiPartyClaimOneDefendantSolicitor()
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                     .build();
@@ -629,7 +629,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaimAgainstSecondDefendantOnly() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_1v2()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                     .multiPartyClaimOneDefendantSolicitor()
                     .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                     .build();
@@ -654,7 +654,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenBothApplicantsAreProceedingWithClaim() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .multiPartyClaimTwoApplicants()
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -697,7 +697,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenOnlyFirstApplicantIsProceedingWithClaim() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .multiPartyClaimTwoApplicants()
                     .applicant1ProceedWithClaimMultiParty2v1(YES)
                     .applicant2ProceedWithClaimMultiParty2v1(NO)
@@ -720,7 +720,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedResponse_whenOnlySecondApplicantIsProceedingWithClaim() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed_2v1()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .multiPartyClaimTwoApplicants()
                     .applicant1ProceedWithClaimMultiParty2v1(NO)
                     .build();

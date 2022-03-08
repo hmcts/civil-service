@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CREATOR;
 
@@ -27,6 +28,13 @@ public class CoreCaseUserService {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
+
+    public List<String> getUserCaseRoles(String caseId, String userId) {
+        return caseAccessDataStoreApi.getUserRoles(getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
+            .getCaseAssignedUserRoles().stream()
+            .filter(c -> c.getUserId().equals(userId)).distinct()
+            .map(c -> c.getCaseRole()).collect(Collectors.toList());
+    }
 
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
@@ -50,15 +58,8 @@ public class CoreCaseUserService {
     }
 
     public boolean userHasCaseRole(String caseId, String userId, CaseRole caseRole) {
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(),
-            authTokenGenerator.generate(),
-            List.of(caseId)
-        );
-
-        return userRoles.getCaseAssignedUserRoles().stream()
-            .filter(c -> c.getUserId().equals(userId))
-            .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
+        return getUserCaseRoles(caseId, userId).stream()
+            .anyMatch(c -> c.equals(caseRole.getFormattedName()));
     }
 
     private String getCaaAccessToken() {
