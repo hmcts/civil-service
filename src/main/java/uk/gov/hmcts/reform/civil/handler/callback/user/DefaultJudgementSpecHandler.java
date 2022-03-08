@@ -32,9 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -283,14 +281,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (regularRepaymentAmountPounds.compareTo(repayment) > 0) {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
-        //convert eligible date from localdatetime to datetime and compare to user provided repayment date
-        //return error if repayment date is before calculated eligible date
-        LocalDate eligibleDate = LocalDateTime.now().plusDays(30).toLocalDate();
 
-        if (caseData.getRepaymentDate().isBefore(eligibleDate)) {
-            errors.add("Selected date must be after " + eligibleDate);
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        if (caseData.getRepaymentDate().isBefore(eligibleDate.plusDays(1))) {
+            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
