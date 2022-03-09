@@ -81,11 +81,10 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             CaseRole.APPLICANTSOLICITORONE
         );
 
-        verify(coreCaseUserService).removeCaseRoleAssignment(
+        verify(coreCaseUserService).removeCreatorRoleCaseAssignment(
             caseData.getCcdCaseReference().toString(),
             caseData.getApplicantSolicitor1UserDetails().getId(),
-            "OrgId1",
-            CaseRole.CREATOR
+            "OrgId1"
         );
     }
 

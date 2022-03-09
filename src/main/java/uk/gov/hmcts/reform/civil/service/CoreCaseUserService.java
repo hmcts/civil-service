@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.CREATOR;
+
 @Service
 @RequiredArgsConstructor
 public class CoreCaseUserService {
@@ -44,14 +46,14 @@ public class CoreCaseUserService {
         }
     }
 
-    public void removeCaseRoleAssignment(String caseId, String userId, String organisationId, CaseRole caseRole) {
+    public void removeCreatorRoleCaseAssignment(String caseId, String userId, String organisationId) {
 
         String caaAccessToken = getCaaAccessToken();
 
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
-            removeAccess(caseId, userId, organisationId, caaAccessToken, caseRole);
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CREATOR)) {
+            removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
         } else {
-            log.info("User doesn't have {} role", caseRole.getFormattedName());
+            log.info("User doesn't have {} role", CREATOR.getFormattedName());
         }
     }
 
@@ -86,13 +88,12 @@ public class CoreCaseUserService {
         );
     }
 
-    private void removeAccess(
-        String caseId, String userId, String organisationId, String caaAccessToken, CaseRole caseRole) {
+    private void removeCreatorAccess(String caseId, String userId, String organisationId, String caaAccessToken) {
         CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
             = CaseAssignedUserRoleWithOrganisation.builder()
             .caseDataId(caseId)
             .userId(userId)
-            .caseRole(caseRole.getFormattedName())
+            .caseRole(CREATOR.getFormattedName())
             .organisationId(organisationId)
             .build();
 

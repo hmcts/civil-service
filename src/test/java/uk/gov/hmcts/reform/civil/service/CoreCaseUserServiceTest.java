@@ -131,7 +131,7 @@ class CoreCaseUserServiceTest {
                 .thenReturn(CaseAssignedUserRolesResource.builder().caseAssignedUserRoles(List.of(caseAssignedUserRole))
                                 .build());
 
-            service.removeCaseRoleAssignment(CASE_ID, USER_ID, ORG_ID, CaseRole.CREATOR);
+            service.removeCreatorRoleCaseAssignment(CASE_ID, USER_ID, ORG_ID);
 
             verify(caseAccessDataStoreApi).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
@@ -151,7 +151,7 @@ class CoreCaseUserServiceTest {
                 .thenReturn(CaseAssignedUserRolesResource.builder().caseAssignedUserRoles(List.of(caseAssignedUserRole))
                                 .build());
 
-            service.removeCaseRoleAssignment(CASE_ID, USER_ID, ORG_ID, CaseRole.CREATOR);
+            service.removeCreatorRoleCaseAssignment(CASE_ID, USER_ID, ORG_ID);
 
             verify(caseAccessDataStoreApi, never()).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,

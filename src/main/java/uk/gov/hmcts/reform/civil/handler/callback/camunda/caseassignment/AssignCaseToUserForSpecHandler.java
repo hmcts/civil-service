@@ -57,7 +57,7 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         String organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
-        coreCaseUserService.removeCaseRoleAssignment(caseId, submitterId, organisationId, CaseRole.CREATOR);
+        coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
 
         CaseData updated = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
