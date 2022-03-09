@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -225,7 +226,8 @@ public class RoboticsDataMapper {
                 caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
                 APPLICANT_ID,
-                APPLICANT_SOLICITOR_ID
+                APPLICANT_SOLICITOR_ID,
+                caseData.getClaimDetailsNotificationDate()
             ),
             buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -233,7 +235,8 @@ public class RoboticsDataMapper {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                respondent1SolicitorId
+                respondent1SolicitorId,
+                caseData.getClaimDetailsNotificationDate()
             )
         ));
 
@@ -244,7 +247,8 @@ public class RoboticsDataMapper {
                 caseData.getApplicant2OrganisationPolicy(),
                 "Claimant",
                 APPLICANT2_ID,
-                APPLICANT_SOLICITOR_ID
+                APPLICANT_SOLICITOR_ID,
+                caseData.getClaimDetailsNotificationDate()
             ));
         }
 
@@ -263,7 +267,8 @@ public class RoboticsDataMapper {
                 caseData.getRespondent2OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT2_ID,
-                respondent2SolicitorId
+                respondent2SolicitorId,
+                caseData.getClaimDetailsNotificationDate()
             ));
         }
         return respondentParties;
@@ -275,7 +280,8 @@ public class RoboticsDataMapper {
         OrganisationPolicy organisationPolicy,
         String type,
         String id,
-        String solicitorId
+        String solicitorId,
+        LocalDateTime claimDetailsNotificationDate
     ) {
         return LitigiousParty.builder()
             .id(id)
@@ -284,6 +290,10 @@ public class RoboticsDataMapper {
             .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
             .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
             .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
+            .dateOfService(ofNullable(claimDetailsNotificationDate)
+                               .map(LocalDateTime::toLocalDate)
+                               .map(d -> d.format(ISO_DATE))
+                               .orElse(null))
             .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
             .build();
     }

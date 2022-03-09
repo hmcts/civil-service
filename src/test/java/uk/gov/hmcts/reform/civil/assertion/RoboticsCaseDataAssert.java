@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.assertion;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -13,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
+
+import java.time.LocalDateTime;
 
 import java.util.Optional;
 
@@ -43,15 +46,37 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             "Claimant",
             actual.getLitigiousParties().get(0),
             expected.getApplicant1(),
-            expected.getApplicant1LitigationFriend()
+            expected.getApplicant1LitigationFriend(),
+            expected.getClaimDetailsNotificationDate()
         );
         assertParty(
             "respondent1",
             "Defendant",
             actual.getLitigiousParties().get(1),
             expected.getRespondent1(),
-            expected.getRespondent1LitigationFriend()
+            expected.getRespondent1LitigationFriend(),
+            expected.getClaimDetailsNotificationDate()
         );
+        if (MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(expected)
+            || MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(expected)) {
+            assertParty(
+                "respondent1",
+                "Defendant",
+                actual.getLitigiousParties().get(2),
+                expected.getRespondent2(),
+                expected.getRespondent2LitigationFriend(),
+                expected.getClaimDetailsNotificationDate()
+            );
+        } else if (MultiPartyScenario.TWO_V_ONE == MultiPartyScenario.getMultiPartyScenario(expected)) {
+            assertParty(
+                "applicant1",
+                "Claimant",
+                actual.getLitigiousParties().get(2),
+                expected.getApplicant2(),
+                expected.getApplicant2LitigationFriend(),
+                expected.getClaimDetailsNotificationDate()
+            );
+        }
 
         assertSolicitor(
             APPLICANT_SOLICITOR_ID,
@@ -199,7 +224,8 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
                              String litigiousPartyType,
                              LitigiousParty litigiousParty,
                              Party party,
-                             LitigationFriend litigationFriend
+                             LitigationFriend litigationFriend,
+                             LocalDateTime claimDetailsNotificationDate
     ) {
         if (party == null && litigiousParty != null) {
             failExpectedPresent(fieldName, litigiousParty);
@@ -211,22 +237,28 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
             return;
         }
 
-        if (litigiousParty != null) {
-            compare(
-                "name",
-                litigiousParty.getName(),
-                ofNullable(PartyUtils.getLitigiousPartyName(party, litigationFriend))
-            );
-            compare(
-                "type",
-                litigiousParty.getType(),
-                ofNullable(litigiousPartyType)
-            );
-            compare(
-                "dateOfBirth",
-                litigiousParty.getDateOfBirth(),
-                PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE))
-            );
+        compare(
+            "name",
+            litigiousParty.getName(),
+            ofNullable(PartyUtils.getLitigiousPartyName(party, litigationFriend))
+        );
+        compare(
+            "type",
+            litigiousParty.getType(),
+            ofNullable(litigiousPartyType)
+        );
+        compare(
+            "dateOfBirth",
+            litigiousParty.getDateOfBirth(),
+            PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE))
+        );
+        compare(
+            "dateOfService",
+            litigiousParty.getDateOfService(),
+            ofNullable(claimDetailsNotificationDate)
+                .map(LocalDateTime::toLocalDate)
+                .map(d -> d.format(ISO_DATE))
+        );
 
             assertThat(litigiousParty.getAddresses().getContactAddress())
                 .isEqualTo(party.getPrimaryAddress());

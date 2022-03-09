@@ -25,18 +25,19 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimFe
 import uk.gov.hmcts.reform.civil.handler.callback.user.createclaim.CreateClaimSharedDataExtractor;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -63,6 +64,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -144,9 +146,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
-
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
@@ -795,6 +798,284 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                      + " for example john.smith@example.com");
             }
 
+        }
+    }
+
+    @Nested
+    class ValidateAddress {
+
+        @Nested
+        class Respondent1Address {
+
+            @Test
+            void shouldReturnNoErrors_whenRespondent1AddressValid() {
+                Party respondent1 = PartyBuilder.builder().company().build();
+
+                CaseData caseData = CaseData.builder().respondent1(respondent1).build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldReturnErrors_whenRespondent1AddressNotValid() {
+                Party respondent1 = Party.builder().primaryAddress(Address.builder().postCode(null).build()).build();
+
+                CaseData caseData = CaseData.builder().respondent1(respondent1).build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                    .willReturn(List.of("Please enter Postcode"));
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
+        }
+
+        @Nested
+        class RespondentSolicitor1Address {
+
+            @Test
+            void shouldReturnNoErrors_whenSolicitor1AddressValid() {
+                SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails =
+                    SolicitorOrganisationDetails.builder().address(AddressBuilder.defaults().build()).build();
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails).build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldReturnErrors_whenSolicitor1AddressNotValid() {
+                SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails =
+                    SolicitorOrganisationDetails.builder()
+                        .address(Address.builder().postCode(null).build())
+                        .build();
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                    .willReturn(List.of("Please enter Postcode"));
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
+        }
+
+        @Nested
+        class RespondentSolicitor2Address {
+
+            @Test
+            void shouldReturnNoErrors_whenSolicitor2AddressValid() {
+                SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails =
+                    SolicitorOrganisationDetails.builder()
+                        .address(AddressBuilder.defaults().build())
+                        .build();
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldReturnErrors_whenSolicitor2AddressNotValid() {
+                SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails =
+                    SolicitorOrganisationDetails.builder().address(Address.builder().postCode(null).build()).build();
+
+                CaseData caseData = CaseData.builder()
+                    .respondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails).build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                    .willReturn(List.of("Please enter Postcode"));
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
+        }
+
+        @Nested
+        class CorrespondentApplicantAddress {
+
+            @Test
+            void shouldReturnNoErrors_whenRequiredAddressIsNo() {
+                CaseData caseData = CaseData.builder()
+                    .specApplicantCorrespondenceAddressRequired(NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNull();
+            }
+
+            @Test
+            void shouldReturnNoErrors_whenRequiredAddressIsYesAndValid() {
+                CaseData caseData = CaseData.builder()
+                    .specApplicantCorrespondenceAddressRequired(YES)
+                    .specApplicantCorrespondenceAddressdetails(AddressBuilder.defaults().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldReturnErrors_whenRequiredAddressIsYesAndNotValid() {
+                CaseData caseData = CaseData.builder()
+                    .specApplicantCorrespondenceAddressRequired(YES)
+                    .specApplicantCorrespondenceAddressdetails(Address.builder().postCode(null).build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                    .willReturn(List.of("Please enter Postcode"));
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
+        }
+
+        @Nested
+        class CorrespondentRespondentAddress {
+
+            @Test
+            void shouldReturnNoErrors_whenRequiredAddressIsNo() {
+                CaseData caseData = CaseData.builder()
+                    .specRespondentCorrespondenceAddressRequired(NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNull();
+            }
+
+            @Test
+            void shouldReturnNoErrors_whenRequiredAddressIsYesAndValid() {
+                CaseData caseData = CaseData.builder()
+                    .specRespondentCorrespondenceAddressRequired(YES)
+                    .specRespondentCorrespondenceAddressdetails(AddressBuilder.defaults().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldReturnErrors_whenRequiredAddressIsYesAndNotValid() {
+                CaseData caseData = CaseData.builder()
+                    .specRespondentCorrespondenceAddressRequired(YES)
+                    .specRespondentCorrespondenceAddressdetails(Address.builder().postCode(null).build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
+
+                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                    .willReturn(List.of("Please enter Postcode"));
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response).isNotNull();
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
         }
     }
 

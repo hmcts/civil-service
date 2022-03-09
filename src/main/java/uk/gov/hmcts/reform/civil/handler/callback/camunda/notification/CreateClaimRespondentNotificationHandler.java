@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -132,7 +133,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
+            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 }

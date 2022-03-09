@@ -7,8 +7,17 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public enum MultiPartyScenario {
     ONE_V_ONE,
+    /**
+     * one claimant vs two defendants with one LR for both defendants.
+     */
     ONE_V_TWO_ONE_LEGAL_REP,
+    /**
+     * two claimants vs one defendant.
+     */
     TWO_V_ONE,
+    /**
+     * one claimant vs two defendants with one LR for each defendant.
+     */
     ONE_V_TWO_TWO_LEGAL_REP;
 
     public static MultiPartyScenario getMultiPartyScenario(CaseData caseData) {
