@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -78,5 +80,13 @@ public class PartyUtils {
             + party.getIndividualFirstName()
             + " "
             + party.getIndividualLastName();
+    }
+
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
+        if (caseData.getRespondent1().equals(respondent)) {
+            return caseData.getRespondent1ClaimResponseType();
+        } else {
+            return caseData.getRespondent2ClaimResponseType();
+        }
     }
 }
