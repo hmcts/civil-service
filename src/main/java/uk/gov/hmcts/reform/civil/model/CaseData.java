@@ -218,6 +218,7 @@ public class CaseData implements MappableObject {
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
 
     private final String additionalInformationForJudge;
+    private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 
