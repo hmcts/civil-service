@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
-
 import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -260,8 +259,8 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
                 .map(d -> d.format(ISO_DATE))
         );
 
-            assertThat(litigiousParty.getAddresses().getContactAddress())
-                .isEqualTo(party.getPrimaryAddress());
-        }
+        assertThat(litigiousParty.getAddresses().getContactAddress())
+            .isEqualTo(party.getPrimaryAddress());
     }
 }
+
