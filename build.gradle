@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.5.0"
+  id "org.flywaydb.flyway" version "8.5.2"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -72,7 +72,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.9'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '31.1-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
@@ -292,7 +292,7 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.24.1'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.27.2'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -326,22 +326,22 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.1'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.1'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.19'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.2'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.4'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.4'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.20'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.2'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.58'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.16'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.0.17'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.64'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.67'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
