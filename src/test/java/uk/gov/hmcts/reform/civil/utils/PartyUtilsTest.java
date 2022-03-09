@@ -220,4 +220,26 @@ class PartyUtilsTest {
         }
 
     }
+
+    @Nested
+    class ClaimantReferences {
+
+        @Test
+        void shouldReturnEmptyReferences_whenNoRefsAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            String partyReferences = PartyUtils.buildClaimantReference(caseData);
+
+            assertEquals("", partyReferences);
+        }
+
+        @Test
+        void shouldReturnClaimaintReferences_whenCaseHasRefsAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            String partyReferences = PartyUtils.buildClaimantReference(caseData);
+
+            assertEquals("Claimant reference: 12345", partyReferences);
+        }
+    }
 }

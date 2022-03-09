@@ -88,11 +88,7 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
         boolean hasRespondent2Reference = defendantSolicitor2Reference.test(caseData);
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
-            .ifPresent(ref -> {
-                stringBuilder.append("Claimant reference: ");
-                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
-            });
+        stringBuilder.append(buildClaimantReference(caseData));
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresent(ref -> {
@@ -110,6 +106,19 @@ public class PartyUtils {
             stringBuilder.append("Defendant 2 reference: ");
             stringBuilder.append(caseData.getRespondentSolicitor2Reference());
         }
+        return stringBuilder.toString();
+    }
+
+    public static String buildClaimantReference(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresent(ref -> {
+                stringBuilder.append("Claimant reference: ");
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            });
+
         return stringBuilder.toString();
     }
 
