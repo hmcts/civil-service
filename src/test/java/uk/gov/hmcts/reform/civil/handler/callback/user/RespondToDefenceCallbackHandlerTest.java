@@ -107,7 +107,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallbackV1 {
 
         @Test
-        void shouldPopulateRespondent1ClaimResponseDocumentCopy_WhenAboutToStartIsInvoked() {
+        void shouldPopulateClaimantResponseScenarioFlag_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .build();
@@ -117,8 +117,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1ClaimResponseDocumentCopy"))
-                .isEqualTo(response.getData().get("respondent1ClaimResponseDocument"));
+            assertThat(response.getData().get("claimantResponseScenarioFlag")).isEqualTo("ONE_V_ONE");
         }
 
         @Test

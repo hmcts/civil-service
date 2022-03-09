@@ -70,7 +70,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1ClaimResponseDocumentCopy,
+            callbackKey(V_1, ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
@@ -81,36 +81,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         );
     }
 
-    private CallbackResponse populateRespondent1ClaimResponseDocumentCopy(CallbackParams callbackParams) {
+    private CallbackResponse populateClaimantResponseScenarioFlag(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder updatedData =
-            caseData.toBuilder()
-                .respondent1ClaimResponseDocumentCopy(caseData.getRespondent1ClaimResponseDocument());
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        switch (multiPartyScenario) {
-            case TWO_V_ONE:
-                updatedData
-                    .claimantResponseScenarioFlag(MultiPartyScenario.TWO_V_ONE)
-                    .build();
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                updatedData
-                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-                    .build();
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                updatedData
-                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
-                    .build();
-                break;
-            default:
-                updatedData
-                    .claimantResponseScenarioFlag(MultiPartyScenario.ONE_V_ONE)
-                    .build();
-        }
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
