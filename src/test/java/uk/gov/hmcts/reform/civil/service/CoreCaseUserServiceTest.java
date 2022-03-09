@@ -221,4 +221,36 @@ class CoreCaseUserServiceTest {
             );
         }
     }
+
+    @Nested
+    class GetUserCaseRoles {
+
+        @BeforeEach
+        void setup() {
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
+                CAA_USER_AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnCaseRoles_whenCaseRoleAssignedToUser() {
+            CaseAssignedUserRolesResource caseAssignedUserRolesResource = CaseAssignedUserRolesResource.builder()
+                .caseAssignedUserRoles(List.of(
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                        .build(),
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID2)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build()))
+                .build();
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(caseAssignedUserRolesResource);
+
+            List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
+            assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+        }
+    }
 }
