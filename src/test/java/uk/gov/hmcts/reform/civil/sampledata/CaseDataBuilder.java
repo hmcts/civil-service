@@ -1836,6 +1836,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2Responds1v2SameSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2DiffSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2(RespondentResponseType responseType) {
         this.respondent1ClaimResponseTypeToApplicant2 = responseType;
         return this;
