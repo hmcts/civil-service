@@ -174,6 +174,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
+    private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final String specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
@@ -295,9 +296,12 @@ public class CaseData implements MappableObject {
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
-    private final YesOrNo isRespondent1;
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+
+    private final YesOrNo isRespondent1;
+    private final YesOrNo isRespondent2;
+    private final YesOrNo isApplicant1;
 }
