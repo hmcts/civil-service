@@ -303,6 +303,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
+        this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2EmailAddress(String respondentSolicitor2EmailAddress) {
+        this.respondentSolicitor2EmailAddress = respondentSolicitor2EmailAddress;
+        return this;
+    }
+
     public CaseDataBuilder isRespondent1(YesOrNo isRespondent1) {
         this.isRespondent1 = isRespondent1;
         return this;
@@ -1347,6 +1357,19 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence() {
+        atStateRespondentFullDefence();
+        respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent1ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
