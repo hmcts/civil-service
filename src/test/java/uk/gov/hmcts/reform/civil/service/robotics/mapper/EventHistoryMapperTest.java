@@ -2383,13 +2383,14 @@ class EventHistoryMapperTest {
                                   .miscText("Claimant has notified defendant.")
                                   .build())
                 .build();
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
             Event respondent1LitigationFriendEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1LitigationFriendDate())
-                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                                  .miscText("Litigation friend added for respondent.")
+                                  .miscText(miscText)
                                   .build())
                 .build();
 
@@ -2437,13 +2438,14 @@ class EventHistoryMapperTest {
                                   .miscText("Claimant has notified defendant.")
                                   .build())
                 .build();
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
             Event respondent2LitigationFriendEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent2LitigationFriendDate())
-                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                                  .miscText("Litigation friend added for respondent.")
+                                  .miscText(miscText)
                                   .build())
                 .build();
 
