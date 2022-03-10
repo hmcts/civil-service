@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -75,6 +77,8 @@ class RoboticsNotificationServiceTest {
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
+    @Autowired
+    RoboticsDataMapper roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
@@ -177,11 +181,57 @@ class RoboticsNotificationServiceTest {
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
         String message = format(
             "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState());
+            reference + " - " + caseData.getCcdState()
+        );
         String subject = format("Multiparty claim data for %s", reference
             + " - " + caseData.getCcdState() + " - " + "Claimant has notified defendant.");
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder().miscellaneous(
+                Event.builder().eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build()
+            ).build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        service.notifyRobotics(caseData, multiPartyScenario);
+
+        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData);
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String message = format(
+            "Multiparty claim data for %s",
+            reference + " - " + caseData.getCcdState()
+        );
+        String subject = format("Multiparty claim data for %s", reference
+            + " - " + caseData.getCcdState() + " - " + lastEventText);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -722,7 +723,6 @@ public class EventHistoryMapper {
                 } else {
                     extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
                     dateReceived  = caseData.getRespondent1TimeExtensionDate();
-
                 }
             }
         }
@@ -734,12 +734,16 @@ public class EventHistoryMapper {
                     .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
                     .dateReceived(dateReceived)
                     .litigiousPartyID("002")
-                    .eventDetailsText(format("agreedExtensionDate: %s", extensionDate
-                        .format(ISO_DATE)))
-                    .eventDetails(EventDetails.builder()
-                                      .agreedExtensionDate(extensionDate
-                                                               .format(ISO_DATE))
-                                      .build())
+                    .eventDetailsText(
+                        //format("agreed extension date: %s", extensionDate.format(ISO_DATE)))
+                        format("agreed extension date: %s",
+                               extensionDate.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
+                    )
+                    .eventDetails(
+                        EventDetails.builder()
+                            .agreedExtensionDate(extensionDate.format(ISO_DATE))
+                            .build()
+                    )
                     .build()
             )
         );
