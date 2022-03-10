@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -147,6 +146,8 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final CaseDocument respondent1GeneratedResponseDocument;
+    private final CaseDocument respondent2GeneratedResponseDocument;
     private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
