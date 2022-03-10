@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -32,8 +33,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyRespondentSolicitor1ForSpec";
+    public static final String TASK2_ID = "CreateClaimContinuingOnlineNotifyRespondentSolicitor2ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationService notificationService;
@@ -51,7 +54,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return isRespondent1TaskId(callbackParams) ? TASK_ID : TASK2_ID;
     }
 
     @Override
@@ -64,9 +67,16 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         LocalDateTime claimNotificationDate = time.now();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-        //TODO - update target email once mapping is completed
+        String targetEmail = isRespondent1TaskId(callbackParams) ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (!YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        }
+
         notificationService.sendMail(
-            "civilmoneyclaimsdemo@gmail.com",
+            targetEmail,
             notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -95,5 +105,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
+    }
+
+    private boolean isRespondent1TaskId(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name());
     }
 }
