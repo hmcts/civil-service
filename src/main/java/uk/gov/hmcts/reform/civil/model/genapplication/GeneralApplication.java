@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -21,9 +20,6 @@ public class GeneralApplication implements MappableObject {
 
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
-    private final IdamUserDetails applicantSolicitor1UserDetails;
-    private final OrganisationPolicy applicant1OrganisationPolicy;
-    private final OrganisationPolicy respondent1OrganisationPolicy;
     private final String respondentSolicitor1EmailAddress;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
@@ -36,7 +32,7 @@ public class GeneralApplication implements MappableObject {
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final String generalAppDeadlineNotification;
     private final YesOrNo isMultiParty;
-    private final YesOrNo isPCClaimantMakingApplication;
+    private final YesOrNo parentClaimantIsApplicant;
     private final CaseLink caseLink;
     private final LocalDateTime generalAppSubmittedDateGAspec;
     private final IdamUserDetails civilServiceUserRoles;
@@ -45,9 +41,6 @@ public class GeneralApplication implements MappableObject {
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
-                       @JsonProperty("applicantSolicitor1UserDetails") IdamUserDetails applicantSolicitor1UserDetails,
-                       @JsonProperty("applicant1OrganisationPolicy") OrganisationPolicy applicant1OrganisationPolicy,
-                       @JsonProperty("respondent1OrganisationPolicy") OrganisationPolicy respondent1OrganisationPolicy,
                        @JsonProperty("respondentSolicitor1EmailAddress") String respondentSolicitor1EmailAddress,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
@@ -60,15 +53,12 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
                        @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
-                       @JsonProperty("isPCClaimantMakingApplication") YesOrNo isPCClaimantMakingApplication,
+                       @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("caseLink") CaseLink caseLink,
                        @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec,
                        @JsonProperty("civilServiceUserRoles") IdamUserDetails civilServiceUserRoles) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
-        this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
-        this.applicant1OrganisationPolicy = applicant1OrganisationPolicy;
-        this.respondent1OrganisationPolicy = respondent1OrganisationPolicy;
         this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         this.businessProcess = businessProcess;
         this.generalAppPBADetails = generalAppPBADetails;
@@ -81,7 +71,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
         this.generalAppDeadlineNotification = generalAppDeadlineNotification;
         this.isMultiParty = isMultiParty;
-        this.isPCClaimantMakingApplication = isPCClaimantMakingApplication;
+        this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.caseLink = caseLink;
         this.generalAppSubmittedDateGAspec = generalAppSubmittedDateGAspec;
         this.civilServiceUserRoles = civilServiceUserRoles;
