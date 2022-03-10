@@ -152,9 +152,11 @@ public class EventHistoryMapper {
                         break;
                 }
             });
+
         buildRespondent1LitigationFriendEvent(builder, caseData);
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
+
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -180,7 +182,8 @@ public class EventHistoryMapper {
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled()
             && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-            String miscText = "Litigation friend added for respondent.";
+
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -197,7 +200,8 @@ public class EventHistoryMapper {
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled()
             && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-            String miscText = "Litigation friend added for respondent.";
+
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
