@@ -260,7 +260,7 @@ public class RoboticsDataMapper {
             }
             respondentParties.add(buildLitigiousParty(
                 caseData.getRespondent2(),
-                caseData.getRespondent1LitigationFriend(),
+                caseData.getRespondent2LitigationFriend(),
                 caseData.getRespondent2OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT2_ID,
