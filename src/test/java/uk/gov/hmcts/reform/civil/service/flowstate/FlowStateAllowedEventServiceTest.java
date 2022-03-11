@@ -195,8 +195,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         DEFAULT_JUDGEMENT,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        CHANGE_SOLICITOR_EMAIL
+
 
                     }
                 ),
@@ -215,8 +215,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         DEFAULT_JUDGEMENT,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        CHANGE_SOLICITOR_EMAIL
 
                     }
                 ),
@@ -235,8 +234,7 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
                         DEFAULT_JUDGEMENT,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        CHANGE_SOLICITOR_EMAIL
 
                     }
                 ),
