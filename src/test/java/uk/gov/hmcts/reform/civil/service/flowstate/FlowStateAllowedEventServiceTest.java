@@ -196,8 +196,6 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL
-
-
                     }
                 ),
                 of(
