@@ -325,17 +325,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            String cprRequiredInfo = "<br />You can only request default judgment if:"
-                + "%n%n * The time for responding to the claim has expired. "
-                + "%n%n * The Defendant has not responded to the claim."
-                + "%n%n * There is no outstanding application by the Defendant "
-                + "to strike out the claim for summary judgment."
-                + "%n%n * The Defendant has not satisfied the whole claim, "
-                + "including costs."
-                + "%n%n * The Defendant has not filed an admission together "
-                + "with request for time to pay."
-                + "%n%n You can make another default judgment request when you "
-                + "know all these statements have been met.";
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -347,11 +337,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# You cannot request default judgment")
-                    .confirmationBody(format(cprRequiredInfo))
-                    .build());
+            assertThat(response.getConfirmationHeader()).isEqualTo(
+                "# Judgment for damages to be decided Granted");
 
         }
     }
