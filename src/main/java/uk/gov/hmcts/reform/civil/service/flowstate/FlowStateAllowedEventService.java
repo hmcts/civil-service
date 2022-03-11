@@ -469,6 +469,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE.fullName(),
             List.of(
+                CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,

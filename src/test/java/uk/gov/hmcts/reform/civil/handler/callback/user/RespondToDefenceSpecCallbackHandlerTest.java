@@ -67,49 +67,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @Nested
-    class AboutToStartCallback {
-
-        private LocalDateTime localDateTime;
-
-        @BeforeEach
-        void setup() {
-            localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
-        }
-
-        @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            Document document = Document.builder()
-                .documentFileName("filename")
-                .documentUrl("url 1")
-                .documentBinaryUrl("url 2")
-                .build();
-            CaseDocument caseDocument = CaseDocument.builder()
-                .documentLink(document)
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-                .build().toBuilder()
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .systemGeneratedCaseDocuments(ElementUtils.wrapElements(caseDocument))
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-            Map documentMap = (Map) response.getData().get("respondent1SpecDefenceResponseDocument");
-            documentMap = (Map) documentMap.get("file");
-
-            assertThat(documentMap.get("document_filename")).isEqualTo(document.getDocumentFileName());
-            assertThat(documentMap.get("document_url")).isEqualTo(document.getDocumentUrl());
-            assertThat(documentMap.get("document_binary_url")).isEqualTo(document.getDocumentBinaryUrl());
-        }
-    }
-
-    @Nested
     class MidStatementOfTruth {
 
         @Test
@@ -128,66 +85,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("uiStatementOfTruth")
                 .extracting("name", "role")
                 .containsExactly(null, null);
-        }
-    }
-
-    @Nested
-    class AboutToSubmitCallback {
-        private final LocalDateTime localDateTime = now();
-
-        @BeforeEach
-        void setup() {
-            when(time.now()).thenReturn(localDateTime);
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class,
-            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
-            mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
-            var params = callbackParamsOf(
-                CaseDataBuilder.builder().atState(flowState).build(),
-                ABOUT_TO_SUBMIT
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("businessProcess")
-                .extracting("status", "camundaEvent")
-                .containsExactly(READY.name(), CLAIMANT_RESPONSE_SPEC.name());
-
-            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
-        }
-
-        @Nested
-        class ResetStatementOfTruth {
-
-            @Test
-            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
-                String name = "John Smith";
-                String role = "Solicitor";
-
-                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("John Smith", "Solicitor");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
-            }
         }
     }
 }
