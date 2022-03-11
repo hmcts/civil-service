@@ -11,30 +11,33 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_SDO_TRIGGERED;
 
 @Service
 @RequiredArgsConstructor
-public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandler implements NotificationData {
+public class CreateSDOApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_SDO_TRIGGERED);
 
-    public static final String TASK_ID = "TakeCaseOfflineNotifyRespondentSolicitor1";
-    private static final String REFERENCE_TEMPLATE = "case-taken-offline-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "create-sdo-applicant-notification-%s";
+    public static final String TASK_ID = "CreateSDONotifyApplicantSolicitor1";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseTakenOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorSDOTriggered
         );
     }
 
@@ -48,15 +51,16 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondentSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorSDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getSolicitorCaseTakenOffline(),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSdoOrdered(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -64,7 +68,14 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                 .getOrganisation().getOrganisationID(), caseData)
         );
+    }
+
+    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
