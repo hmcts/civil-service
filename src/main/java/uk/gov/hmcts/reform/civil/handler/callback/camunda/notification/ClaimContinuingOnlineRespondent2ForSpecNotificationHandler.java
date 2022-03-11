@@ -29,12 +29,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends CallbackHandler
+public class ClaimContinuingOnlineRespondent2ForSpecNotificationHandler extends CallbackHandler
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
-    public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyRespondentSolicitor1ForSpec";
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+    public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyRespondentSolicitor2ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationService notificationService;
@@ -65,7 +65,13 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         LocalDateTime claimNotificationDate = time.now();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-        String targetEmail = caseData.getRespondentSolicitor1EmailAddress();
+        String targetEmail = caseData.getRespondentSolicitor2EmailAddress();
+
+        if (!YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        }
 
         notificationService.sendMail(
             targetEmail,
@@ -84,7 +90,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                      .toLocalDate(), DATE)
