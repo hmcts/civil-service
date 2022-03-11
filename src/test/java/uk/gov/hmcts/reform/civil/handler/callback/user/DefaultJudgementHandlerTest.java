@@ -55,7 +55,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
 })
 public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
-    
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
@@ -398,7 +398,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldGenerateTwoForm_when1v1() {
-            CaseDocument DOCUMENT = CaseDocument.builder()
+            CaseDocument document = CaseDocument.builder()
                 .createdBy("John")
                 .documentName("document name")
                 .documentSize(0L)
@@ -413,8 +413,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             List<CaseDocument> documents = new ArrayList<>();
 
-            documents.add(DOCUMENT);
-            documents.add(DOCUMENT);
+            documents.add(document);
+            documents.add(document);
 
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
