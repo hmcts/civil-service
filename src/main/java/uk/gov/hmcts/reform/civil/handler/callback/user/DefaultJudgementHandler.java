@@ -191,7 +191,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
             buildDocument(callbackParams, caseDataBuilder);
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
