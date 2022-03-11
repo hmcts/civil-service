@@ -20,5 +20,6 @@ public class DefaultJudgmentForm implements MappableObject {
     private final String applicantReference;
     private final String respondentReference;
     private final Party respondent;
+    private final String formText;
 
 }

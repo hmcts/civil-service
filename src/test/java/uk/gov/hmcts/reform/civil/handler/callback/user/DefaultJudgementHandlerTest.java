@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -18,19 +20,32 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -44,6 +59,26 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private DefaultJudgementHandler handler;
+
+
+    @MockBean
+    private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public static final CaseDocument DOCUMENT = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("document name")
+        .documentSize(0L)
+        .documentType(DEFAULT_JUDGMENT)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
 
     @Nested
     class AboutToStartCallback {
@@ -337,4 +372,86 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         }
     }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+      @Test
+      public void  shouldGenerateOneForm_when1v1() {
+          CaseDocument DOCUMENT = CaseDocument.builder()
+              .createdBy("John")
+              .documentName("document name")
+              .documentSize(0L)
+              .documentType(DEFAULT_JUDGMENT)
+              .createdDatetime(LocalDateTime.now())
+              .documentLink(Document.builder()
+                                .documentUrl("fake-url")
+                                .documentFileName("file-name")
+                                .documentBinaryUrl("binary-url")
+                                .build())
+              .build();
+
+          List<CaseDocument> documents = new ArrayList<>();
+
+          documents.add(DOCUMENT);
+
+          when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
+          CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+          CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+          var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+          verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+
+          CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+          assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+
+        }
+
+        @Test
+        public void  shouldGenerateTwoForm_when1v1() {
+            CaseDocument DOCUMENT = CaseDocument.builder()
+                .createdBy("John")
+                .documentName("document name")
+                .documentSize(0L)
+                .documentType(DEFAULT_JUDGMENT)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                                  .documentUrl("fake-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build())
+                .build();
+
+            List<CaseDocument> documents = new ArrayList<>();
+
+            documents.add(DOCUMENT);
+            documents.add(DOCUMENT);
+
+            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+
+        }
+
+
+    }
+
 }

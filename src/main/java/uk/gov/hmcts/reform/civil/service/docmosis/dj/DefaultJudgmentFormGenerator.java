@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
@@ -42,7 +41,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             new PDF(
                 getFileName(caseData, docmosisTemplate),
                 docmosisDocument1.getBytes(),
-                DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
+                DocumentType.DEFAULT_JUDGMENT
             )
         ));
         if (templateData.size() > 1) {
@@ -53,7 +52,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 new PDF(
                     getFileName(caseData, docmosisTemplate),
                     docmosisDocument2.getBytes(),
-                    DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
+                    DocumentType.DEFAULT_JUDGMENT
                 )
             ));
         }
@@ -83,7 +82,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
         defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null).
-                                     caseNumber(caseData.getLegacyCaseReference()).
+                                     caseNumber(caseData.getLegacyCaseReference())
+                                     .formText("No Acknowledgement of service").
                                      respondent(getResondent(caseData.getRespondent1())).
                                      applicantReference(Objects.isNull(caseData.getSolicitorReferences()) ?
                                                             null : caseData.getSolicitorReferences().
@@ -94,6 +94,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         if (caseData.getRespondent2() != null) {
             defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null).
                                          caseNumber(caseData.getLegacyCaseReference()).
+                                         formText("No Acknowledgement of service").
                                          respondent(getResondent(caseData.getRespondent2())).
                                          applicantReference(Objects.isNull(caseData.getSolicitorReferences()) ?
                                                                 null : caseData.getSolicitorReferences().

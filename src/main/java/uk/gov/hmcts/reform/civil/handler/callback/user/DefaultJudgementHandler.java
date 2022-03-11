@@ -27,12 +27,15 @@ import java.util.Objects;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 
 @Service
 @RequiredArgsConstructor
@@ -177,7 +180,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
 
-
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -196,4 +198,4 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .build();
     }
 
-    }
+}
