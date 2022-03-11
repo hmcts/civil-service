@@ -234,7 +234,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Selected date must be after " + formatLocalDate(
+                    eligibleDate,
+                    DATE
+                ));
         }
 
         @Nested
@@ -473,4 +477,3 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 }
-

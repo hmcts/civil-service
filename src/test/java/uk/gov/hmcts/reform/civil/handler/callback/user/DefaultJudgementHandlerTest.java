@@ -34,7 +34,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,16 +56,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private DefaultJudgementHandler handler;
-
-
-    @MockBean
-    private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
-
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-
     public static final CaseDocument DOCUMENT = CaseDocument.builder()
         .createdBy("John")
         .documentName("document name")
@@ -79,6 +68,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private DefaultJudgementHandler handler;
+    @MockBean
+    private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
 
     @Nested
     class AboutToStartCallback {
@@ -230,7 +225,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate.now().plusMonths(1)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
                 .hearingDates(
-                wrapElements(hearingDates)).build();
+                    wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -254,7 +249,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate.now().plusMonths(4)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
                 .builder().hearingDates(
-                wrapElements(hearingDates)).build();
+                    wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .build().toBuilder()
@@ -279,7 +274,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate.now().plusMonths(-4)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
                 .builder().hearingDates(
-                wrapElements(hearingDates)).build();
+                    wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .build().toBuilder()
@@ -303,7 +298,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate.now().plusMonths(2)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
                 .builder().hearingDates(
-                wrapElements(hearingDates)).build();
+                    wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -376,45 +371,45 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-      @Test
-      public void  shouldGenerateOneForm_when1v1() {
-          CaseDocument DOCUMENT = CaseDocument.builder()
-              .createdBy("John")
-              .documentName("document name")
-              .documentSize(0L)
-              .documentType(DEFAULT_JUDGMENT)
-              .createdDatetime(LocalDateTime.now())
-              .documentLink(Document.builder()
-                                .documentUrl("fake-url")
-                                .documentFileName("file-name")
-                                .documentBinaryUrl("binary-url")
-                                .build())
-              .build();
+        @Test
+        public void shouldGenerateOneForm_when1v1() {
+            CaseDocument document = CaseDocument.builder()
+                .createdBy("John")
+                .documentName("document name")
+                .documentSize(0L)
+                .documentType(DEFAULT_JUDGMENT)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                                  .documentUrl("fake-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build())
+                .build();
 
-          List<CaseDocument> documents = new ArrayList<>();
+            List<CaseDocument> documents = new ArrayList<>();
 
-          documents.add(DOCUMENT);
+            documents.add(document);
 
-          when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
-          CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
-          CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-          var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-          verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
-          CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-          assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
 
         }
 
         @Test
-        public void  shouldGenerateTwoForm_when1v1() {
+        public void shouldGenerateTwoForm_when1v1() {
             CaseDocument DOCUMENT = CaseDocument.builder()
                 .createdBy("John")
                 .documentName("document name")
@@ -450,7 +445,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
 
         }
-
 
     }
 

@@ -19,8 +19,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentMan
 
 import java.util.List;
 
-
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,7 +38,7 @@ public class DefaultJudgmentFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N121.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String fileName = String.format(N121.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
         .documentType(DEFAULT_JUDGMENT)
@@ -71,7 +69,6 @@ public class DefaultJudgmentFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
-
     }
 
     @Test
@@ -90,6 +87,4 @@ public class DefaultJudgmentFormGeneratorTest {
     }
 
 
-
-
-    }
+}
