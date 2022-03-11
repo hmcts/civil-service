@@ -28,7 +28,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
         DocmosisDocument docmosisDocument2;
@@ -81,33 +80,31 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private List<DefaultJudgmentForm> getDefaultJudgmentForm(CaseData caseData) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null).
-                                     caseNumber(caseData.getLegacyCaseReference())
+        defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
+                                     .caseNumber(caseData.getLegacyCaseReference())
                                      .formText("No Acknowledgement of service").
-                                     respondent(getResondent(caseData.getRespondent1())).
-                                     applicantReference(Objects.isNull(caseData.getSolicitorReferences()) ?
-                                                            null : caseData.getSolicitorReferences().
-                                         getApplicantSolicitor1Reference())
-                                     .respondentReference(Objects.isNull(caseData.getSolicitorReferences()) ?
-                                                              null : caseData.getSolicitorReferences().
-                                         getRespondentSolicitor1Reference()).build());
+                                     respondent(getResondent(caseData.getRespondent1()))
+                                     .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
+                                                             ? null : caseData.getSolicitorReferences()
+                                         .getApplicantSolicitor1Reference())
+                                     .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
+                                                              ? null : caseData.getSolicitorReferences()
+                                         .getRespondentSolicitor1Reference()).build());
         if (caseData.getRespondent2() != null) {
-            defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null).
-                                         caseNumber(caseData.getLegacyCaseReference()).
-                                         formText("No Acknowledgement of service").
-                                         respondent(getResondent(caseData.getRespondent2())).
-                                         applicantReference(Objects.isNull(caseData.getSolicitorReferences()) ?
-                                                                null : caseData.getSolicitorReferences().
-                                             getApplicantSolicitor1Reference())
-                                         .respondentReference(Objects.isNull(caseData.getSolicitorReferences()) ?
-                                                                  null : caseData.getSolicitorReferences().
-                                             getRespondentSolicitor1Reference()).build());
+            defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
+                                         .caseNumber(caseData.getLegacyCaseReference())
+                                         .formText("No Acknowledgement of service")
+                                         .respondent(getResondent(caseData.getRespondent2()))
+                                         .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
+                                                                 ? null : caseData.getSolicitorReferences()
+                                             .getApplicantSolicitor1Reference())
+                                         .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
+                                                                  ? null : caseData.getSolicitorReferences()
+                                             .getRespondentSolicitor1Reference()).build());
         }
         return defaultJudgmentForms;
 
     }
-
-
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
 

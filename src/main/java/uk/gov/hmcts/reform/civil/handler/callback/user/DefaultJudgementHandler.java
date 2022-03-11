@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
@@ -178,8 +177,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
-
-
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -189,8 +186,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
-        if (caseDocuments.size() > 1)
+        if (caseDocuments.size() > 1) {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
+        }
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
