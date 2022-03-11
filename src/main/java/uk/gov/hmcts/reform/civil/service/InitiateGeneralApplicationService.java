@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -86,20 +87,29 @@ public class InitiateGeneralApplicationService {
         String deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
-
+        if (caseData.getGeneralAppRespondentAgreement() != null
+                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
+            applicationBuilder
+                    .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                    .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+        } else {
+            applicationBuilder
+                    .generalAppInformOtherParty(GAInformOtherParty.builder().build())
+                    .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+        }
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
-            .generalAppPBADetails(caseData.getGeneralAppPBADetails())
+            .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
-            .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-            .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
-            .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppDeadlineNotification(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
+            .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
+                                       .build())
             .build();
 
         return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);

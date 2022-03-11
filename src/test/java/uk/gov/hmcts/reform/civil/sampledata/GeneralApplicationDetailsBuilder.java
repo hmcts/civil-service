@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -114,13 +115,13 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataForApplicationFee(CaseData caseData, boolean isConsented,
-                                                           boolean isWithNotice) {
+                                                     boolean isWithNotice) {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (!isConsented) {
             caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
-                    .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
-                    .build());
+                            .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
+                            .build());
         } else {
             caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
                     .generalAppInformOtherParty(null);
@@ -321,6 +322,79 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
+    public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
+        return CaseData.builder()
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppRespondentAgreement(respondentOrderAgreement)
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(YES)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppInformOtherParty(GAInformOtherParty.builder()
+                        .isWithNotice(NO)
+                        .reasonsForWithoutNotice(STRING_CONSTANT)
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
+                        .build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .applicantsPbaAccounts(PBALIST)
+                        .pbaReference(STRING_CONSTANT)
+                        .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                        .id(STRING_CONSTANT)
+                        .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .build();
+    }
+
     public CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
         GeneralApplication application = GeneralApplication.builder()
                 .generalAppType(GAApplicationType.builder()
@@ -335,17 +409,6 @@ public class GeneralApplicationDetailsBuilder {
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                        .id(STRING_CONSTANT)
-                        .email(APPLICANT_EMAIL_ID_CONSTANT).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID(STRING_CONSTANT).build())
-                        .orgPolicyReference(STRING_CONSTANT).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID(STRING_CONSTANT).build())
-                        .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .generalAppInformOtherParty(GAInformOtherParty.builder()
                         .isWithNotice(NO)
@@ -428,17 +491,6 @@ public class GeneralApplicationDetailsBuilder {
                         .applicantsPbaAccounts(PBA_ACCOUNTS)
                         .pbaReference(STRING_CONSTANT)
                         .build())
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                        .id(STRING_CONSTANT)
-                        .email(APPLICANT_EMAIL_ID_CONSTANT).build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID(STRING_CONSTANT).build())
-                        .orgPolicyReference(STRING_CONSTANT).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID(STRING_CONSTANT).build())
-                        .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)

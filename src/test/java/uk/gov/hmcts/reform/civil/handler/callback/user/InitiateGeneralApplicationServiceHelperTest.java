@@ -17,10 +17,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.Collections.singletonList;
-import static joptsimple.internal.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
@@ -80,64 +77,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
-    void shouldReturnTrueIfGA_ApplicantSameAsPC_Applicant() {
-
-        Boolean result = helper.isGA_ApplicantSameAsPC_Applicant(caseData, getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void shouldReturnFalseIfGA_ApplicantUserDetailsNotProvided() {
-        CaseData caseData1Data = caseData.toBuilder().applicantSolicitor1UserDetails(null).build();
-        Boolean result = helper.isGA_ApplicantSameAsPC_Applicant(caseData1Data, getUserDetails(TEST_USER_EMAILID));
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void shouldReturnFalseIfGA_ApplicantOrgDetailsNotProvided() {
-        CaseData caseData1Data = caseData.toBuilder().applicant1OrganisationPolicy(null).build();
-        Boolean result = helper.isGA_ApplicantSameAsPC_Applicant(caseData1Data, getUserDetails(TEST_USER_EMAILID));
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void shouldReturnFalseIfGA_ApplicantNotSameAsPC_Applicant() {
-
-        Boolean result = helper.isGA_ApplicantSameAsPC_Applicant(caseData, getUserDetails(TEST_USER_EMAILID));
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void shouldReturnTrueIfGA_ApplicantSameAsPC_Respondent() {
-
-        Boolean result = helper
-            .isGA_ApplicantSameAsPC_Respondent(caseData, getUserDetails(RESPONDENT_EMAIL_ID_CONSTANT));
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void shouldReturnFalseIfGA_ApplicantNotSameAsPC_Respondent() {
-
-        Boolean result = helper.isGA_ApplicantSameAsPC_Respondent(caseData, getUserDetails(TEST_USER_EMAILID));
-        assertThat(result).isFalse();
-    }
-
-    @Test
     void shouldReturnFalseIfGA_RespondentEmailNotProvided() {
         CaseData caseData1Data = caseData.toBuilder().respondentSolicitor1EmailAddress(null).build();
         Boolean result = helper.isGA_ApplicantSameAsPC_Applicant(caseData1Data, getUserDetails(TEST_USER_EMAILID));
         assertThat(result).isFalse();
-    }
-
-    @Test
-    void shouldReturnRespondent1SolicitorUserDetails() {
-
-        IdamUserDetails result = helper
-            .constructRespondent1SolicitorUserDetails(getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
-
-        assertThat(result).isNotNull();
-        assertThat(result.getEmail()).isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
-        assertThat(result.getId()).isEqualTo(STRING_CONSTANT);
     }
 
     @Test
@@ -149,17 +92,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                     getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
 
         assertThat(result).isNotNull();
-        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(YES);
-        assertThat(result.getApplicantSolicitor1UserDetails()).isNotNull();
-        assertThat(result.getApplicantSolicitor1UserDetails().getEmail()).isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
-        assertThat(result.getRespondentSolicitor1EmailAddress()).isNotNull();
         assertThat(result.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
-        assertThat(result.getRespondent1OrganisationPolicy()).isNotNull();
-        assertThat(result.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
-        assertThat(result.getApplicant1OrganisationPolicy()).isNotNull();
-        assertThat(result.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
     }
 
     @Test
@@ -171,17 +104,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                     getUserDetails(RESPONDENT_EMAIL_ID_CONSTANT));
 
         assertThat(result).isNotNull();
-        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(NO);
-        assertThat(result.getApplicantSolicitor1UserDetails()).isNotNull();
-        assertThat(result.getApplicantSolicitor1UserDetails().getEmail()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
         assertThat(result.getRespondentSolicitor1EmailAddress()).isNotNull();
         assertThat(result.getRespondentSolicitor1EmailAddress()).isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
-        assertThat(result.getRespondent1OrganisationPolicy()).isNotNull();
-        assertThat(result.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
-        assertThat(result.getApplicant1OrganisationPolicy()).isNotNull();
-        assertThat(result.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
     }
 
     @Test
@@ -205,11 +129,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
 
         assertThat(result).isNotNull();
-        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(YES);
-        assertThat(result.getApplicantSolicitor1UserDetails()).isNull();
-        assertThat(result.getRespondentSolicitor1EmailAddress()).isNull();
-        assertThat(result.getRespondent1OrganisationPolicy()).isNull();
-        assertThat(result.getApplicant1OrganisationPolicy()).isNull();
     }
 
     @Test
@@ -221,21 +140,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         getUserDetails("SOME_OTHER_PERSON"));
 
         assertThat(result).isNotNull();
-        assertThat(result.getIsPCClaimantMakingApplication()).isEqualTo(NO);
-        assertThat(result.getApplicantSolicitor1UserDetails()).isNull();
         assertThat(result.getRespondentSolicitor1EmailAddress()).isNull();
-        assertThat(result.getRespondent1OrganisationPolicy()).isNull();
-        assertThat(result.getApplicant1OrganisationPolicy()).isNull();
-    }
-
-    @Test
-    void isEmailIDSameAsUserShouldReturnFalseIfBlankOrNull() {
-        assertThat(helper.isEmailIDSameAsUser(null, getUserDetails(APPLICANT_EMAIL_ID_CONSTANT))).isFalse();
-        assertThat(helper.isEmailIDSameAsUser(EMPTY, getUserDetails(APPLICANT_EMAIL_ID_CONSTANT))).isFalse();
-    }
-
-    @Test
-    void isGA_ApplicantSameAsPC_Applicant_ShouldReturnFalseWhenApplicantUserDetailOrOrgPolicyAreNull() {
-
     }
 }
