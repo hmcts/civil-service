@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -178,9 +179,25 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .build();
     }
 
+    // Change it to camunda handler
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+            buildDocument(callbackParams, caseDataBuilder);
+        } else if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            // Dont generate anything
+        } else {
+            buildDocument(callbackParams, caseDataBuilder);
+        }
+
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
         List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -191,10 +208,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
         }
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
     }
 
 }

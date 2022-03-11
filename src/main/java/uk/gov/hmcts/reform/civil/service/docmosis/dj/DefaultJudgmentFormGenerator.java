@@ -100,7 +100,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                              .getApplicantSolicitor1Reference())
                                          .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
                                                                   ? null : caseData.getSolicitorReferences()
-                                             .getRespondentSolicitor1Reference()).build());
+                                             .getRespondentSolicitor2Reference()).build());
         }
         return defaultJudgmentForms;
 
