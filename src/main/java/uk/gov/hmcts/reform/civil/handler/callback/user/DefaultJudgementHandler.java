@@ -177,6 +177,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
+
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

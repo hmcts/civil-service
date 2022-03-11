@@ -82,8 +82,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
         defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
                                      .caseNumber(caseData.getLegacyCaseReference())
-                                     .formText("No Acknowledgement of service").
-                                     respondent(getResondent(caseData.getRespondent1()))
+                                     .formText("No Acknowledgement of service")
+                                     .respondent(getResondent(caseData.getRespondent1()))
                                      .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                                              ? null : caseData.getSolicitorReferences()
                                          .getApplicantSolicitor1Reference())
