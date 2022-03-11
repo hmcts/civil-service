@@ -55,19 +55,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
 })
 public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
-
-    public static final CaseDocument DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(DEFAULT_JUDGMENT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired

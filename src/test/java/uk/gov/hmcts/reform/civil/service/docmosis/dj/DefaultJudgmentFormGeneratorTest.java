@@ -86,5 +86,4 @@ public class DefaultJudgmentFormGeneratorTest {
         assertThat(caseDocuments.size()).isEqualTo(2);
     }
 
-
 }
