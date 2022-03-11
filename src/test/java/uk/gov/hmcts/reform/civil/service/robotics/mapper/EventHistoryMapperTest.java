@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -632,9 +633,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -739,9 +740,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor2AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor2AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -784,9 +785,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -831,9 +832,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -917,9 +918,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1059,9 +1060,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1216,9 +1217,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1409,9 +1410,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1656,9 +1657,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1790,9 +1791,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2026,9 +2027,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2166,9 +2167,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2268,9 +2269,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreedExtensionDate: %s", caseData
+                .eventDetailsText(format("agreed extension date: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(ISO_DATE)))
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2382,13 +2383,14 @@ class EventHistoryMapperTest {
                                   .miscText("Claimant has notified defendant.")
                                   .build())
                 .build();
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
             Event respondent1LitigationFriendEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1LitigationFriendDate())
-                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                                  .miscText("Litigation friend added for respondent.")
+                                  .miscText(miscText)
                                   .build())
                 .build();
 
@@ -2436,13 +2438,14 @@ class EventHistoryMapperTest {
                                   .miscText("Claimant has notified defendant.")
                                   .build())
                 .build();
+            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
             Event respondent2LitigationFriendEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent2LitigationFriendDate())
-                .eventDetailsText("Litigation friend added for respondent.")
+                .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                                  .miscText("Litigation friend added for respondent.")
+                                  .miscText(miscText)
                                   .build())
                 .build();
 

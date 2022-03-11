@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -176,6 +177,7 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -192,7 +194,10 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        DEFAULT_JUDGEMENT
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL,
+                        INITIATE_GENERAL_APPLICATION
+
                     }
                 ),
                 of(
@@ -209,7 +214,10 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        DEFAULT_JUDGEMENT
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL,
+                        INITIATE_GENERAL_APPLICATION
+
                     }
                 ),
                 of(
@@ -226,7 +234,10 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
-                        DEFAULT_JUDGEMENT
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL,
+                        INITIATE_GENERAL_APPLICATION
+
                     }
                 ),
                 of(
@@ -241,6 +252,7 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -256,6 +268,7 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -272,6 +285,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -288,6 +302,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -302,6 +317,7 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         TAKE_CASE_OFFLINE,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -314,6 +330,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -326,6 +343,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -338,6 +356,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -350,6 +369,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
@@ -362,6 +382,7 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION
                     }
                 ),
