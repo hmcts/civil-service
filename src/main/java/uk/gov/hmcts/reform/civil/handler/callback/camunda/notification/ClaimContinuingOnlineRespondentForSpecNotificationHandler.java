@@ -33,8 +33,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
-    public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyRespondentSolicitor1ForSpec";
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+    public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondentSolicitor1ForSpec";
+    public static final String TASK_ID_Respondent2 = "CreateClaimContinuingOnlineNotifyRespondentSolicitor2ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationService notificationService;
@@ -52,7 +54,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return isRespondent1Event(callbackParams) ? TASK_ID_Respondent1 : TASK_ID_Respondent2;
     }
 
     @Override
@@ -65,12 +67,18 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         LocalDateTime claimNotificationDate = time.now();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-        String targetEmail = caseData.getRespondentSolicitor1EmailAddress();
+        String targetEmail = isRespondent1Event(callbackParams)
+            ? caseData.getRespondentSolicitor1EmailAddress()
+            : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
 
         notificationService.sendMail(
             targetEmail,
             notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
-            addProperties(caseData),
+            addPropertiesWithPostCheck(caseData, callbackParams),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
@@ -78,6 +86,15 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
             .build();
+    }
+
+    private Map<String, String> addPropertiesWithPostCheck(CaseData caseData, CallbackParams callbackParams) {
+        Map<String, String> map = addProperties(caseData);
+        if(!isRespondent1Event(callbackParams)) {
+            map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
+        }
+        return map;
     }
 
     @Override
@@ -98,5 +115,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
+    }
+
+    private boolean isRespondent1Event(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name());
     }
 }
