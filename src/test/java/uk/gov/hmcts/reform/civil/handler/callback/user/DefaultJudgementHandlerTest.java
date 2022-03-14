@@ -408,7 +408,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-
         @Test
         public void shouldNotGenerateOneForm_when1v1() {
             CaseDocument document = CaseDocument.builder()
