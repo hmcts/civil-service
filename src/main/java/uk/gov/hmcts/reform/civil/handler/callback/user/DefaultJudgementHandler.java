@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -179,34 +181,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .build();
     }
 
-    // Change it to camunda handler
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
-            buildDocument(callbackParams, caseDataBuilder);
-        } else if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            // Dont generate anything
-        } else {
-            buildDocument(callbackParams, caseDataBuilder);
-        }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
-        List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generate(
-            callbackParams.getCaseData(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
-        if (caseDocuments.size() > 1) {
-            systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
-        }
-        caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
-    }
 
 }
