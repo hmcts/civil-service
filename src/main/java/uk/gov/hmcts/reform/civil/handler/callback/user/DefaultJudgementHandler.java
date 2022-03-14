@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.time.LocalDate;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -43,14 +46,18 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class DefaultJudgementHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
-    public static final String CPR_REQUIRED_INFO = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
-        + "%n%nJudgment has been entered and your case will be referred to a judge for directions.";
-    public static final String HEADER = "# Judgment for damages to be decided Granted";
+    public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
+        + "Judgment has been entered and your case will be referred to a judge for directions.";
+    public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "
+        + "and tell you what happens next.";
     public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
     public static final String TRIAL_TEXT = "will be trial hearing provided text";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
+    private final NotificationService notificationService;
+    private final NotificationsProperties notificationsProperties;
+    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -70,16 +77,27 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private String getBody(CaseData caseData) {
+        if (isMultiPartyScenario(caseData) && !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+            return JUDGMENT_REFERRED;
+        } else {
+            return JUDGMENT_GRANTED;
+        }
+    }
+
+    private String getHeader(CaseData caseData) {
+        if (isMultiPartyScenario(caseData) && !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+            return format("# Judgment for damages to be decided requested %n## Claim number: %s", caseData.getLegacyCaseReference());
+        } else {
+            return format("# Judgment for damages to be decided Granted %n## Claim number: %s", caseData.getLegacyCaseReference());
+        }
+    }
+
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format(HEADER))
-            .confirmationBody(format(CPR_REQUIRED_INFO, format(
-                "/cases/case-details/%s#Claim documents",
-                caseData.getCcdCaseReference()
-            )))
-
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
