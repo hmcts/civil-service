@@ -9,25 +9,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -52,11 +60,35 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UnavailableDateValidator dateValidator;
     @Mock
     private ExitSurveyContentService exitSurveyContentService;
+    @Mock
+    private PostcodeValidator postcodeValidator;
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
+                                                              .postCode(postCode)
+                                                              .build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        List<String> errors = Collections.singletonList("error 1");
+        Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
+
+        CallbackResponse response = handler.handle(params);
+        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
     @Nested
