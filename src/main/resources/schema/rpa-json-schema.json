@@ -705,7 +705,7 @@
           },
           "litigiousPartyID": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/litigiousPartyID",
-            "type": "null"
+            "type": ["null", "string"]
           },
           "eventDetails": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails",

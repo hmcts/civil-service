@@ -2392,6 +2392,7 @@ class EventHistoryMapperTest {
                 .eventDetails(EventDetails.builder()
                                   .miscText(miscText)
                                   .build())
+                .litigiousPartyID("002")
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2447,6 +2448,7 @@ class EventHistoryMapperTest {
                 .eventDetails(EventDetails.builder()
                                   .miscText(miscText)
                                   .build())
+                .litigiousPartyID("003")
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
