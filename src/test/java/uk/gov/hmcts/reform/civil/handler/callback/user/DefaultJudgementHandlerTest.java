@@ -337,12 +337,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void ShouldReturnJudgementGrantedResponse_whenInvoked(){
-            Object LegacyCaseReference = "111111";
-            String Header = format("# Judgment for damages to be decided "
+        void shouldReturnJudgementGrantedResponse_whenInvoked() {
+            Object legacyReference = "111111";
+            String header = format("# Judgment for damages to be decided "
                                        + "Granted %n## Claim"
-                                       + " number: %s", LegacyCaseReference);
-            String Body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+                                       + " number: %s", legacyReference);
+            String body = "<br /><a href=\"%s\" target=\"_blank\">Download"
                 + "  interim judgment</a> "
                 + "Judgment has been entered and your case"
                 + " will be referred to a judge for directions.";
@@ -356,18 +356,18 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(Header)
-                                                                          .confirmationBody(Body)
+                                                                          .confirmationHeader(header)
+                                                                          .confirmationBody(body)
                                                                           .build());
         }
 
         @Test
-        void ShouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2(){
-            Object LegacyCaseReference = "111111";
-            String Header = format("# Judgment for damages to be decided "
+        void shouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2() {
+            Object legacyReference = "111111";
+            String header = format("# Judgment for damages to be decided "
                                        + "requested %n## Claim "
-                                       + "number: %s", LegacyCaseReference);
-            String Body = "Your request will be referred"
+                                       + "number: %s", legacyReference);
+            String body = "Your request will be referred"
                 + " to a judge and we will contact you "
                 + "and tell you what happens next.";
 
@@ -388,19 +388,19 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(Header)
-                                                                          .confirmationBody(Body)
+                                                                          .confirmationHeader(header)
+                                                                          .confirmationBody(body)
                                                                           .build());
 
         }
 
         @Test
-        void ShouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2(){
-            Object LegacyCaseReference = "111111";
-            String Header = format("# Judgment for damages to be decided "
+        void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
+            Object legacyReference = "111111";
+            String header = format("# Judgment for damages to be decided "
                                        + "Granted %n## Claim"
-                                       + " number: %s", LegacyCaseReference);
-            String Body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+                                       + " number: %s", legacyReference);
+            String body = "<br /><a href=\"%s\" target=\"_blank\">Download"
                 + "  interim judgment</a> "
                 + "Judgment has been entered and your case"
                 + " will be referred to a judge for directions.";
@@ -422,8 +422,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(Header)
-                                                                          .confirmationBody(Body)
+                                                                          .confirmationHeader(header)
+                                                                          .confirmationBody(body)
                                                                           .build());
 
         }
