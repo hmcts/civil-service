@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +26,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
+public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
     private final ObjectMapper objectMapper;
@@ -38,10 +41,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "experts"), this::validateApplicantExperts,
+            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
+    }
+
+    private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
