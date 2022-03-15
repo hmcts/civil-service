@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,12 +27,15 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -321,29 +325,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class SubmittedCallback {
-
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingDates(
-                    null).build())
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response.getConfirmationHeader()).isEqualTo(
-                "# Judgment for damages to be decided Granted");
-
-        }
-    }
-
-    @Nested
     class AboutToSubmitCallback {
 
         @Test
@@ -364,4 +345,101 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     }
 
+    @Nested
+    class SubmittedCallback {
+
+        @Test
+        void ShouldReturnJudgementGrantedResponse_whenInvoked(){
+            Object LegacyCaseReference = "111111";
+            String Header = format("# Judgment for damages to be decided "
+                                       + "Granted %n## Claim"
+                                       + " number: %s", LegacyCaseReference);
+            String Body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+                + "  interim judgment</a> "
+                + "Judgment has been entered and your case"
+                + " will be referred to a judge for directions.";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .legacyCaseReference("111111")
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(Header)
+                                                                          .confirmationBody(Body)
+                                                                          .build());
+        }
+
+        @Test
+        void ShouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2(){
+            Object LegacyCaseReference = "111111";
+            String Header = format("# Judgment for damages to be decided "
+                                       + "requested %n## Claim "
+                                       + "number: %s", LegacyCaseReference);
+            String Body = "Your request will be referred"
+                + " to a judge and we will contact you "
+                + "and tell you what happens next.";
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .legacyCaseReference("111111")
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .applicant1(PartyBuilder.builder().build())
+                .defendantDetails(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(Header)
+                                                                          .confirmationBody(Body)
+                                                                          .build());
+
+        }
+
+        @Test
+        void ShouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2(){
+            Object LegacyCaseReference = "111111";
+            String Header = format("# Judgment for damages to be decided "
+                                       + "Granted %n## Claim"
+                                       + " number: %s", LegacyCaseReference);
+            String Body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+                + "  interim judgment</a> "
+                + "Judgment has been entered and your case"
+                + " will be referred to a judge for directions.";
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .legacyCaseReference("111111")
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .applicant1(PartyBuilder.builder().build())
+                .defendantDetails(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Both")
+                                                 .build())
+                                      .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(Header)
+                                                                          .confirmationBody(Body)
+                                                                          .build());
+
+        }
+    }
 }
+
+

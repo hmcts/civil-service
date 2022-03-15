@@ -10,14 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,18 +25,14 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -54,10 +47,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     public static final String TRIAL_TEXT = "will be trial hearing provided text";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
-    private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
-    private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
-    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -207,6 +196,5 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 
 }
