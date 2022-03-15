@@ -1,2 +1,9 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    maven {
+      url "https://jitpack.io"
+    }
+  }
+}
 include 'sendgrid-client'
-
