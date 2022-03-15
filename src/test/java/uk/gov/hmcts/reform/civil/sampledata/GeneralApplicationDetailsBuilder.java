@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -249,6 +250,12 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
         return caseData.toBuilder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .addApplicant2(YES)
+                .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
+                .addRespondent2(YES)
+                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Respondent2").build())
                 .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
@@ -324,6 +331,12 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .addApplicant2(YES)
+                .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
+                .addRespondent2(YES)
+                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Respondent2").build())
                 .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
