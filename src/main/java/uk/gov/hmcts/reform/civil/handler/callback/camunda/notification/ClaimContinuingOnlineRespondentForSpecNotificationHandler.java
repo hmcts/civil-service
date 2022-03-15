@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,27 +94,23 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     private Map<String, String> addPropertiesWithPostCheck(CaseData caseData, CallbackParams callbackParams) {
         Map<String, String> map = addProperties(caseData);
-        if (!isRespondent1Event(callbackParams)) {
-            return Map.of(
-                CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                    caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
-                                                                         .toLocalDate(), DATE)
-            );
+        if (isRespondent1Event(callbackParams)) {
+            map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
+        } else {
+            map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
         }
         return map;
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
-                                                                     .toLocalDate(), DATE)
-        );
+        Map<String, String> map = new HashMap<>();
+        map.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        map.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
+                                                                         .toLocalDate(), DATE));
+        return map;
     }
 
     public String getRespondentLegalOrganizationName(String id) {
@@ -126,7 +123,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     }
 
     private boolean isRespondent1Event(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name());
+        return NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name()
+            .equals(callbackParams.getRequest().getEventId());
     }
 }
