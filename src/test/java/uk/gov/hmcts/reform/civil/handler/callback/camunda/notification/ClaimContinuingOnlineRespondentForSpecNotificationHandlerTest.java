@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
@@ -68,13 +69,15 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
         }
 
         @Test
-        void shouldNotifyRespondentSolicitor_whenInvoked() {
+        void shouldNotifyRespondent1Solicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
                                                              .organisationName("test solicatior").build())
                 .claimDetailsNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(LocalDateTime.now())
+                .addRespondent2(YesOrNo.NO)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
@@ -83,11 +86,71 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "civilmoneyclaimsdemo@gmail.com",
+                "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
                 "claim-continuing-online-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotifyRespondent2Solicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
+                                                             .email("testorg@email.com")
+                                                             .organisationName("test solicatior").build())
+                .claimDetailsNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotNotifyRespondent2SolicitorIfNoSecondDefendant_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
+                                                             .email("testorg@email.com")
+                                                             .organisationName("test solicatior").build())
+                .claimDetailsNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+                    .build()).build();
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotNotifyRespondent2SolicitorIf2ndDefendantSameLegalRep_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
+                                                             .email("testorg@email.com")
+                                                             .organisationName("test solicatior").build())
+                .claimDetailsNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+                    .build()).build();
+
+            handler.handle(params);
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
@@ -102,6 +165,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build()).build())).isEqualTo(TASK_ID_Respondent1);
+            "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build())
+                                                 .build())).isEqualTo(TASK_ID_Respondent1);
     }
 }

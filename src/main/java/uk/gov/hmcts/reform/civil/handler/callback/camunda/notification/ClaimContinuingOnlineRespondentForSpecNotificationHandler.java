@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -73,6 +74,8 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
         if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
+        } else if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
         notificationService.sendMail(
@@ -90,7 +93,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     private Map<String, String> addPropertiesWithPostCheck(CaseData caseData, CallbackParams callbackParams) {
         Map<String, String> map = addProperties(caseData);
-        if(!isRespondent1Event(callbackParams)) {
+        if (!isRespondent1Event(callbackParams)) {
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()),
