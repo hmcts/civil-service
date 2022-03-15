@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#setting encoding for Python 2 / 3 compatibilities
+#setting encoding for Python 2 / 3 compatibilities test
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 export PYTHONDONTWRITEBYTECODE=1
