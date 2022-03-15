@@ -54,7 +54,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             buildDocument(callbackParams, caseDataBuilder);
-        } else {
+        } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             buildDocument(callbackParams, caseDataBuilder);
         }
 
