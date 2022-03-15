@@ -91,8 +91,13 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     private Map<String, String> addPropertiesWithPostCheck(CaseData caseData, CallbackParams callbackParams) {
         Map<String, String> map = addProperties(caseData);
         if(!isRespondent1Event(callbackParams)) {
-            map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
+            return Map.of(
+                CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                    caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
+                                                                         .toLocalDate(), DATE)
+            );
         }
         return map;
     }
