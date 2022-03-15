@@ -45,8 +45,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         + "and tell you what happens next.";
     public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
     public static final String TRIAL_TEXT = "will be trial hearing provided text";
-    public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested %n## Claim number: %s";
-    public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted %n## Claim number: %s";
+    public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested %n##"
+        + " Claim number: %s";
+    public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted %n##"
+        + " Claim number: %s";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
 
@@ -69,7 +71,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (isMultiPartyScenario(caseData) && !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        if (isMultiPartyScenario(caseData) &&
+            !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             return JUDGMENT_REFERRED;
         } else {
             return JUDGMENT_GRANTED;
@@ -77,7 +80,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (isMultiPartyScenario(caseData) && !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        if (isMultiPartyScenario(caseData) &&
+            !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             return format(JUDGMENT_REQUESTED, caseData.getLegacyCaseReference());
 
         } else {
