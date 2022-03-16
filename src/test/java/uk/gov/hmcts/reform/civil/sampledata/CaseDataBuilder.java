@@ -650,7 +650,7 @@ public class CaseDataBuilder {
             case NOTIFICATION_ACKNOWLEDGED:
                 return atStateNotificationAcknowledged();
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
-                return atStateNotificationAcknowledgedTimeExtension();
+                return atStateNotificationAcknowledgedRespondent1TimeExtension();
             case FULL_DEFENCE:
                 return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
             case FULL_ADMISSION:
@@ -1300,7 +1300,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         takenOfflineByStaff();
         takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
         return this;
@@ -1443,7 +1443,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentFullDefenceAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         //respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1551,7 +1551,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentFullAdmissionAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         ccdState = AWAITING_APPLICANT_INTENTION;
@@ -1580,7 +1580,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentPartAdmissionAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.PART_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1609,7 +1609,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentCounterClaimAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1713,7 +1713,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         this.claimDismissedDate = respondent1TimeExtensionDate.plusDays(1);
         this.claimDismissedDeadline = LocalDateTime.now().minusDays(1);
         return this;
@@ -1732,12 +1732,31 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateNotificationAcknowledgedTimeExtension() {
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension(int numberOfHoursAfterCurrentDate) {
         atStateNotificationAcknowledged();
-        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(1);
+        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension() {
+        return atStateNotificationAcknowledgedRespondent1TimeExtension(1);
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension(int numberOfHoursAfterCurrentDate) {
+        atStateNotificationAcknowledged();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension() {
+        return atStateNotificationAcknowledgedRespondent2TimeExtension(5);
     }
 
     public CaseDataBuilder atStatePastApplicantResponseDeadline() {

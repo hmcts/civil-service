@@ -580,7 +580,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
@@ -722,7 +722,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvent_whenRespondent2ExtendsTimeRespondent1TimeExtended() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -767,7 +767,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvent_whenRespondent1ExtendsTimeRespondent2TimeNotExtended() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -812,7 +812,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvent_whenRespondent1ExtendsTimeRespondent2TimeExtended() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -864,7 +864,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
@@ -1150,7 +1150,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithFullDefenceNotProceedsWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                 .build();
             Event expectedDefenceFiled = Event.builder()
@@ -2200,7 +2200,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenPastApplicantResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .build();
             Event expectedDefenceFiled = Event.builder()
