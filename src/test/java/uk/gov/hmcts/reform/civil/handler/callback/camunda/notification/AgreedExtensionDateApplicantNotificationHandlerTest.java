@@ -78,7 +78,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
 
             @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
-                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
@@ -90,7 +90,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
 
             @Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
-                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
@@ -111,10 +111,10 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                     caseData.getRespondentSolicitor2AgreedDeadlineExtension()
                 );
 
-                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
-                    "respondentsolicitor2@example.com",
+                    "respondentsolicitor@example.com",
                     templateId,
                     expectedNotificationData,
                     reference
@@ -146,7 +146,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
 
             @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
-                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
@@ -158,7 +158,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
 
             @Test
             void shouldNotifyRespondentSolicitor2() {
-                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
@@ -179,7 +179,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                     caseData.getRespondentSolicitor2AgreedDeadlineExtension()
                 );
 
-                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE");
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
@@ -212,11 +212,11 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             .isEqualTo("AgreedExtensionDateNotifyApplicantSolicitor1");
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build()).build()))
+            "NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build()).build()))
             .isEqualTo("AgreedExtensionDateNotifyRespondentSolicitor1CC");
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE").build()).build()))
+            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC").build()).build()))
             .isEqualTo("AgreedExtensionDateNotifyRespondentSolicitor2CC");
     }
 }

@@ -22,8 +22,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -37,10 +37,11 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         new AbstractMap.SimpleEntry<>(
             NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE, "AgreedExtensionDateNotifyApplicantSolicitor1"),
         new AbstractMap.SimpleEntry<>(
-            NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC,
+            NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC,
             "AgreedExtensionDateNotifyRespondentSolicitor1CC"),
         new AbstractMap.SimpleEntry<>(
-            NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE, "AgreedExtensionDateNotifyRespondentSolicitor2CC")
+            NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC,
+            "AgreedExtensionDateNotifyRespondentSolicitor2CC")
     );
 
     private static final String REFERENCE_TEMPLATE = "agreed-extension-date-applicant-notification-%s";
@@ -114,10 +115,10 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE.name())) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         }
-        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC.name())) {
+        if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC.name())) {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
-        if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE.name())) {
+        if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC.name())) {
             return caseData.getRespondentSolicitor2EmailAddress();
         }
 
