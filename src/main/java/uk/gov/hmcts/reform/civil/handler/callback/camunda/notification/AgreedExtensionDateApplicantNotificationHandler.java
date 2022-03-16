@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.time.LocalDate;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +32,10 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static Map<CaseEvent, String> EVENT_TASK_ID_MAP = Map.ofEntries(
-        new AbstractMap.SimpleEntry<>(
-            NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE, "AgreedExtensionDateNotifyApplicantSolicitor1"),
-        new AbstractMap.SimpleEntry<>(
-            NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC,
-            "AgreedExtensionDateNotifyRespondentSolicitor1CC"),
-        new AbstractMap.SimpleEntry<>(
-            NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC,
-            "AgreedExtensionDateNotifyRespondentSolicitor2CC")
+    private static Map<CaseEvent, String> EVENT_TASK_ID_MAP = Map.of(
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE, "AgreedExtensionDateNotifyApplicantSolicitor1",
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC, "AgreedExtensionDateNotifyRespondentSolicitor1CC",
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC, "AgreedExtensionDateNotifyRespondentSolicitor2CC"
     );
 
     private static final String REFERENCE_TEMPLATE = "agreed-extension-date-applicant-notification-%s";
@@ -70,7 +64,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            getRespondentSolicitorEmailAddress(callbackParams),
+            getSolicitorEmailAddress(callbackParams),
             notificationsProperties.getClaimantSolicitorAgreedExtensionDate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -108,7 +102,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         );
     }
 
-    private String getRespondentSolicitorEmailAddress(CallbackParams callbackParams) {
+    private String getSolicitorEmailAddress(CallbackParams callbackParams) {
         String eventId = callbackParams.getRequest().getEventId();
         CaseData caseData = callbackParams.getCaseData();
 

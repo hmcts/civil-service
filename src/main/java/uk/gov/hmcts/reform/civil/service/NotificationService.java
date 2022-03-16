@@ -13,7 +13,7 @@ public class NotificationService {
 
     private final NotificationClient notificationClient;
 
-    public void  sendMail(
+    public void sendMail(
         String targetEmail,
         String emailTemplate,
         Map<String, String> parameters,
