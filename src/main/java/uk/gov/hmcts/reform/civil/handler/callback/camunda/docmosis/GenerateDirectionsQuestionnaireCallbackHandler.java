@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -32,8 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        GENERATE_DIRECTIONS_QUESTIONNAIRE,
-        GENERATE_DIRECTIONS_QUESTIONNAIRE_SPEC
+        GENERATE_DIRECTIONS_QUESTIONNAIRE
     );
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
