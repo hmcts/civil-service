@@ -156,12 +156,9 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
-        String message = format(
-            "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState()
-        );
-        String subject = format("Multiparty claim data for %s", reference
-            + " - " + caseData.getCcdState() + " - " + "Claimant has notified defendant.");
+        String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                "Claimant has notified defendant.");
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
@@ -190,11 +187,10 @@ class RoboticsNotificationServiceTest {
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
         String message = format(
-            "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState()
+            "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
-        String subject = format("Multiparty claim data for %s", reference
-            + " - " + caseData.getCcdState() + " - " + "Claim details notified.");
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                "Claim details notified.");
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
@@ -233,12 +229,9 @@ class RoboticsNotificationServiceTest {
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
-        String message = format(
-            "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState()
-        );
-        String subject = format("Multiparty claim data for %s", reference
-            + " - " + caseData.getCcdState() + " - " + lastEventText);
+        String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                lastEventText);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);

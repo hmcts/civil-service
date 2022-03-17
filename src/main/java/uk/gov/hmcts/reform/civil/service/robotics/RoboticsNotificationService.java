@@ -74,14 +74,14 @@ public class RoboticsNotificationService {
     }
 
     private String getMessage(CaseData caseData, boolean isMultiParty) {
-        return isMultiParty ? String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference() + " - "
-            + caseData.getCcdState()) : String.format("Robotics case data JSON is attached for %s",
+        return isMultiParty ? String.format("Multiparty claim data for %s - %s", caseData.getLegacyCaseReference(),
+            caseData.getCcdState()) : String.format("Robotics case data JSON is attached for %s",
                 caseData.getLegacyCaseReference());
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        return isMultiParty ? String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
-            + " - " + caseData.getCcdState() + " - " + triggerEvent) : String.format("Robotics case data for %s",
+        return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
+            caseData.getCcdState(), triggerEvent) : String.format("Robotics case data for %s",
                 caseData.getLegacyCaseReference());
     }
 
