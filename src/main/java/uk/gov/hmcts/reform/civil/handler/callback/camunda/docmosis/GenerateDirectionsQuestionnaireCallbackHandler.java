@@ -31,8 +31,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DIRECTIONS_QUESTIONNAIRE,
-                                                          GENERATE_DIRECTIONS_QUESTIONNAIRE_SPEC);
+    private static final List<CaseEvent> EVENTS = List.of(
+        GENERATE_DIRECTIONS_QUESTIONNAIRE,
+        GENERATE_DIRECTIONS_QUESTIONNAIRE_SPEC
+    );
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final ObjectMapper objectMapper;
@@ -114,6 +116,14 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             .build();
     }
 
+    /**
+     * Next version for prepareDirectionsQuestionnaire. The main difference is storing the generated document
+     * not only in the generated documents list but also in respondent1GeneratedResponseDocument, so we can use
+     * easily locate it in intention to proceed journey.
+     *
+     * @param callbackParams parameters of the callback
+     * @return response of the callback
+     */
     private CallbackResponse prepareDirectionsQuestionnaireV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

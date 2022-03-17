@@ -52,10 +52,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build())
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
         .build();
 
     @MockBean
@@ -71,11 +71,12 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void setup() {
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
         when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
-            anyString(), anyString())).thenReturn(DOCUMENT);
+                                                                                    anyString(), anyString()
+        )).thenReturn(DOCUMENT);
     }
 
     @Nested
-    class version0 {
+    class Version0 {
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
@@ -106,8 +107,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
-                                                                                           "BEARER_TOKEN", "ONE");
+            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(
+                caseData, "BEARER_TOKEN", "ONE"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
@@ -117,7 +119,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack()
+                .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
@@ -128,8 +131,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
-                                                                                           "BEARER_TOKEN", "TWO");
+            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(
+                caseData, "BEARER_TOKEN", "TWO"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
@@ -139,7 +143,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRSameResponse() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.YES)
                 .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
@@ -159,7 +164,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     }
 
     @Nested
-    class version1 {
+    class Version1 {
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
@@ -190,8 +195,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
-                                                                                           "BEARER_TOKEN", "ONE");
+            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(
+                caseData, "BEARER_TOKEN", "ONE"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
@@ -201,7 +207,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
@@ -212,8 +219,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(caseData,
-                                                                                           "BEARER_TOKEN", "TWO");
+            verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(
+                caseData, "BEARER_TOKEN", "TWO"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
@@ -223,7 +231,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRSameResponse() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.YES)
                 .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
