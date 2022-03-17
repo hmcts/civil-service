@@ -397,7 +397,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("You believe you owe &#163;").append(admitOwed).append(
+        sb.append("<br>You believe you owe &#163;").append(admitOwed).append(
                 ". We've emailed ").append(applicantName)
             .append(" your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE));
@@ -405,7 +405,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             sb.append(" and your explanation of why you do not owe the full amount.");
         }
 
-        sb.append("<br>").append("The claimant has until 4pm on ")
+        sb.append("<br><br>").append("The claimant has until 4pm on ")
             .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
             .append(" to respond to your claim. <br>We will let you know when they respond.")
             .append(String
