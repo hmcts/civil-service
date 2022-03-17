@@ -439,19 +439,17 @@ public class FlowPredicate {
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                                || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-                            || YES.equals(caseData.getApplicant1ProceedWithClaim());
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 break;
             case ONE_V_ONE:
                 predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case TWO_V_ONE:
-                predicate = (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                                || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
-                            || YES.equals(caseData.getApplicant1ProceedWithClaim());
+                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
                 break;
             default:
                 break;
@@ -459,69 +457,23 @@ public class FlowPredicate {
         return predicate;
     }
 
-    // replace with this after CMC-1856 is merged for backwards compatibility
-    //private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
-    //    boolean predicate = false;
-    //    switch (getMultiPartyScenario(caseData)) {
-    //        case ONE_V_TWO_TWO_LEGAL_REP:
-    //        case ONE_V_TWO_ONE_LEGAL_REP:
-    //            predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-    //                || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-    //            break;
-    //        case ONE_V_ONE:
-    //            predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
-    //            break;
-    //        case TWO_V_ONE:
-    //            predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-    //                || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //    return predicate;
-    //}
-
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = (NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                                && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-                            || NO.equals(caseData.getApplicant1ProceedWithClaim());
+                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                    && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 break;
             case ONE_V_ONE:
                 predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case TWO_V_ONE:
-                predicate = (NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                                && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
-                            || NO.equals(caseData.getApplicant1ProceedWithClaim());
+                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
                 break;
             default:
                 break;
         }
         return predicate;
     }
-
-    // replace with this after CMC-1856 is merged for backwards compatibility
-    //private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
-    //    boolean predicate = false;
-    //    switch (getMultiPartyScenario(caseData)) {
-    //        case ONE_V_TWO_TWO_LEGAL_REP:
-    //            predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-    //                && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-    //            break;
-    //        case ONE_V_ONE:
-    //            predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
-    //            break;
-    //        case TWO_V_ONE:
-    //            predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-    //                && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //    return predicate;
-    //}
 }
