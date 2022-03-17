@@ -54,64 +54,59 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (respondent2HasSameLegalRep(caseData)) {
-            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseType() != null
-                    && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
-                    CaseDocument directionsQuestionnaire =
-                        directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
-                            caseData,
-                            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                            "ONE"
-                        );
+        if (respondent2HasSameLegalRep(caseData) && NO == caseData.getRespondentResponseIsSame()) {
+            if (isDefendant1DQResponse(caseData)) {
+                generateAndSet1V2SameSolDivergentResponsesDQ(callbackParams, caseData, caseDataBuilder, "ONE");
+            }
 
-                    List<Element<CaseDocument>> systemGeneratedCaseDocuments =
-                        caseData.getSystemGeneratedCaseDocuments();
-                    systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-                    caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-                }
-
-                if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseType() != null
-                    && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
-                    CaseDocument directionsQuestionnaire =
-                        directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
-                            caseData,
-                            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                            "TWO"
-                        );
-
-                    List<Element<CaseDocument>> systemGeneratedCaseDocuments =
-                        caseData.getSystemGeneratedCaseDocuments();
-                    systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-                    caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-                }
-            } else {
-                // TODO explore the possibility of this being redundant and remove if so
-                CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
-                    caseData,
-                    callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-                List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
-                systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+            if (isDefendant2DQResponse(caseData)) {
+                generateAndSet1V2SameSolDivergentResponsesDQ(callbackParams, caseData, caseDataBuilder, "TWO");
             }
         } else {
-            CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
-            systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+            generateAndSetDQ(callbackParams, caseData, caseDataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void generateAndSetDQ(CallbackParams callbackParams, CaseData caseData,
+                                  CaseData.CaseDataBuilder caseDataBuilder) {
+        CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
+            caseData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
+        systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+    }
+
+    private boolean isDefendant2DQResponse(CaseData caseData) {
+        return caseData.getRespondent2DQ() != null
+            && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
+    }
+
+    private boolean isDefendant1DQResponse(CaseData caseData) {
+        return caseData.getRespondent1DQ() != null
+            && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType());
+    }
+
+    private void generateAndSet1V2SameSolDivergentResponsesDQ(CallbackParams callbackParams, CaseData caseData,
+                                                              CaseData.CaseDataBuilder caseDataBuilder,
+                                                              String defendantIdentifier) {
+        CaseDocument directionsQuestionnaire =
+            directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
+            caseData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            defendantIdentifier
+        );
+
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments =
+            caseData.getSystemGeneratedCaseDocuments();
+        systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
     /**
