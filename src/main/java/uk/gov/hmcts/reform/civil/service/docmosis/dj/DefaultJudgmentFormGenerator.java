@@ -69,13 +69,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private Party getResondent(uk.gov.hmcts.reform.civil.model.Party respondent) {
-
-        return Party.builder()
-            .name(respondent.getPartyName())
-            .primaryAddress(respondent.getPrimaryAddress())
-            .build();
-    }
 
     private List<DefaultJudgmentForm> getDefaultJudgmentForm(CaseData caseData) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
@@ -83,6 +76,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
                                      .caseNumber(caseData.getLegacyCaseReference())
                                      .formText("No Acknowledgement of service")
+                                     .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant1()))
                                      .respondent(getResondent(caseData.getRespondent1()))
                                      .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                                              ? null : caseData.getSolicitorReferences()
@@ -94,6 +88,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
                                          .caseNumber(caseData.getLegacyCaseReference())
                                          .formText("No Acknowledgement of service")
+                                         .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant1()))
                                          .respondent(getResondent(caseData.getRespondent2()))
                                          .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                                                  ? null : caseData.getSolicitorReferences()
@@ -110,4 +105,31 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
         return N121;
     }
+
+    private Party getResondent(uk.gov.hmcts.reform.civil.model.Party respondent) {
+
+        return Party.builder()
+            .name(respondent.getPartyName())
+            .primaryAddress(respondent.getPrimaryAddress())
+            .build();
+    }
+
+    private List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
+                                     uk.gov.hmcts.reform.civil.model.Party applicant2) {
+
+        List<Party> applicants = new ArrayList<>();
+        applicants.add(Party.builder()
+                           .name(applicant1.getPartyName())
+                           .primaryAddress(applicant1.getPrimaryAddress())
+                           .build());
+        if (applicant2 != null) {
+            applicants.add(Party.builder()
+                               .name(applicant2.getPartyName())
+                               .primaryAddress(applicant2.getPrimaryAddress())
+                               .build());
+        }
+        return applicants;
+    }
+
+
 }
