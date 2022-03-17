@@ -347,7 +347,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData))
+        String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
+                                getRepayPlanSummary(caseData))
             .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
         return SubmittedCallbackResponse.builder()
@@ -493,6 +494,70 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             sb.append("'s");
         }
         sb.append(" legal representative if you need details on how to pay.</p>");
+        return Optional.of(sb.toString());
+    }
+
+    /**
+     * Confirmation summary text for a response with a repayment plan offer.
+     *
+     * @param caseData a case data
+     * @return if suitable, the summary text for repayment plan offer
+     */
+    private Optional<String> getRepayPlanSummary(CaseData caseData) {
+        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            return Optional.empty();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+        sb.append("<br>We've emailed ").append(applicantName)
+            .append(" to say you've suggested paying by instalments.")
+            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.")
+            .append(String
+                        .format(
+                            "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                        ))
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your offer</h3>");
+        } else {
+            sb.append(" accepts your offer</h3>");
+        }
+        sb.append("You should<ul>")
+            .append("<li>set up a repayment plan to begin when you said it would</li>")
+            .append("<li>keep proof of any payments you make</li>")
+            .append("</ul>")
+            .append("Contact ").append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay")
+            .append("<br><br>")
+            .append("If you do not pay immediately, ").append(applicantName)
+            .append(" can either:")
+            .append("<ul>")
+            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
+            .append("<li>request a county court judgement against you</li>")
+            .append("</ul>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" reject your offer</h3>");
+        } else {
+            sb.append(" rejects your offer</h3>");
+        }
+        sb.append("The court will decide how you must pay");
+
         return Optional.of(sb.toString());
     }
 
