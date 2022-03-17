@@ -347,8 +347,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = getPartialAdmitSetDateSummary(caseData)
-            .orElse(getDefaultConfirmationBody(caseData));
+        String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData))
+            .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
@@ -463,6 +463,35 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
             .append("</h3>")
             .append("<p>The court will decide how you must pay</p>");
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getPartialAdmitImmediatelySummary(CaseData caseData) {
+        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            return Optional.empty();
+        }
+        LocalDate whenWillYouPay = LocalDate.now().plusDays(5);
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("We've emailed ").append(applicantName)
+            .append(" to say you will pay immediately.")
+            .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
+            .append("<ul>")
+            .append("<li>pay ").append(applicantName).append(" By ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
+            .append("<li>Keep proof of any payments you make</li>")
+            .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
+            .append("</ul>")
+            .append("<p>Contact ")
+            .append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay.</p>");
         return Optional.of(sb.toString());
     }
 
