@@ -71,8 +71,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (isMultiPartyScenario(caseData) &&
-            !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        if (isMultiPartyScenario(caseData)
+            && !caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
             return JUDGMENT_REFERRED;
         } else {
             return JUDGMENT_GRANTED;
@@ -80,8 +81,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (isMultiPartyScenario(caseData) &&
-            !caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        if (isMultiPartyScenario(caseData)
+            && !caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
             return format(JUDGMENT_REQUESTED, caseData.getLegacyCaseReference());
 
         } else {
