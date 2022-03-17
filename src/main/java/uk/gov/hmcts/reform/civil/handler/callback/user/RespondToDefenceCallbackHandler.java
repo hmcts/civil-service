@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -51,7 +52,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class RespondToDefenceCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE);
@@ -69,13 +69,15 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(V_1, ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmitMultiParty,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -85,10 +87,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
-
-        if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-            updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -183,6 +181,29 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
+            .applicant1ResponseDate(time.now());
+
+        if (caseData.getApplicant1ProceedWithClaim() == YES) {
+            // moving statement of truth value to correct field, this was not possible in mid event.
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+            Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
+                .applicant1DQStatementOfTruth(statementOfTruth)
+                .build();
+
+            builder.applicant1DQ(dq);
+            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse aboutToSubmitMultiParty(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
@@ -221,13 +242,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
-
-        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
-            builder.respondentSharedClaimResponseDocument(null);
-        }
-
-        //Set to null because there are no more deadlines
-        builder.nextDeadline(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
