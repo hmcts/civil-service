@@ -73,10 +73,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private List<DefaultJudgmentForm> getDefaultJudgmentForm(CaseData caseData) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
+        defaultJudgmentForms.add(DefaultJudgmentForm.builder()
                                      .caseNumber(caseData.getLegacyCaseReference())
                                      .formText("No Acknowledgement of service")
-                                     .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant1()))
+                                     .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
                                      .respondent(getResondent(caseData.getRespondent1()))
                                      .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                                              ? null : caseData.getSolicitorReferences()
@@ -85,10 +85,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                                               ? null : caseData.getSolicitorReferences()
                                          .getRespondentSolicitor1Reference()).build());
         if (caseData.getRespondent2() != null) {
-            defaultJudgmentForms.add(DefaultJudgmentForm.builder().applicants(null)
+            defaultJudgmentForms.add(DefaultJudgmentForm.builder()
                                          .caseNumber(caseData.getLegacyCaseReference())
                                          .formText("No Acknowledgement of service")
-                                         .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant1()))
+                                         .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
                                          .respondent(getResondent(caseData.getRespondent2()))
                                          .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                                                  ? null : caseData.getSolicitorReferences()

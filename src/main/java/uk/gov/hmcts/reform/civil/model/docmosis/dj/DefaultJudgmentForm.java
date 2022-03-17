@@ -16,7 +16,7 @@ import java.util.List;
 public class DefaultJudgmentForm implements MappableObject {
 
     private final String caseNumber;
-    private final List<Party> applicants;
+    private final List<Party> applicant;
     private final String applicantReference;
     private final String respondentReference;
     private final Party respondent;
