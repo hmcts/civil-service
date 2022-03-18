@@ -40,15 +40,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
-        + "Judgment has been entered and your case will be referred to a judge for directions.";
+        + "%n%n Judgment has been entered and your case will be referred to a judge for directions.";
     public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "
         + "and tell you what happens next.";
     public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
     public static final String TRIAL_TEXT = "will be trial hearing provided text";
-    public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested %n##"
-        + " Claim number: %s";
-    public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted %n##"
-        + " Claim number: %s";
+    public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
+    public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
 
