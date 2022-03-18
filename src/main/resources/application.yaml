@@ -228,8 +228,8 @@ rd_professional:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil+robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
+    recipient: douglasrice@yahoo.com
+    multipartyrecipient: douglas.rice@hmcts.net
 ---
 
 spring:
