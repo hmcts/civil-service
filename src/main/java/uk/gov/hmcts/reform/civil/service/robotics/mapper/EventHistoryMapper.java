@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -549,25 +550,9 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                String paginatedMessage;
-                int index = 1;
-                LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-                if (respondent1ResponseDate != null && respondent2ResponseDate != null) {
-                    if (respondent1ResponseDate.isBefore(respondent2ResponseDate)
-                        || respondent1ResponseDate.isEqual(respondent2ResponseDate)) {
-                        index = isRespondent1 ? 1 : 2;
-                    } else {
-                        index = isRespondent1 ? 2 : 1;
-                    }
-                }
-                paginatedMessage = format(
-                    "[%d of 2 - %s] ",
-                    index,
-                    time.now().toLocalDate().toString()
-                );
+                String paginatedMessage = getPaginatedMessageIndexFor1v2SameSolicitor(caseData, isRespondent1);
                 defaultText = (format(
-                    "RPA Reason: %s Defendant: %s has responded: %s; "
+                    "RPA Reason:%s Defendant: %s has responded: %s; "
                         + "preferredCourtCode: %s; stayClaim: %s",
                     paginatedMessage,
                     respondent.getPartyName(),
@@ -593,6 +578,26 @@ public class EventHistoryMapper {
             );
         }
         return defaultText;
+    }
+
+    // Index 1 if respondent 1 responds on or before respondent 2's response date
+    private String getPaginatedMessageIndexFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
+        int index = 1;
+        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+        if (respondent1ResponseDate != null && respondent2ResponseDate != null) {
+            if (respondent1ResponseDate.isBefore(respondent2ResponseDate)
+                || respondent1ResponseDate.isEqual(respondent2ResponseDate)) {
+                index = isRespondent1 ? 1 : 2;
+            } else {
+                index = isRespondent1 ? 2 : 1;
+            }
+        }
+        return format(
+            " [%d of 2 - %s] ",
+            index,
+            time.now().toLocalDate().toString()
+        );
     }
 
     private void buildUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
