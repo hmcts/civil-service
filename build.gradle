@@ -11,7 +11,7 @@ plugins {
   id "io.freefair.lombok" version "5.3.3.3"
   id "org.flywaydb.flyway" version "8.5.2"
   id 'net.ltgt.apt' version '0.21'
-  id 'com.github.hmcts.rse-cft-lib' version '0.15.3'
+  id 'com.github.hmcts.rse-cft-lib' version '0.15.17'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -97,17 +97,11 @@ allprojects {
 
   repositories {
     mavenLocal()
-    jcenter()
     mavenCentral()
-    maven {
-      url  "http://repo.spring.io/milestone"
-    }
-    maven {
-      url  "https://repo.spring.io/libs-milestone"
-    }
     maven {
       url "https://jitpack.io"
     }
+    jcenter()
   }
 }
 
@@ -261,7 +255,7 @@ def versions = [
   junitPlatform      : '1.8.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.0.0.M2',
+  springStatemachine : '3.0.0',
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.12',
   pact               : '3.5.24'
@@ -435,4 +429,30 @@ pact {
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+task generateXls(type: Exec) {
+    def definitionDir = project.file('civil-ccd-definition/ccd-definition')
+    def xls = project.file('civil-ccd-definition/build/ccd-release-config/civil-ccd-prod.xlsx')
+    commandLine rootProject.file('civil-ccd-definition/bin/build-release-ccd-definition.sh').path
+    inputs.dir definitionDir
+    outputs.file xls
+    environment "CCD_DEF_CASE_SERVICE_BASE_URL", "http://localhost:4000"
+}
+
+bootWithCCD {
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+    environment 'SPRING_PROFILES_ACTIVE', 'local'
+    environment 'DOCMOSIS_TORNADO_KEY', 'placeholder'
+    environment 'GOV_NOTIFY_API_KEY', 'placeholder'
+    environment 'LAUNCH_DARKLY_SDK_KEY', 'placeholder'
+    environment 'LAUNCH_DARKLY_OFFLINE_MODE', 'placeholder'
+    environment 'SENDGRID_API_KEY', 'placeholder'
+    environment 'CMC_DB_PORT', '6432'
+    environment 'CMC_DB_USERNAME', 'postgres'
+    environment 'CMC_DB_PASSWORD', 'postgres'
+
+    environment 'POLLING_EVENT_EMITTER_ENABLED', 'false'
 }

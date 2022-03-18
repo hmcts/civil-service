@@ -1,0 +1,3 @@
+[submodule "civil-ccd-definition"]
+	path = civil-ccd-definition
+	url = git@github.com:hmcts/civil-ccd-definition.git
