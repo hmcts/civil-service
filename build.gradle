@@ -441,6 +441,7 @@ task generateXls(type: Exec) {
 }
 
 bootWithCCD {
+    dependsOn generateXls
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
