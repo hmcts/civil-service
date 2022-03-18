@@ -436,18 +436,14 @@ public class EventHistoryMapper {
 
     public String prepareMultipartyProceedMiscText(int reasonNumber, boolean forRespondent1, CaseData caseData) {
         return String.format(
-            "RPA Reason: [%d of 2 - %s] Claimant has provided intention: %s against defendant: %s, %s",
+            "RPA Reason: [%d of 2 - %s] Claimant has provided intention: %s against defendant: %s",
             reasonNumber,
             time.now().toLocalDate().toString(),
             YES.equals(forRespondent1
                            ? caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()
                            : caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()
             ) ? "proceed" : "not proceed",
-            forRespondent1 ? caseData.getRespondent1().getPartyName() : caseData.getRespondent2().getPartyName(),
-            prepareEventDetailsText(
-                caseData.getApplicant1DQ(),
-                caseData.getCourtLocation().getApplicantPreferredCourt()
-            )
+            forRespondent1 ? caseData.getRespondent1().getPartyName() : caseData.getRespondent2().getPartyName()
         );
     }
 
