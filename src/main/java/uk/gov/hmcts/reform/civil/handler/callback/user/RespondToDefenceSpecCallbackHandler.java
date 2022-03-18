@@ -9,8 +9,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -27,7 +30,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
+public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
     private final ObjectMapper objectMapper;
@@ -42,6 +46,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "experts"), this::validateApplicantExperts,
+            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
+            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::emptyCallbackResponse
@@ -62,6 +69,29 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateApplicantWitnesses(CallbackParams callbackParams) {
+        return validateWitnesses(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
+        return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
+        // setting null here does not clear, need to overwrite with value.
+        // must be to do with the way XUI cache data entered through the lifecycle of an event.
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 }

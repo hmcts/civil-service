@@ -27,6 +27,7 @@ public class Applicant1DQ implements DQ {
     private final FurtherInformation applicant1DQFurtherInformation;
     private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
+    private final FutureApplications applicant1DQFutureApplications;
 
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
