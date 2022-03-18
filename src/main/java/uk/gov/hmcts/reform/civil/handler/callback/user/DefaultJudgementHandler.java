@@ -76,7 +76,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .getLabel().startsWith("Both")) {
             return JUDGMENT_REFERRED;
         } else {
-            return JUDGMENT_GRANTED;
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
         }
     }
 
