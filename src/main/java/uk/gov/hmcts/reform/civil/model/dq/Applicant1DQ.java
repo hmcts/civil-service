@@ -19,6 +19,7 @@ public class Applicant1DQ implements DQ {
     private final Experts applicant1DQExperts;
     private final Witnesses applicant1DQWitnesses;
     private final Hearing applicant1DQHearing;
+    private final HearingLRspec applicant1DQHearingLRspec;
     private final SmallClaimHearing applicant1DQSmallClaimHearing;
     private final Document applicant1DQDraftDirections;
     private final RequestedCourt applicant1DQRequestedCourt;
