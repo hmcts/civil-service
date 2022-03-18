@@ -54,11 +54,11 @@ public class RoboticsNotificationService {
 
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                triggerEvent = isMultiParty ? findLatestEventTriggerReason(roboticsCaseData.getEvents()) : null;
+                triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-                triggerEvent = isMultiParty ? findLatestEventTriggerReason(roboticsCaseData.getEvents()) : null;
+                triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
 
