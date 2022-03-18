@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -348,7 +349,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
-                                getRepayPlanSummary(caseData))
+                                getRepayPlanSummary(caseData)
+            )
             .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
         return SubmittedCallbackResponse.builder()
@@ -505,7 +507,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
      */
     private Optional<String> getRepayPlanSummary(CaseData caseData) {
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            || !NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
+            || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+            .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+        ) {
             return Optional.empty();
         }
 
