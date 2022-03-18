@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -77,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
@@ -682,6 +684,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState(FlowState.Main flowState) {
+        return atState(flowState, ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atState(FlowState.Main flowState, MultiPartyScenario mpScenario) {
         switch (flowState) {
             case DRAFT:
                 return atStateClaimDraft();
@@ -724,7 +730,7 @@ public class CaseDataBuilder {
             case COUNTER_CLAIM:
                 return atStateRespondentCounterClaim();
             case FULL_DEFENCE_PROCEED:
-                return atStateApplicantRespondToDefenceAndProceed();
+                return atStateApplicantRespondToDefenceAndProceed(mpScenario);
             case FULL_DEFENCE_NOT_PROCEED:
                 return atStateApplicantRespondToDefenceAndNotProceed();
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
@@ -1724,6 +1730,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
+        return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario mpScenario) {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()

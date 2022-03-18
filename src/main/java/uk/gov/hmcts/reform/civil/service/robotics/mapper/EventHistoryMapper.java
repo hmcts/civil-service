@@ -418,15 +418,37 @@ public class EventHistoryMapper {
                     caseData.getCourtLocation().getApplicantPreferredCourt()
                 ))
                 .build()
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getApplicant1ResponseDate())
-                            .eventDetailsText("RPA Reason: Applicant proceeds.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Applicant proceeds.")
-                                              .build())
-                            .build());
+        ).miscellaneous((caseData.getRespondent2() == null
+            ? List.of("RPA Reason: Claimant(s) proceeds.")
+            : List.of(
+                String.format(prepareMultipartyProceedMiscText(1, true, caseData)),
+                String.format(prepareMultipartyProceedMiscText(2, false, caseData))
+            )).stream().map(reason -> Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(MISCELLANEOUS.getCode())
+            .dateReceived(caseData.getApplicant1ResponseDate())
+            .eventDetailsText(reason)
+            .eventDetails(EventDetails.builder()
+                              .miscText(reason)
+                              .build())
+            .build()).collect(Collectors.toList()));
+    }
+
+    public String prepareMultipartyProceedMiscText(int reasonNumber, boolean forRespondent1, CaseData caseData) {
+        return String.format(
+            "RPA Reason: [%d of 2 - %s] Claimant has provided intention: %s against defendant: %s, %s",
+            reasonNumber,
+            time.now().toLocalDate().toString(),
+            YES.equals(forRespondent1
+                           ? caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()
+                           : caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()
+            ) ? "proceed" : "not proceed",
+            forRespondent1 ? caseData.getRespondent1().getPartyName() : caseData.getRespondent2().getPartyName(),
+            prepareEventDetailsText(
+                caseData.getApplicant1DQ(),
+                caseData.getCourtLocation().getApplicantPreferredCourt()
+            )
+        );
     }
 
     public String prepareEventDetailsText(DQ dq, String preferredCourtCode) {

@@ -1505,9 +1505,9 @@ class EventHistoryMapperTest {
                     .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getApplicant1ResponseDate())
-                    .eventDetailsText("RPA Reason: Applicant proceeds.")
+                    .eventDetailsText("RPA Reason: Claimant(s) proceeds.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Applicant proceeds.")
+                                      .miscText("RPA Reason: Claimant(s) proceeds.")
                                       .build())
                     .build()
             );
