@@ -467,8 +467,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private Optional<String> getPartialAdmitImmediatelySummary(CaseData caseData) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || !RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
