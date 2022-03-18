@@ -15,10 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -380,5 +377,27 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
         }
+    }
+
+    @Test
+    void specificSummary_whenPartialAdmitPaidLess() {
+        BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+        BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.YES)
+            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+            .totalClaimAmount(totalClaimAmount)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response.getConfirmationBody())
+            .contains(caseData.getApplicant1().getPartyName())
+            .contains("The claim will be settled. We'll contact you when they respond.")
+            .contains(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid().toString());
     }
 }
