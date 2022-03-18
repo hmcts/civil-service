@@ -439,8 +439,8 @@ public class FlowPredicate {
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
             case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 break;
@@ -460,6 +460,7 @@ public class FlowPredicate {
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         boolean predicate = false;
         switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
