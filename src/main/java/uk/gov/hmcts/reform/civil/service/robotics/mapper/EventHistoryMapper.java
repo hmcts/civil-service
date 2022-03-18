@@ -35,7 +35,10 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
@@ -118,6 +121,10 @@ public class EventHistoryMapper {
                     case FULL_DEFENCE:
                         buildRespondentFullDefence(builder, caseData);
                         break;
+                    case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
+                    case DIVERGENT_RESPOND_GO_OFFLINE:
+                        buildRespondentDivergentResponse(builder, caseData);
+                        break;
                     case FULL_DEFENCE_NOT_PROCEED:
                         buildFullDefenceNotProceed(builder, caseData);
                         break;
@@ -163,6 +170,120 @@ public class EventHistoryMapper {
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
+    }
+
+    private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+
+        buildRespondentResponseEventForEachRespondent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                                      respondent1ResponseDate, RESPONDENT_ID);
+
+        String miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+        builder.miscellaneous((Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(MISCELLANEOUS.getCode())
+            .dateReceived(respondent1ResponseDate)
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build()));
+
+        buildRespondentResponseEventForEachRespondent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                                      respondent2ResponseDate, RESPONDENT2_ID);
+        miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+        builder.miscellaneous((Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(MISCELLANEOUS.getCode())
+            .dateReceived(respondent2ResponseDate)
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build()));
+    }
+
+    private void buildRespondentResponseEventForEachRespondent(EventHistory.EventHistoryBuilder builder,
+                                                               CaseData caseData,
+                                                               RespondentResponseType respondentResponseType,
+                                                               LocalDateTime respondentResponseDate,
+                                                               String respondentID) {
+        switch (respondentResponseType) {
+            case FULL_DEFENCE:
+                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+                if (respondentID.equals(RESPONDENT_ID)) {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+                } else {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
+                }
+                break;
+            case COUNTER_CLAIM:
+                builder.defenceAndCounterClaim(
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                            .dateReceived(respondentResponseDate)
+                            .litigiousPartyID(respondentID)
+                            .build());
+                break;
+            case PART_ADMISSION:
+                builder.receiptOfPartAdmission(
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                            .dateReceived(respondentResponseDate)
+                            .litigiousPartyID(respondentID)
+                            .build());
+                break;
+            case FULL_ADMISSION:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            default:
+                break;
+        }
+    }
+
+    public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        String defaultText = "";
+        if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
+            switch (caseData.getRespondent1ClaimResponseType()) {
+                case COUNTER_CLAIM:
+                    defaultText = "RPA Reason: Defendant rejects and counter claims.";
+                    break;
+                case FULL_ADMISSION:
+                    defaultText = "RPA Reason: Defendant fully admits.";
+                    break;
+                case PART_ADMISSION:
+                    defaultText = "RPA Reason: Defendant partial admission.";
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            String paginatedMessage = "";
+            if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+                paginatedMessage = getPaginatedMessageIndexFor1v2SameSolicitor(caseData, isRespondent1);
+            }
+            defaultText = (format(
+                "RPA Reason:%s Defendant: %s has responded: %s;",
+                paginatedMessage,
+                respondent.getPartyName(),
+                getResponseTypeForRespondent(caseData, respondent)
+            ));
+        }
+        return defaultText;
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -743,63 +864,129 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.receiptOfAdmission(List.of(Event.builder()
-                                               .eventSequence(prepareEventSequence(builder.build()))
-                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                               .dateReceived(caseData.getRespondent1ResponseDate())
-                                               .litigiousPartyID("002")
-                                               .build())
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant fully admits.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant fully admits.")
-                                              .build())
-                            .build());
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.receiptOfAdmission(Event.builder()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent1ResponseDate())
+                                           .litigiousPartyID(RESPONDENT_ID)
+                                           .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.receiptOfAdmission(Event.builder()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent2ResponseDate())
+                                           .litigiousPartyID(RESPONDENT2_ID)
+                                           .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
     }
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.receiptOfPartAdmission(
-            List.of(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
-                    .build()
-            )
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant partial admission.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant partial admission.")
-                                              .build())
-                            .build());
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent2ResponseDate())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
     }
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.defenceAndCounterClaim(
-            List.of(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
-                    .build()
-            )
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant rejects and counter claims.")
-                                              .build())
-                            .build());
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.defenceAndCounterClaim(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.defenceAndCounterClaim(
+                List.of(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(caseData.getRespondent2ResponseDate())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build()
+                )
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
     }
 
     private void buildConsentExtensionFilingDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

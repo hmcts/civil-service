@@ -23,12 +23,12 @@ public class EventHistory {
     private List<Event> consentExtensionFilingDefence = List.of(Event.builder().build());
     @Singular("defenceFiled")
     private List<Event> defenceFiled;
-    @Builder.Default
-    private List<Event> defenceAndCounterClaim = List.of(Event.builder().build());
-    @Builder.Default
-    private List<Event> receiptOfPartAdmission = List.of(Event.builder().build());
-    @Builder.Default
-    private List<Event> receiptOfAdmission = List.of(Event.builder().build());
+    @Singular("defenceAndCounterClaim")
+    private List<Event> defenceAndCounterClaim;
+    @Singular("receiptOfPartAdmission")
+    private List<Event> receiptOfPartAdmission;
+    @Singular("receiptOfAdmission")
+    private List<Event> receiptOfAdmission;
     @Builder.Default
     private List<Event> replyToDefence = List.of(Event.builder().build());
     @Singular("directionsQuestionnaire")
