@@ -38,7 +38,11 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -270,7 +274,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> validationErrors = validateCaseData(caseData);
-        if(validationErrors.size() > 0) {
+        if (validationErrors.size() > 0) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validationErrors)
                 .build();
@@ -375,7 +379,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
-        if(caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
