@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -349,7 +350,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
-                                getRepayPlanSummary(caseData)
+                                getRepayPlanSummary(caseData),
+                                getFullAdmitAlreadyPaidSummary(caseData)
             )
             .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
@@ -563,6 +565,45 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         sb.append("The court will decide how you must pay");
 
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getFullAdmitAlreadyPaidSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>You told us you've paid the &#163;").append(caseData.getTotalClaimAmount())
+            .append(" you believe you owe. We've sent ")
+            .append(applicantName)
+            .append(" this response.")
+
+            .append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your response</h3>");
+        } else {
+            sb.append(" accepts your response</h3>");
+        }
+        sb.append("<p>The claim will be settled</p>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" reject your response</h3>");
+        } else {
+            sb.append(" rejects your response</h3>");
+        }
+            sb.append("<p>The court will review the case. You may have to go to a hearing.")
+            .append("<br><br>We'll contact you to tell you what to do next</p>");
         return Optional.of(sb.toString());
     }
 
