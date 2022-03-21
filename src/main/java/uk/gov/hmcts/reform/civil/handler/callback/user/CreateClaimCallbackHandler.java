@@ -38,10 +38,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -271,6 +268,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        List<String> validationErrors = validateCaseData(caseData);
+        if(validationErrors.size() > 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validationErrors)
+                .build();
+        }
+
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
@@ -364,5 +369,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private List<String> validateCaseData(CaseData caseData) {
+        List<String> errorsMessages = new ArrayList<>();
+        // Tactical fix. We have an issue where null courtLocation is being submitted.
+        // We are validating it exists on submission if not we return an error to the user.
+        if(caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+            errorsMessages.add("Court location code is required");
+        }
+        return errorsMessages;
     }
 }
