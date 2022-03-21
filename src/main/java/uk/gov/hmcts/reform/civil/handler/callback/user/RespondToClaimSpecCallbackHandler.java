@@ -614,11 +614,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
             return Optional.empty();
         }
+
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
-        if (totalClaimAmount == null) {
+        if (Stream.of(howMuchWasPaid, totalClaimAmount)
+            .anyMatch(Objects::isNull)) {
             return Optional.empty();
         }
+
+        if (howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) < 0) {
+            return Optional.empty();
+        }
+
         String applicantName = caseData.getApplicant1().getPartyName();
 
         String sb = "You told us you've paid the &#163;"
@@ -656,7 +665,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             return Optional.empty();
         }
 
-        BigDecimal howMuchWasPaid = caseData.getRespondToAdmittedClaim().getHowMuchWasPaid();
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
         if (Stream.of(howMuchWasPaid, totalClaimAmount)
