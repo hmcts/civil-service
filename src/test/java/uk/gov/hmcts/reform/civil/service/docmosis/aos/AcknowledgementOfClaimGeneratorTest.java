@@ -365,7 +365,7 @@ class AcknowledgementOfClaimGeneratorTest {
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(
                     templateData.getSolicitorReferences(),
-                    fetchSolicitorReferences(caseData.getSolicitorReferences())
+                    fetchSolicitorReferences(caseData)
                 ),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(
