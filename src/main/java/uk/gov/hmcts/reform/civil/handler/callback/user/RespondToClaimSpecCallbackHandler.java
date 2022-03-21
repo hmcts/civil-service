@@ -603,7 +603,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         } else {
             sb.append(" rejects your response</h3>");
         }
-            sb.append("<p>The court will review the case. You may have to go to a hearing.")
+        sb.append("<p>The court will review the case. You may have to go to a hearing.")
             .append("<br><br>We'll contact you to tell you what to do next</p>");
         return Optional.of(sb.toString());
     }
@@ -613,30 +613,27 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = caseData.getRespondToAdmittedClaim().getHowMuchWasPaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
-        if (Stream.of(howMuchWasPaid, totalClaimAmount)
-            .anyMatch(Objects::isNull)) {
+        if (totalClaimAmount == null) {
             return Optional.empty();
         }
         String applicantName = caseData.getApplicant1().getPartyName();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("You told us you've paid the &#163;")
-            .append(totalClaimAmount)
-            .append(" you believe you owe. We've sent ")
-            .append(applicantName)
-            .append(" this response.")
-            .append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
-            .append("<h3 class=\"govuk-heading-m\">If ")
-            .append(applicantName).append(" accepts your response</h3>")
-            .append("<p>The claim will be settled.</p>")
-            .append("<h3 class=\"govuk-heading-m\">If ")
-            .append(applicantName).append(" rejects your response</h3>")
-            .append("<p>The court will review the case. You may have to go to a hearing.</p>")
-            .append("<p>We'll contact you to tell you what to do next.</p>");
-        return Optional.of(sb.toString());
+        String sb = "You told us you've paid the &#163;"
+            + totalClaimAmount
+            + " you believe you owe. We've sent "
+            + applicantName
+            + " this response."
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " accepts your response</h3>"
+            + "<p>The claim will be settled.</p>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " rejects your response</h3>"
+            + "<p>The court will review the case. You may have to go to a hearing.</p>"
+            + "<p>We'll contact you to tell you what to do next.</p>";
+        return Optional.of(sb);
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
