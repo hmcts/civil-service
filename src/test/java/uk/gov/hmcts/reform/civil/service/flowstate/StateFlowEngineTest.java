@@ -1205,7 +1205,7 @@ class StateFlowEngineTest {
             @Test
             void shouldReturnAdmitsPartResponse_in1v2Scenario_whenBothRespondentsSubmitAdmitPartResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                    .atStateFullAdmission_1v2_BothRespondentSolicitorsSubmitFullAdmissionResponse()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
 

@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -68,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
 @RequiredArgsConstructor
@@ -489,18 +488,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
-    }
-
-    private Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
-                                                        LocalDateTime createdAt, DocumentType type) {
-        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
-                       .documentLink(document)
-                       .documentName(document.getDocumentFileName())
-                       .documentType(type)
-                       .createdDatetime(createdAt)
-                       .createdBy(createdBy)
-                       .build()
-                );
     }
 
     private boolean applicant2Present(CaseData caseData) {
