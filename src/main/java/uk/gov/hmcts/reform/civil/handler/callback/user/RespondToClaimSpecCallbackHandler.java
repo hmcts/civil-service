@@ -352,7 +352,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
                                 getRepayPlanSummary(caseData),
                                 getFullAdmitAlreadyPaidSummary(caseData),
-                                getPartialAdmitPaidFullSummary(caseData)
+                                getPartialAdmitPaidFullSummary(caseData),
+                                getPartialAdmitPaidLessSummary(caseData)
             )
             .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
@@ -647,6 +648,42 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private Optional<String> getPartialAdmitPaidLessSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        BigDecimal howMuchWasPaid = caseData.getRespondToAdmittedClaim().getHowMuchWasPaid();
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+
+        if (Stream.of(howMuchWasPaid, totalClaimAmount)
+            .anyMatch(Objects::isNull)) {
+            return Optional.empty();
+        }
+
+        if (howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) >= 0) {
+            return Optional.empty();
+        }
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("You told us you've paid the &#163;")
+            .append(howMuchWasPaid)
+            .append(". We've sent ")
+            .append(applicantName)
+            .append(" this response.")
+            .append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName).append(" accepts your response</h3>")
+            .append("<p>The claim will be settled. We'll contact you when they respond.</p>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName).append(" rejects your response</h3>")
+            .append("<p>The court will review the case. You may have to go to a hearing.</p>")
+            .append("<p>We'll contact you to tell you what to do next.</p>");
+        return Optional.of(sb.toString());
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
