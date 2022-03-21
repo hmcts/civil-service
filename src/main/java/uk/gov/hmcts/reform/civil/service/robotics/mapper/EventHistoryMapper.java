@@ -176,8 +176,8 @@ public class EventHistoryMapper {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
 
-        buildRespondentResponseEventForEachRespondent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                                      respondent1ResponseDate, RESPONDENT_ID);
+        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                     respondent1ResponseDate, RESPONDENT_ID);
 
         String miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
         builder.miscellaneous((Event.builder()
@@ -190,8 +190,8 @@ public class EventHistoryMapper {
                               .build())
             .build()));
 
-        buildRespondentResponseEventForEachRespondent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                                      respondent2ResponseDate, RESPONDENT2_ID);
+        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                     respondent2ResponseDate, RESPONDENT2_ID);
         miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
         builder.miscellaneous((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
@@ -204,11 +204,11 @@ public class EventHistoryMapper {
             .build()));
     }
 
-    private void buildRespondentResponseEventForEachRespondent(EventHistory.EventHistoryBuilder builder,
-                                                               CaseData caseData,
-                                                               RespondentResponseType respondentResponseType,
-                                                               LocalDateTime respondentResponseDate,
-                                                               String respondentID) {
+    private void buildRespondentResponseEvent(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              RespondentResponseType respondentResponseType,
+                                              LocalDateTime respondentResponseDate,
+                                              String respondentID) {
         switch (respondentResponseType) {
             case FULL_DEFENCE:
                 builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
@@ -274,7 +274,7 @@ public class EventHistoryMapper {
         } else {
             String paginatedMessage = "";
             if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                paginatedMessage = getPaginatedMessageIndexFor1v2SameSolicitor(caseData, isRespondent1);
+                paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
                 "RPA Reason:%s Defendant: %s has responded: %s;",
@@ -671,7 +671,7 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                String paginatedMessage = getPaginatedMessageIndexFor1v2SameSolicitor(caseData, isRespondent1);
+                String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
                 defaultText = (format(
                     "RPA Reason:%s Defendant: %s has responded: %s; "
                         + "preferredCourtCode: %s; stayClaim: %s",
@@ -701,18 +701,12 @@ public class EventHistoryMapper {
         return defaultText;
     }
 
-    // Index 1 if respondent 1 responds on or before respondent 2's response date
-    private String getPaginatedMessageIndexFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
+    private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
         int index = 1;
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
         if (respondent1ResponseDate != null && respondent2ResponseDate != null) {
-            if (respondent1ResponseDate.isBefore(respondent2ResponseDate)
-                || respondent1ResponseDate.isEqual(respondent2ResponseDate)) {
-                index = isRespondent1 ? 1 : 2;
-            } else {
-                index = isRespondent1 ? 2 : 1;
-            }
+            index = isRespondent1 ? 1 : 2;
         }
         return format(
             " [%d of 2 - %s] ",
