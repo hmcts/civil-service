@@ -438,5 +438,26 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(caseData.getTotalClaimAmount().toString())
                 .contains("you've paid");
         }
+
+        @Test
+        void specificSummary_whenPartialAdmitPaidFull() {
+            BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YesOrNo.YES)
+                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+                .totalClaimAmount(totalClaimAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(caseData.getTotalClaimAmount().toString());
+        }
     }
 }
