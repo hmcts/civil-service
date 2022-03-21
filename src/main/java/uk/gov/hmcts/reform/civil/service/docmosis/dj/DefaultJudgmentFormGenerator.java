@@ -45,7 +45,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         ));
         if (templateData.size() > 1) {
             docmosisDocument2 =
-                documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
+                documentGeneratorService.generateDocmosisDocument(templateData.get(1), docmosisTemplate);
             caseDocuments.add(documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
