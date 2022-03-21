@@ -47,7 +47,7 @@ public class AcknowledgementOfClaimGeneratorForSpec
         return AcknowledgementOfClaimFormForSpec.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
