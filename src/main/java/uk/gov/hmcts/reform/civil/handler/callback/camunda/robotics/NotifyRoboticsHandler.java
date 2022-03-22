@@ -42,6 +42,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
             if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
             } else {
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
