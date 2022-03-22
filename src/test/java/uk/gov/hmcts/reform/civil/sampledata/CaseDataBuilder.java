@@ -104,6 +104,7 @@ public class CaseDataBuilder {
     // Create Claim
     protected Long ccdCaseReference;
     protected SolicitorReferences solicitorReferences;
+    protected String respondentSolicitor2Reference;
     protected CourtLocation courtLocation;
     protected Party applicant1;
     protected Party applicant2;
@@ -1959,6 +1960,7 @@ public class CaseDataBuilder {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
         return this;
     }
 
@@ -2206,6 +2208,7 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .build();
     }
 }
