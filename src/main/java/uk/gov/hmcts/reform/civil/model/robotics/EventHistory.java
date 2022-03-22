@@ -29,8 +29,8 @@ public class EventHistory {
     private List<Event> receiptOfPartAdmission = List.of(Event.builder().build());
     @Builder.Default
     private List<Event> receiptOfAdmission = List.of(Event.builder().build());
-    @Builder.Default
-    private List<Event> replyToDefence = List.of(Event.builder().build());
+    @Singular("replyDefence")
+    private List<Event> replyToDefence;
     @Singular("directionsQuestionnaire")
     private List<Event> directionsQuestionnaireFiled;
 

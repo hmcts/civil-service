@@ -1736,7 +1736,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario mpScenario) {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
-        applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
@@ -1752,6 +1751,10 @@ public class CaseDataBuilder {
             case ONE_V_TWO_TWO_LEGAL_REP: {
                 respondent2SameLegalRepresentative = NO;
                 return atStateRespondentFullDefenceRespondent2();
+            }
+            case ONE_V_ONE: {
+                applicant1ProceedWithClaim = YES;
+                return this;
             }
             default: {
                 return this;
@@ -1771,6 +1774,20 @@ public class CaseDataBuilder {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
         applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = YES;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
+        //TODO: Add applicant2 information here!
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
@@ -1805,6 +1822,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateBothApplicantsRespondToDefenceAndProceed_2v1() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
         applicant1ProceedWithClaimMultiParty2v1 = YES;
         applicant2ProceedWithClaimMultiParty2v1 = YES;
 
@@ -1816,17 +1835,37 @@ public class CaseDataBuilder {
         applicant2DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
             .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicant1RespondToDefenceAndProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
         applicant1DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
 
     public CaseDataBuilder atStateApplicant2RespondToDefenceAndProceed_2v1() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
         applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         applicant2ProceedWithClaimMultiParty2v1 = YES;
         applicant2DefenceResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
             .build();
         applicant2DQ();
         applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
@@ -1836,9 +1875,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_2v1() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
         applicant1ProceedWithClaimMultiParty2v1 = NO;
         applicant2ProceedWithClaimMultiParty2v1 = NO;
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
@@ -1995,7 +2037,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
-        this.applicant2 = PartyBuilder.builder().individual().build();
+        this.applicant2 = PartyBuilder.builder().individual("Jason").build();
         return this;
     }
 
