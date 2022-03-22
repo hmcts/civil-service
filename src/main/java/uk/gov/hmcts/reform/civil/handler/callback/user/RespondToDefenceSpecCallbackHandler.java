@@ -9,14 +9,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
-import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
-import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.util.Collections;
 import java.util.List;
