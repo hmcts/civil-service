@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DEFAULT_JUDGMENT;
@@ -75,7 +76,8 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             documents.add(document);
-            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
+            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
+                                                       eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -87,10 +89,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                  .build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"),
+                                                          eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
@@ -111,6 +115,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                  .build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -136,7 +141,8 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
-            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
+            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
+                                                       eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -146,10 +152,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                  .build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"),
+                                                          eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);

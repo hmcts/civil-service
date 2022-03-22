@@ -7,6 +7,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -21,5 +22,9 @@ public class DefaultJudgmentForm implements MappableObject {
     private final String respondentReference;
     private final Party respondent;
     private final String formText;
+    private final Party claimantLR;
+    private final BigDecimal debt;
+    private final BigDecimal costs;
+    private final BigDecimal totalCost;
 
 }
