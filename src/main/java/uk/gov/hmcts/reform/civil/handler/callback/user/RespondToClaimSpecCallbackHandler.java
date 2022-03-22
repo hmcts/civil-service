@@ -511,7 +511,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private Optional<String> getRepayPlanSummary(CaseData caseData) {
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            || !NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
             || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
             .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
         ) {
