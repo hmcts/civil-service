@@ -267,6 +267,7 @@ public class CaseData implements MappableObject {
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
+    private final YesOrNo setSmallClaimsFlag;
 
     // dates
     private final LocalDateTime submittedDate;

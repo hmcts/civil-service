@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
@@ -43,6 +45,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "small-claims"), this::setSmallClaimsFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -51,6 +54,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse setSmallClaimsFlag(CallbackParams callbackParams) {
+        System.out.println("hitting mid event");
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().setSmallClaimsFlag(YesOrNo.NO);
+
+        if (true) {
+            updatedData.setSmallClaimsFlag(YesOrNo.YES)
+                .build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
