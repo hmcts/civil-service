@@ -6,19 +6,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -317,7 +305,10 @@ public class CaseData implements MappableObject {
     private final LocalDate repaymentDate;
     private final List<Element<CaseDocument>> defaultJudgmentDocuments;
     private final String hearingSelection;
-
+    // for default judgment specified tab
+    private final DJPaymentTypeSelection paymentTypeSelection;
+    private final RepaymentFrequencyDJ repaymentFrequency;
+    // for default judgment specified tab
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
