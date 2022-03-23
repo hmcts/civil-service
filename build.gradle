@@ -379,6 +379,8 @@ dependencies {
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
+  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.1'
 
   contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
   contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
