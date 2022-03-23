@@ -28,6 +28,7 @@ public class Applicant1DQ implements DQ {
     private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
     private final FutureApplications applicant1DQFutureApplications;
+    private final WelshLanguageRequirements applicant1DQLanguageLRspec;
 
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
@@ -109,5 +110,11 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return applicant1DQStatementOfTruth;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQLanguageLRspec")
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return applicant1DQLanguageLRspec;
     }
 }
