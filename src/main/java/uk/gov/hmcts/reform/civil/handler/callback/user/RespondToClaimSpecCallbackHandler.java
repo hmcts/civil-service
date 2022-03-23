@@ -488,7 +488,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .append("<ul>")
             .append("<li>pay ").append(applicantName).append(" By ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
-            .append("<li>Keep proof of any payments you make</li>")
+            .append("<li>keep proof of any payments you make</li>")
             .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
             .append("</ul>")
             .append("<p>Contact ")
