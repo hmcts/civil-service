@@ -126,7 +126,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     }
 
     private DocmosisTemplates getDocmosisTemplate(String event) {
-        return event.equals(GENERATE_DJ_FORM_SPEC) ? N121_SPEC : N121;
+        return event.equals(GENERATE_DJ_FORM_SPEC.name()) ? N121_SPEC : N121;
 
     }
 
