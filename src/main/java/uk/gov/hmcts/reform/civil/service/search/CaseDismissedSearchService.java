@@ -34,6 +34,10 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                             .must(beState(CASE_ISSUED)))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                .should(boolQuery()
+                            .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                            .must(rangeQuery("data.respondent2ResponseDeadline").lt("now"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
