@@ -646,6 +646,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq, CaseData caseData) {
         var welshLanguageRequirements = SPEC_CLAIM.equals(caseData.getSuperClaimType())
             ? dq.getWelshLanguageRequirementsLRspec() : dq.getWelshLanguageRequirements();
+        if (welshLanguageRequirements == null) {
+            return WelshLanguageRequirements.builder()
+                .evidence("")
+                .court("")
+                .documents("")
+                .build();
+        }
         return WelshLanguageRequirements.builder()
             .evidence(ofNullable(
                 welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
