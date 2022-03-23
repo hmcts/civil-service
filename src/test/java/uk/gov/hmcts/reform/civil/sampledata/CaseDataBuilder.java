@@ -1787,7 +1787,6 @@ public class CaseDataBuilder {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
         applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
-        //TODO: Add applicant2 information here!
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
@@ -1801,7 +1800,6 @@ public class CaseDataBuilder {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = NO;
         applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = YES;
-        //TODO: Add applicant2 information here!
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
