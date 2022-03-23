@@ -140,6 +140,7 @@ public class CaseDataBuilder {
     // Defendant Response Defendant 1
     protected RespondentResponseType respondent1ClaimResponseType;
     protected ResponseDocument respondent1ClaimResponseDocument;
+    protected ResponseDocument respondentSharedClaimResponseDocument;
     protected Respondent1DQ respondent1DQ;
     protected Respondent2DQ respondent2DQ;
     protected Applicant1DQ applicant1DQ;
