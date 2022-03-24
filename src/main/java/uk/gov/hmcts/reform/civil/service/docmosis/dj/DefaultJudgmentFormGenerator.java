@@ -114,8 +114,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent(getRespondent(respondent))
             .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
                                                    .getOrganisation().getOrganisationID()))
-            .debt(getDebtAmount(caseData))
-            .costs(getClaimFee(caseData))
+            .debt(debtAmount)
+            .costs(cost)
             .totalCost(debtAmount.add(cost))
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                     ? null : caseData.getSolicitorReferences()
@@ -176,7 +176,9 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private BigDecimal getClaimFee(CaseData caseData) {
         var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        claimFeePounds.add(calculateFixedCosts(caseData));
+
+        claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
+
         return claimFeePounds;
     }
 
@@ -184,7 +186,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         var subTotal = caseData.getTotalClaimAmount()
             .add(interest);
-        subTotal.subtract(getPartialPayment(caseData));
+        subTotal = subTotal.subtract(getPartialPayment(caseData));
 
         return subTotal;
     }
@@ -216,6 +218,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         } else if (totalClaimAmount > 5000) {
             fixedCost = COMMENCEMENT_FIXED_COST_110 + ENTRY_FIXED_COST_30;
         }
+
         return new BigDecimal(fixedCost);
     }
 
