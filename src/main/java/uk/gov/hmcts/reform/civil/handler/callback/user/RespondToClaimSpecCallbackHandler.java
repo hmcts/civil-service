@@ -482,7 +482,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String applicantName = caseData.getApplicant1().getPartyName();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("We've emailed ").append(applicantName)
+        sb.append("<br>We've emailed ").append(applicantName)
             .append(" to say you will pay immediately.")
             .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
             .append("<ul>")
@@ -629,7 +629,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         String applicantName = caseData.getApplicant1().getPartyName();
 
-        String sb = "You told us you've paid the &#163;"
+        String sb = "<br>You told us you've paid the &#163;"
             + totalClaimAmount
             + " you believe you owe. We've sent "
             + applicantName
@@ -679,7 +679,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         String applicantName = caseData.getApplicant1().getPartyName();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("You told us you've paid the &#163;")
+        sb.append("<br>You told us you've paid the &#163;")
             .append(howMuchWasPaid)
             .append(". We've sent ")
             .append(applicantName)
