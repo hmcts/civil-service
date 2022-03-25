@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -67,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
 @RequiredArgsConstructor
@@ -258,18 +258,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
-        if ((caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent1ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(YES))
-            || (caseData.getRespondent2ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType().equals(
-                RespondentResponseType.FULL_DEFENCE)
-                && isRespondent1.equals(NO))
-            || (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
-                && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                || RespondentResponseType.FULL_DEFENCE.equals(caseData
-                .getRespondent1ClaimResponseTypeToApplicant2())))) {
+        if (isSolicitor1AndRespondent1ResponseIsFullDefence(caseData, isRespondent1)
+            || isSolicitor2AndRespondent2ResponseIsFullDefence(caseData, isRespondent1)
+            || isSameSolicitorAndAnyRespondentResponseIsFullDefence(caseData)
+            || is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(caseData)) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
                 .build();
         }
@@ -474,40 +466,28 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                      caseData.getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                    updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQDraftDirections)
             .ifPresent(respondent1DQ -> defendantUploads.add(
                 buildElemCaseDocument(respondent1DQ, "Defendant",
-                                      caseData.getRespondent1ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getRespondent2ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                      caseData.getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                    updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQDraftDirections)
             .ifPresent(respondent2DQ -> defendantUploads.add(
                 buildElemCaseDocument(respondent2DQ, "Defendant 2",
-                                      caseData.getRespondent2ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
-    }
-
-    private Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
-                                                        LocalDateTime createdAt, DocumentType type) {
-        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
-                       .documentLink(document)
-                       .documentName(document.getDocumentFileName())
-                       .documentType(type)
-                       .createdDatetime(createdAt)
-                       .createdBy(createdBy)
-                       .build()
-                );
     }
 
     private boolean applicant2Present(CaseData caseData) {
@@ -583,5 +563,29 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             return true;
         }
         return false;
+    }
+
+    private boolean is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(CaseData caseData) {
+        return TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
+    }
+
+    private boolean isSameSolicitorAndAnyRespondentResponseIsFullDefence(CaseData caseData) {
+        return respondent2HasSameLegalRep(caseData)
+            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
+    }
+
+    private boolean isSolicitor2AndRespondent2ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+        return caseData.getRespondent2ClaimResponseType() != null
+            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(NO);
+    }
+
+    private boolean isSolicitor1AndRespondent1ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+        return caseData.getRespondent1ClaimResponseType() != null
+            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
+            && isRespondent1.equals(YES);
     }
 }

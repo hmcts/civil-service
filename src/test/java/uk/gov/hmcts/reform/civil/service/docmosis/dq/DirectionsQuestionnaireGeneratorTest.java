@@ -10,11 +10,14 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -30,16 +33,23 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
+import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
+import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,6 +64,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
@@ -148,7 +159,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .atStateApplicantRespondToDefenceAndProceed().build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
@@ -210,6 +224,34 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                       eq(N181_MULTIPARTY_SAME_SOL));
         }
 
+        @Test
+        void specGenerate() {
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(),
+                   "defendant", REFERENCE_NUMBER);
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                      eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC));
+        }
+
         @Nested
         class GetTemplateData {
 
@@ -226,11 +268,13 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenCaseStateIsFullDefence_shouldGetRespondentDQData() {
+            void whenCaseStateIsFullDefence1v1ApplicantProceeds_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build()
                     .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .build();
@@ -239,6 +283,61 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes1_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence2v1Applicant1Proceeds_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence2v1Applicant2Proceeds_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant2DQ(), caseData);
             }
 
             @Test
@@ -257,6 +356,182 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect2v1(templateData, caseData.getRespondent1DQ(), caseData);
+            }
+
+            @Test
+            void whenNoRequestedCourt_build() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQRequestedCourt(null)
+                                       .responseClaimCourtLocationRequired(null)
+                                       .respondToCourtLocation(null)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+            }
+
+            @Test
+            void whenNoExperts_build() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+            }
+
+            @Test
+            void whenExperts_includeDetails() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
+                    uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
+                    .name("Expert 1")
+                    .fieldOfExpertise("expertise 1")
+                    .whyRequired("Explanation")
+                    .estimatedCost(BigDecimal.valueOf(10000))
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
+                                                                 .expertRequired(YES)
+                                                                 .expertReportsSent(ExpertReportsSent.NOT_OBTAINED)
+                                                                 .jointExpertSuitable(YES)
+                                                                 .details(ElementUtils.wrapElements(expert1))
+                                                                 .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                Expert extracted = templateData.getExperts().getDetails().get(0);
+                assertThat(extracted.getName()).isEqualTo(expert1.getName());
+                assertThat(extracted.getFieldOfExpertise()).isEqualTo(expert1.getFieldOfExpertise());
+                assertThat(extracted.getWhyRequired()).isEqualTo(expert1.getWhyRequired());
+                assertThat(extracted.getFormattedCost()).isEqualTo("£100.00");
+            }
+
+            @Test
+            void whenDisclosureReport_include() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+                assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
+                assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            }
+
+            @Test
+            void whenFurtherInformation_include() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFutureApplications(
+                                           FutureApplications.builder()
+                                               .intentionToMakeFutureApplications(YES)
+                                               .whatWillFutureApplicationsBeMadeFor("Reason for future apps")
+                                               .build()
+                                       )
+                                       .respondent1DQFurtherInformation(FurtherInformation.builder()
+                                                                            .otherInformationForJudge("other info")
+                                                                            .build())
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                FurtherInformation extracted = templateData.getFurtherInformation();
+                assertThat(extracted.getFutureApplications()).isEqualTo(YES);
+                assertThat(extracted.getIntentionToMakeFutureApplications()).isEqualTo(YES);
+                assertThat(extracted.getOtherInformationForJudge()).isEqualTo("other info");
+            }
+
+            @Test
+            public void whenNoWelsh_build() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQLanguage(null)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getWelshLanguageRequirements()).isNotNull();
+            }
+
+            @Test
+            void whenSmallClaimAndNoWitness() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(uk.gov.hmcts.reform.civil.model.dq.Hearing.builder()
+                                                                 .hearingLength(null)
+                                                                 .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(0);
+            }
+
+            @Test
+            void whenSmallClaimAndWitnesses() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(witnessesIncludingDefendant);
             }
 
             private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
@@ -455,7 +730,11 @@ class DirectionsQuestionnaireGeneratorTest {
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
@@ -474,7 +753,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .build();
@@ -488,7 +767,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -504,6 +783,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -571,6 +851,25 @@ class DirectionsQuestionnaireGeneratorTest {
                     eq(N181));
             }
 
+            @Test
+            void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes2Only_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .build()
+                    .toBuilder()
+                    .respondent2(PartyBuilder.builder().company().build())
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent2Representative(caseData);
+                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+            }
+
             private void assertThatDqFieldsAreCorrect(DirectionsQuestionnaireForm templateData, DQ dq,
                                                       CaseData caseData) {
                 Assertions.assertAll(
@@ -613,7 +912,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .name(respondent.getPartyName())
                                    .primaryAddress(respondent.getPrimaryAddress())
                                    .representative(defendant2Representative)
-                                   .litigationFriendName("respondent LF")
+                                   .litigationFriendName("respondent 2 LF")
                                    .build());
             }
 
@@ -630,7 +929,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .name(respondent2.getPartyName())
                                    .primaryAddress(respondent2.getPrimaryAddress())
                                    .representative(defendant2Representative)
-                                   .litigationFriendName("respondent LF")
+                                   .litigationFriendName("respondent 2 LF")
                                    .build());
             }
 
@@ -728,4 +1027,149 @@ class DirectionsQuestionnaireGeneratorTest {
             }
         }
     }
+
+    @Nested
+    class ResponseToDefence {
+
+        @BeforeEach
+        void setup() {
+            when(representativeService.getRespondent1Representative(any())).thenReturn(defendant1Representative);
+            when(representativeService.getRespondent2Representative(any())).thenReturn(defendant2Representative);
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlySecondIntendsToProceed() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.YES)
+                .applicant2ResponseDate(LocalDateTime.now())
+                .applicant2DQ()
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstOnlyFirstDefendant() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstOnlySecondDefendant() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(N181));
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstBothDefendant() {
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
+                                                                   eq(N181_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N181_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                eq(N181_MULTIPARTY_SAME_SOL));
+        }
+    }
+
 }
