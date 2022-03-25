@@ -440,6 +440,35 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenFullAdmitBySetDate() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(
+                    RespondToClaimAdmitPartLRspec.builder()
+                        .whenWillThisAmountBePaid(whenWillPay)
+                        .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(" and your explanation of why you cannot pay before then.")
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE))
+                .doesNotContain(caseData.getTotalClaimAmount().toString());
+
+        }
+
+        @Test
         void specificSummary_whenPartialAdmitPaidFull() {
             BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
             BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
