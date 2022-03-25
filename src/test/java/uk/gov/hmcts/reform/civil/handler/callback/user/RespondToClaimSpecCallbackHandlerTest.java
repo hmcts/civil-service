@@ -349,14 +349,25 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "set-generic-response-type-flag";
 
         @Test
-        void shouldSetMultiPartyResponseTypeFlags_Respondent1IsFullDefence() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        void shouldSetMultiPartyResponseTypeFlags_COUNTER_ADMIT_OR_ADMIT_PART_combination1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("NOT_FULL_DEFENCE");
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_COUNTER_ADMIT_OR_ADMIT_PART_combination2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
     }
 }

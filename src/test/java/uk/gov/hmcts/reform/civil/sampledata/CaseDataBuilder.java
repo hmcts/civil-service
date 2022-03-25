@@ -150,6 +150,8 @@ public class CaseDataBuilder {
     protected YesOrNo respondentResponseIsSame;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    protected RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
     protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
@@ -1379,6 +1381,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_CounterClaimX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefence() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -2206,6 +2220,8 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
             .build();
     }
 }
