@@ -196,6 +196,7 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
@@ -288,6 +289,12 @@ public class CaseData implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    private YesOrNo specFullAdmissionOrPartAdmission;
+    private YesOrNo sameSolicitorSameResponse;
+    private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
+    private YesOrNo specFullDefenceOrPartAdmission1V1;
+    private YesOrNo specFullDefenceOrPartAdmission;
+    private YesOrNo specDisputesOrPartAdmission;
 
     // dates
     private final LocalDateTime submittedDate;
