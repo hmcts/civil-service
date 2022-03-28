@@ -17,10 +17,10 @@ public class EventHistory {
 
     @Singular("miscellaneous")
     private List<Event> miscellaneous;
-    @Singular("acknowledgementOfServiceReceived")
-    private List<Event> acknowledgementOfServiceReceived;
-    @Singular("consentExtensionFilingDefence")
-    private List<Event> consentExtensionFilingDefence;
+    @Builder.Default
+    private List<Event> acknowledgementOfServiceReceived = List.of(Event.builder().build());
+    @Builder.Default
+    private List<Event> consentExtensionFilingDefence = List.of(Event.builder().build());
     @Singular("defenceFiled")
     private List<Event> defenceFiled;
     @Singular("defenceAndCounterClaim")
@@ -29,20 +29,10 @@ public class EventHistory {
     private List<Event> receiptOfPartAdmission;
     @Singular("receiptOfAdmission")
     private List<Event> receiptOfAdmission;
-    @Singular("replyDefence")
-    private List<Event> replyToDefence;
+    @Builder.Default
+    private List<Event> replyToDefence = List.of(Event.builder().build());
     @Singular("directionsQuestionnaire")
     private List<Event> directionsQuestionnaireFiled;
-    @Singular("breathingSpaceEntered")
-    private List<Event> breathingSpaceEntered;
-    @Singular("breathingSpaceLifted")
-    private List<Event> breathingSpaceLifted;
-    @Singular("breathingSpaceMentalHealthEntered")
-    private List<Event> breathingSpaceMentalHealthEntered;
-    @Singular("breathingSpaceMentalHealthLifted")
-    private List<Event> breathingSpaceMentalHealthLifted;
-    @Singular("statesPaid")
-    private List<Event> statesPaid;
 
     @JsonIgnore
     public List<Event> flatEvents() {
@@ -55,12 +45,7 @@ public class EventHistory {
             receiptOfPartAdmission,
             receiptOfAdmission,
             replyToDefence,
-            directionsQuestionnaireFiled,
-            breathingSpaceEntered,
-            breathingSpaceLifted,
-            breathingSpaceMentalHealthEntered,
-            breathingSpaceMentalHealthLifted,
-            statesPaid
+            directionsQuestionnaireFiled
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
