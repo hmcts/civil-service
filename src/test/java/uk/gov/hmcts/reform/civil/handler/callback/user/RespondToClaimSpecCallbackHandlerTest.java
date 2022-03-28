@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -509,6 +510,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getConfirmationBody())
             .contains(caseData.getApplicant1().getPartyName())
             .contains("The claim will be settled. We'll contact you when they respond.")
-            .contains(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid().toString());
+            .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
+                          .toString());
     }
 }
