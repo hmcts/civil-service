@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
 
 @Service
+@ConditionalOnBean(RoboticsNotificationService.class)
 public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHandler {
 
     public NotifyRoboticsOnCaseHandedOfflineHandler(
