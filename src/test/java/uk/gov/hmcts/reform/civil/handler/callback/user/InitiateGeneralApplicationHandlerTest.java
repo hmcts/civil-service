@@ -551,14 +551,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(application.getGeneralAppHearingDetails().getHearingPreferencesPreferredType())
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
-            assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
-                .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
             assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
-            assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
-            assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-                .isEqualTo(STRING_CONSTANT);
-            assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-                .isEqualTo(STRING_CONSTANT);
         }
     }
 

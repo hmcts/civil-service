@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -96,6 +97,70 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
 
+    @Test
+    void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsentInfoNotProvided() {
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
+                any(UserDetails.class))).thenCallRealMethod();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForConsentUnconsentCheck(null);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
+                .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
+                .getReasonsForWithoutNotice()).isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
+                .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
+                .isNull();
+    }
+
+    @Test
+    void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
+                any(UserDetails.class))).thenCallRealMethod();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
+                .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
+                .getReasonsForWithoutNotice()).isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
+                .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
+                .isNull();
+    }
+
+    @Test
+    void shouldPopulateInformOtherPartyAndStatementOfTruthIfUnconsented() {
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
+                any(UserDetails.class))).thenCallRealMethod();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
+                .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
+                .getReasonsForWithoutNotice()).isEqualTo(STRING_CONSTANT);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
+                .isEqualTo(STRING_CONSTANT);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
+                .isEqualTo(STRING_CONSTANT);
+    }
+
+    //Urgency Date validation
     @Test
     void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
@@ -396,6 +461,24 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(givenDate).isEqualTo(actual).isNotNull();
     }
 
+    @Test
+    void shouldPopulatePartyNameDetails() {
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
+                any(UserDetails.class))).thenCallRealMethod();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
+
+    }
+
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
@@ -495,14 +578,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getIsMultiParty()).isEqualTo(NO);
-        assertThat(application.getApplicantSolicitor1UserDetails().getEmail())
-            .isEqualTo(APPLICANT_EMAIL_ID_CONSTANT);
         assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
-        assertThat(application.getApplicantSolicitor1UserDetails().getId()).isEqualTo(STRING_CONSTANT);
-        assertThat(application.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
-        assertThat(application.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(STRING_CONSTANT);
     }
 }
 

@@ -190,8 +190,8 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
-task runFunctionalTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:functional'
+task runApiTests(type: Exec, description: 'Runs Api tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
@@ -218,7 +218,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runFunctionalTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -369,7 +369,8 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
   testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testCompile 'com.github.hmcts:fortify-client:1.2.2'
+  testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.4'
+  testImplementation 'com.github.hmcts:fortify-client:1.2.2:all'
   //pact contract testing
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
