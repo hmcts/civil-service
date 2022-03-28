@@ -119,16 +119,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
             if (caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
                 == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
-                || DISPUTES_THE_CLAIM == caseData.getDefenceRouteRequired()
+                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
                 || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                 caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
-                caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
             } else {
                 caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
             }
             if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
                 != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
-                && (DISPUTES_THE_CLAIM == caseData.getDefenceRouteRequired()
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
                 || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
                 caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
             } else {
@@ -158,13 +157,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
             == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
-            || DISPUTES_THE_CLAIM == caseData.getDefenceRouteRequired()
+            || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
             || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
             caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
         }
-        if (DISPUTES_THE_CLAIM == caseData.getDefenceRouteRequired()
-            || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
+        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
             caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
