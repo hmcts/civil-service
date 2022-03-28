@@ -98,7 +98,7 @@ class AddressLinesMapperTest {
     }
 
     @Nested
-    class ShouldReturnOriginalAddress {
+    class ShouldReturnTransformedAddressLines {
 
         @Test
         void shouldReturnOriginalAddress_whenSplittingSpreadsOverThreeLines() {
@@ -110,7 +110,10 @@ class AddressLinesMapperTest {
 
             Address result = mapper.splitLongerLines(address);
 
-            assertThat(result).isEqualTo(address);
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo(address.getAddressLine2());
+            assertThat(result.getAddressLine3()).isEqualTo("abcdefghijk12345678901234567890");
+            assertThat(result.getPostTown()).isEqualTo("zxcvbnmzxcvbnm");
         }
 
         @Test
@@ -122,7 +125,28 @@ class AddressLinesMapperTest {
 
             Address result = mapper.splitLongerLines(address);
 
-            assertThat(result).isEqualTo(address);
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo("12345678901234567890abcdefghijk12345678901234567890");
+            assertThat(result.getAddressLine3()).isEqualTo("zxcvbnmzxcvbnm");
+        }
+
+        @Test
+        void shouldReturnOriginalAddress_whenSplittingBySpaceLeavesIndividualLineExceedingLimit() {
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890abcdefghijk 12345678901234567890, zxcvbnmzxcvbnm")
+                .addressLine2("123456789012345678901")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).extracting("addressLine1")
+                .isEqualTo("12345678901234567890abcdefghijk");
+            assertThat(result).extracting("addressLine2")
+                .isEqualTo("12345678901234567890 ,");
+            assertThat(result).extracting("addressLine3")
+                .isEqualTo("zxcvbnmzxcvbnm ,");
+            assertThat(result).extracting("postTown")
+                .isEqualTo("123456789012345678901");
         }
 
         @Test
