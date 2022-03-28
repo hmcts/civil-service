@@ -28,7 +28,7 @@ public class AddressLinesMapper {
         List<String> addressLines = prepareAddressLines(originalAddress);
         boolean anyLineExceedsLimit = addressLines.stream().anyMatch(line -> line.length() > LINE_LIMIT);
         if (addressLines.size() > 3 || anyLineExceedsLimit) {
-            return appendLinesWithinLineLimit(originalAddress, addressLines);
+            return splitBySpace(originalAddress, addressLines);
         } else {
             return originalAddress.toBuilder()
                 .addressLine1(Iterables.get(addressLines, 0, null))
@@ -38,7 +38,7 @@ public class AddressLinesMapper {
         }
     }
 
-    private Address appendLinesWithinLineLimit(Address originalAddress, List<String> addressLines) {
+    private Address splitBySpace(Address originalAddress, List<String> addressLines) {
         addressLines = addressLines.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         String curAddressLine1 = Iterables.get(addressLines, 0, "");
         String addressLine1 = "";

@@ -98,10 +98,10 @@ class AddressLinesMapperTest {
     }
 
     @Nested
-    class ShouldReturnTransformedAddressLines {
+    class ShouldReturnSpaceBasedSplitAddressLines {
 
         @Test
-        void shouldReturnTransformedAddress_whenSplittingSpreadsOverThreeLines() {
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines() {
             Address address = Address.builder()
                 .addressLine1("12345678901234567890")
                 .addressLine2("I am the second line")
@@ -117,7 +117,7 @@ class AddressLinesMapperTest {
         }
 
         @Test
-        void shouldReturnTransformedAddress_whenSplittingSpreadsOverThreeLinesWithSpaces() {
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
             Address address = Address.builder()
                 .addressLine1("1234567890 1234567890")
                 .addressLine2("I am the    second   line")
@@ -133,7 +133,7 @@ class AddressLinesMapperTest {
         }
 
         @Test
-        void shouldReturnTransformedAddress_whenSplittingLeavesIndividualLineExceedingLimit() {
+        void shouldSplitAddressBySpace_whenSplittingLeavesIndividualLineExceedingLimit() {
             Address address = Address.builder()
                 .addressLine1("12345678901234567890")
                 .addressLine2("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
@@ -147,7 +147,7 @@ class AddressLinesMapperTest {
         }
 
         @Test
-        void shouldReturnTransformedAddress_whenSplittingBySpaceLeavesIndividualLineExceedingLimit() {
+        void shouldSplitAddressBySpace_whenSplittingBySpaceLeavesIndividualLineExceedingLimit() {
             Address address = Address.builder()
                 .addressLine1("12345678901234567890abcdefghijk 12345678901234567890, zxcvbnmzxcvbnm")
                 .addressLine2("123456789012345678901")
@@ -164,6 +164,10 @@ class AddressLinesMapperTest {
             assertThat(result).extracting("postTown")
                 .isEqualTo("123456789012345678901");
         }
+    }
+
+    @Nested
+    class ShouldReturnOriginalAddressLines {
 
         @Test
         void shouldReturnOriginalAddress_whenNoNeedToSplit() {
