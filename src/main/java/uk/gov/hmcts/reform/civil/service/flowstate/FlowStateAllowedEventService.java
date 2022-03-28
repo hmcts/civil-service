@@ -424,6 +424,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
