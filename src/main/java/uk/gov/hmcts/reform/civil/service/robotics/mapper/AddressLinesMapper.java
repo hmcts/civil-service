@@ -29,6 +29,7 @@ public class AddressLinesMapper {
         List<String> addressLines = prepareAddressLines(originalAddress);
         boolean anyLineExceedsLimit = addressLines.stream().anyMatch(line -> line.length() > LINE_LIMIT);
         if (addressLines.size() > 3 || anyLineExceedsLimit) {
+            addressLines.add(originalAddress.getPostTown());
             return splitBySpace(originalAddress, addressLines);
         } else {
             return originalAddress.toBuilder()
@@ -81,7 +82,8 @@ public class AddressLinesMapper {
         } else {
             addressLine = addressLineWithCarryover;
         }
-        return addressLine;
+        return position == 3 && addressLines.size() > 4 ? addressLine.concat(", ").concat(String.join(",",
+            addressLines.subList(4, addressLines.size()))) : addressLine;
     }
 
     private List<String> prepareAddressLines(Address originalAddress) {

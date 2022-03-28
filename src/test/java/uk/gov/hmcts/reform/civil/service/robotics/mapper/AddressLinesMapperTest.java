@@ -117,6 +117,24 @@ class AddressLinesMapperTest {
         }
 
         @Test
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverFourLines() {
+
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890")
+                .addressLine2("I am the second line")
+                .addressLine3("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
+                .postTown("there is something here")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo(address.getAddressLine2());
+            assertThat(result.getAddressLine3()).isEqualTo("abcdefghijk12345678901234567890");
+            assertThat(result.getPostTown()).isEqualTo("zxcvbnmzxcvbnm, there is something here");
+        }
+
+        @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
             Address address = Address.builder()
                 .addressLine1("1234567890 1234567890")
