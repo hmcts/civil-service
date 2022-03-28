@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -42,13 +41,7 @@ public class AddressLinesMapper {
     private Address appendLinesWithinLineLimit(Address originalAddress, List<String> addressLines) {
         addressLines = addressLines.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         String curAddressLine1 = Iterables.get(addressLines, 0, "");
-        String curAddressLine2 = Iterables.get(addressLines, 1, "");
-        String curAddressLine3 = Iterables.get(addressLines, 2, "");
-        String curAddressLine4 = Iterables.get(addressLines, 3, "");
         String addressLine1 = "";
-        String addressLine2 = "";
-        String addressLine3 = "";
-        String postTown = "";
         Queue<String> addressParts = new LinkedList<>();
 
         if (StringUtils.length(curAddressLine1) > LINE_LIMIT) {
@@ -68,6 +61,8 @@ public class AddressLinesMapper {
             addressLine1 = String.join(" ", addressParts).concat(curAddressLine1);
         }
 
+        String curAddressLine2 = Iterables.get(addressLines, 1, "");
+        String addressLine2 = "";
         if (addressParts.size() > 0 && StringUtils.isNotEmpty(curAddressLine2)) {
             addressParts.offer(",");
         }
@@ -88,6 +83,8 @@ public class AddressLinesMapper {
             addressLine2 = String.join(" ", addressParts).concat(curAddressLine2);
         }
 
+        String curAddressLine3 = Iterables.get(addressLines, 2, "");
+        String addressLine3 = "";
         if (addressParts.size() > 0 && StringUtils.isNotEmpty(curAddressLine3)) {
             addressParts.offer(",");
         }
@@ -108,6 +105,8 @@ public class AddressLinesMapper {
             addressLine3 = String.join(" ", addressParts).concat(curAddressLine3);
         }
 
+        String curAddressLine4 = Iterables.get(addressLines, 3, "");
+        String postTown = "";
         if (addressParts.size() > 0 && StringUtils.isNotEmpty(curAddressLine4)) {
             addressParts.offer(",");
         }
@@ -139,8 +138,8 @@ public class AddressLinesMapper {
     private List<String> prepareAddressLines(Address originalAddress) {
         List<String> addressLines = new ArrayList<>();
         if (originalAddress.getAddressLine1() != null) {
-                addressLines.addAll(splitByCommaIfLongerThanLimit(originalAddress.getAddressLine1()));
-            }
+            addressLines.addAll(splitByCommaIfLongerThanLimit(originalAddress.getAddressLine1()));
+        }
         if (originalAddress.getAddressLine2() != null) {
             addressLines.addAll(splitByCommaIfLongerThanLimit(originalAddress.getAddressLine2()));
         }
