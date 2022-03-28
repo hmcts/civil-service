@@ -1413,6 +1413,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isNull();
             }
         }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(null)
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt(null).build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
     }
 
     @Nested
