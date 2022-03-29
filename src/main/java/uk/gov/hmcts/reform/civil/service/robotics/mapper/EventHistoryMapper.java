@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1023,7 +1024,8 @@ public class EventHistoryMapper {
     }
 
     private String getExtensionEventText(MultiPartyScenario scenario, PartyData party) {
-        String extensionDate = party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE);
+        String extensionDate = party.getSolicitorAgreedDeadlineExtension()
+            .format(DateTimeFormatter.ofPattern("dd MM yyyy"));
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
                 return format("RPA Reason: Defendant(s) have agreed extension: %s", extensionDate);
@@ -1031,7 +1033,7 @@ public class EventHistoryMapper {
                 return format("RPA Reason: Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
                               extensionDate);
             default:
-                return format("agreedExtensionDate: %s", extensionDate);
+                return format("agreed extension date: %s", extensionDate);
         }
     }
 }
