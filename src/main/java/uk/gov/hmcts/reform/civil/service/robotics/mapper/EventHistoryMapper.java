@@ -181,8 +181,7 @@ public class EventHistoryMapper {
         LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
 
         buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                     respondent1ResponseDate, RESPONDENT_ID
-        );
+                                     respondent1ResponseDate, RESPONDENT_ID);
 
         String miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
         builder.miscellaneous((Event.builder()
@@ -196,8 +195,7 @@ public class EventHistoryMapper {
             .build()));
 
         buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                     respondent2ResponseDate, RESPONDENT2_ID
-        );
+                                     respondent2ResponseDate, RESPONDENT2_ID);
         miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
         builder.miscellaneous((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
@@ -221,32 +219,30 @@ public class EventHistoryMapper {
                 if (respondentID.equals(RESPONDENT_ID)) {
                     builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                         builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true
-                    ));
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
                 } else {
                     builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                         builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false
-                    ));
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
                 }
                 break;
             case COUNTER_CLAIM:
                 builder.defenceAndCounterClaim(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                            .dateReceived(respondentResponseDate)
+                            .litigiousPartyID(respondentID)
+                            .build());
                 break;
             case PART_ADMISSION:
                 builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                            .dateReceived(respondentResponseDate)
+                            .litigiousPartyID(respondentID)
+                            .build());
                 break;
             case FULL_ADMISSION:
                 builder.receiptOfAdmission(
@@ -305,11 +301,7 @@ public class EventHistoryMapper {
                              .dateReceived(caseNote.getCreatedOn().atStartOfDay())
                              .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                              .eventDetails(EventDetails.builder()
-                                               .miscText(left(
-                                                   (
-                                                       format("case note added: %s", caseNote.getNote())),
-                                                   250
-                                               ))
+                                               .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
                                                .build())
                              .build())
                 .collect(Collectors.toList());
@@ -610,19 +602,16 @@ public class EventHistoryMapper {
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
             defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID
-                ));
+                buildDefenceFiledEvent(builder,
+                                       respondent1ResponseDate,
+                                       RESPONDENT_ID));
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent1ResponseDate,
                                                        RESPONDENT_ID,
                                                        respondent1DQ,
                                                        respondent1,
-                                                       isRespondent1
-                ));
+                                                       isRespondent1));
         }
         if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
             isRespondent1 = false;
@@ -631,19 +620,16 @@ public class EventHistoryMapper {
             LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
 
             defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID
-                ));
+                buildDefenceFiledEvent(builder,
+                                       respondent2ResponseDate,
+                                       RESPONDENT2_ID));
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent2ResponseDate,
                                                        RESPONDENT2_ID,
                                                        respondent2DQ,
                                                        respondent2,
-                                                       isRespondent1
-                ));
+                                                       isRespondent1));
         }
         builder.defenceFiled(defenceFiledEvents);
         builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
@@ -703,21 +689,20 @@ public class EventHistoryMapper {
                 ));
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                defaultText = format(
-                    "RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; "
-                        + "stayClaim: %s",
-                    respondent.getPartyName(),
-                    getResponseTypeForRespondent(caseData, respondent),
-                    getPreferredCourtCode(dq),
-                    isStayClaim(dq)
+                defaultText = format("RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; "
+                                         + "stayClaim: %s",
+                                     respondent.getPartyName(),
+                                     getResponseTypeForRespondent(caseData, respondent),
+                                     getPreferredCourtCode(dq),
+                                     isStayClaim(dq)
                 );
                 break;
             default:
                 defaultText = format(
-                    "RPA Reason: preferredCourtCode: %s; stayClaim: %s",
-                    getPreferredCourtCode(dq),
-                    isStayClaim(dq)
-                );
+                "RPA Reason: preferredCourtCode: %s; stayClaim: %s",
+                getPreferredCourtCode(dq),
+                isStayClaim(dq)
+            );
         }
         return defaultText;
     }
@@ -742,18 +727,14 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unrepresentedDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unrepresentedDefendantsNames.size() > 1
-                    ? format(
-                    "[%d of %d - %s] ",
-                    index + 1,
-                    unrepresentedDefendantsNames.size(),
-                    time.now().toLocalDate().toString()
-                )
+                    ? format("[%d of %d - %s] ",
+                             index + 1,
+                             unrepresentedDefendantsNames.size(),
+                             time.now().toLocalDate().toString())
                     : "";
-                String eventText = format(
-                    "RPA Reason: %sUnrepresented defendant: %s",
-                    paginatedMessage,
-                    unrepresentedDefendantsNames.get(index)
-                );
+                String eventText = format("RPA Reason: %sUnrepresented defendant: %s",
+                                          paginatedMessage,
+                                          unrepresentedDefendantsNames.get(index));
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -788,18 +769,14 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unregisteredDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unregisteredDefendantsNames.size() > 1
-                    ? format(
-                    "[%d of %d - %s] ",
-                    index + 1,
-                    unregisteredDefendantsNames.size(),
-                    time.now().toLocalDate().toString()
-                )
+                    ? format("[%d of %d - %s] ",
+                             index + 1,
+                             unregisteredDefendantsNames.size(),
+                             time.now().toLocalDate().toString())
                     : "";
-                String eventText = format(
-                    "RPA Reason: %sUnregistered defendant solicitor firm: %s",
-                    paginatedMessage,
-                    unregisteredDefendantsNames.get(index)
-                );
+                String eventText = format("RPA Reason: %sUnregistered defendant solicitor firm: %s",
+                                          paginatedMessage,
+                                          unregisteredDefendantsNames.get(index));
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -817,19 +794,15 @@ public class EventHistoryMapper {
                                                             CaseData caseData) {
         String localDateTime = time.now().toLocalDate().toString();
 
-        String unrepresentedEventText = format(
-            "RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
-                + "defendant solicitor firm. Unrepresented defendant: %s",
-            localDateTime,
-            getDefendantNames(UNREPRESENTED, caseData).get(0)
-        );
-        String unregisteredEventText = format(
-            "RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
-                + "defendant solicitor firm. Unregistered defendant solicitor "
-                + "firm: %s",
-            localDateTime,
-            getDefendantNames(UNREGISTERED, caseData).get(0)
-        );
+        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
+                                                   + "defendant solicitor firm. Unrepresented defendant: %s",
+                                               localDateTime,
+                                               getDefendantNames(UNREPRESENTED, caseData).get(0));
+        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
+                                                  + "defendant solicitor firm. Unregistered defendant solicitor "
+                                                  + "firm: %s",
+                                              localDateTime,
+                                              getDefendantNames(UNREGISTERED, caseData).get(0));
 
         builder.miscellaneous(
             List.of(
@@ -935,12 +908,12 @@ public class EventHistoryMapper {
         if (caseData.getRespondent1ResponseDate() != null) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.receiptOfPartAdmission(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
             ).miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
@@ -954,12 +927,12 @@ public class EventHistoryMapper {
         if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.receiptOfPartAdmission(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .litigiousPartyID(RESPONDENT2_ID)
-                    .build()
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent2ResponseDate())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build()
             ).miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
@@ -977,12 +950,12 @@ public class EventHistoryMapper {
         if (caseData.getRespondent1ResponseDate() != null) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.defenceAndCounterClaim(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
             ).miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
@@ -1009,10 +982,10 @@ public class EventHistoryMapper {
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent2ResponseDate())
                                 .eventDetailsText(miscText)
-                                                   .eventDetails(EventDetails.builder()
+                                .eventDetails(EventDetails.builder()
                                                   .miscText(miscText)
-                                                                     .build())
-                                                   .build());
+                                                  .build())
+                                .build());
         }
     }
 
@@ -1062,4 +1035,3 @@ public class EventHistoryMapper {
         }
     }
 }
-

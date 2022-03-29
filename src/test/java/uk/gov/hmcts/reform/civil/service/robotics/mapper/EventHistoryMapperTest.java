@@ -607,7 +607,7 @@ class EventHistoryMapperTest {
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
                     format("agreedExtensionDate: %s", caseData.getRespondentSolicitor1AgreedDeadlineExtension()
-                               .format(ISO_DATE)));
+                        .format(ISO_DATE)));
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -628,7 +628,7 @@ class EventHistoryMapperTest {
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
                     format("RPA Reason: Defendant: Mr. Sole Trader has agreed extension: %s",
-                        caseData.getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)
+                           caseData.getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)
                     )
                 );
 
