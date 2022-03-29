@@ -89,4 +89,16 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrdered;
+
+    @NotEmpty
+    private String interimJudgmentRequestedClaimant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalClaimant;
+
+    @NotEmpty
+    private String interimJudgmentRequestedDefendant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalDefendant;
 }

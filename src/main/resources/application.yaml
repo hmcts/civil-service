@@ -129,6 +129,10 @@ notifications:
   claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
+  interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
+  interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
+  interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
+  interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
