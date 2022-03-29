@@ -52,7 +52,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 //        + "%n%n You can make another default judgment request when you know all these statements have been met.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
-        + "%n The defendant will be served the Default Judgment.";
+        + "%n%n The defendant will be served the Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
