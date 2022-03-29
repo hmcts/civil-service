@@ -322,4 +322,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
+
+    private final YesOrNo respondent1PickByTimeExtensionScheduler;
+    private final YesOrNo respondent2PickByTimeExtensionScheduler;
 }

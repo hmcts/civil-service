@@ -232,6 +232,8 @@ public class CaseDataBuilder {
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
+    private YesOrNo respondent1PickByTimeExtensionScheduler;
+    private YesOrNo respondent2PickByTimeExtensionScheduler;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1312,6 +1314,31 @@ public class CaseDataBuilder {
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDate = null;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension() {
+        atStateClaimDetailsNotified();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = YES;
         return this;
     }
 
@@ -1587,6 +1614,46 @@ public class CaseDataBuilder {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
         respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothRespondentsSameResponse(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondentResponseType;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondentResponseType);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType responseType) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = responseType;
+        respondent2ClaimResponseType = responseType;
+        respondentResponseIsSame(YES);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2ResponseDate = respondent1ResponseDate;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent2Responds(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
         return this;
     }
 
@@ -1981,6 +2048,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2Responds1v2SameSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2DiffSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2(RespondentResponseType responseType) {
         this.respondent1ClaimResponseTypeToApplicant2 = responseType;
         return this;
@@ -2004,6 +2083,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Copy(Party party) {
         this.respondent2Copy = party;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1PickByTimeExtensionScheduler(YesOrNo pickByScheduler) {
+        this.respondent1PickByTimeExtensionScheduler = pickByScheduler;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2PickByTimeExtensionScheduler(YesOrNo pickByScheduler) {
+        this.respondent2PickByTimeExtensionScheduler = pickByScheduler;
         return this;
     }
 
@@ -2206,6 +2295,8 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .respondent1PickByTimeExtensionScheduler(respondent1PickByTimeExtensionScheduler)
+            .respondent2PickByTimeExtensionScheduler(respondent2PickByTimeExtensionScheduler)
             .build();
     }
 }

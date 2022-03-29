@@ -4,12 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -17,10 +22,9 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +35,11 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -52,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 
@@ -115,6 +123,10 @@ public class EventHistoryMapper {
                     case FULL_DEFENCE:
                         buildRespondentFullDefence(builder, caseData);
                         break;
+                    case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
+                    case DIVERGENT_RESPOND_GO_OFFLINE:
+                        buildRespondentDivergentResponse(builder, caseData);
+                        break;
                     case FULL_DEFENCE_NOT_PROCEED:
                         buildFullDefenceNotProceed(builder, caseData);
                         break;
@@ -164,6 +176,124 @@ public class EventHistoryMapper {
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
+    private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+
+        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                     respondent1ResponseDate, RESPONDENT_ID
+        );
+
+        String miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+        builder.miscellaneous((Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(MISCELLANEOUS.getCode())
+            .dateReceived(respondent1ResponseDate)
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build()));
+
+        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                     respondent2ResponseDate, RESPONDENT2_ID
+        );
+        miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+        builder.miscellaneous((Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(MISCELLANEOUS.getCode())
+            .dateReceived(respondent2ResponseDate)
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build()));
+    }
+
+    private void buildRespondentResponseEvent(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              RespondentResponseType respondentResponseType,
+                                              LocalDateTime respondentResponseDate,
+                                              String respondentID) {
+        switch (respondentResponseType) {
+            case FULL_DEFENCE:
+                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+                if (respondentID.equals(RESPONDENT_ID)) {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true
+                    ));
+                } else {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false
+                    ));
+                }
+                break;
+            case COUNTER_CLAIM:
+                builder.defenceAndCounterClaim(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case PART_ADMISSION:
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case FULL_ADMISSION:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            default:
+                break;
+        }
+    }
+
+    public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        String defaultText = "";
+        if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
+            switch (caseData.getRespondent1ClaimResponseType()) {
+                case COUNTER_CLAIM:
+                    defaultText = "RPA Reason: Defendant rejects and counter claims.";
+                    break;
+                case FULL_ADMISSION:
+                    defaultText = "RPA Reason: Defendant fully admits.";
+                    break;
+                case PART_ADMISSION:
+                    defaultText = "RPA Reason: Defendant partial admission.";
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            String paginatedMessage = "";
+            if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+                paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
+            }
+            defaultText = (format(
+                "RPA Reason:%s Defendant: %s has responded: %s;",
+                paginatedMessage,
+                respondent.getPartyName(),
+                getResponseTypeForRespondent(caseData, respondent)
+            ));
+        }
+        return defaultText;
+    }
+
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
             List<Event> events = unwrapElements(caseData.getCaseNotes())
@@ -175,7 +305,11 @@ public class EventHistoryMapper {
                              .dateReceived(caseNote.getCreatedOn().atStartOfDay())
                              .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                              .eventDetails(EventDetails.builder()
-                                               .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
+                                               .miscText(left(
+                                                   (
+                                                       format("case note added: %s", caseNote.getNote())),
+                                                   250
+                                               ))
                                                .build())
                              .build())
                 .collect(Collectors.toList());
@@ -466,34 +600,140 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder
-            .defenceFiled(
-                List.of(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_FILED.getCode())
-                        .dateReceived(caseData.getRespondent1ResponseDate())
-                        .litigiousPartyID(RESPONDENT_ID)
-                        .build()
-                ))
-            .clearDirectionsQuestionnaireFiled()
-            .directionsQuestionnaire(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .eventDetailsText(prepareEventDetailsText(
-                        caseData.getRespondent1DQ(),
-                        getPreferredCourtCode(caseData.getRespondent1DQ())
-                    ))
-                    .eventDetails(EventDetails.builder()
-                                      .stayClaim(isStayClaim(caseData.getRespondent1DQ()))
-                                      .preferredCourtCode(getPreferredCourtCode(caseData.getRespondent1DQ()))
-                                      .preferredCourtName("")
-                                      .build())
-                    .build()
-            );
+        List<Event> defenceFiledEvents = new ArrayList<>();
+        List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
+        boolean isRespondent1;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            isRespondent1 = true;
+            Party respondent1 = caseData.getRespondent1();
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+
+            defenceFiledEvents.add(
+                buildDefenceFiledEvent(
+                    builder,
+                    respondent1ResponseDate,
+                    RESPONDENT_ID
+                ));
+            directionsQuestionnaireFiledEvents.add(
+                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
+                                                       respondent1ResponseDate,
+                                                       RESPONDENT_ID,
+                                                       respondent1DQ,
+                                                       respondent1,
+                                                       isRespondent1
+                ));
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            isRespondent1 = false;
+            Party respondent2 = caseData.getRespondent2();
+            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+
+            defenceFiledEvents.add(
+                buildDefenceFiledEvent(
+                    builder,
+                    respondent2ResponseDate,
+                    RESPONDENT2_ID
+                ));
+            directionsQuestionnaireFiledEvents.add(
+                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
+                                                       respondent2ResponseDate,
+                                                       RESPONDENT2_ID,
+                                                       respondent2DQ,
+                                                       respondent2,
+                                                       isRespondent1
+                ));
+        }
+        builder.defenceFiled(defenceFiledEvents);
+        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
+    }
+
+    private Event buildDirectionsQuestionnaireFiledEvent(EventHistory.EventHistoryBuilder builder,
+                                                         CaseData caseData,
+                                                         LocalDateTime respondentResponseDate,
+                                                         String litigiousPartyID,
+                                                         DQ respondentDQ,
+                                                         Party respondent,
+                                                         boolean isRespondent1) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+            .dateReceived(respondentResponseDate)
+            .litigiousPartyID(litigiousPartyID)
+            .eventDetailsText(prepareFullDefenceEventText(
+                respondentDQ,
+                caseData,
+                isRespondent1,
+                respondent
+            ))
+            .eventDetails(EventDetails.builder()
+                              .stayClaim(isStayClaim(respondentDQ))
+                              .preferredCourtCode(getPreferredCourtCode(respondentDQ))
+                              .preferredCourtName("")
+                              .build())
+            .build();
+    }
+
+    private Event buildDefenceFiledEvent(EventHistory.EventHistoryBuilder builder,
+                                         LocalDateTime respondentResponseDate,
+                                         String litigiousPartyID) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(DEFENCE_FILED.getCode())
+            .dateReceived(respondentResponseDate)
+            .litigiousPartyID(litigiousPartyID)
+            .build();
+    }
+
+    public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
+        String defaultText;
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        switch (scenario) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
+                defaultText = (format(
+                    "RPA Reason:%s Defendant: %s has responded: %s; "
+                        + "preferredCourtCode: %s; stayClaim: %s",
+                    paginatedMessage,
+                    respondent.getPartyName(),
+                    getResponseTypeForRespondent(caseData, respondent),
+                    getPreferredCourtCode(dq),
+                    isStayClaim(dq)
+                ));
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                defaultText = format(
+                    "RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; "
+                        + "stayClaim: %s",
+                    respondent.getPartyName(),
+                    getResponseTypeForRespondent(caseData, respondent),
+                    getPreferredCourtCode(dq),
+                    isStayClaim(dq)
+                );
+                break;
+            default:
+                defaultText = format(
+                    "RPA Reason: preferredCourtCode: %s; stayClaim: %s",
+                    getPreferredCourtCode(dq),
+                    isStayClaim(dq)
+                );
+        }
+        return defaultText;
+    }
+
+    private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
+        int index = 1;
+        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+        if (respondent1ResponseDate != null && respondent2ResponseDate != null) {
+            index = isRespondent1 ? 1 : 2;
+        }
+        return format(
+            " [%d of 2 - %s] ",
+            index,
+            time.now().toLocalDate().toString()
+        );
     }
 
     private void buildUnrepresentedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -502,14 +742,18 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unrepresentedDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unrepresentedDefendantsNames.size() > 1
-                    ? format("[%d of %d - %s] ",
-                             index + 1,
-                             unrepresentedDefendantsNames.size(),
-                             time.now().toLocalDate().toString())
+                    ? format(
+                    "[%d of %d - %s] ",
+                    index + 1,
+                    unrepresentedDefendantsNames.size(),
+                    time.now().toLocalDate().toString()
+                )
                     : "";
-                String eventText = format("RPA Reason: %sUnrepresented defendant: %s",
-                                          paginatedMessage,
-                                          unrepresentedDefendantsNames.get(index));
+                String eventText = format(
+                    "RPA Reason: %sUnrepresented defendant: %s",
+                    paginatedMessage,
+                    unrepresentedDefendantsNames.get(index)
+                );
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -544,14 +788,18 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unregisteredDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unregisteredDefendantsNames.size() > 1
-                    ? format("[%d of %d - %s] ",
-                             index + 1,
-                             unregisteredDefendantsNames.size(),
-                             time.now().toLocalDate().toString())
+                    ? format(
+                    "[%d of %d - %s] ",
+                    index + 1,
+                    unregisteredDefendantsNames.size(),
+                    time.now().toLocalDate().toString()
+                )
                     : "";
-                String eventText = format("RPA Reason: %sUnregistered defendant solicitor firm: %s",
-                                          paginatedMessage,
-                                          unregisteredDefendantsNames.get(index));
+                String eventText = format(
+                    "RPA Reason: %sUnregistered defendant solicitor firm: %s",
+                    paginatedMessage,
+                    unregisteredDefendantsNames.get(index)
+                );
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -569,15 +817,19 @@ public class EventHistoryMapper {
                                                             CaseData caseData) {
         String localDateTime = time.now().toLocalDate().toString();
 
-        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
-                                                   + "defendant solicitor firm. Unrepresented defendant: %s",
-                                               localDateTime,
-                                               getDefendantNames(UNREPRESENTED, caseData).get(0));
-        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
-                                                  + "defendant solicitor firm. Unregistered defendant solicitor "
-                                                  + "firm: %s",
-                                              localDateTime,
-                                              getDefendantNames(UNREGISTERED, caseData).get(0));
+        String unrepresentedEventText = format(
+            "RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
+                + "defendant solicitor firm. Unrepresented defendant: %s",
+            localDateTime,
+            getDefendantNames(UNREPRESENTED, caseData).get(0)
+        );
+        String unregisteredEventText = format(
+            "RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
+                + "defendant solicitor firm. Unregistered defendant solicitor "
+                + "firm: %s",
+            localDateTime,
+            getDefendantNames(UNREGISTERED, caseData).get(0)
+        );
 
         builder.miscellaneous(
             List.of(
@@ -639,113 +891,129 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.receiptOfAdmission(List.of(Event.builder()
-                                               .eventSequence(prepareEventSequence(builder.build()))
-                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                               .dateReceived(caseData.getRespondent1ResponseDate())
-                                               .litigiousPartyID("002")
-                                               .build())
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant fully admits.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant fully admits.")
-                                              .build())
-                            .build());
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.receiptOfAdmission(Event.builder()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent1ResponseDate())
+                                           .litigiousPartyID(RESPONDENT_ID)
+                                           .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.receiptOfAdmission(Event.builder()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent2ResponseDate())
+                                           .litigiousPartyID(RESPONDENT2_ID)
+                                           .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
     }
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.receiptOfPartAdmission(
-            List.of(
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.receiptOfPartAdmission(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
+                    .litigiousPartyID(RESPONDENT_ID)
                     .build()
-            )
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant partial admission.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant partial admission.")
-                                              .build())
-                            .build());
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.receiptOfPartAdmission(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .litigiousPartyID(RESPONDENT2_ID)
+                    .build()
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
+        }
     }
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.defenceAndCounterClaim(
-            List.of(
+        String miscText;
+        if (caseData.getRespondent1ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.defenceAndCounterClaim(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
+                    .litigiousPartyID(RESPONDENT_ID)
                     .build()
-            )
-        ).miscellaneous(Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Defendant rejects and counter claims.")
-                                              .build())
-                            .build());
-    }
-
-    private void buildConsentExtensionFilingDefence2(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        LocalDateTime dateReceived = caseData.getRespondent1TimeExtensionDate();
-        if (dateReceived == null) {
-            return;
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
         }
-        // date and time check to find the login
-        LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-
-        //finding extension date for the correct respondent in a 1v2 different solicitor scenario
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1TimeExtensionDate() == null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                dateReceived  = caseData.getRespondent2TimeExtensionDate();
-            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                if (caseData.getRespondent2TimeExtensionDate()
-                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
-                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent2TimeExtensionDate();
-                } else {
-                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent1TimeExtensionDate();
-                }
-            }
+        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.defenceAndCounterClaim(
+                List.of(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(caseData.getRespondent2ResponseDate())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build()
+                )
+            ).miscellaneous(Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                                   .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                                     .build())
+                                                   .build());
         }
-
-        builder.consentExtensionFilingDefence(
-            List.of(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                    .dateReceived(dateReceived)
-                    .litigiousPartyID("002")
-                    .eventDetailsText(
-                        //format("agreed extension date: %s", extensionDate.format(ISO_DATE)))
-                        format("agreed extension date: %s",
-                               extensionDate.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
-                    )
-                    .eventDetails(
-                        EventDetails.builder()
-                            .agreedExtensionDate(extensionDate.format(ISO_DATE))
-                            .build()
-                    )
-                    .build()
-            )
-        );
     }
 
     private void buildConsentExtensionFilingDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -753,54 +1021,45 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
 
         if (defendant1ExtensionExists.test(caseData)) {
-            LocalDate deadlineExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-            events.add(Event.builder()
-                           .eventSequence(prepareEventSequence(builder.build()))
-                           .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                           .dateReceived(caseData.getRespondent1TimeExtensionDate())
-                           .litigiousPartyID(RESPONDENT_ID)
-                           .eventDetailsText(getExtensionEventText(scenario,
-                                                                   deadlineExtension,
-                                                                   caseData.getRespondent1().getPartyName()))
-                           .eventDetails(EventDetails.builder()
-                                             .agreedExtensionDate(deadlineExtension
-                                                                      .format(ISO_DATE))
-                                             .build()).build());
+            events.add(buildConsentExtensionFilingDefenceEvent(
+                PartyUtils.respondent1Data(caseData), scenario, prepareEventSequence(builder.build())
+            ));
         }
 
-        if (scenario == ONE_V_TWO_TWO_LEGAL_REP && defendant2ExtensionExists.test(caseData)) {
-            LocalDate deadlineExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-            events.add(Event.builder()
-                           .eventSequence(prepareEventSequence(builder.build()))
-                           .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                           .dateReceived(caseData.getRespondent2TimeExtensionDate())
-                           .litigiousPartyID(RESPONDENT2_ID)
-                           .eventDetailsText(getExtensionEventText(scenario,
-                                                                   deadlineExtension,
-                                                                   caseData.getRespondent2().getPartyName()))
-                           .eventDetails(EventDetails.builder()
-                                             .agreedExtensionDate(deadlineExtension
-                                                                      .format(ISO_DATE))
-                                             .build()).build());
+        if (defendant2ExtensionExists.test(caseData)) {
+            events.add(buildConsentExtensionFilingDefenceEvent(
+                PartyUtils.respondent2Data(caseData), scenario, prepareEventSequence(builder.build())
+            ));
         }
 
         builder.consentExtensionFilingDefence(events);
     }
 
-    private String getExtensionEventText(MultiPartyScenario scenario, LocalDate extensionDate, String defendant) {
-        String defaultText;
+    private Event buildConsentExtensionFilingDefenceEvent(
+        PartyData party, MultiPartyScenario scenario, int eventNumber) {
+        return Event.builder()
+            .eventSequence(eventNumber)
+            .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
+            .dateReceived(party.getTimeExtensionDate())
+            .litigiousPartyID(party.getRole().equals(RESPONDENT_ONE) ? RESPONDENT_ID : RESPONDENT2_ID)
+            .eventDetailsText(getExtensionEventText(scenario, party))
+            .eventDetails(EventDetails.builder()
+                              .agreedExtensionDate(party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE))
+                              .build())
+            .build();
+    }
+
+    private String getExtensionEventText(MultiPartyScenario scenario, PartyData party) {
+        String extensionDate = party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE);
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                defaultText = format("RPA Reason: Defendant(s) have agreed extension: %s",
-                                     extensionDate.format(ISO_DATE));
-                break;
+                return format("RPA Reason: Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
-                defaultText = format("RPA Reason: Defendant: %s has agreed extension: %s", defendant,
-                                     extensionDate.format(ISO_DATE));
-                break;
+                return format("RPA Reason: Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
+                              extensionDate);
             default:
-                defaultText = format("agreedExtensionDate: %s", extensionDate.format(ISO_DATE));
+                return format("agreedExtensionDate: %s", extensionDate);
         }
-        return defaultText;
     }
 }
+

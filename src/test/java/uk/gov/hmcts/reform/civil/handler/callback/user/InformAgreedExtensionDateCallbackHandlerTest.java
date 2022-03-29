@@ -322,6 +322,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             extensionDate = now().plusDays(14);
             when(deadlinesCalculator.calculateFirstWorkingDay(extensionDate)).thenReturn(extensionDate);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
         }
 
         @Test
@@ -351,6 +353,75 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+        }
+
+        @Nested
+        class OneVTwo {
+
+            @Test
+            void shouldAddTimeExtensionSchedulerFlags_whenRespondent1RequestsTimeExtensionInSameSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension()
+                    .respondentSolicitor1AgreedDeadlineExtension(extensionDate)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("respondent1PickByTimeExtensionScheduler", "No")
+                    .containsEntry("respondent2PickByTimeExtensionScheduler", "Yes");
+            }
+
+            @Test
+            void shouldAddTimeExtensionSchedulerFlags_whenRespondent2RequestsTimeExtensionInSameSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
+                    .respondentSolicitor2AgreedDeadlineExtension(extensionDate)
+                    .respondent1TimeExtensionDate(null)
+                    .respondentSolicitor1AgreedDeadlineExtension(null)
+                    .addRespondent2(YES)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("respondent1PickByTimeExtensionScheduler", "Yes")
+                    .containsEntry("respondent2PickByTimeExtensionScheduler", "No");
+            }
+
+            @Test
+            void shouldNotAddTimeExtensionSchedulerFlags_whenInANonSameSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotifiedTimeExtension()
+                    .respondentSolicitor1AgreedDeadlineExtension(extensionDate)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData().get("respondent1PickByTimeExtensionScheduler")).isNull();
+                assertThat(response.getData().get("respondent1PickByTimeExtensionScheduler")).isNull();
+            }
+
+            @Test
+            void shouldNotChangeTimeExtensionSchedulerFlags_whenTimeExtensionFlagsExist() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension()
+                    .respondent1PickByTimeExtensionScheduler(NO)
+                    .respondent2PickByTimeExtensionScheduler(YES)
+                    .respondentSolicitor1AgreedDeadlineExtension(extensionDate)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("respondent1PickByTimeExtensionScheduler", "No")
+                    .containsEntry("respondent2PickByTimeExtensionScheduler", "Yes");
+            }
+
         }
     }
 
