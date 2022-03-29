@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -167,6 +168,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
         LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysAt4pmDeadline(respondent1ResponseDeadline);
         LocalDateTime newDeadlineRespondent2 = null;
+        boolean bothDefendantsAcknowledged = false;
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
@@ -227,7 +229,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
             //1v2 diff login 1
-
+            bothDefendantsAcknowledged = (caseData.getRespondent2AcknowledgeNotificationDate() != null);
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1(updatedRespondent1)
                 .solicitorReferences(caseData.getSolicitorReferencesCopy())
@@ -245,6 +247,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();
             //1v2 diff login 2
+            bothDefendantsAcknowledged = (caseData.getRespondent1AcknowledgeNotificationDate() != null);
             caseDataUpdated
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent2(updatedRespondent2)
@@ -258,6 +261,14 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .solicitorReferencesCopy(null)
                 .build();
         }
+
+        // scheduler
+        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP) && bothDefendantsAcknowledged) {
+            caseDataUpdated
+                .respondent1AcknowledgeClaimPickByScheduler(YES)
+                .respondent2AcknowledgeClaimPickByScheduler(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();

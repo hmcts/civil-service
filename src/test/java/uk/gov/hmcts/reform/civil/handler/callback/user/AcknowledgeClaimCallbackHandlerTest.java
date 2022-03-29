@@ -400,6 +400,61 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
         }
+
+        @Test
+        void shouldSetSchedulerFlag_whenBothDefendantsAcknowledgeIn1v2DifferentSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged1v2SameSolicitor()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .containsEntry("respondent1AcknowledgeClaimPickByScheduler", "Yes")
+                .containsEntry("respondent2AcknowledgeClaimPickByScheduler", "Yes");
+
+        }
+
+        @Test
+        void shouldNotSetSchedulerFlag_whenOnlyOneDefendantAcknowledgesIn1v2DifferentSolicitor() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .doesNotContainKey("respondent1AcknowledgeClaimPickByScheduler")
+                .doesNotContainKey("respondent2AcknowledgeClaimPickByScheduler");
+        }
+
+        @Test
+        void shouldNotSetSchedulerFlag_when1v2SameSolicitor() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged1v2SameSolicitor()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .doesNotContainKey("respondent1AcknowledgeClaimPickByScheduler")
+                .doesNotContainKey("respondent2AcknowledgeClaimPickByScheduler");
+        }
     }
 
     @Nested
