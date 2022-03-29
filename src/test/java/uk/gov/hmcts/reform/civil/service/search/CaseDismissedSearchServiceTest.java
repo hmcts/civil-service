@@ -9,6 +9,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 
 class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -29,6 +30,10 @@ class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
                         .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))))
             .should(boolQuery()
                         .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                        .must(rangeQuery("data.respondent2ResponseDeadline").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);
