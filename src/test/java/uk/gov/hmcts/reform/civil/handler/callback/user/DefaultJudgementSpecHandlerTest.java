@@ -248,7 +248,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
                 String cprRequiredInfo = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" " +
                     "target=\"_blank\">Download  default judgment</a> "
-                    + "%n The defendant will be served the Default Judgment.";
+                    + "%n%n The defendant will be served the Default Judgment.";
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                     .build();
