@@ -452,12 +452,13 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 
+    // CMC-1354 - only applicable for 1v2 Differenct Solicitor scenario
     public static final Predicate<CaseData> claimPastRespondentResponseDeadline = caseData -> {
         if (ONE_V_TWO_TWO_LEGAL_REP == getMultiPartyScenario(caseData)) {
             return caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())
                 && caseData.getRespondent2ResponseDeadline().isBefore(LocalDateTime.now());
         } else {
-                return caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now());
+                return false;
         }
     };
 

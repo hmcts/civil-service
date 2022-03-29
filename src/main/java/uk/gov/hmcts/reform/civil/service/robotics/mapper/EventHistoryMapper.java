@@ -296,6 +296,7 @@ public class EventHistoryMapper {
         switch (flowState) {
             case CLAIM_NOTIFIED:
             case CLAIM_DETAILS_NOTIFIED:
+            case PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA:
                 return "RPA Reason: Claim dismissed after no response from defendant after claimant sent notification.";
             case NOTIFICATION_ACKNOWLEDGED:
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:

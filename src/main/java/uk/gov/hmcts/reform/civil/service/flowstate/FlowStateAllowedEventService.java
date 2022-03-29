@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_AP
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 
 @Service
@@ -368,6 +369,12 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
+            List.of(
+                DISMISS_CLAIM
+            )
+        ),
+        entry(
+            PAST_RESPONDENT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM
             )
