@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -114,9 +115,9 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent(getRespondent(respondent))
             .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
                                                    .getOrganisation().getOrganisationID()))
-            .debt(debtAmount)
-            .costs(cost)
-            .totalCost(debtAmount.add(cost))
+            .debt(debtAmount.setScale(2))
+            .costs(cost.setScale(2))
+            .totalCost(debtAmount.add(cost).setScale(2))
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                     ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
@@ -176,9 +177,9 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private BigDecimal getClaimFee(CaseData caseData) {
         var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-
-        claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
-
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+            claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
+        }
         return claimFeePounds;
     }
 
