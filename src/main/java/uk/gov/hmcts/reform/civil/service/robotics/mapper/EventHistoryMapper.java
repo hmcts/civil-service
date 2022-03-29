@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -17,10 +18,9 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +31,8 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -175,7 +175,8 @@ public class EventHistoryMapper {
                              .dateReceived(caseNote.getCreatedOn().atStartOfDay())
                              .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                              .eventDetails(EventDetails.builder()
-                                               .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
+                                               .miscText(left((
+                                                   format("case note added: %s", caseNote.getNote())), 250))
                                                .build())
                              .build())
                 .collect(Collectors.toList());
@@ -698,109 +699,49 @@ public class EventHistoryMapper {
                             .build());
     }
 
-    private void buildConsentExtensionFilingDefence2(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        LocalDateTime dateReceived = caseData.getRespondent1TimeExtensionDate();
-        if (dateReceived == null) {
-            return;
-        }
-        // date and time check to find the login
-        LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-
-        //finding extension date for the correct respondent in a 1v2 different solicitor scenario
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1TimeExtensionDate() == null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                dateReceived  = caseData.getRespondent2TimeExtensionDate();
-            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                if (caseData.getRespondent2TimeExtensionDate()
-                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
-                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent2TimeExtensionDate();
-                } else {
-                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-                    dateReceived  = caseData.getRespondent1TimeExtensionDate();
-                }
-            }
-        }
-
-        builder.consentExtensionFilingDefence(
-            List.of(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                    .dateReceived(dateReceived)
-                    .litigiousPartyID("002")
-                    .eventDetailsText(
-                        //format("agreed extension date: %s", extensionDate.format(ISO_DATE)))
-                        format("agreed extension date: %s",
-                               extensionDate.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
-                    )
-                    .eventDetails(
-                        EventDetails.builder()
-                            .agreedExtensionDate(extensionDate.format(ISO_DATE))
-                            .build()
-                    )
-                    .build()
-            )
-        );
-    }
-
     private void buildConsentExtensionFilingDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = new ArrayList<>();
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
 
         if (defendant1ExtensionExists.test(caseData)) {
-            LocalDate deadlineExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-            events.add(Event.builder()
-                           .eventSequence(prepareEventSequence(builder.build()))
-                           .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                           .dateReceived(caseData.getRespondent1TimeExtensionDate())
-                           .litigiousPartyID(RESPONDENT_ID)
-                           .eventDetailsText(getExtensionEventText(scenario,
-                                                                   deadlineExtension,
-                                                                   caseData.getRespondent1().getPartyName()))
-                           .eventDetails(EventDetails.builder()
-                                             .agreedExtensionDate(deadlineExtension
-                                                                      .format(ISO_DATE))
-                                             .build()).build());
+            events.add(buildConsentExtensionFilingDefenceEvent(
+                PartyUtils.respondent1Data(caseData), scenario, prepareEventSequence(builder.build())
+            ));
         }
 
-        if (scenario == ONE_V_TWO_TWO_LEGAL_REP && defendant2ExtensionExists.test(caseData)) {
-            LocalDate deadlineExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-            events.add(Event.builder()
-                           .eventSequence(prepareEventSequence(builder.build()))
-                           .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
-                           .dateReceived(caseData.getRespondent2TimeExtensionDate())
-                           .litigiousPartyID(RESPONDENT2_ID)
-                           .eventDetailsText(getExtensionEventText(scenario,
-                                                                   deadlineExtension,
-                                                                   caseData.getRespondent2().getPartyName()))
-                           .eventDetails(EventDetails.builder()
-                                             .agreedExtensionDate(deadlineExtension
-                                                                      .format(ISO_DATE))
-                                             .build()).build());
+        if (defendant2ExtensionExists.test(caseData)) {
+            events.add(buildConsentExtensionFilingDefenceEvent(
+                PartyUtils.respondent2Data(caseData), scenario, prepareEventSequence(builder.build())
+            ));
         }
 
         builder.consentExtensionFilingDefence(events);
     }
 
-    private String getExtensionEventText(MultiPartyScenario scenario, LocalDate extensionDate, String defendant) {
-        String defaultText;
+    private Event buildConsentExtensionFilingDefenceEvent(
+        PartyData party, MultiPartyScenario scenario, int eventNumber) {
+        return Event.builder()
+            .eventSequence(eventNumber)
+            .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
+            .dateReceived(party.getTimeExtensionDate())
+            .litigiousPartyID(party.getRole().equals(RESPONDENT_ONE) ? RESPONDENT_ID : RESPONDENT2_ID)
+            .eventDetailsText(getExtensionEventText(scenario, party))
+            .eventDetails(EventDetails.builder()
+                              .agreedExtensionDate(party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE))
+                              .build())
+            .build();
+    }
+
+    private String getExtensionEventText(MultiPartyScenario scenario, PartyData party) {
+        String extensionDate = party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE);
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                defaultText = format("RPA Reason: Defendant(s) have agreed extension: %s",
-                                     extensionDate.format(ISO_DATE));
-                break;
+                return format("RPA Reason: Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
-                defaultText = format("RPA Reason: Defendant: %s has agreed extension: %s", defendant,
-                                     extensionDate.format(ISO_DATE));
-                break;
+                return format("RPA Reason: Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
+                              extensionDate);
             default:
-                defaultText = format("agreedExtensionDate: %s", extensionDate.format(ISO_DATE));
+                return format("agreedExtensionDate: %s", extensionDate);
         }
-        return defaultText;
     }
 }

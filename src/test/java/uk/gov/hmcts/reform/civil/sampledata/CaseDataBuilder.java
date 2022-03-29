@@ -232,6 +232,8 @@ public class CaseDataBuilder {
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
+    private YesOrNo respondent1PickByTimeExtensionScheduler;
+    private YesOrNo respondent2PickByTimeExtensionScheduler;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1312,6 +1314,31 @@ public class CaseDataBuilder {
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDate = null;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension() {
+        atStateClaimDetailsNotified();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = YES;
         return this;
     }
 
@@ -2007,6 +2034,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1PickByTimeExtensionScheduler(YesOrNo pickByScheduler) {
+        this.respondent1PickByTimeExtensionScheduler = pickByScheduler;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2PickByTimeExtensionScheduler(YesOrNo pickByScheduler) {
+        this.respondent2PickByTimeExtensionScheduler = pickByScheduler;
+        return this;
+    }
+
     public CaseDataBuilder generateYearsAndMonthsIncorrectInput() {
         atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -2206,6 +2243,8 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .respondent1PickByTimeExtensionScheduler(respondent1PickByTimeExtensionScheduler)
+            .respondent2PickByTimeExtensionScheduler(respondent2PickByTimeExtensionScheduler)
             .build();
     }
 }

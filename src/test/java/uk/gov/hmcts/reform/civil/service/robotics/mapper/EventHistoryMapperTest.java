@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -20,12 +21,13 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -33,6 +35,8 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -573,6 +577,114 @@ class EventHistoryMapperTest {
                 "replyToDefence",
                 "directionsQuestionnaireFiled"
             );
+        }
+    }
+
+    @Nested
+    class NotifyTimeExtensionAcknowledged {
+
+        Map<PartyRole, String> partyLitIdMap = Map.of(
+            RESPONDENT_ONE, "002",
+            RESPONDENT_TWO, "003"
+        );
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        }
+
+        @Nested
+        class OneVOne {
+
+            @Test
+            void shouldPrepareExpectedEvents() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
+                Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
+                    PartyUtils.respondent1Data(caseData),
+                    format("agreedExtensionDate: %s", caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                               .format(ISO_DATE)));
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                    .containsExactly(deadlineExtendedEvent);
+            }
+        }
+
+        @Nested
+        class OneVTwo {
+
+            @Test
+            void shouldPrepareExpectedEvents_Respondent1RequestsTimeExtensionDifferentSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
+
+                Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
+                    PartyUtils.respondent1Data(caseData),
+                    format("RPA Reason: Defendant: Mr. Sole Trader has agreed extension: %s",
+                        caseData.getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)
+                    )
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                    .containsExactly(deadlineExtendedEvent);
+            }
+
+            @Test
+            void shouldPrepareExpectedEvents_Respondent2RequestsTimeExtensionDifferentSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension().build();
+
+                Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
+                    PartyUtils.respondent2Data(caseData),
+                    format("RPA Reason: Defendant: Mr. John Rambo has agreed extension: %s",
+                           caseData.getRespondentSolicitor2AgreedDeadlineExtension().format(ISO_DATE)
+                    )
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                    .containsExactly(deadlineExtendedEvent);
+            }
+
+            @Test
+            void shouldPrepareExpectedEvents_SameSolicitorScenario() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension().build();
+
+                Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
+                    PartyUtils.respondent1Data(caseData),
+                    format("RPA Reason: Defendant(s) have agreed extension: %s",
+                           caseData.getRespondentSolicitor1AgreedDeadlineExtension().format(ISO_DATE)
+                    )
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                    .containsExactly(deadlineExtendedEvent);
+            }
+        }
+
+        public Event expectedDeadLineExtendedEvent(PartyData partyData, String expectedMessage) {
+            return Event.builder()
+                .eventSequence(4)
+                .eventCode("45")
+                .dateReceived(partyData.getTimeExtensionDate())
+                .litigiousPartyID(partyLitIdMap.get(partyData.getRole()))
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(partyData.getSolicitorAgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(expectedMessage)
+                .build();
         }
     }
 
@@ -1659,9 +1771,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreed extension date: %s", caseData
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
+                    .format(ISO_DATE)))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -1793,9 +1905,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreed extension date: %s", caseData
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
+                    .format(ISO_DATE)))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2029,9 +2141,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreed extension date: %s", caseData
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
+                    .format(ISO_DATE)))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2169,9 +2281,9 @@ class EventHistoryMapperTest {
                                   .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                                            .format(ISO_DATE))
                                   .build())
-                .eventDetailsText(format("agreed extension date: %s", caseData
+                .eventDetailsText(format("agreedExtensionDate: %s", caseData
                     .getRespondentSolicitor1AgreedDeadlineExtension()
-                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
+                    .format(ISO_DATE)))
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);

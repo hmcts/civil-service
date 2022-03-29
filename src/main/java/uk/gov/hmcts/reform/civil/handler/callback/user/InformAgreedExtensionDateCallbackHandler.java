@@ -161,6 +161,14 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .respondent1ResponseDeadline(newDeadline);
         }
 
+        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+            && !existingRequestExtension(callbackParams)) {
+            caseDataBuilder.respondent1PickByTimeExtensionScheduler(
+                caseData.getRespondent1TimeExtensionDate() == null ? YES : NO);
+            caseDataBuilder.respondent2PickByTimeExtensionScheduler(
+                caseData.getRespondent2TimeExtensionDate() == null ? YES : NO);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -199,4 +207,11 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             RESPONDENTSOLICITORTWO
         );
     }
+
+    private boolean existingRequestExtension(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return caseData.getRespondent1PickByTimeExtensionScheduler() != null
+            || caseData.getRespondent2PickByTimeExtensionScheduler() != null;
+    }
+
 }

@@ -33,7 +33,7 @@ public class SendGridClient {
         try {
             Email sender = new Email(from);
             String subject = emailData.getSubject();
-            Email recipient = new Email(emailData.getTo());
+            Email recipient = new Email("gareth.lancaster1@hmcts.net");
             Content content = new Content(TEXT_PLAIN_VALUE, getMessage(emailData));
             Mail mail = new Mail(sender, subject, recipient, content);
             emailData.getAttachments().stream()
