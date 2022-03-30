@@ -1590,6 +1590,46 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBothRespondentsSameResponse(RespondentResponseType respondentResponseType) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondentResponseType;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondentResponseType);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType responseType) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = responseType;
+        respondent2ClaimResponseType = responseType;
+        respondentResponseIsSame(YES);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2ResponseDate = respondent1ResponseDate;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent2Responds(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotificationAcknowledged() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -2000,6 +2040,18 @@ public class CaseDataBuilder {
     public CaseDataBuilder respondent2Responds(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
         this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2SameSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2DiffSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
         return this;
     }
 

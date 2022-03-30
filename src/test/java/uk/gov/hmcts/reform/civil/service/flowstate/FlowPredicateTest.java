@@ -993,7 +993,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.YES)
                 .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
                 .build();
@@ -1005,7 +1004,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
                 .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.YES)
                 .build();
@@ -1017,7 +1015,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
                 .build();
@@ -1029,7 +1026,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
                 .build();
@@ -1041,7 +1037,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
                 .build();
@@ -1049,11 +1044,10 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2TwoLR_ProceedVsRespondent2() {
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_ProceedVsRespondent2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
                 .build();
@@ -1082,7 +1076,6 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicantsProceedIntention(YesOrNo.YES)
                 .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
                 .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
                 .build();
@@ -1090,11 +1083,21 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2OneLR_ApplicantNotProceedAgainstBothDefendants() {
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2SameSol_ApplicantNotProceedAgainstBothDefendants() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceNotProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_ApplicantNotProceedAgainstBothDefendants() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
                 .build();
