@@ -359,10 +359,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
             String header = "# Judgment for damages to be decided "
                                        + "Granted ";
-            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
-                + "  interim judgment</a> "
-                + "\r\n\r\n Judgment has been entered and your case"
-                + " will be referred to a judge for directions.";
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
+                + "target=\"_blank\">Download  interim judgment</a> \r\n\r\n Judgment has been entered"
+                + " and your case will be referred to a judge for directions.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
                 .respondent1(PartyBuilder.builder().build())
@@ -378,10 +377,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response.toString()).isEqualTo(SubmittedCallbackResponse.builder()
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
                                                                           .confirmationBody(body)
-                                                                          .build().toString());
+                                                                          .build());
         }
     }
 }
