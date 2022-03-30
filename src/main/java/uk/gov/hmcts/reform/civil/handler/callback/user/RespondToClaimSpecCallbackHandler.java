@@ -744,19 +744,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         String applicantName = caseData.getApplicant1().getPartyName();
 
-        String sb = "<br>You told us you've paid the &#163;" +
-            MonetaryConversions.penniesToPounds(howMuchWasPaid) +
-            ". We've sent " +
-            applicantName +
-            " this response." +
-            "<h2 class=\"govuk-heading-m\">What happens next</h2>" +
-            "<h3 class=\"govuk-heading-m\">If " +
-            applicantName + " accepts your response</h3>" +
-            "<p>The claim will be settled. We'll contact you when they respond.</p>" +
-            "<h3 class=\"govuk-heading-m\">If " +
-            applicantName + " rejects your response</h3>" +
-            "<p>The court will review the case. You may have to go to a hearing.</p>" +
-            "<p>We'll contact you to tell you what to do next.</p>";
+        String sb = "<br>You told us you've paid the &#163;"
+            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
+            + ". We've sent "
+            + applicantName
+            + " this response."
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " accepts your response</h3>"
+            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " rejects your response</h3>"
+            + "<p>The court will review the case. You may have to go to a hearing.</p>"
+            + "<p>We'll contact you to tell you what to do next.</p>";
         return Optional.of(sb);
     }
 

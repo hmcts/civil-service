@@ -471,8 +471,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenPartialAdmitPaidFull() {
-            BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
             BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
