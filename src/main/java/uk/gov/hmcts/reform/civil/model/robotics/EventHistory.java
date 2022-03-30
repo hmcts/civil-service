@@ -17,8 +17,8 @@ public class EventHistory {
 
     @Singular("miscellaneous")
     private List<Event> miscellaneous;
-    @Builder.Default
-    private List<Event> acknowledgementOfServiceReceived = List.of(Event.builder().build());
+    @Singular("acknowledgementOfServiceReceived")
+    private List<Event> acknowledgementOfServiceReceived;
     @Singular("consentExtensionFilingDefence")
     private List<Event> consentExtensionFilingDefence;
     @Singular("defenceFiled")

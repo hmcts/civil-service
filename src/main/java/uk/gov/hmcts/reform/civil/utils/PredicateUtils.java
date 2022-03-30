@@ -17,4 +17,11 @@ public class PredicateUtils {
     public static final Predicate<CaseData> defendant2ExtensionExists = caseData ->
         caseData.getRespondent2TimeExtensionDate() != null
             && caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null;
+
+
+    public static final Predicate<CaseData> defendant1AckExists = caseData ->
+        caseData.getRespondent1AcknowledgeNotificationDate()  != null;
+
+    public static final Predicate<CaseData> defendant2AckExists = caseData ->
+        caseData.getRespondent2AcknowledgeNotificationDate() != null;
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,9 +17,11 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
-
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
@@ -102,31 +105,27 @@ public class RoboticsNotificationService {
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
-
-        List<Event> event = eventHistory.getMiscellaneous();
-        String triggerReason = getLastDetailsText(event).orElse(null);
-
-        triggerReason = updateTriggerReason(eventHistory.getAcknowledgementOfServiceReceived(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getConsentExtensionFilingDefence(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getDefenceFiled(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getDefenceAndCounterClaim(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getReceiptOfPartAdmission(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
-        triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
-
-        return triggerReason;
+        List<Event> events = flatEvents(eventHistory);
+        events.sort(Comparator.comparing(Event::getDateReceived));
+        return events.get(events.size() - 1).getEventDetailsText();
     }
 
-    private static Optional<String> getLastDetailsText(List<Event> events) {
-        if (events.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.ofNullable(events.get(events.size() - 1).getEventDetailsText());
-        }
-    }
-
-    private static String updateTriggerReason(List<Event> event, String triggerReason) {
-        return getLastDetailsText(event).orElse(triggerReason);
+    private static List<Event> flatEvents(EventHistory eventHistory) {
+        List<List<Event>> eventsList = Lists.newArrayList(
+            eventHistory.getMiscellaneous(),
+            eventHistory.getAcknowledgementOfServiceReceived(),
+            eventHistory.getConsentExtensionFilingDefence(),
+            eventHistory.getDefenceFiled(),
+            eventHistory.getDefenceAndCounterClaim(),
+            eventHistory.getReceiptOfPartAdmission(),
+            eventHistory.getReceiptOfAdmission(),
+            eventHistory.getReplyToDefence(),
+            eventHistory.getDirectionsQuestionnaireFiled()
+        );
+        return eventsList.stream()
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(event -> event.getDateReceived() != null)
+            .collect(Collectors.toList());
     }
 }

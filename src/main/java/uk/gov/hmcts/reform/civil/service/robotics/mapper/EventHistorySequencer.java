@@ -35,7 +35,7 @@ public class EventHistorySequencer {
                     builder.miscellaneous(event);
                     break;
                 case ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED:
-                    builder.acknowledgementOfServiceReceived(List.of(event));
+                    builder.acknowledgementOfServiceReceived(event);
                     break;
                 case CONSENT_EXTENSION_FILING_DEFENCE:
                     builder.consentExtensionFilingDefence(List.of(event));
@@ -76,6 +76,9 @@ public class EventHistorySequencer {
         }
         if (isEmpty(builder.build().getDefenceAndCounterClaim())) {
             builder.defenceAndCounterClaim(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getAcknowledgementOfServiceReceived())) {
+            builder.acknowledgementOfServiceReceived(List.of(Event.builder().build()));
         }
         if (isEmpty(builder.build().getConsentExtensionFilingDefence())) {
             builder.consentExtensionFilingDefence(List.of(Event.builder().build()));

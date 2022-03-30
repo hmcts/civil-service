@@ -61,7 +61,9 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 
 @Component
@@ -114,6 +116,11 @@ public class EventHistoryMapper {
                         break;
                     case FULL_ADMISSION:
                         buildRespondentFullAdmission(builder, caseData);
+                        break;
+                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
+                    case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                        //send rpa for first defendant in 1v2 diff solicitor
+                        buildSomething(builder, caseData);
                         break;
                     case PART_ADMISSION:
                         buildRespondentPartAdmission(builder, caseData);
@@ -174,6 +181,7 @@ public class EventHistoryMapper {
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
 
+        System.out.println(eventHistorySequencer.sortEvents(builder.build()));
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -592,6 +600,18 @@ public class EventHistoryMapper {
                                   .build());
     }
 
+    private void buildSomething(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(MISCELLANEOUS.getCode())
+                                  .dateReceived(caseData.getRespondent1ResponseDate())
+                                  .eventDetailsText("RPA Reason: One of the defendant has responded.")
+                                  .eventDetails(EventDetails.builder()
+                                                    .miscText("RPA Reason: One of the defendant has responded.")
+                                                    .build())
+                                  .build());
+    }
+
     private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> defenceFiledEvents = new ArrayList<>();
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
@@ -824,44 +844,111 @@ public class EventHistoryMapper {
             ));
     }
 
+
+
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        //TODO Defendant 2 will be handled under RPA ticket [CMC-1677]
-        LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-        if (dateAcknowledge == null) {
-            return;
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP: {
+                List<Event> events = new ArrayList<>();
+                if (defendant1AckExists.test(caseData)) {
+                    events.add(respondent1AcknowledgementOfService(builder, caseData, format(
+                        "Defendant: %s has acknowledged: %s",
+                        caseData.getRespondent1().getPartyName(),
+                        caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                    )));
+                }
+                if (defendant2AckExists.test(caseData)) {
+                    events.add(respondent2AcknowledgementOfService(builder, caseData, format(
+                        "Defendant: %s has acknowledged: %s",
+                        caseData.getRespondent2().getPartyName(),
+                        caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                    )));
+                }
+
+                builder.acknowledgementOfServiceReceived(events);
+                break;
+            }
+            case ONE_V_TWO_ONE_LEGAL_REP: {
+                String currentTime = time.now().toLocalDate().toString();
+
+                builder
+                    .acknowledgementOfServiceReceived(
+                        List.of(
+                            respondent1AcknowledgementOfService(builder, caseData, format(
+                                "RPA Reason: [1 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                currentTime,
+                                caseData.getRespondent1().getPartyName(),
+                                caseData.getRespondent1ClaimResponseIntentionType().getLabel())
+                            ),
+                            respondent2AcknowledgementOfService(builder, caseData, format(
+                                "RPA Reason: [2 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                currentTime,
+                                caseData.getRespondent2().getPartyName(),
+                                caseData.getRespondent2ClaimResponseIntentionType().getLabel())
+                            )
+                        ));
+                break;
+            }
+            default: {
+                if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+                    buildAcknowledgementOfServiceSpec(builder, caseData.getRespondent1AcknowledgeNotificationDate());
+                    return;
+                }
+
+                builder
+                    .acknowledgementOfServiceReceived(
+                        List.of(
+                            respondent1AcknowledgementOfService(
+                                builder, caseData,
+                                format("responseIntention: %s",
+                                       caseData.getRespondent1ClaimResponseIntentionType().getLabel()))));
+            }
         }
+    }
+
+    private Event respondent1AcknowledgementOfService(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                                      String eventDetailsText) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
+            .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
+            .litigiousPartyID("002")
+            .eventDetails(EventDetails.builder()
+                              .responseIntention(caseData.getRespondent1ClaimResponseIntentionType().getLabel())
+                              .build())
+            .eventDetailsText(eventDetailsText)
+            .build();
+    }
+
+    private Event respondent2AcknowledgementOfService(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                                      String eventDetailsText) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
+            .dateReceived(caseData.getRespondent2AcknowledgeNotificationDate())
+            .litigiousPartyID("003")
+            .eventDetails(EventDetails.builder()
+                              .responseIntention(
+                                  caseData.getRespondent2ClaimResponseIntentionType().getLabel())
+                              .build())
+            .eventDetailsText(eventDetailsText)
+            .build();
+    }
+
+    private void buildAcknowledgementOfServiceSpec(EventHistory.EventHistoryBuilder builder,
+                                                   LocalDateTime dateAcknowledge) {
         builder
             .acknowledgementOfServiceReceived(
-                List.of(
-                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)
-                        ?
-                        Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode("38")
-                            .dateReceived(dateAcknowledge)
-                            .litigiousPartyID("002")
-                            .eventDetails(EventDetails.builder()
-                                              .acknowledgeService("Acknowledgement of Service")
-                                              .build())
-                            .eventDetailsText(format(
-                                "Defendant LR Acknowledgement of Service "
-                            ))
-                            .build()
-                        : Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
-                        .dateReceived(dateAcknowledge)
-                        .litigiousPartyID("002")
-                        .eventDetails(EventDetails.builder()
-                                          .responseIntention(caseData.getRespondent1ClaimResponseIntentionType()
-                                                                 .getLabel())
-                                          .build())
-                        .eventDetailsText(format(
-                            "responseIntention: %s",
-                            caseData.getRespondent1ClaimResponseIntentionType().getLabel()
-                        ))
-                        .build()
-                ));
+                List.of(Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode("38")
+                    .dateReceived(dateAcknowledge)
+                    .litigiousPartyID("002")
+                    .eventDetails(EventDetails.builder()
+                                      .acknowledgeService("Acknowledgement of Service")
+                                      .build())
+                    .eventDetailsText(format("Defendant LR Acknowledgement of Service "))
+                    .build()));
     }
 
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
