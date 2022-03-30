@@ -1756,6 +1756,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePastClaimDismissedDeadline_1v2() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        claimDismissedDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDismissed() {
         atStatePastClaimDismissedDeadline();
         ccdState = CASE_DISMISSED;
