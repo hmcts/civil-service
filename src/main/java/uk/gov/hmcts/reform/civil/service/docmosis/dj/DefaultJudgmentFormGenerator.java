@@ -60,9 +60,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     @Override
     public DefaultJudgmentForm getTemplateData(CaseData caseData) throws IOException {
-
         return null;
-
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
