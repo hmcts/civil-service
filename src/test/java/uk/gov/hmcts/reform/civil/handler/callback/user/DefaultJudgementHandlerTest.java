@@ -311,7 +311,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 + "Granted ";
             String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
                 + "  interim judgment</a> "
-                + "\r\n\r\n Judgment has been entered and your case"
+                + "%n%n Judgment has been entered and your case"
                 + " will be referred to a judge for directions.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
@@ -323,7 +323,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
-                                                                          .confirmationBody(body)
+                                                                          .confirmationBody(String.format(body))
                                                                           .build());
         }
 
@@ -360,7 +360,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             String header = "# Judgment for damages to be decided "
                                        + "Granted ";
             String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
-                + "target=\"_blank\">Download  interim judgment</a> \r\n\r\n Judgment has been entered"
+                + "target=\"_blank\">Download  interim judgment</a> %n%n Judgment has been entered"
                 + " and your case will be referred to a judge for directions.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
@@ -379,7 +379,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
-                                                                          .confirmationBody(body)
+                                                                          .confirmationBody(String.format(body))
                                                                           .build());
         }
     }
