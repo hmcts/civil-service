@@ -131,5 +131,4 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return applicants;
     }
 
-
 }
