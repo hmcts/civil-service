@@ -292,7 +292,7 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.27.2'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.28.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
