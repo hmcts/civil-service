@@ -69,10 +69,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-
     private List<DefaultJudgmentForm> getDefaultJudgmentForm(CaseData caseData) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
-
         defaultJudgmentForms.add(DefaultJudgmentForm.builder()
                                      .caseNumber(caseData.getLegacyCaseReference())
                                      .formText("No Acknowledgement of service")
@@ -98,16 +96,13 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                              .getRespondentSolicitor2Reference()).build());
         }
         return defaultJudgmentForms;
-
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-
         return N121;
     }
 
     private Party getResondent(uk.gov.hmcts.reform.civil.model.Party respondent) {
-
         return Party.builder()
             .name(respondent.getPartyName())
             .primaryAddress(respondent.getPrimaryAddress())
@@ -130,5 +125,4 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         }
         return applicants;
     }
-
 }
