@@ -111,7 +111,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
                                      uk.gov.hmcts.reform.civil.model.Party applicant2) {
-
         List<Party> applicants = new ArrayList<>();
         applicants.add(Party.builder()
                            .name(applicant1.getPartyName())
