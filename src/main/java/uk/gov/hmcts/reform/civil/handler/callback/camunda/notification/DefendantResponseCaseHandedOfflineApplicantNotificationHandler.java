@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -65,10 +66,6 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
         sendNotificationToSolicitor(caseData, recipient, templateID);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private boolean is1v1Or2v1Case(CaseData caseData) {
-        return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
     }
 
     private void sendNotificationToSolicitor(CaseData caseData, String recipient, String templateID) {

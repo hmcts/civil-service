@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -50,7 +52,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(callbackParams) ? TASK_ID_RESPONDENT1 : TASK_ID_RESPONDENT2;
+        return isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE) ? TASK_ID_RESPONDENT1
+            : TASK_ID_RESPONDENT2;
     }
 
     @Override
@@ -71,7 +74,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         } else {
             //Use Multiparty Template as there are 2 defendant responses
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-            if (isRespondent1(callbackParams)) {
+            if (isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)) {
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
             } else {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
@@ -90,15 +93,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-    }
-
-    private Boolean isRespondent1(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
-    }
-
-    private boolean is1v1Or2v1Case(CaseData caseData) {
-        return getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
     }
 
     @Override
