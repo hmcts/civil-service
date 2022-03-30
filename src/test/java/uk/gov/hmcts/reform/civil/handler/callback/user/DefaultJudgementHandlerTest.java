@@ -378,10 +378,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+            assertThat(response.toString()).isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
                                                                           .confirmationBody(body)
-                                                                          .build());
+                                                                          .build().toString());
         }
     }
 }
