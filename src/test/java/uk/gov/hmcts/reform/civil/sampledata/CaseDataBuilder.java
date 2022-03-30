@@ -378,7 +378,8 @@ public class CaseDataBuilder {
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder().vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
@@ -409,7 +410,8 @@ public class CaseDataBuilder {
             .respondent2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder().vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
             .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
@@ -442,7 +444,8 @@ public class CaseDataBuilder {
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder().vulnerabilityAdjustmentsRequired(NO).build())
+            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                    .vulnerabilityAdjustmentsRequired(NO).build())
             .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
             .build();
         return this;
