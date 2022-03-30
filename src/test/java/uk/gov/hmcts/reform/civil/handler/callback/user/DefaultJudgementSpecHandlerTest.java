@@ -211,7 +211,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .repaymentSuggestion(suggest)
                 .repaymentDate(testDate)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -231,7 +230,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .repaymentSuggestion(suggest)
                 .repaymentDate(testDate)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0))
@@ -298,7 +296,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 assertThat(response.getErrors()).isEmpty();
             }
-
         }
 
         @Nested
@@ -390,7 +387,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + "£1.00\n"
                     + " ## Total still owed \n"
                     + " £681.00";
-
                 assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
             }
 
@@ -454,10 +450,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .paymentSetDate(LocalDate.now().minusDays(15))
                     .partialPaymentAmount("100")
                     .totalClaimAmount(BigDecimal.valueOf(5001))
-
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"

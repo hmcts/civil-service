@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -24,12 +23,10 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -52,8 +49,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private DefaultJudgementHandler handler;
-    @MockBean
-    private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
 
     @Nested
     class AboutToStartCallback {
@@ -65,7 +60,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             assertThat(response.getErrors()).isNotEmpty();
         }
 
@@ -78,7 +72,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -97,7 +90,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
-
     }
 
     @Nested
@@ -122,7 +114,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("bothDefendants")).isEqualTo("Both");
-
         }
 
         @Test
@@ -142,7 +133,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("bothDefendants")).isEqualTo("One");
-
         }
     }
 
@@ -164,16 +154,13 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .detailsOfDirectionDisposal(disposalText)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("detailsOfDirectionDisposal")).isEqualTo(disposalText);
-
         }
 
         @Test
         void shouldReturnTrialText_whenHearingTypeSelectionTrial() {
-
             String trialText = "will be trial hearing provided text";
             //text that will populate text area when the hearing type selected is trial
             //dummy text for now until proper text provided.
@@ -185,11 +172,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .detailsOfDirectionDisposal(trialText)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("detailsOfDirectionTrial")).isEqualTo(trialText);
-
         }
     }
 
@@ -215,11 +200,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Unavailable From Date should be less than To Date");
-
         }
 
         @Test
@@ -239,16 +222,13 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Dates must be within the next 3 months.");
-
         }
 
         @Test
         void shouldReturnError_whenDateFromPastDatedProvided() {
-
             HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
                 LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
                 LocalDate.now().plusMonths(-4)).build();
@@ -264,11 +244,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Date cannot be past date");
-
         }
 
         @Test
@@ -279,7 +257,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
                 .builder().hearingDates(
                     wrapElements(hearingDates)).build();
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -287,11 +264,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
-
         }
 
         @Test
@@ -304,11 +279,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
-
         }
     }
 
@@ -317,7 +290,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldCallExternalTask_whenAboutToSubmit() {
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -325,12 +297,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
-
         }
-
     }
 
     @Nested
@@ -338,16 +307,13 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementGrantedResponse_whenInvoked() {
-            Object legacyReference = "111111";
-            String header = format("# Judgment for damages to be decided "
-                                       + "Granted %n## Claim"
-                                       + " number: %s", legacyReference);
-            String body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+            String header = "# Judgment for damages to be decided "
+                + "Granted ";
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
                 + "  interim judgment</a> "
-                + "Judgment has been entered and your case"
+                + "\r\n\r\n Judgment has been entered and your case"
                 + " will be referred to a judge for directions.";
-
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
                 .applicant1(PartyBuilder.builder().build())
                 .respondent1(PartyBuilder.builder().individual().build())
@@ -363,14 +329,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2() {
-            Object legacyReference = "111111";
-            String header = format("# Judgment for damages to be decided "
-                                       + "requested %n## Claim "
-                                       + "number: %s", legacyReference);
+            String header = "# Judgment for damages to be decided "
+                                       + "requested ";
             String body = "Your request will be referred"
                 + " to a judge and we will contact you "
                 + "and tell you what happens next.";
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
                 .respondent1(PartyBuilder.builder().build())
@@ -384,27 +347,22 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                                                  .build())
                                       .build())
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
                                                                           .confirmationBody(body)
                                                                           .build());
-
         }
 
         @Test
         void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
-            Object legacyReference = "111111";
-            String header = format("# Judgment for damages to be decided "
-                                       + "Granted %n## Claim"
-                                       + " number: %s", legacyReference);
-            String body = "<br /><a href=\"%s\" target=\"_blank\">Download"
+            String header = "# Judgment for damages to be decided "
+                                       + "Granted ";
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
                 + "  interim judgment</a> "
-                + "Judgment has been entered and your case"
+                + "\r\n\r\n Judgment has been entered and your case"
                 + " will be referred to a judge for directions.";
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .legacyCaseReference("111111")
                 .respondent1(PartyBuilder.builder().build())
@@ -418,14 +376,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                                                  .build())
                                       .build())
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(header)
                                                                           .confirmationBody(body)
                                                                           .build());
-
         }
     }
 }
