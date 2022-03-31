@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -78,7 +78,10 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTime.now())
+                .createdDatetime(document.createdOn
+                                     .toInstant()
+                                     .atZone(ZoneId.systemDefault())
+                                     .toLocalDateTime())
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();
