@@ -43,13 +43,13 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
-//    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
-//        + "%n%n * The time for responding to the claim has expired. "
-//        + "%n%n * The Defendant has not responded to the claim."
-//        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."
-//        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-//        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-//        + "%n%n You can make another default judgment request when you know all these statements have been met.";
+    //    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
+    //        + "%n%n * The time for responding to the claim has expired. "
+    //        + "%n%n * The Defendant has not responded to the claim."
+    //        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."
+    //        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
+    //        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
+    //        + "%n%n You can make another default judgment request when you know all these statements have been met.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
