@@ -26,15 +26,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-
-
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJRespondentReceivedNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification
+    .DJRespondentReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-
 
 @SpringBootTest(classes = {
     DJRespondentReceivedNotificationHandler.class,
@@ -55,7 +53,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
     class AboutToSubmitCallback{
 
         @BeforeEach
-        void setup(){
+        void setup() {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-id");
             when(organisationService.findOrganisationById(anyString()))
@@ -87,6 +85,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
         }
 
     }
+
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
