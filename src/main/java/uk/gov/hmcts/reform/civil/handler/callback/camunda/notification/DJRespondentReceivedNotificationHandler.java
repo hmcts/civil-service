@@ -51,7 +51,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-//        Send email to respondent solicitor
+        // Send email to respondent solicitor
         notificationService.sendMail(
             caseData.getRespondentSolicitor1EmailAddress(),
             notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived(),
