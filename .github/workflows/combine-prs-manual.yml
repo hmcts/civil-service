@@ -1,10 +1,8 @@
-name: 'Combine PRs'
+name: 'Manual Combine PRs'
 
 # Controls when the action will run - in this case triggered manually
 on:
-  push:
-    branches:
-      - combine-prs
+  workflow_dispatch:
     inputs:
       branchPrefix:
         description: 'Branch prefix to find combinable PRs based on'
@@ -22,11 +20,6 @@ on:
         description: 'Exclude PRs with this label'
         required: true
         default: 'nocombine'
-env:
-  branchPrefix: dependabot
-  mustBeGreen: false
-  combineBranchName: combine-prs-branch
-  ignoreLabel: nocombine
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "combine-prs"
@@ -52,7 +45,7 @@ jobs:
             for (const pull of pulls) {
               const branch = pull['head']['ref'];
               console.log('Pull for branch: ' + branch);
-              if (branch.startsWith('${{ github.event.inputs.branchPrefix }}') || branch.startsWith('${{env.branchPrefix}}')) {
+              if (branch.startsWith('${{ github.event.inputs.branchPrefix }}')) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
                 console.log('Checking labels: ' + branch);
@@ -60,7 +53,7 @@ jobs:
                 for(const label of labels) {
                   const labelName = label['name'];
                   console.log('Checking label: ' + labelName);
-                  if(labelName == '${{ env.ignoreLabel }}') {
+                  if(labelName == '${{ github.event.inputs.ignoreLabel }}') {
                     console.log('Discarding ' + branch + ' with label ' + labelName);
                     statusOK = false;
                   }
@@ -94,7 +87,7 @@ jobs:
         env:
           BASE_BRANCH: ${{ steps.fetch-branch-names.outputs.base-branch }}
           BRANCHES_TO_COMBINE: ${{ steps.fetch-branch-names.outputs.result }}
-          COMBINE_BRANCH_NAME: ${{ env.combineBranchName }}
+          COMBINE_BRANCH_NAME: ${{ github.event.inputs.combineBranchName }}
         run: |
           echo "$COMBINE_BRANCH_NAME"
           echo "$BRANCHES_TO_COMBINE"
@@ -129,7 +122,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'Combined PR',
-              head: '${{ env.combineBranchName }}',
+              head: '${{ github.event.inputs.combineBranchName }}',
               base: '${{ steps.fetch-branch-names.outputs.base-branch }}',
               body: body
             });
