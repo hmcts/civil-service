@@ -27,12 +27,12 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @RequiredArgsConstructor
 public class DJRespondentReceivedNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED);
     public static final String TASK_ID = "NotifyRespondentSolicitorDJReceived";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED);
+    private static final String REFERENCE_TEMPLATE = "default-judgment-respondent-received-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private static final String REFERENCE_TEMPLATE = "default-judgment-respondent-received-notification-%s";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,7 +65,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
-                                                               .getOrganisation().getOrganisationID(), caseData),
+                                                              .getOrganisation().getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
