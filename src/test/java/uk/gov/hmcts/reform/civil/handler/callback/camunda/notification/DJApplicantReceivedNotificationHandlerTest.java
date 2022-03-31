@@ -26,7 +26,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
@@ -50,7 +49,7 @@ public class DJApplicantReceivedNotificationHandlerTest {
     private DJApplicantReceivedNotificationHandler handler;
 
     @Nested
-    class AboutToSubmitCallback{
+    class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
