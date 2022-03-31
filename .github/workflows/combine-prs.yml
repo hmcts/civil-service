@@ -2,7 +2,9 @@ name: 'Combine PRs'
 
 # Controls when the action will run - in this case triggered manually
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - combine-prs
     inputs:
       branchPrefix:
         description: 'Branch prefix to find combinable PRs based on'
