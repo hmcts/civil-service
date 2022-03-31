@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -42,13 +43,16 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
-    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
-        + "%n%n * The time for responding to the claim has expired. "
-        + "%n%n * The Defendant has not responded to the claim."
-        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."
-        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-        + "%n%n You can make another default judgment request when you know all these statements have been met.";
+//    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
+//        + "%n%n * The time for responding to the claim has expired. "
+//        + "%n%n * The Defendant has not responded to the claim."
+//        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary judgment."
+//        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
+//        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
+//        + "%n%n You can make another default judgment request when you know all these statements have been met.";
+    public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
+    public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
+        + "%n%n The defendant will be served the Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
@@ -71,7 +75,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
             callbackKey(MID, "repaymentValidate"), this::repaymentValidate,
             callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -85,16 +89,23 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
-            .confirmationBody(getBody())
+            .confirmationBody(getBody(callbackParams.getCaseData()))
             .build();
     }
 
     private String getHeader() {
-        return format("# You cannot request default judgment");
+
+        return format(JUDGMENT_GRANTED_HEADER);
+        //return format("# You cannot request default judgment");
     }
 
-    private String getBody() {
-        return format(CPR_REQUIRED_INFO);
+    private String getBody(CaseData caseData) {
+
+        return format(JUDGMENT_GRANTED, format(
+            "/cases/case-details/%s#Claim documents",
+            caseData.getCcdCaseReference()
+        ));
+       // return format(CPR_REQUIRED_INFO);
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
@@ -292,6 +303,16 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }

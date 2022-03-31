@@ -335,7 +335,10 @@ public class CaseData implements MappableObject {
     private final LocalDate repaymentDate;
     private final List<Element<CaseDocument>> defaultJudgmentDocuments;
     private final String hearingSelection;
-
+    // for default judgment specified tab
+    private final DJPaymentTypeSelection paymentTypeSelection;
+    private final RepaymentFrequencyDJ repaymentFrequency;
+    // for default judgment specified tab
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
