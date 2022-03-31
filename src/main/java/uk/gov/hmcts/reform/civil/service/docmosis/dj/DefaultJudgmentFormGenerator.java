@@ -90,7 +90,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-
     private List<DefaultJudgmentForm> getDefaultJudgmentForms(CaseData caseData) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 

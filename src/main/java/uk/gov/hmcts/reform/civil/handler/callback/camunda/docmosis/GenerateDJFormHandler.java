@@ -13,16 +13,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -30,8 +28,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class GenerateDJFormHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        GENERATE_DJ_FORM,
-        GENERATE_DJ_FORM_SPEC
+        CaseEvent.GENERATE_DJ_FORM,
+        CaseEvent.GENERATE_DJ_FORM_SPEC
     );
     private static final String TASK_ID = "GenerateDJForm";
     private static final String TASK_ID_SPEC = "GenerateDJFormSpec";
@@ -85,6 +83,6 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     private boolean isSpecHandler(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
-            .equals(GENERATE_DJ_FORM_SPEC.name());
+            .equals(CaseEvent.GENERATE_DJ_FORM_SPEC.name());
     }
 }

@@ -105,7 +105,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             "/cases/case-details/%s#Claim documents",
             caseData.getCcdCaseReference()
         ));
-       // return format(CPR_REQUIRED_INFO);
+        // return format(CPR_REQUIRED_INFO);
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
