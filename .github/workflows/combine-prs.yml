@@ -110,11 +110,12 @@ jobs:
           git config pull.rebase false
           git config user.name github-actions
           git config user.email github-actions@github.com
-
+          echo "reached here"
           git branch $COMBINE_BRANCH_NAME $basebranch
           git checkout $COMBINE_BRANCH_NAME
           git pull origin $sourcebranches --no-edit
           git push origin $COMBINE_BRANCH_NAME
+          echo "finished the creation job"
       # Creates a PR with the new combined branch
       - uses: actions/github-script@v3
         name: Create Combined Pull Request
