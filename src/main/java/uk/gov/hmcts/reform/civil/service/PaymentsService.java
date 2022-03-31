@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -21,7 +22,12 @@ public class PaymentsService {
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
 
-    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) {
+    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
+        // To be removed, only used for simulating 422 error for testing locally
+        //        Request request = Request.create(Request.HttpMethod.GET, "url",
+        //                                         new HashMap<>(), null, new RequestTemplate());
+        //        throw new FeignException.UnprocessableEntity("", request, null);
+
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
