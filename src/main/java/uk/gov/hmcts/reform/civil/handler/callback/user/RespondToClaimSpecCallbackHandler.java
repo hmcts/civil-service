@@ -349,6 +349,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
+        // each method should return Optional.empty if it's not applicable to caseData
         String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
                                 getRepayPlanSummary(caseData),
                                 getFullAdmitAlreadyPaidSummary(caseData),
