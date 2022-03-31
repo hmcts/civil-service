@@ -75,7 +75,7 @@ jobs:
             }
 
             if (branches.length == 0) {
-              core.setOutput('No PRs/branches matched criteria');
+              core.setFailed('No PRs/branches matched criteria');
               return;
             }
 
