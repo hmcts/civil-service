@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -914,6 +915,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("name", "role")
                     .containsExactly(null, null);
             }
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(null)
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt(null).build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
     }
 
