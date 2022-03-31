@@ -20,6 +20,7 @@ on:
         description: 'Exclude PRs with this label'
         required: true
         default: 'nocombine'
+  push:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
