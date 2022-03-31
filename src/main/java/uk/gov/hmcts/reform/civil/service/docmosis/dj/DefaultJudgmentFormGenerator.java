@@ -52,7 +52,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
         DocmosisDocument docmosisDocument2;
-        List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData);
+        List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event);
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
         DocmosisDocument docmosisDocument1 =
             documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
@@ -90,20 +90,21 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private List<DefaultJudgmentForm> getDefaultJudgmentForms(CaseData caseData) {
+    private List<DefaultJudgmentForm> getDefaultJudgmentForms(CaseData caseData, String event) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1()));
+        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event));
         if (caseData.getRespondent2() != null) {
 
-            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2()));
+            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event));
         }
         return defaultJudgmentForms;
 
     }
 
     private DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
-                                                       uk.gov.hmcts.reform.civil.model.Party respondent) {
+                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                       String event) {
         BigDecimal debtAmount = getDebtAmount(caseData);
         BigDecimal cost = getClaimFee(caseData);
 
@@ -114,9 +115,9 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent(getRespondent(respondent))
             .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
                                                    .getOrganisation().getOrganisationID()))
-            .debt(debtAmount.setScale(2))
-            .costs(cost.setScale(2))
-            .totalCost(debtAmount.add(cost).setScale(2))
+            .debt(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? debtAmount.setScale(2) : null)
+            .costs(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? cost.setScale(2) : null)
+            .totalCost(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? debtAmount.add(cost).setScale(2) : null)
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                     ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
