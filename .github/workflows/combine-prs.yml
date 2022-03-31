@@ -52,20 +52,7 @@ jobs:
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
 
-                console.log('Checking green status: ' + branch);
-                const statuses = await github.paginate('GET /repos/{owner}/{repo}/commits/{ref}/status', {
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  ref: branch
-                });
-                if(statuses.length > 0) {
-                  const latest_status = statuses[0]['state'];
-                  console.log('Validating status: ' + latest_status);
-                  if(latest_status != 'success') {
-                    console.log('Discarding ' + branch + ' with status ' + latest_status);
-                    statusOK = false;
-                  }
-                }
+
 
                 console.log('Checking labels: ' + branch);
                 const labels = pull['labels'];
