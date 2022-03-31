@@ -3,7 +3,8 @@ name: 'Combine PRs'
 # Controls when the action will run - in this case triggered manually
 on:
   push:
-    branches: combine-prs
+    branches:
+     - 'combine-prs'
   workflow_dispatch:
     inputs:
       branchPrefix:
