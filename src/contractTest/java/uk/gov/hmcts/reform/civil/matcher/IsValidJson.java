@@ -16,7 +16,7 @@ public class IsValidJson extends TypeSafeMatcher<String> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("only valid as per json schema  " + validationService.getJsonSchemaFile());
+        description.appendText("only valid as per json schema " + validationService.getJsonSchemaFile());
     }
 
     public static Matcher<String> validateJson() {
