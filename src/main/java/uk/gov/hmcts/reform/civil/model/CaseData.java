@@ -220,7 +220,7 @@ public class CaseData implements MappableObject {
     private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
-    private final YesOrNo applicant1ClaimMediationSpecRequired;
+    private final SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
     private final YesOrNo applicant1ClaimExpertSpecRequired;
