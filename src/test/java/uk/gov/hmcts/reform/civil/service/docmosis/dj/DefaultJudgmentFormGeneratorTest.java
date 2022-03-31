@@ -67,7 +67,6 @@ public class DefaultJudgmentFormGeneratorTest {
     @MockBean
     private InterestCalculator interestCalculator;
 
-
     @Test
     void shouldDefaultJudgmentFormGeneratorOneForm_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121)))
@@ -82,7 +81,6 @@ public class DefaultJudgmentFormGeneratorTest {
 
         when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
             .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
-
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
