@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,11 +32,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceSpecCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
+public class RespondToDefenceSpecCallbackHandler extends CallbackHandler implements ExpertsValidator,
+    WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
     private final ExitSurveyContentService exitSurveyContentService;
@@ -72,8 +69,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler impleme
 
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
