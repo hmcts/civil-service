@@ -105,8 +105,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                        uk.gov.hmcts.reform.civil.model.Party respondent,
                                                        String event) {
-        BigDecimal debtAmount = getDebtAmount(caseData);
-        BigDecimal cost = getClaimFee(caseData);
+        BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name()) ? getDebtAmount(caseData).setScale(2) : null;
+        BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name()) ? getClaimFee(caseData).setScale(2) : null;
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
@@ -115,8 +115,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent(getRespondent(respondent))
             .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
                                                    .getOrganisation().getOrganisationID()))
-            .debt(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? debtAmount.setScale(2) : null)
-            .costs(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? cost.setScale(2) : null)
+            .debt(debtAmount)
+            .costs(cost)
             .totalCost(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? debtAmount.add(cost).setScale(2) : null)
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                     ? null : caseData.getSolicitorReferences()
