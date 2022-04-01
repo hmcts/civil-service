@@ -103,21 +103,21 @@ reference:
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
-  respondentSolicitorClaimIssueMultipartyEmailTemplate: "28f30511-e58d-4eac-b09c-e145ad42710a"
-  respondentSolicitorClaimDetailsEmailTemplateMultiParty: "5a03f1f4-9349-4217-8b6b-979685c9c671"
-  solicitorDefendantResponseCaseTakenOffline: "513af1f3-e2be-49db-a463-b6f12641d13d"
+  respondentSolicitorClaimIssueMultipartyEmailTemplate: "97ffda16-0d55-49fc-ade4-36f023cdad23"
+  respondentSolicitorClaimDetailsEmailTemplateMultiParty: "6cce54b7-4cf0-4770-9dca-db1a38226f1e"
+  solicitorDefendantResponseCaseTakenOffline: "c865678e-66a5-4249-8ab6-65de962c5211"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "d6b33ddd-833e-46ed-9887-c86e929d140b"
   claimantSolicitorDefendantResponseFullDefence: "64c1ce3c-1b2a-4959-914b-38cceb6ae195"
-  respondentSolicitorAcknowledgeClaim: "a40576c3-c95b-4ac5-9096-c70267580663"
-  failedPayment: "51aee712-459c-4b64-ae82-4e3b81c83da0"
-  solicitorClaimDismissed: "b39a05a9-f8fd-454e-8bf4-cda93ad175c8"
-  claimantSolicitorCaseWillProgressOffline: "290461ee-7b1d-404d-9b19-e46b1f6458d1"
+  respondentSolicitorAcknowledgeClaim: "3ae4b5d8-6e73-4d72-9ae6-ff25f4941cdb"
+  failedPayment: "d6a28ba8-7496-4b13-bf1b-b821c61fdae6"
+  solicitorClaimDismissed: "b5b38ee3-863b-428d-b893-a440c82b6212"
+  claimantSolicitorCaseWillProgressOffline: "f92cc2fa-ede1-40c4-99ff-22d912ab7fe7"
   claimantSolicitorAgreedExtensionDate: "97421dfb-f2d7-43c0-8525-e0d045e17d10"
-  claimantSolicitorConfirmsToProceed: "5a27048a-ed18-4a7c-b33b-e7ff5b8279a6"
-  claimantSolicitorConfirmsNotToProceed: "891843df-f641-4c91-b5d4-d6a0899b722d"
-  claimantSolicitorClaimContinuingOnline: "eacc12e2-c4b9-470c-bf49-23441bcd8386"
-  solicitorCaseTakenOffline: "976d4b4a-43e0-498a-8c1e-8a0dc48e7fe8"
-  solicitorLitigationFriendAdded: "b659b48e-2585-4162-911e-4166b51c3d0e"
+  claimantSolicitorConfirmsToProceed: "cd08fe4c-24a2-4353-adb0-1aef8e41fbcf"
+  claimantSolicitorConfirmsNotToProceed: "2d09dbed-f0d1-4d81-b72a-22c3fbfc649e"
+  claimantSolicitorClaimContinuingOnline: "7b30d4cb-c930-4409-aba6-f6d6cf14e376"
+  solicitorCaseTakenOffline: "a2c8a2d4-da8c-4477-b1ed-4399dfbd2424"
+  solicitorLitigationFriendAdded: "9fbbd0fd-4d61-439b-9f08-2935687b2791"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
@@ -128,6 +128,7 @@ notifications:
   respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
   claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
+  sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -139,7 +140,7 @@ os-postcode-lookup:
 
 stitching:
   api:
-    url: http://localhost:8084/api/stitch-ccd-bundles
+    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}

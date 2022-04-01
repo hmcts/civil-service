@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -295,8 +296,13 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     PARTY_REFERENCES, buildPartiesReferences(caseData)
                 );
             } else {
+                //if there are 2 respondents on the case, concatenate the names together for the template subject line
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME,
+                    getPartyNameBasedOnType(caseData.getRespondent1())
+                        .concat(" and ")
+                        .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
                     PARTY_REFERENCES, buildPartiesReferences(caseData)
                 );
             }

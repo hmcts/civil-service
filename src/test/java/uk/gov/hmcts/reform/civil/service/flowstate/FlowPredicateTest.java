@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -37,7 +39,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergen
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
@@ -370,6 +374,16 @@ class FlowPredicateTest {
                     fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
                 assertFalse(predicate.test(caseData));
             }
+
+            @Test
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterClaimNotifiedSpec() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .build();
+                assertTrue(fullDefenceSpec.test(caseData));
+            }
         }
 
         @Nested
@@ -697,7 +711,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenBothDefendantsRespondedWithFullAdmission() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse()
+                        .atStateFullAdmission_1v2_BothRespondentSolicitorsSubmitFullAdmissionResponse()
                         .build();
 
                     assertTrue(fullAdmission.test(caseData));
@@ -967,8 +981,76 @@ class FlowPredicateTest {
     class ApplicantRespondToDefence {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateFullDefence() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence2v1FirstApplicantProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.YES)
+                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence2v1SecondApplicantProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.YES)
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2OneLR_ProceedVsRespondent1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2OneLR_ProceedVsRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2TwoLR_ProceedVsRespondent1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_ProceedVsRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
 
@@ -978,6 +1060,48 @@ class FlowPredicateTest {
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();
             assertFalse(fullDefenceProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v1AndApplicantNotProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceNotProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence2v1BothApplicantsNotProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceNotProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2SameSol_ApplicantNotProceedAgainstBothDefendants() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceNotProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_ApplicantNotProceedAgainstBothDefendants() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .build();
+            assertTrue(fullDefenceNotProceed.test(caseData));
         }
     }
 

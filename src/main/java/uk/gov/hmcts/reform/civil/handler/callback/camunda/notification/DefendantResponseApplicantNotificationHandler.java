@@ -95,6 +95,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
+
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
         } else {
@@ -135,8 +136,13 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else {
+            //if there are 2 respondents on the case, concatenate the names together for the template subject line
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME,
+                getPartyNameBasedOnType(caseData.getRespondent1())
+                    .concat(" and ")
+                    .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }

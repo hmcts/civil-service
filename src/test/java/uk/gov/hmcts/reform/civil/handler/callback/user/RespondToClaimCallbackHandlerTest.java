@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -869,6 +870,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetDefendantResponseDocuments() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -890,15 +892,65 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("createdBy=Defendant")
                 .contains("documentName=defendant1-defence.pdf")
                 .contains("documentSize=0")
-                .contains("createdDatetime")
+                .contains("createdDatetime=2022-02-18T12:10:55")
                 .contains("documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
                 .contains("documentType=DEFENDANT_DEFENCE")
                 .contains("documentName=defendant2-defence.pdf")
                 .contains("documentName=defendant1-directions.pdf")
                 .contains("documentName=defendant2-directions.pdf")
                 .contains("createdBy=Defendant 2")
-                .contains("createdDatetime")
                 .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
+        }
+
+        @Test
+        void shouldRetainSolicitorReferences_WhenNoReferencesPresent() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, Map.of());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("solicitorReferences")
+                .isNull();
+            assertThat(response.getData())
+                .extracting("respondentSolicitor2Reference")
+                .isNull();
+        }
+
+        @Test
+        void shouldRetainSolicitorReferences_WhenAllReferencesPresent() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build().toBuilder()
+                .build();
+            var beforeCaseData = Map.of("solicitorReferences",
+                                        Map.of("applicantSolicitor1Reference", "12345",
+                                               "respondentSolicitor1Reference", "6789"),
+                                        "respondentSolicitor2Reference", "01234");
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, beforeCaseData);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("solicitorReferences")
+                .asString()
+                .contains("applicantSolicitor1Reference=12345")
+                .contains("respondentSolicitor1Reference=6789")
+                .doesNotContain("respondentSolicitor2Reference");
+            assertThat(response.getData())
+                .extracting("respondentSolicitor2Reference")
+                .asString()
+                .contains("01234");
         }
 
         @Test

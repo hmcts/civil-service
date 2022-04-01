@@ -215,6 +215,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         } else {
             //1v2 template is used and expects different data
             return Map.of(
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),

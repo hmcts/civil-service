@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -25,10 +26,10 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -147,10 +148,19 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final CaseDocument respondent1GeneratedResponseDocument;
+    private final CaseDocument respondent2GeneratedResponseDocument;
     private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
+    private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimRespondent2;
     private final ResponseDocument applicant1DefenceResponseDocument;
+    private final ResponseDocument claimantDefenceResDocToDefendant2;
+    private final List<Element<CaseDocument>> claimantResponseDocuments;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
     /**
@@ -174,6 +184,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
+    private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final String specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
@@ -215,6 +226,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final YesOrNo specDefenceAdmittedRequired;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped
@@ -239,6 +251,9 @@ public class CaseData implements MappableObject {
 
     @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
+
+    @JsonUnwrapped
+    private final Applicant2DQ applicant2DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -266,6 +281,10 @@ public class CaseData implements MappableObject {
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
+    private YesOrNo applicantsProceedIntention;
+    private final MultiPartyScenario claimantResponseScenarioFlag;
+    private YesOrNo claimantResponseDocumentToDefendant2Flag;
+    private YesOrNo claimant2ResponseFlag;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -286,6 +305,7 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent2ResponseDate;
     private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime applicant1ResponseDate;
+    private final LocalDateTime applicant2ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
@@ -295,9 +315,12 @@ public class CaseData implements MappableObject {
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
-    private final YesOrNo isRespondent1;
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+
+    private final YesOrNo isRespondent1;
+    private final YesOrNo isRespondent2;
+    private final YesOrNo isApplicant1;
 }

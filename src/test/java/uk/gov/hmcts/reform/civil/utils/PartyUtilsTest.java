@@ -14,6 +14,9 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.sampledata.PartyBuilder.DATE_OF_BIRTH;
 
 class PartyUtilsTest {
@@ -219,5 +222,84 @@ class PartyUtilsTest {
                          partyReferences);
         }
 
+    }
+
+    @Nested
+    class ClaimantReferences {
+
+        @Test
+        void shouldReturnEmptyReferences_whenNoRefsAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            String partyReferences = PartyUtils.buildClaimantReference(caseData);
+
+            assertEquals("", partyReferences);
+        }
+
+        @Test
+        void shouldReturnClaimaintReferences_whenCaseHasRefsAvailable() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            String partyReferences = PartyUtils.buildClaimantReference(caseData);
+
+            assertEquals("Claimant reference: 12345", partyReferences);
+        }
+    }
+
+    @Nested
+    class PartyResponseType {
+
+        @Test
+        void shouldReturnCorrectResponseTypeFor1v1Cases() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                caseData,
+                caseData.getRespondent1()
+            ), FULL_DEFENCE);
+
+            CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                partAdmissionCaseData,
+                partAdmissionCaseData.getRespondent1()
+            ), PART_ADMISSION);
+        }
+
+        @Test
+        void shouldReturnCorrectResponseTypeFor1v2Cases() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .build();
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                caseData,
+                caseData.getRespondent1()
+            ), FULL_DEFENCE);
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                caseData,
+                caseData.getRespondent2()
+            ), FULL_DEFENCE);
+
+            CaseData partAdmissionCaseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullAdmission()
+                .respondent2Responds(PART_ADMISSION)
+                .build();
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                partAdmissionCaseData,
+                partAdmissionCaseData.getRespondent1()
+            ), FULL_ADMISSION);
+
+            assertEquals(PartyUtils.getResponseTypeForRespondent(
+                partAdmissionCaseData,
+                partAdmissionCaseData.getRespondent2()
+            ), PART_ADMISSION);
+        }
     }
 }
