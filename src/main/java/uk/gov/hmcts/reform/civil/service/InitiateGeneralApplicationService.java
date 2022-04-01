@@ -84,6 +84,14 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
+        applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
+        applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
+        if (YES.equals(caseData.getAddApplicant2())) {
+            applicationBuilder.claimant2PartyName(caseData.getApplicant2().getPartyName());
+        }
+        if (YES.equals(caseData.getAddRespondent2())) {
+            applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
+        }
         String deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
