@@ -13,8 +13,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -37,12 +40,16 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -381,6 +388,39 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private Optional<String> getPartialAdmitPaidLessSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+
+        if (howMuchWasPaid == null || totalClaimAmount == null
+            || howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) >= 0) {
+            return Optional.empty();
+        }
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        String sb = "<br>You told us you've paid the &#163;"
+            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
+            + ". We've sent "
+            + applicantName
+            + " this response."
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " accepts your response</h3>"
+            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " rejects your response</h3>"
+            + "<p>The court will review the case. You may have to go to a hearing.</p>"
+            + "<p>We'll contact you to tell you what to do next.</p>";
+        return Optional.of(sb);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
