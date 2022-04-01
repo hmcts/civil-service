@@ -3,23 +3,17 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -27,69 +21,31 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidLessConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitSetDateConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
-import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -98,88 +54,16 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondToClaimSpecCallbackHandler handler;
 
     @Mock
-    private Time time;
-    @Mock
     private PaymentDateValidator validator;
     @Mock
     private UnavailableDateValidator dateValidator;
     @Mock
     private ExitSurveyContentService exitSurveyContentService;
-    @Mock
-    private FeatureToggleService toggleService;
-    @Mock
-    private PostcodeValidator postcodeValidator;
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
-    @Mock
-    private UserService userService;
-    @Mock
-    private CoreCaseUserService coreCaseUserService;
-    @Mock
-    private StateFlow mockedStateFlow;
-    @Mock
-    private StateFlowEngine stateFlowEngine;
-    @Mock
-    private DateOfBirthValidator dateOfBirthValidator;
-
-    @Spy
-    private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
-        new FullAdmitAlreadyPaidConfirmationText(),
-        new FullAdmitSetDateConfirmationText(),
-        new PartialAdmitPaidFullConfirmationText(),
-        new PartialAdmitPaidLessConfirmationText(),
-        new PartialAdmitPayImmediatelyConfirmationText(),
-        new PartialAdmitSetDateConfirmationText(),
-        new RepayPlanConfirmationText(),
-        new SpecResponse1v2DivergentText(),
-        new RepayPlanConfirmationText(),
-        new CounterClaimConfirmationText()
-    );
-
-    private List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderSpecGenerators = List.of(
-        new SpecResponse1v2DivergentHeaderText(),
-        new SpecResponse2v1DifferentHeaderText()
-    );
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
-                                     confirmationTextGenerators
-        );
-        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
-                                     confirmationHeaderSpecGenerators
-        );
-    }
-
-    @Test
-    public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
-
-    @Test
-    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
-        String postCode = "postCode";
-        CaseData caseData = CaseData.builder()
-            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
-                                                              .postCode(postCode)
-                                                              .build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
-        CallbackRequest request = CallbackRequest.builder()
-            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
-            .build();
-        params = params.toBuilder().request(request).build();
-
-        List<String> errors = Collections.singletonList("error 1");
-        Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
-
-        CallbackResponse response = handler.handle(params);
-        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
     @Nested
@@ -218,25 +102,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentAdmitPartOfClaimFastTrack()
-                .build();
-            CallbackParams params = callbackParamsOf(
-                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
-            when(validator.validate(any())).thenReturn(List.of("Validation error"));
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getData()).isNull();
-            assertThat(response.getErrors()).isNotNull();
-            assertEquals(1, response.getErrors().size());
-            assertEquals("Validation error", response.getErrors().get(0));
-        }
-
-        @Test
         public void testSpecDefendantResponseFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
@@ -251,9 +116,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-            // need to be non-null to ensure previous data is cleaned
-            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
-                .isNotNull();
         }
 
         @Test
@@ -438,237 +300,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-        @Test
-        public void testValidateDefendant2RepaymentDate() {
-            CaseData caseData = CaseDataBuilder.builder().generateDefendant2RepaymentDateForAdmitPartResponse().build();
-            CallbackParams params = callbackParamsOf(caseData, MID,
-                                                     "validate-repayment-plan-2", "DEFENDANT_RESPONSE_SPEC"
-            );
-            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertEquals("Validation error", response.getErrors().get(0));
-
-        }
-    }
-
-    @Nested
-    class AboutToSubmitTests {
-
-        @Test
-        void updateRespondent1AddressWhenUpdated() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
-
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
-        }
-
-        @Test
-        void updateRespondent2AddressWhenUpdated() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
-
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo("address line 1");
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo("address line 2");
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo("address line 3");
-        }
-    }
-
-    @Nested
-    class MidEventSetGenericResponseTypeFlagCallback {
-
-        private static final String PAGE_ID = "set-generic-response-type-flag";
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        /**
-         * if solicitor says that each defendant gets their response but then chooses the same
-         * option from full defence/part admit/full admit/counterclaim, then it is not different response.
-         */
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("FULL_DEFENCE");
-            assertThat(response.getData()).extracting("sameSolicitorSameResponse")
-                .isEqualTo("Yes");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_AdmitAll_OR_Admit_Part_1v2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2AdmitAll_AdmitPart()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_FullDefence_OR_AdmitAll_1v2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2FullDefence_AdmitPart()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-    }
-
-    @Nested
-    class MidEventCallbackValidateWitnesses {
-
-        private static final String PAGE_ID = "witnesses";
-
-        @Test
-        void shouldReturnError_whenWitnessRequiredAndNullDetails() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent1DQWitnessesRequiredSpec(YES)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).containsExactly("Witness details required");
-        }
-
-        @Test
-        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent1DQWitnessesRequiredSpec(YES)
-                .respondent1DQWitnessesDetailsSpec(testWitness)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldReturnNoError_whenWitnessNotRequired() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent1DQWitnessesRequiredSpec(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
     }
 
     @Nested
     class SubmittedCallback {
-
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -692,7 +327,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You have submitted your response%n## Claim number: %s", claimNumber))
+                    .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
                     .confirmationBody(body)
                     .build());
         }
@@ -854,244 +489,28 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(caseData.getTotalClaimAmount().toString());
         }
-
-        @Test
-        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.FULL_DEFENCE,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
-                )
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2SameLegalRepresentative(YES)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String claimNumber = caseData.getLegacyCaseReference();
-
-            StringBuilder body = new StringBuilder();
-            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
-                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
-                            + "counterclaim.")
-                .append(String.format(
-                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append(String.format(
-                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append("<br><br>Post the completed form to:")
-                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
-                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# The defendants have chosen their responses%n## Claim number <br>%s",
-                        claimNumber
-                    ))
-                    .confirmationBody(body.toString())
-                    .build());
-        }
-
-        @Test
-        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponsePartAdmissionFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.PART_ADMISSION,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
-                )
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2SameLegalRepresentative(YES)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String claimNumber = caseData.getLegacyCaseReference();
-
-            StringBuilder body = new StringBuilder();
-            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
-                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
-                            + "counterclaim.")
-                .append(String.format(
-                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append(String.format(
-                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append("<br><br>Post the completed form to:")
-                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
-                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# The defendants have chosen their responses%n## Claim number <br>%s",
-                        claimNumber
-                    ))
-                    .confirmationBody(body.toString())
-                    .build());
-        }
-
-        @Test
-        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimFullAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.COUNTER_CLAIM,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
-                )
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2SameLegalRepresentative(YES)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String claimNumber = caseData.getLegacyCaseReference();
-
-            StringBuilder body = new StringBuilder();
-            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
-                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
-                            + "counterclaim.")
-                .append(String.format(
-                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append(String.format(
-                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append("<br><br>Post the completed form to:")
-                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
-                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# The defendants have chosen their responses%n## Claim number <br>%s",
-                        claimNumber
-                    ))
-                    .confirmationBody(body.toString())
-                    .build());
-        }
-
-        @Test
-        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimPartAdmission() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.COUNTER_CLAIM,
-                    RespondentResponseTypeSpec.PART_ADMISSION
-                )
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2SameLegalRepresentative(YES)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String claimNumber = caseData.getLegacyCaseReference();
-
-            StringBuilder body = new StringBuilder();
-            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
-                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
-                            + "counterclaim.")
-                .append(String.format(
-                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append(String.format(
-                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                    format("https://www.gov.uk/respond-money-claim")
-                ))
-                .append("<br><br>Post the completed form to:")
-                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
-                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# The defendants have chosen their responses%n## Claim number <br>%s",
-                        claimNumber
-                    ))
-                    .confirmationBody(body.toString())
-                    .build());
-        }
-
-        @Test
-        void specificSummary_whenPartialAdmitPaidLess() {
-            BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
-            BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .specDefenceAdmittedRequired(YesOrNo.YES)
-                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
-                .totalClaimAmount(totalClaimAmount)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertThat(response.getConfirmationBody())
-                .contains(caseData.getApplicant1().getPartyName())
-                .contains("The claim will be settled. We'll contact you when they respond.")
-                .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
-                              .toString());
-
-        }
-
-        @Test
-        void specificSummary_whenCounterClaim() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertThat(response.getConfirmationBody())
-                .doesNotContain(caseData.getApplicant1().getPartyName())
-                .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
-        }
     }
 
-    @Nested
-    class ValidateDateOfBirth {
+    @Test
+    void specificSummary_whenPartialAdmitPaidLess() {
+        BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+        BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.YES)
+            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+            .totalClaimAmount(totalClaimAmount)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-        @Test
-        void when1v1_thenSameSolSameResponseNull() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
-            when(dateOfBirthValidator.validate(any())).thenReturn(Collections.emptyList());
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .doesNotHaveToString("sameSolicitorSameResponse");
-        }
-
-        @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentAdmitPartOfClaimFastTrack()
-                .build();
-            CallbackParams params = callbackParamsOf(
-                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
-
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-        }
+        assertThat(response.getConfirmationBody())
+            .contains(caseData.getApplicant1().getPartyName())
+            .contains("The claim will be settled. We'll contact you when they respond.")
+            .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
+                          .toString());
     }
 }
