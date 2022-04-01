@@ -150,6 +150,8 @@ public class CaseDataBuilder {
     protected YesOrNo respondentResponseIsSame;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    protected RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
     protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
@@ -227,6 +229,7 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
@@ -606,6 +609,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addRespondent2(YesOrNo addRespondent2) {
         this.addRespondent2 = addRespondent2;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        this.respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        this.respondent2ClaimResponseTypeForSpec = respondentResponseTypeSpec;
         return this;
     }
 
@@ -1379,6 +1392,30 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_CounterClaimX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2AdmitAll_AdmitPart() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2FullDefence_AdmitPart() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefence() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -1472,6 +1509,37 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses() {
+        atStateRespondentFullDefenceSpec();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant2-defence.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceSpec() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 
@@ -2258,6 +2326,10 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
             .build();
     }
 }
