@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -61,12 +64,22 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @MockBean
     private GeneralAppsDeadlinesCalculator calc;
 
+    @MockBean
+    private OrganisationApi organisationApi;
+
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
+
     @BeforeEach
     public void setUp() throws IOException {
         when(calc.calculateApplicantResponseDeadline(
             any(LocalDateTime.class),
             anyInt()))
             .thenReturn(weekdayDate);
+
+        when(organisationApi.findUserOrganisation(any(), any()))
+            .thenReturn(uk.gov.hmcts.reform.prd.model.Organisation
+                            .builder().organisationIdentifier("OrgId1").build());
     }
 
     @Test
@@ -80,7 +93,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
@@ -92,7 +105,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             .getTestCaseDataCollectionOfApps(CaseData.builder().build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
@@ -105,7 +118,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .getTestCaseDataForConsentUnconsentCheck(null);
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -126,7 +139,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -147,7 +160,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -469,7 +482,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");

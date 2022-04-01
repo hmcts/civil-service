@@ -504,7 +504,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class)))
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
 
             when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
