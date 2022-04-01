@@ -110,7 +110,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .formText("No Acknowledgement of service")
+            .formText("No response")
             .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
             .respondent(getRespondent(respondent))
             .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
