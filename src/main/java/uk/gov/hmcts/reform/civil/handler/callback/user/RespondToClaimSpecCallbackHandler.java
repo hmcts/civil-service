@@ -344,6 +344,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
+        String header;
 
         String body = CaseDataToTextGenerator.getTextFor(
             confirmationTextSpecGenerators.stream(),
@@ -351,9 +352,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             caseData
         );
 
+        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            header = "# You have chosen to counterclaim%n## Claim number: %s";
+        } else {
+            header = "# You've submitted your response%n## Claim number: %s";
+        }
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
-                format("# You've submitted your response%n## Claim number: %s", claimNumber))
+                format(header, claimNumber))
             .confirmationBody(body)
             .build();
     }

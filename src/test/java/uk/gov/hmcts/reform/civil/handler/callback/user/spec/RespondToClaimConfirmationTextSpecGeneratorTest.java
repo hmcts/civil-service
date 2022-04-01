@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
@@ -144,6 +145,14 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .build();
     }
 
+    private CaseData getCounterClaim() {
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+    }
+
     @Override
     public Class<RespondToClaimConfirmationTextSpecGenerator> getIntentionInterface() {
         return RespondToClaimConfirmationTextSpecGenerator.class;
@@ -161,7 +170,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
             Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
             Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
-            Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class)
+            Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
+            Pair.of(getCounterClaim(), CounterClaimConfirmationText.class)
         );
     }
 }

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
@@ -76,7 +77,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         new PartialAdmitPaidLessConfirmationText(),
         new PartialAdmitPayImmediatelyConfirmationText(),
         new PartialAdmitSetDateConfirmationText(),
-        new RepayPlanConfirmationText()
+        new RepayPlanConfirmationText(),
+        new CounterClaimConfirmationText()
     );
 
     @BeforeEach
@@ -531,5 +533,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .contains("The claim will be settled. We'll contact you when they respond.")
             .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
                           .toString());
+    }
+
+    @Test
+    void specificSummary_whenCounterClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response.getConfirmationBody())
+            .doesNotContain(caseData.getApplicant1().getPartyName())
+            .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
+        assertThat(response.getConfirmationHeader())
+            .contains("You have chosen to counterclaim");
     }
 }
