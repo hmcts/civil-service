@@ -13,10 +13,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -27,7 +30,6 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -38,12 +40,16 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -66,7 +72,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
-    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -454,10 +459,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = format(
+        // each method should return Optional.empty if it's not applicable to caseData
+        String body = Stream.of(getPartialAdmitSetDateSummary(caseData), getPartialAdmitImmediatelySummary(caseData),
+                                getRepayPlanSummary(caseData),
+                                getFullAdmitAlreadyPaidSummary(caseData),
+                                getFullAdmitSetDateSummary(caseData),
+                                getPartialAdmitPaidFullSummary(caseData),
+                                getPartialAdmitPaidLessSummary(caseData)
+            )
+            .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(
+                format("# You've submitted your response%n## Claim number: %s", claimNumber))
+            .confirmationBody(body)
+            .build();
+    }
+
+    private String getDefaultConfirmationBody(CaseData caseData) {
+        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+        return format(
             "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
                 + "We will let you know when they respond."
@@ -465,12 +488,336 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             formatLocalDateTime(responseDeadline, DATE),
             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
         );
+    }
 
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(
-                format("# You've submitted your response%n## Claim number: %s", claimNumber))
-            .confirmationBody(body)
-            .build();
+    /**
+     * If applicable, creates the confirmation text for a case with partial admission, an amount still owed,
+     * and an offer to pay by a set date.
+     *
+     * @param caseData a case data
+     * @return the confirmation body if the case is a partial admission, the respondent hasn't paid yet,
+     *     the respondent wants to pay by a set date and all fields needed for the text are available.
+     */
+    private Optional<String> getPartialAdmitSetDateSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            return Optional.empty();
+        }
+        BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+
+        if (Stream.of(admitOwed, whenWillYouPay, totalClaimAmount)
+            .anyMatch(Objects::isNull)) {
+            return Optional.empty();
+        }
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>You believe you owe &#163;").append(admitOwed).append(
+                ". We've emailed ").append(applicantName)
+            .append(" your offer to pay by ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE));
+        if (admitOwed.compareTo(totalClaimAmount) < 0) {
+            sb.append(" and your explanation of why you do not owe the full amount.");
+        }
+
+        sb.append("<br><br>").append("The claimant has until 4pm on ")
+            .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
+            .append(" to respond to your claim. <br>We will let you know when they respond.")
+            .append(String
+                        .format(
+                            "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                        ));
+
+        sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your offer</h3>");
+        } else {
+            sb.append(" accepts your offer</h3>");
+        }
+        sb.append("<ul>")
+            .append("<li>pay ").append(applicantName).append("</li>")
+            .append("<li>make sure any cheques or bank transfers are clear in their account by the deadline</li>")
+            .append("<li>keep proof of any payments you make</li>")
+            .append("</ul>")
+            .append("<p>Contact ")
+            .append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay.</p>")
+
+            .append("<p>Because you've said you will not pay immediately, ")
+            .append(applicantName)
+            .append(" can either:</p>")
+            .append("<ul>")
+            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
+            .append("<li>request a county court judgment against you for &#163;")
+            .append(admitOwed).append("</li>")
+            .append("</ul>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName)
+            .append(" disagrees that you only owe &#163;")
+            .append(admitOwed)
+            .append("</h3>")
+            .append("<p>We'll ask if they want to try mediation. ")
+            .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
+            .append(
+                "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
+            .append(totalClaimAmount).append(".</p>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName)
+            .append(" rejects your offer to pay by ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
+            .append("</h3>")
+            .append("<p>The court will decide how you must pay</p>");
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getPartialAdmitImmediatelySummary(CaseData caseData) {
+        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            return Optional.empty();
+        }
+        LocalDate whenWillYouPay = LocalDate.now().plusDays(5);
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>We've emailed ").append(applicantName)
+            .append(" to say you will pay immediately.")
+            .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
+            .append("<ul>")
+            .append("<li>pay ").append(applicantName).append(" By ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
+            .append("<li>keep proof of any payments you make</li>")
+            .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
+            .append("</ul>")
+            .append("<p>Contact ")
+            .append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay.</p>");
+        return Optional.of(sb.toString());
+    }
+
+    /**
+     * Confirmation summary text for a response with a repayment plan offer.
+     *
+     * @param caseData a case data
+     * @return if suitable, the summary text for repayment plan offer
+     */
+    private Optional<String> getRepayPlanSummary(CaseData caseData) {
+        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+            .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+        ) {
+            return Optional.empty();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+        sb.append("<br>We've emailed ").append(applicantName)
+            .append(" to say you've suggested paying by instalments.")
+            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.")
+            .append(String
+                        .format(
+                            "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                        ))
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your offer</h3>");
+        } else {
+            sb.append(" accepts your offer</h3>");
+        }
+        sb.append("You should<ul>")
+            .append("<li>set up a repayment plan to begin when you said it would</li>")
+            .append("<li>keep proof of any payments you make</li>")
+            .append("</ul>")
+            .append("Contact ").append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay")
+            .append("<br><br>")
+            .append("If you do not pay immediately, ").append(applicantName)
+            .append(" can either:")
+            .append("<ul>")
+            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
+            .append("<li>request a county court judgement against you</li>")
+            .append("</ul>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" reject your offer</h3>");
+        } else {
+            sb.append(" rejects your offer</h3>");
+        }
+        sb.append("The court will decide how you must pay");
+
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getFullAdmitAlreadyPaidSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>You told us you've paid the &#163;").append(caseData.getTotalClaimAmount())
+            .append(" you believe you owe. We've sent ")
+            .append(applicantName)
+            .append(" this response.")
+
+            .append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your response</h3>");
+        } else {
+            sb.append(" accepts your response</h3>");
+        }
+        sb.append("<p>The claim will be settled</p>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" reject your response</h3>");
+        } else {
+            sb.append(" rejects your response</h3>");
+        }
+        sb.append("<p>The court will review the case. You may have to go to a hearing.")
+            .append("<br><br>We'll contact you to tell you what to do next</p>");
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getFullAdmitSetDateSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || !YesOrNo.NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
+            || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            return Optional.empty();
+        }
+
+        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+        if (caseData.getApplicant2() != null) {
+            applicantName += " and " + caseData.getApplicant2().getPartyName();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>We've emailed ")
+            .append(applicantName)
+            .append(" your offer to pay by ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
+            .append(" and your explanation of why you cannot pay before then.")
+            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.");
+
+        sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" accept your offer</h3>");
+        } else {
+            sb.append(" accepts your offer</h3>");
+        }
+        sb.append("<ul>")
+            .append("<li>pay ").append(applicantName).append(" by ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
+            .append("<li>keep proof of any payments you make</li>")
+            .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid</li>")
+            .append("</ul>")
+            .append("<p>Contact ")
+            .append(applicantName);
+        if (applicantName.endsWith("s")) {
+            sb.append("'");
+        } else {
+            sb.append("'s");
+        }
+        sb.append(" legal representative if you need details on how to pay.</p>")
+            .append("<p>If you do not pay immediately, ").append(applicantName)
+            .append(" can either:</p>")
+            .append("<ul>")
+            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
+            .append("<li>request a county court judgement against you</li>")
+            .append("</ul>")
+
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName);
+        if (caseData.getApplicant2() != null) {
+            sb.append(" reject your offer</h3>");
+        } else {
+            sb.append(" rejects your offer</h3>");
+        }
+        sb.append("<ul>")
+            .append("<li>the court will decide how you must pay</li>")
+            .append("</ul>");
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> getPartialAdmitPaidFullSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+
+        if (howMuchWasPaid == null || totalClaimAmount == null
+            || howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) < 0) {
+            return Optional.empty();
+        }
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        String sb = "<br>You told us you've paid the &#163;"
+            + totalClaimAmount
+            + " you believe you owe. We've sent "
+            + applicantName
+            + " this response."
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " accepts your response</h3>"
+            + "<p>The claim will be settled.</p>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " rejects your response</h3>"
+            + "<p>The court will review the case. You may have to go to a hearing.</p>"
+            + "<p>We'll contact you to tell you what to do next.</p>";
+        return Optional.of(sb);
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
@@ -484,6 +831,39 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private Optional<String> getPartialAdmitPaidLessSummary(CaseData caseData) {
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return Optional.empty();
+        }
+
+        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+
+        if (howMuchWasPaid == null || totalClaimAmount == null
+            || howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) >= 0) {
+            return Optional.empty();
+        }
+
+        String applicantName = caseData.getApplicant1().getPartyName();
+
+        String sb = "<br>You told us you've paid the &#163;"
+            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
+            + ". We've sent "
+            + applicantName
+            + " this response."
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " accepts your response</h3>"
+            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
+            + "<h3 class=\"govuk-heading-m\">If "
+            + applicantName + " rejects your response</h3>"
+            + "<p>The court will review the case. You may have to go to a hearing.</p>"
+            + "<p>We'll contact you to tell you what to do next.</p>";
+        return Optional.of(sb);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
