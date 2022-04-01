@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -899,6 +900,57 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=defendant2-directions.pdf")
                 .contains("createdBy=Defendant 2")
                 .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
+        }
+
+        @Test
+        void shouldRetainSolicitorReferences_WhenNoReferencesPresent() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, Map.of());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("solicitorReferences")
+                .isNull();
+            assertThat(response.getData())
+                .extracting("respondentSolicitor2Reference")
+                .isNull();
+        }
+
+        @Test
+        void shouldRetainSolicitorReferences_WhenAllReferencesPresent() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build().toBuilder()
+                .build();
+            var beforeCaseData = Map.of("solicitorReferences",
+                                        Map.of("applicantSolicitor1Reference", "12345",
+                                               "respondentSolicitor1Reference", "6789"),
+                                        "respondentSolicitor2Reference", "01234");
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, beforeCaseData);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("solicitorReferences")
+                .asString()
+                .contains("applicantSolicitor1Reference=12345")
+                .contains("respondentSolicitor1Reference=6789")
+                .doesNotContain("respondentSolicitor2Reference");
+            assertThat(response.getData())
+                .extracting("respondentSolicitor2Reference")
+                .asString()
+                .contains("01234");
         }
 
         @Test
