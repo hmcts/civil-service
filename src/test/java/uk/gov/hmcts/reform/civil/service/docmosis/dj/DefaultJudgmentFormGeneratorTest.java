@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DEFAULT_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -69,7 +69,7 @@ public class DefaultJudgmentFormGeneratorTest {
     @Test
     void shouldDefaultJudgmentFormGeneratorOneForm_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
-            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+            .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
@@ -96,7 +96,7 @@ public class DefaultJudgmentFormGeneratorTest {
     @Test
     void shouldDefaultJudgmentFormGeneratorTwoForms_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
-            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+            .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
