@@ -432,6 +432,11 @@ public class FlowPredicate {
             && caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
 
+    public static final Predicate<CaseData> partAdmissionSpecClaim = caseData ->
+        SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
+
     private FlowPredicate() {
         //Utility class
     }
