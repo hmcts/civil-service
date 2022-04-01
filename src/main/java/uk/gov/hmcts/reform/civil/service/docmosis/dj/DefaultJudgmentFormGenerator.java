@@ -117,7 +117,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                                    .getOrganisation().getOrganisationID()))
             .debt(debtAmount)
             .costs(cost)
-            .totalCost(event.equals(GENERATE_DJ_FORM_SPEC.name()) ? debtAmount.add(cost).setScale(2) : null)
+            .totalCost(event.equals(GENERATE_DJ_FORM_SPEC.name())  && debtAmount != null
+                           ? debtAmount.add(cost).setScale(2) : null)
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
                                     ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())

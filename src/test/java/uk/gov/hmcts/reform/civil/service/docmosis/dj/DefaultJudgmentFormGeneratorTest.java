@@ -29,10 +29,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DEFAULT_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -44,7 +43,7 @@ public class DefaultJudgmentFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = String.format(N121.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String fileName = String.format(N121_SPEC.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
         .documentType(DEFAULT_JUDGMENT)
@@ -69,7 +68,7 @@ public class DefaultJudgmentFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentFormGeneratorOneForm_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121)))
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
             .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
 
         when(documentManagementService
@@ -85,7 +84,7 @@ public class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM.name());
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments.size()).isEqualTo(1);
 
@@ -96,7 +95,7 @@ public class DefaultJudgmentFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentFormGeneratorTwoForms_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121)))
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
             .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
 
         when(documentManagementService
@@ -112,7 +111,7 @@ public class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
             .build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM.name());
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments.size()).isEqualTo(2);
     }

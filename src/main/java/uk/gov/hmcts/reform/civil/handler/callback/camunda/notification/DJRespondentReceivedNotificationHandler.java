@@ -77,7 +77,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
-        System.out.println(organisation.get().getName());
+
         return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
