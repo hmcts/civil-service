@@ -143,6 +143,7 @@ public class CaseData implements MappableObject {
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
+    private final YesOrNo defendantSingleResponseToBothClaimants;
     private final RespondentResponseType respondent1ClaimResponseType;
     private final RespondentResponseType respondent2ClaimResponseType;
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
