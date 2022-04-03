@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -21,7 +21,10 @@ import static java.util.Optional.ofNullable;
 public class AddressLinesMapper {
 
     private static final int LINE_LIMIT = 35;
+    private static final String STRING_EMPTY = "";
+    private static final String STRING_SPACE = " ";
     private static final char CHAR_COMMA = ',';
+    private static final char CHAR_SPACE = ' ';
 
     public Address splitLongerLines(Address originalAddress) {
         requireNonNull(originalAddress);
@@ -29,8 +32,7 @@ public class AddressLinesMapper {
         List<String> addressLines = prepareAddressLines(originalAddress);
         boolean anyLineExceedsLimit = addressLines.stream().anyMatch(line -> line.length() > LINE_LIMIT);
         if (addressLines.size() > 3 || anyLineExceedsLimit) {
-            addressLines.add(originalAddress.getPostTown());
-            return splitBySpace(originalAddress, addressLines);
+            return resolveAddressBySpace(originalAddress);
         } else {
             return originalAddress.toBuilder()
                 .addressLine1(Iterables.get(addressLines, 0, null))
@@ -40,50 +42,62 @@ public class AddressLinesMapper {
         }
     }
 
-    private Address splitBySpace(Address originalAddress, List<String> addressLines) {
-        addressLines = addressLines.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-        Queue<String> addressParts = new LinkedList<>();
+    private Address resolveAddressBySpace(Address originalAddress) {
+        Address.AddressBuilder addressBuilder = originalAddress.toBuilder();
 
-        String addressLine1 = getAddressLine(addressLines, addressParts, 0);
-        String addressLine2 = getAddressLine(addressLines, addressParts, 1);
-        String addressLine3 = getAddressLine(addressLines, addressParts, 2);
-        String postTown = getAddressLine(addressLines, addressParts, 3);
+        Queue<String> addressParts = resolveAddressLine(originalAddress.getAddressLine1(), STRING_EMPTY, true);
+        String addressLine1 = addressParts.poll();
+        addressBuilder.addressLine1(StringUtils.isEmpty(addressLine1) ? null : addressLine1);
 
-        return originalAddress.toBuilder()
-            .addressLine1(StringUtils.isEmpty(addressLine1) ? null : addressLine1)
-            .addressLine2(StringUtils.isEmpty(addressLine2) ? null : addressLine2)
-            .addressLine3(StringUtils.isEmpty(addressLine3) ? null : addressLine3)
-            .postTown(StringUtils.isEmpty(postTown) ? null : postTown)
-            .build();
+        addressParts = resolveAddressLine(originalAddress.getAddressLine2(), addressParts.poll(), true);
+        String addressLine2 = addressParts.poll();
+        addressBuilder.addressLine2(StringUtils.isEmpty(addressLine2) ? null : addressLine2);
+
+        addressParts = resolveAddressLine(originalAddress.getAddressLine3(), addressParts.poll(), true);
+        String addressLine3 = addressParts.poll();
+        addressBuilder.addressLine3(StringUtils.isEmpty(addressLine3) ? null : addressLine3);
+
+        addressParts = resolveAddressLine(originalAddress.getPostTown(), addressParts.poll(), false);
+        String postTown = addressParts.poll();
+        addressBuilder.postTown(StringUtils.isEmpty(postTown) ? null : postTown);
+
+        return addressBuilder.build();
     }
 
-    @Nullable
-    private String getAddressLine(List<String> addressLines, Queue<String> addressParts, int position) {
-        String srcAddressLine = Iterables.get(addressLines, position, "");
-        String addressLine = "";
-        if (addressParts.size() > 0 && StringUtils.isNotEmpty(srcAddressLine)) {
-            addressParts.offer(",");
+    private Queue<String> resolveAddressLine(String addressLine, String overflow, boolean overflowAllowed) {
+        String retained;
+        addressLine = StringUtils.normalizeSpace(addressLine);
+        if (StringUtils.isEmpty(addressLine)) {
+            if (StringUtils.isEmpty(overflow)) {
+                return new LinkedList<>(Arrays.asList(null, null));
+            } else if (StringUtils.length(overflow) <= LINE_LIMIT) {
+                return new LinkedList<>(List.of(overflow, overflow));
+            }
         }
-        String addressLineWithCarryover = String.join(" ", addressParts).concat(srcAddressLine);
-        if (StringUtils.length(addressLineWithCarryover) > LINE_LIMIT) {
-            if (StringUtils.isNotEmpty(srcAddressLine)) {
-                addressParts.addAll(Splitter.on(' ').omitEmptyStrings().splitToList(srcAddressLine));
+        if (!overflowAllowed) {
+            String returnAddress = StringUtils.length(overflow.concat(ofNullable(addressLine).orElse("")))
+                > LINE_LIMIT ? addressLine : overflow.concat(ofNullable(addressLine).orElse(""));
+            return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
+        }
+        if (StringUtils.length(overflow) + StringUtils.length(addressLine) > LINE_LIMIT) {
+            retained = STRING_EMPTY;
+            Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
+                .splitToList(overflow.concat(ofNullable(addressLine).orElse(""))));
+            while (addressParts.isEmpty() || retained.concat(" ").concat(addressParts.peek()).length() <= LINE_LIMIT) {
+                retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
             }
-            String delimiter = "";
-            while (addressLine.concat(delimiter).concat(ofNullable(addressParts.peek()).orElse(""))
-                .length() < LINE_LIMIT) {
-                addressLine = addressLine.concat(delimiter).concat(requireNonNull(addressParts.poll()));
-                delimiter = " ";
-            }
-            if (StringUtils.isEmpty(addressLine)) {
-                addressLine = addressLineWithCarryover;
-                addressParts.clear();
+            if (StringUtils.isEmpty(retained)) {
+                retained = addressLine;
+                overflow = STRING_EMPTY;
+            } else {
+                String overflowStr = String.join(STRING_SPACE, addressParts);
+                overflow = overflowStr.concat(overflowStr.trim().endsWith(",") ? " " : ", ");
             }
         } else {
-            addressLine = addressLineWithCarryover;
+            retained = addressLine;
+            overflow = STRING_EMPTY;
         }
-        return position == 3 && addressLines.size() > 4 ? addressLine.concat(", ").concat(String.join(",",
-            addressLines.subList(4, addressLines.size()))) : addressLine;
+        return new LinkedList<>(List.of(retained.trim(), overflow));
     }
 
     private List<String> prepareAddressLines(Address originalAddress) {
