@@ -34,10 +34,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AgreedExtensionDateApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AgreedExtensionDateApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     AgreedExtensionDateApplicantNotificationHandler.class,
@@ -220,7 +223,8 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             }
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "agreedExtensionDate", formatLocalDate(extensionDate, DATE)
+                AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }

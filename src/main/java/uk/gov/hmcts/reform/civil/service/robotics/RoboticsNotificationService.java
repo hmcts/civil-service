@@ -37,7 +37,7 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    private final FeatureToggleService featureToggleService;
+    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
@@ -52,7 +52,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())  && toggleService.isLrSpecEnabled()) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
