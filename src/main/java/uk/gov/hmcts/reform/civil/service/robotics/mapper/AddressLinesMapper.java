@@ -23,6 +23,8 @@ public class AddressLinesMapper {
     private static final int LINE_LIMIT = 35;
     private static final String STRING_EMPTY = "";
     private static final String STRING_SPACE = " ";
+    private static final String STRING_COMMA = ",";
+    private static final String STRING_COMMA_SPACE = ", ";
     private static final char CHAR_COMMA = ',';
     private static final char CHAR_SPACE = ' ';
 
@@ -71,19 +73,25 @@ public class AddressLinesMapper {
             if (StringUtils.isEmpty(overflow)) {
                 return new LinkedList<>(Arrays.asList(null, null));
             } else if (StringUtils.length(overflow) <= LINE_LIMIT) {
-                return new LinkedList<>(List.of(overflow, overflow));
+                return new LinkedList<>(List.of(overflow, STRING_EMPTY));
             }
         }
         if (!overflowAllowed) {
-            String returnAddress = StringUtils.length(overflow.concat(ofNullable(addressLine).orElse("")))
-                > LINE_LIMIT ? addressLine : overflow.concat(ofNullable(addressLine).orElse(""));
+            int addLineLen = StringUtils.length(addressLine);
+            String addressLineCandidate = overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY));
+            String returnAddress = StringUtils.length(addressLineCandidate) > LINE_LIMIT
+                ? (addLineLen >= LINE_LIMIT ? addressLine.substring(0, LINE_LIMIT - 1) :
+                    overflow.substring(0, LINE_LIMIT - 3 - addLineLen).concat(STRING_COMMA_SPACE)
+                        .concat(ofNullable(addressLine).orElse(STRING_EMPTY)))
+                    : addressLineCandidate;
             return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
         }
         if (StringUtils.length(overflow) + StringUtils.length(addressLine) > LINE_LIMIT) {
             retained = STRING_EMPTY;
             Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
-                .splitToList(overflow.concat(ofNullable(addressLine).orElse(""))));
-            while (addressParts.isEmpty() || retained.concat(" ").concat(addressParts.peek()).length() <= LINE_LIMIT) {
+                .splitToList(overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY))));
+            while (addressParts.isEmpty() || retained.concat(STRING_SPACE).concat(addressParts.peek())
+                .length() <= LINE_LIMIT) {
                 retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
             }
             if (StringUtils.isEmpty(retained)) {
@@ -91,7 +99,8 @@ public class AddressLinesMapper {
                 overflow = STRING_EMPTY;
             } else {
                 String overflowStr = String.join(STRING_SPACE, addressParts);
-                overflow = overflowStr.concat(overflowStr.trim().endsWith(",") ? " " : ", ");
+                overflow = overflowStr.concat(overflowStr.trim().endsWith(STRING_COMMA)
+                                                  ? STRING_SPACE : STRING_COMMA_SPACE);
             }
         } else {
             retained = addressLine;
