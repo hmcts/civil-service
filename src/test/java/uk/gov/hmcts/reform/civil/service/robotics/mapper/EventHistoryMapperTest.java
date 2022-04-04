@@ -710,6 +710,68 @@ class EventHistoryMapperTest {
                     .containsExactly(expectedAcknowledgementOfServiceReceived.get(0),
                                      expectedAcknowledgementOfServiceReceived.get(1));
             }
+
+            @Test
+            void shouldHaveCorrectEvents_whenOnlyRespondentOneRepAcknowledges() {
+                String expectedMiscText1 = "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged1v2SameSolicitor()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .respondent2AcknowledgeNotificationDate(null)
+                    .build();
+
+                Event expectedAcknowledgementOfServiceReceivedEvent =
+                    Event.builder()
+                        .eventSequence(2)
+                        .eventCode("38")
+                        .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
+                        .litigiousPartyID("002")
+                        .eventDetails(EventDetails.builder()
+                                          .responseIntention(
+                                              caseData.getRespondent1ClaimResponseIntentionType().getLabel())
+                                          .build())
+                        .eventDetailsText(expectedMiscText1)
+                        .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("acknowledgementOfServiceReceived").asList()
+                    .containsExactly(expectedAcknowledgementOfServiceReceivedEvent);
+            }
+
+            @Test
+            void shouldHaveCorrectEvents_whenOnlyRespondentTwoRepAcknowledges() {
+                String expectedMiscText1 = "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged1v2SameSolicitor()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .respondent1AcknowledgeNotificationDate(null)
+                    .build();
+
+                Event expectedAcknowledgementOfServiceReceivedEvent =
+                    Event.builder()
+                        .eventSequence(2)
+                        .eventCode("38")
+                        .dateReceived(caseData.getRespondent2AcknowledgeNotificationDate())
+                        .litigiousPartyID("003")
+                        .eventDetails(EventDetails.builder()
+                                          .responseIntention(
+                                              caseData.getRespondent2ClaimResponseIntentionType().getLabel())
+                                          .build())
+                        .eventDetailsText(expectedMiscText1)
+                        .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("acknowledgementOfServiceReceived").asList()
+                    .containsExactly(expectedAcknowledgementOfServiceReceivedEvent);
+            }
         }
 
         @Nested

@@ -1912,6 +1912,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2Only() {
+        atStateNotificationAcknowledgedRespondent2();
+        respondent1AcknowledgeNotificationDate = null;
+        return this;
+    }
+
     public CaseDataBuilder atDeadlinePassedAfterStateNotificationAcknowledged() {
         atStateNotificationAcknowledged();
         this.claimDismissedDate = respondent1AcknowledgeNotificationDate.plusDays(1);

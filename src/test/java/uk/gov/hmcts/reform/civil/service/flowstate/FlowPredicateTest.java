@@ -308,8 +308,24 @@ class FlowPredicateTest {
     class NotificationAcknowledged {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
+        void shouldReturnTrue_whenCaseDataAtStateClaimRespondentOneAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            assertTrue(notificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimRespondentTwoAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2Only()
+                .build();
+            assertTrue(notificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimBothAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .build();
             assertTrue(notificationAcknowledged.test(caseData));
         }
 
