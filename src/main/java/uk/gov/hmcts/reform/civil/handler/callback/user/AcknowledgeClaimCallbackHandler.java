@@ -366,13 +366,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        // scheduler
-        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP) && bothDefendantsAcknowledged) {
-            caseDataUpdated
-                .respondent1AcknowledgeClaimPickByScheduler(YES)
-                .respondent2AcknowledgeClaimPickByScheduler(YES);
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();

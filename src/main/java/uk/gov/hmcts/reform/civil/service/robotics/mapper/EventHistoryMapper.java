@@ -63,9 +63,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
-
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 @Component
 @RequiredArgsConstructor
 public class EventHistoryMapper {
@@ -114,13 +115,11 @@ public class EventHistoryMapper {
                     case CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
                         buildConsentExtensionFilingDefence(builder, caseData);
                         break;
+                    case FULL_DEFENCE:
+                        buildRespondentFullDefence(builder, caseData);
+                        break;
                     case FULL_ADMISSION:
                         buildRespondentFullAdmission(builder, caseData);
-                        break;
-                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
-                    case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
-                        //send rpa for first defendant in 1v2 diff solicitor
-                        buildSomething(builder, caseData);
                         break;
                     case PART_ADMISSION:
                         buildRespondentPartAdmission(builder, caseData);
@@ -128,9 +127,13 @@ public class EventHistoryMapper {
                     case COUNTER_CLAIM:
                         buildRespondentCounterClaim(builder, caseData);
                         break;
-                    case FULL_DEFENCE:
-                        buildRespondentFullDefence(builder, caseData);
-                        break;
+                    // AWAITING_RESPONSES states would only happen in 1v2 diff sol after 1 defendant responses.
+                    // These states will not show in the history mapper after the second defendant response.
+                    // It can share the same RPA builder as DIVERGENT_RESPOND state because it builds events according
+                    // to defendant response
+                    // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
+                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
+                    case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
                     case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
                     case DIVERGENT_RESPOND_GO_OFFLINE:
                         buildRespondentDivergentResponse(builder, caseData);
@@ -188,33 +191,37 @@ public class EventHistoryMapper {
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+        String miscText;
 
-        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                     respondent1ResponseDate, RESPONDENT_ID);
+        if (defendant1ResponseExists.test(caseData)) {
+            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                         respondent1ResponseDate, RESPONDENT_ID);
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(respondent1ResponseDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build()));
+        }
 
-        String miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-        builder.miscellaneous((Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(respondent1ResponseDate)
-            .eventDetailsText(miscText)
-            .eventDetails(EventDetails.builder()
-                              .miscText(miscText)
-                              .build())
-            .build()));
-
-        buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                     respondent2ResponseDate, RESPONDENT2_ID);
-        miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-        builder.miscellaneous((Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(respondent2ResponseDate)
-            .eventDetailsText(miscText)
-            .eventDetails(EventDetails.builder()
-                              .miscText(miscText)
-                              .build())
-            .build()));
+        if (defendant2ResponseExists.test(caseData)) {
+            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                         respondent2ResponseDate, RESPONDENT2_ID);
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(respondent2ResponseDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build()));
+        }
     }
 
     private void buildRespondentResponseEvent(EventHistory.EventHistoryBuilder builder,
@@ -600,23 +607,11 @@ public class EventHistoryMapper {
                                   .build());
     }
 
-    private void buildSomething(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.miscellaneous(Event.builder()
-                                  .eventSequence(prepareEventSequence(builder.build()))
-                                  .eventCode(MISCELLANEOUS.getCode())
-                                  .dateReceived(caseData.getRespondent1ResponseDate())
-                                  .eventDetailsText("RPA Reason: One of the defendant has responded.")
-                                  .eventDetails(EventDetails.builder()
-                                                    .miscText("RPA Reason: One of the defendant has responded.")
-                                                    .build())
-                                  .build());
-    }
-
     private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> defenceFiledEvents = new ArrayList<>();
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
         boolean isRespondent1;
-        if (caseData.getRespondent1ResponseDate() != null) {
+        if (defendant1ResponseExists.test(caseData)) {
             isRespondent1 = true;
             Party respondent1 = caseData.getRespondent1();
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
@@ -634,7 +629,7 @@ public class EventHistoryMapper {
                                                        respondent1,
                                                        isRespondent1));
         }
-        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+        if (defendant2ResponseExists.test(caseData)) {
             isRespondent1 = false;
             Party respondent2 = caseData.getRespondent2();
             Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
@@ -851,14 +846,14 @@ public class EventHistoryMapper {
             case ONE_V_TWO_TWO_LEGAL_REP: {
                 List<Event> events = new ArrayList<>();
                 if (defendant1AckExists.test(caseData)) {
-                    events.add(respondent1AcknowledgementOfService(builder, caseData, format(
+                    events.add(buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
                         "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent1().getPartyName(),
                         caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                     )));
                 }
                 if (defendant2AckExists.test(caseData)) {
-                    events.add(respondent2AcknowledgementOfService(builder, caseData, format(
+                    events.add(buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
                         "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent2().getPartyName(),
                         caseData.getRespondent2ClaimResponseIntentionType().getLabel()
@@ -874,13 +869,13 @@ public class EventHistoryMapper {
                 builder
                     .acknowledgementOfServiceReceived(
                         List.of(
-                            respondent1AcknowledgementOfService(builder, caseData, format(
+                            buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
                                 "RPA Reason: [1 of 2 - %s] Defendant: %s has acknowledged: %s",
                                 currentTime,
                                 caseData.getRespondent1().getPartyName(),
                                 caseData.getRespondent1ClaimResponseIntentionType().getLabel())
                             ),
-                            respondent2AcknowledgementOfService(builder, caseData, format(
+                            buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
                                 "RPA Reason: [2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                 currentTime,
                                 caseData.getRespondent2().getPartyName(),
@@ -898,38 +893,29 @@ public class EventHistoryMapper {
                 builder
                     .acknowledgementOfServiceReceived(
                         List.of(
-                            respondent1AcknowledgementOfService(
-                                builder, caseData,
+                            buildAcknowledgementOfServiceEvent(
+                                builder, caseData, true,
                                 format("responseIntention: %s",
-                                       caseData.getRespondent1ClaimResponseIntentionType().getLabel()))));
+                                       caseData.getRespondent1ClaimResponseIntentionType().getLabel())
+                                )));
             }
         }
     }
 
-    private Event respondent1AcknowledgementOfService(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                                      String eventDetailsText) {
+    private Event buildAcknowledgementOfServiceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                                     boolean isRespondent1, String eventDetailsText) {
         return Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
-            .dateReceived(caseData.getRespondent1AcknowledgeNotificationDate())
-            .litigiousPartyID("002")
-            .eventDetails(EventDetails.builder()
-                              .responseIntention(caseData.getRespondent1ClaimResponseIntentionType().getLabel())
-                              .build())
-            .eventDetailsText(eventDetailsText)
-            .build();
-    }
-
-    private Event respondent2AcknowledgementOfService(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                                      String eventDetailsText) {
-        return Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
-            .dateReceived(caseData.getRespondent2AcknowledgeNotificationDate())
-            .litigiousPartyID("003")
+            .dateReceived(isRespondent1
+                              ? caseData.getRespondent1AcknowledgeNotificationDate()
+                              : caseData.getRespondent2AcknowledgeNotificationDate())
+            .litigiousPartyID(isRespondent1 ? "002" : "003")
             .eventDetails(EventDetails.builder()
                               .responseIntention(
-                                  caseData.getRespondent2ClaimResponseIntentionType().getLabel())
+                                  isRespondent1
+                                      ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                                      : caseData.getRespondent2ClaimResponseIntentionType().getLabel())
                               .build())
             .eventDetailsText(eventDetailsText)
             .build();
@@ -953,7 +939,7 @@ public class EventHistoryMapper {
 
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
-        if (caseData.getRespondent1ResponseDate() != null) {
+        if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.receiptOfAdmission(Event.builder()
                                            .eventSequence(prepareEventSequence(builder.build()))
@@ -971,7 +957,7 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
         }
-        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+        if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.receiptOfAdmission(Event.builder()
                                            .eventSequence(prepareEventSequence(builder.build()))
@@ -993,7 +979,7 @@ public class EventHistoryMapper {
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
-        if (caseData.getRespondent1ResponseDate() != null) {
+        if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.receiptOfPartAdmission(
                     Event.builder()
@@ -1012,7 +998,7 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
         }
-        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+        if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.receiptOfPartAdmission(
                     Event.builder()
@@ -1035,7 +1021,7 @@ public class EventHistoryMapper {
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
-        if (caseData.getRespondent1ResponseDate() != null) {
+        if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.defenceAndCounterClaim(
                     Event.builder()
@@ -1054,7 +1040,7 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
         }
-        if (caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null) {
+        if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.defenceAndCounterClaim(
                 List.of(

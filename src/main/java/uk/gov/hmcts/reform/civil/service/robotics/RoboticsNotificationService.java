@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Slf4j
@@ -107,7 +108,15 @@ public class RoboticsNotificationService {
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
         List<Event> events = flatEvents(eventHistory);
         events.sort(Comparator.comparing(Event::getDateReceived));
-        return events.get(events.size() - 1).getEventDetailsText();
+
+        List<Event> lastMiscelleousEvent = events.stream()
+            .filter(event ->
+                        event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
+                        && event.getEventCode().equals(MISCELLANEOUS.getCode()))
+            .collect(Collectors.toList());
+
+        return lastMiscelleousEvent.size() == 1 ?  lastMiscelleousEvent.get(0).getEventDetailsText()
+            : events.get(events.size() - 1).getEventDetailsText();
     }
 
     private static List<Event> flatEvents(EventHistory eventHistory) {
