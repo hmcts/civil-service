@@ -65,6 +65,18 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
             builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getDefenceFiled())) {
+            builder.defenceFiled(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReceiptOfAdmission())) {
+            builder.receiptOfAdmission(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReceiptOfPartAdmission())) {
+            builder.receiptOfPartAdmission(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefenceAndCounterClaim())) {
+            builder.defenceAndCounterClaim(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
