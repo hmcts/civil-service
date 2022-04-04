@@ -68,7 +68,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     properties = {
         "sendgrid.api-key:some-key",
         "robotics.notification.sender:no-reply@exaple.com",
-        "robotics.notification.recipient:recipient@example.com"
+        "robotics.notification.recipient:recipient@example.com",
+        "robotics.notification.multipartyrecipient:multipartyrecipient@example.com"
     }
 )
 class RoboticsNotificationServiceTest {
@@ -137,7 +138,15 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder().build();
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                .miscellaneous(Event.builder()
+                   .eventDetailsText(lastEventText)
+                   .dateReceived(LocalDateTime.now())
+                   .build())
+                .build())
+            .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
         service.notifyRobotics(caseData, false);
 
@@ -167,7 +176,7 @@ class RoboticsNotificationServiceTest {
 
     @Test
     @SneakyThrows
-    void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
+    void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvidedAndRpaDisabled() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
@@ -182,17 +191,46 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
-        String message = format(
-            "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState()
-        );
-        String subject = format("Multiparty claim data for %s", reference
-            + " - " + caseData.getCcdState() + " - " + "Claimant has notified defendant.");
+        String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                "Claimant has notified defendant.");
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvidedAndRpaEnabled() {
+        when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        service.notifyRobotics(caseData, isMultiPartyScenario(caseData));
+
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
+        String message = format(
+            "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
+        );
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                "Claim details notified.");
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
@@ -217,6 +255,7 @@ class RoboticsNotificationServiceTest {
             ).build())
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         service.notifyRobotics(caseData, multiPartyScenario);
@@ -226,12 +265,9 @@ class RoboticsNotificationServiceTest {
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
-        String message = format(
-            "Multiparty claim data for %s",
-            reference + " - " + caseData.getCcdState()
-        );
-        String subject = format("Multiparty claim data for %s", reference
-            + " - " + caseData.getCcdState() + " - " + lastEventText);
+        String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
+        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+                                lastEventText);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
