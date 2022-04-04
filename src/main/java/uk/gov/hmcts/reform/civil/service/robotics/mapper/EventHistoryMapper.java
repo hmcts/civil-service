@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -55,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
@@ -522,38 +524,127 @@ public class EventHistoryMapper {
     }
 
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.replyToDefence(List.of(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(REPLY_TO_DEFENCE.getCode())
-                .dateReceived(caseData.getApplicant1ResponseDate())
-                .litigiousPartyID(APPLICANT_ID)
-                .build())
-        ).directionsQuestionnaire(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                .dateReceived(caseData.getApplicant1ResponseDate())
-                .litigiousPartyID(APPLICANT_ID)
-                .eventDetails(EventDetails.builder()
-                                  .stayClaim(isStayClaim(caseData.getApplicant1DQ()))
-                                  .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                  .preferredCourtName("")
-                                  .build())
-                .eventDetailsText(prepareEventDetailsText(
-                    caseData.getApplicant1DQ(),
-                    caseData.getCourtLocation().getApplicantPreferredCourt()
-                ))
-                .build()
-        ).miscellaneous(Event.builder()
+        List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
+        List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
+
+        List<Event> replyDefenceForProceedingApplicants = IntStream.range(0, applicantDetails.size())
+            .mapToObj(index ->
+                          Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getApplicant1ResponseDate())
-                            .eventDetailsText("RPA Reason: Applicant proceeds.")
-                            .eventDetails(EventDetails.builder()
-                                              .miscText("RPA Reason: Applicant proceeds.")
-                                              .build())
-                            .build());
+                            .eventCode(REPLY_TO_DEFENCE.getCode())
+                            .dateReceived(applicantDetails.get(index).getResponseDate())
+                            .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                            .build())
+            .collect(Collectors.toList());
+        builder.replyToDefence(replyDefenceForProceedingApplicants);
+
+        List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
+            .mapToObj(index ->
+                          Event.builder()
+                              .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                              .dateReceived(applicantDetails.get(index).getResponseDate())
+                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                              .eventDetails(EventDetails.builder()
+                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                    .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                    .preferredCourtName("")
+                                    .build())
+                              .eventDetailsText(prepareEventDetailsText(
+                                  applicantDetails.get(index).getDq(),
+                                  caseData.getCourtLocation().getApplicantPreferredCourt()))
+                              .build())
+            .collect(Collectors.toList());
+        builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
+
+        List<Event> miscText = IntStream.range(0, miscEventText.size())
+            .mapToObj(index ->
+                          Event.builder()
+                              .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(MISCELLANEOUS.getCode())
+                              .dateReceived(caseData.getApplicant1ResponseDate())
+                              .eventDetailsText(miscEventText.get(index))
+                              .eventDetails(EventDetails.builder()
+                                                .miscText(miscEventText.get(index))
+                                                .build())
+                              .build())
+            .collect(Collectors.toList());
+        builder.miscellaneous(miscText);
+    }
+
+    private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
+        List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();
+        if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
+                applicantsDetails.add(ClaimantResponseDetails.builder()
+                                          .dq(caseData.getApplicant1DQ())
+                                          .litigiousPartyID(APPLICANT_ID)
+                                          .responseDate(caseData.getApplicant1ResponseDate())
+                                          .build());
+            }
+            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+                applicantsDetails.add(ClaimantResponseDetails.builder()
+                                          .dq(caseData.getApplicant2DQ())
+                                          .litigiousPartyID(APPLICANT2_ID)
+                                          .responseDate(caseData.getApplicant2ResponseDate())
+                                          .build());
+            }
+        } else {
+            applicantsDetails.add(ClaimantResponseDetails.builder()
+                                      .dq(caseData.getApplicant1DQ())
+                                      .litigiousPartyID(APPLICANT_ID)
+                                      .responseDate(caseData.getApplicant1ResponseDate())
+                                      .build());
+        }
+        return applicantsDetails;
+    }
+
+    private List<String> prepMultipartyProceedMiscText(CaseData caseData) {
+        List<String> eventDetailsText = new ArrayList<>();
+        String currentTime = time.now().toLocalDate().toString();
+
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP: {
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                    currentTime,
+                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        ? "proceed"
+                        : "not proceed",
+                    caseData.getRespondent1().getPartyName()));
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                    currentTime,
+                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                        ? "proceed"
+                        : "not proceed",
+                    caseData.getRespondent2().getPartyName()));
+                break;
+            }
+            case TWO_V_ONE: {
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [1 of 2 - %s] Claimant: %s has provided intention: %s",
+                    currentTime,
+                    caseData.getApplicant1().getPartyName(),
+                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        ? "proceed"
+                        : "not proceed"));
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s",
+                    currentTime,
+                    caseData.getApplicant2().getPartyName(),
+                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+                        ? "proceed"
+                        : "not proceed"));
+                break;
+            }
+            case ONE_V_ONE:
+            default: {
+                eventDetailsText.add("RPA Reason: Claimant proceeds.");
+            }
+        }
+        return eventDetailsText;
     }
 
     public String prepareEventDetailsText(DQ dq, String preferredCourtCode) {
@@ -577,13 +668,17 @@ public class EventHistoryMapper {
     }
 
     private void buildFullDefenceNotProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        String miscText = getMultiPartyScenario(caseData).equals(TWO_V_ONE)
+            ? "RPA Reason: Claimants intend not to proceed."
+            : "RPA Reason: Claimant intends not to proceed.";
+
         builder.miscellaneous(Event.builder()
                                   .eventSequence(prepareEventSequence(builder.build()))
                                   .eventCode(MISCELLANEOUS.getCode())
                                   .dateReceived(caseData.getApplicant1ResponseDate())
-                                  .eventDetailsText("RPA Reason: Claimant intends not to proceed.")
+                                  .eventDetailsText(miscText)
                                   .eventDetails(EventDetails.builder()
-                                                    .miscText("RPA Reason: Claimant intends not to proceed.")
+                                                    .miscText(miscText)
                                                     .build())
                                   .build());
     }
