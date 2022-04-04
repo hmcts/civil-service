@@ -28,8 +28,7 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
             .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
-        if (Stream.of(howMuchWasPaid, totalClaimAmount)
-            .anyMatch(Objects::isNull)) {
+        if (howMuchWasPaid == null || totalClaimAmount == null) {
             return Optional.empty();
         }
 
