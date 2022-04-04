@@ -23,11 +23,6 @@ public class PaymentsService {
     private final OrganisationService organisationService;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
-        // To be removed, only used for simulating 422 error for testing locally
-        //        Request request = Request.create(Request.HttpMethod.GET, "url",
-        //                                         new HashMap<>(), null, new RequestTemplate());
-        //        throw new FeignException.UnprocessableEntity("", request, null);
-
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
