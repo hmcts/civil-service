@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplnSolGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -83,7 +83,7 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
-            .generalAppApplnSolictor(GAApplnSolGAspec.builder().build())
+            .generalAppApplnSolictor(GASolicitorDetailsGAspec.builder().build())
             .build();
     }
 
@@ -123,7 +123,7 @@ public class InitiateGeneralApplicationService {
         Optional<Organisation> org = findOrganisation(authToken);
         if (org.isPresent()) {
             applicationBuilder
-                .generalAppApplnSolictor(GAApplnSolGAspec
+                .generalAppApplnSolictor(GASolicitorDetailsGAspec
                                              .builder()
                                              .id(userDetails.getId())
                                              .email(userDetails.getEmail())

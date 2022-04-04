@@ -11,7 +11,7 @@ import java.util.Optional;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class GAApplnSolGAspec {
+public class GASolicitorDetailsGAspec {
 
     private final String email;
     private final String id;
@@ -20,7 +20,7 @@ public class GAApplnSolGAspec {
     private final String organisationIdentifier;
 
     @JsonCreator
-    GAApplnSolGAspec(@JsonProperty("email") String email,
+    GASolicitorDetailsGAspec(@JsonProperty("email") String email,
                  @JsonProperty("id") String id,
                  @JsonProperty("forename") String forename,
                  @JsonProperty("surname") Optional<String> surname,
