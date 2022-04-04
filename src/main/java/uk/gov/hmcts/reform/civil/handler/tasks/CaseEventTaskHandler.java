@@ -29,9 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SE
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -105,7 +103,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
                     return "RPA Reason: Defendant rejects and counter claims.";
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant(s).";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
@@ -113,12 +110,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
                 case FULL_DEFENCE_PROCEED:
-                case FULL_ADMIT_PROCEED:
-                case PART_ADMIT_PROCEED:
                     return "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
-                case FULL_ADMIT_NOT_PROCEED:
-                case PART_ADMIT_NOT_PROCEED:
                     return "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
@@ -160,32 +153,24 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             }
 
             switch (flowState) {
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
-                                      StringUtils.join(
-                                          getDefendantNames(UNREPRESENTED, caseData), " and "
-                                      ));
+                                  StringUtils.join(
+                                             getDefendantNames(UNREPRESENTED, caseData), " and "
+                                         ));
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return format("Unregistered defendant solicitor firm: %s",
-                                     StringUtils.join(
-                                         getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                               ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                           caseData), " and "
-                                     ));
+                                         StringUtils.join(
+                                             getDefendantNames(UNREGISTERED, caseData), " and "
+                                         ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return format("Unrepresented defendant and unregistered defendant solicitor firm. "
                                       + "Unrepresented defendant: %s. "
                                       + "Unregistered defendant solicitor firm: %s.",
-                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
-                                        StringUtils.join(
-                                            getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                                  ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                              caseData), " and "
-                                        ));
+                                         StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                                         StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
                 case FULL_DEFENCE_PROCEED:
-                    return !SPEC_CLAIM.equals(caseData.getSuperClaimType())
-                        ? getDescriptionFullDefenceProceed(caseData) : null;
+                    return getDescriptionFullDefenceProceed(caseData);
                 default:
                     break;
             }

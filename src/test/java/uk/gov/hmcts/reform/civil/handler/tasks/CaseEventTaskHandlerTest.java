@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -38,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
@@ -58,15 +56,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -236,13 +228,13 @@ class CaseEventTaskHandlerTest {
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
         @EnumSource(
             value = FlowState.Main.class,
-            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
+                "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
                 "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
                 "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED", "TAKEN_OFFLINE_BY_STAFF"})
@@ -257,7 +249,6 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
-
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -408,86 +399,6 @@ class CaseEventTaskHandlerTest {
                 .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
                                + "Unrepresented defendant: Mr. John Rambo. "
                                + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
-        }
-
-        @Nested
-        class ToBeRemovedAfterNOC {
-            @BeforeEach
-            public void setup() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-            }
-
-            @Test
-            void prod_shouldHaveCorrectDescription_whenInUnregisteredSolicitorState() {
-                FlowState.Main state = PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
-                VariableMap variables = Variables.createVariables();
-                variables.putValue(FLOW_STATE, state.fullName());
-                variables.putValue(
-                    FLOW_FLAGS,
-                    getFlowFlags(state)
-                );
-
-                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStatePendingClaimIssuedUnregisteredDefendant()
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-
-                CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-
-                when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
-                    .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
-                                    .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
-
-                when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
-                    .thenReturn(caseData);
-
-                caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-                CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
-                Event event = caseDataContent.getEvent();
-                assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader");
-            }
-
-            @Test
-            void prod_shouldHaveCorrectDescription_whenInUnrepresentedDefendantAndUnregisteredSolicitorState() {
-                FlowState.Main state = PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-                VariableMap variables = Variables.createVariables();
-                variables.putValue(FLOW_STATE, state.fullName());
-                variables.putValue(
-                    FLOW_FLAGS,
-                    getFlowFlags(state)
-                );
-
-                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant()
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-                CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-
-                when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
-                    .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
-                                    .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
-
-                when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
-                    .thenReturn(caseData);
-
-                caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-                CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
-                Event event = caseDataContent.getEvent();
-                assertThat(event.getDescription())
-                    .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
-                                   + "Unrepresented defendant: Mr. John Rambo. "
-                                   + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
-            }
         }
 
         @Nested
@@ -698,24 +609,10 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true
+                              "RPA_CONTINUOUS_FEED", false
                 );
-            } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
-                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                || state.equals(FULL_ADMISSION)
-                || state.equals(PART_ADMISSION)
-                || state.equals(COUNTER_CLAIM)
-                || state.equals(FULL_DEFENCE_PROCEED)
-                || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
-                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true);
             }
-            return Map.of("RPA_CONTINUOUS_FEED", false,
-                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true);
+            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {
@@ -723,69 +620,37 @@ class CaseEventTaskHandlerTest {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
             switch (state) {
                 case FULL_ADMISSION:
-                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
+                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails();
                     break;
                 case PART_ADMISSION:
-                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
+                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails();
                     break;
                 case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
+                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
-                        .respondent1OrgRegistered(NO)
-                        .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(NO)
-                        .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
                     break;
                 case FULL_DEFENCE_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed();
                     break;
                 case FULL_DEFENCE_NOT_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed();
                     break;
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
-                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);
+                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
                     break;
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);;
+                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
-                    caseDataBuilder.atStateTakenOfflineByStaff()
-                        .addRespondent2(NO)
-                        .respondent2Represented(null)
-                        .respondent2OrgRegistered(null);
+                    caseDataBuilder.atStateTakenOfflineByStaff();
                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
