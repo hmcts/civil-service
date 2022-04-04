@@ -67,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
+
 @Component
 @RequiredArgsConstructor
 public class EventHistoryMapper {
@@ -838,8 +839,6 @@ public class EventHistoryMapper {
                     .build()
             ));
     }
-
-
 
     private void buildAcknowledgementOfServiceReceived(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {

@@ -1625,12 +1625,13 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType responseType) {
-        atStateNotificationAcknowledged();
+        atStateClaimDetailsNotified();
         respondent1ClaimResponseType = responseType;
         respondent2ClaimResponseType = responseType;
         respondentResponseIsSame(YES);
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondent2ResponseDate = respondent1ResponseDate;
+        respondent2ClaimResponseIntentionType = respondent1ClaimResponseIntentionType;
         return this;
     }
 
@@ -1750,7 +1751,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentRespondToClaim(RespondentResponseType respondentResponseType) {
-        atStateClaimDetailsNotified();
+        atStateNotificationAcknowledged();
         respondent1ClaimResponseType = respondentResponseType;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);

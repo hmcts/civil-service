@@ -935,12 +935,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(8)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -966,12 +966,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(8)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -997,12 +997,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(8)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1029,12 +1029,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(8)
+                    .hasSize(9)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1060,12 +1060,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(FULL_DEFENCE.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(10)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1123,12 +1123,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(10)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1185,12 +1185,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(DIVERGENT_RESPOND_GO_OFFLINE.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(10)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1216,12 +1216,12 @@ class StateFlowEngineTest {
                     .isNotNull()
                     .isEqualTo(FULL_ADMISSION.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(9)
+                    .hasSize(10)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
@@ -1304,12 +1304,18 @@ class StateFlowEngineTest {
                 .isNotNull()
                 .isEqualTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName());
             assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
+                .hasSize(10)
                 .extracting(State::getName)
                 .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                 );
             verify(featureToggleService).isRpaContinuousFeedEnabled();

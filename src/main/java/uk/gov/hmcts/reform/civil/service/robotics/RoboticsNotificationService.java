@@ -17,10 +17,12 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
@@ -83,7 +85,7 @@ public class RoboticsNotificationService {
 
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
@@ -109,13 +111,13 @@ public class RoboticsNotificationService {
         List<Event> events = flatEvents(eventHistory);
         events.sort(Comparator.comparing(Event::getDateReceived));
 
-        List<Event> lastMiscelleousEvent = events.stream()
+        List<Event> lastMiscellaneousEvent = events.stream()
             .filter(event ->
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
                         && event.getEventCode().equals(MISCELLANEOUS.getCode()))
             .collect(Collectors.toList());
 
-        return lastMiscelleousEvent.size() == 1 ?  lastMiscelleousEvent.get(0).getEventDetailsText()
+        return lastMiscellaneousEvent.size() == 1 ?  lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
     }
 
@@ -136,5 +138,34 @@ public class RoboticsNotificationService {
             .flatMap(Collection::stream)
             .filter(event -> event.getDateReceived() != null)
             .collect(Collectors.toList());
+    }
+
+    public static String findLatestEventTriggerReasonSpec(EventHistory eventHistory) {
+
+        List<Event> event = eventHistory.getMiscellaneous();
+        String triggerReason = getLastDetailsText(event).orElse(null);
+
+        triggerReason = updateTriggerReason(eventHistory.getAcknowledgementOfServiceReceived(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getConsentExtensionFilingDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceFiled(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceAndCounterClaim(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReceiptOfPartAdmission(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
+
+        return triggerReason;
+    }
+
+    private static Optional<String> getLastDetailsText(List<Event> events) {
+        if (events.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(events.get(events.size() - 1).getEventDetailsText());
+        }
+    }
+
+    private static String updateTriggerReason(List<Event> event, String triggerReason) {
+        return getLastDetailsText(event).orElse(triggerReason);
     }
 }
