@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLA
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
-import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.matcher.IsValidJson.validateJson;
 
@@ -527,7 +526,8 @@ class RpaConsumerTest extends BaseRpaTest {
 
                 assertThat(payload, validateJson());
 
-                String description = "Robotics case data for applicant responded with confirms to proceeds - minimal data";
+                String description = "Robotics case data for applicant responded " +
+                    "with confirms to proceeds - minimal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
                 assertEquals(PactVerificationResult.Ok.INSTANCE, result);
@@ -544,7 +544,8 @@ class RpaConsumerTest extends BaseRpaTest {
 
                 assertThat(payload, validateJson());
 
-                String description = "Robotics case data for applicant responded with confirms to proceeds - maximal data";
+                String description = "Robotics case data for applicant responded " +
+                    "with confirms to proceeds - maximal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
                 assertEquals(PactVerificationResult.Ok.INSTANCE, result);
