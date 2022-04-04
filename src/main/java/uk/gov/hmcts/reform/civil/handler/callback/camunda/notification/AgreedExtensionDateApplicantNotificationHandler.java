@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -14,32 +13,29 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @Service
 @RequiredArgsConstructor
 public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static Map<CaseEvent, String> EVENT_TASK_ID_MAP = Map.of(
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE, "AgreedExtensionDateNotifyApplicantSolicitor1",
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC, "AgreedExtensionDateNotifyRespondentSolicitor1CC",
-        NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC, "AgreedExtensionDateNotifyRespondentSolicitor2CC"
-    );
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE,
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC);
 
+    public static final String TASK_ID = "AgreedExtensionDateNotifyApplicantSolicitor1";
+    public static final String TASK_ID_CC = "AgreedExtensionDateNotifyRespondentSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "agreed-extension-date-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -54,19 +50,22 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return EVENT_TASK_ID_MAP.get(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
+        return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return new ArrayList<>(EVENT_TASK_ID_MAP.keySet());
+        return EVENTS;
     }
 
     private CallbackResponse notifyApplicantSolicitorForAgreedExtensionDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var recipient = isCcNotification(callbackParams)
+            ? getRespondentSolicitorEmailAddress(caseData)
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         notificationService.sendMail(
-            getSolicitorEmailAddress(callbackParams),
+            recipient,
             notificationsProperties.getClaimantSolicitorAgreedExtensionDate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -76,50 +75,62 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        LocalDateTime extensionDate = caseData.getRespondent1ResponseDeadline();
+        LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
 
         //finding extension date for the correct respondent in a 1v2 different solicitor scenario
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1ResponseDeadline() == null)
-                && (caseData.getRespondent2ResponseDeadline() != null)) {
-                extensionDate = caseData.getRespondent2ResponseDeadline();
-            } else if ((caseData.getRespondent1ResponseDeadline() != null)
-                && (caseData.getRespondent2ResponseDeadline() == null)) {
-                extensionDate = caseData.getRespondent1ResponseDeadline();
-            } else if ((caseData.getRespondent1ResponseDeadline() != null)
-                && (caseData.getRespondent2ResponseDeadline() != null)) {
-                if (caseData.getRespondent2ResponseDeadline()
-                    .isAfter(caseData.getRespondent1ResponseDeadline())) {
-                    extensionDate = caseData.getRespondent2ResponseDeadline();
+            if ((caseData.getRespondent1TimeExtensionDate() == null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() == null)) {
+                extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                if (caseData.getRespondent2TimeExtensionDate()
+                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
+                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
                 } else {
-                    extensionDate = caseData.getRespondent1ResponseDeadline();
+                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
                 }
             }
         }
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData),
-            DEFENDANT_NAME, fetchDefendantName(caseData)
+            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 
-    private String getSolicitorEmailAddress(CallbackParams callbackParams) {
-        String eventId = callbackParams.getRequest().getEventId();
-        CaseData caseData = callbackParams.getCaseData();
+    private boolean isCcNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC.name());
+    }
 
-        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE.name())) {
-            return caseData.getApplicantSolicitor1UserDetails().getEmail();
-        }
-        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC.name())) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC.name())) {
-            return caseData.getRespondentSolicitor2EmailAddress();
-        }
+    private String getRespondentSolicitorEmailAddress(CaseData caseData) {
+        String respondentSolicitorEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
 
-        throw new CallbackException(String.format("Callback handler received unexpected event id: %s", eventId));
+        //finding email for the correct respondent in a 1v2 different solicitor scenario
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1TimeExtensionDate() == null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                respondentSolicitorEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() == null)) {
+                respondentSolicitorEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
+            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                if (caseData.getRespondent2TimeExtensionDate()
+                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
+                    respondentSolicitorEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
+                } else {
+                    respondentSolicitorEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
+                }
+            }
+        }
+        return respondentSolicitorEmailAddress;
     }
 }
