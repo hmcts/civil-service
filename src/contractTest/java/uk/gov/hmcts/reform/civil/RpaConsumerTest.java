@@ -526,8 +526,8 @@ class RpaConsumerTest extends BaseRpaTest {
 
                 assertThat(payload, validateJson());
 
-                String description = "Robotics case data for applicant responded " +
-                    "with confirms to proceeds - minimal data";
+                String description = "Robotics case data for applicant responded "
+                    + "with confirms to proceeds - minimal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
                 assertEquals(PactVerificationResult.Ok.INSTANCE, result);
@@ -544,8 +544,8 @@ class RpaConsumerTest extends BaseRpaTest {
 
                 assertThat(payload, validateJson());
 
-                String description = "Robotics case data for applicant responded " +
-                    "with confirms to proceeds - maximal data";
+                String description = "Robotics case data for applicant responded "
+                    + "with confirms to proceeds - maximal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
                 assertEquals(PactVerificationResult.Ok.INSTANCE, result);
