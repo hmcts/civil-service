@@ -73,13 +73,10 @@ public class EventHistoryMapper {
     private final Time time;
 
     public EventHistory buildEvents(CaseData caseData) {
-        List<State> states = null;
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-        states = stateFlowEngine.evaluate(caseData).getStateHistory();
 
-        List<State> stateHistory = states;
-        stateHistory
+        stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
                 switch (flowState) {
@@ -137,7 +134,9 @@ public class EventHistoryMapper {
                         buildTakenOfflineByStaff(builder, caseData);
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
-                        buildClaimDismissedPastDeadline(builder, caseData, stateHistory);
+                        buildClaimDismissedPastDeadline(builder, caseData,
+                                                        stateFlowEngine.evaluate(caseData).getStateHistory()
+                        );
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
                         buildClaimDismissedPastNotificationsDeadline(
@@ -820,14 +819,18 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unrepresentedDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unrepresentedDefendantsNames.size() > 1
-                    ? format("[%d of %d - %s] ",
-                             index + 1,
-                             unrepresentedDefendantsNames.size(),
-                             time.now().toLocalDate().toString())
+                    ? format(
+                    "[%d of %d - %s] ",
+                    index + 1,
+                    unrepresentedDefendantsNames.size(),
+                    time.now().toLocalDate().toString()
+                )
                     : "";
-                String eventText = format("RPA Reason: %sUnrepresented defendant: %s",
-                                          paginatedMessage,
-                                          unrepresentedDefendantsNames.get(index));
+                String eventText = format(
+                    "RPA Reason: %sUnrepresented defendant: %s",
+                    paginatedMessage,
+                    unrepresentedDefendantsNames.get(index)
+                );
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -862,14 +865,18 @@ public class EventHistoryMapper {
         List<Event> events = IntStream.range(0, unregisteredDefendantsNames.size())
             .mapToObj(index -> {
                 String paginatedMessage = unregisteredDefendantsNames.size() > 1
-                    ? format("[%d of %d - %s] ",
-                             index + 1,
-                             unregisteredDefendantsNames.size(),
-                             time.now().toLocalDate().toString())
+                    ? format(
+                    "[%d of %d - %s] ",
+                    index + 1,
+                    unregisteredDefendantsNames.size(),
+                    time.now().toLocalDate().toString()
+                )
                     : "";
-                String eventText = format("RPA Reason: %sUnregistered defendant solicitor firm: %s",
-                                          paginatedMessage,
-                                          unregisteredDefendantsNames.get(index));
+                String eventText = format(
+                    "RPA Reason: %sUnregistered defendant solicitor firm: %s",
+                    paginatedMessage,
+                    unregisteredDefendantsNames.get(index)
+                );
 
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -887,15 +894,19 @@ public class EventHistoryMapper {
                                                             CaseData caseData) {
         String localDateTime = time.now().toLocalDate().toString();
 
-        String unrepresentedEventText = format("RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
-                                                   + "defendant solicitor firm. Unrepresented defendant: %s",
-                                               localDateTime,
-                                               getDefendantNames(UNREPRESENTED, caseData).get(0));
-        String unregisteredEventText = format("RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
-                                                  + "defendant solicitor firm. Unregistered defendant solicitor "
-                                                  + "firm: %s",
-                                              localDateTime,
-                                              getDefendantNames(UNREGISTERED, caseData).get(0));
+        String unrepresentedEventText = format(
+            "RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
+                + "defendant solicitor firm. Unrepresented defendant: %s",
+            localDateTime,
+            getDefendantNames(UNREPRESENTED, caseData).get(0)
+        );
+        String unregisteredEventText = format(
+            "RPA Reason: [2 of 2 - %s] Unrepresented defendant and unregistered "
+                + "defendant solicitor firm. Unregistered defendant solicitor "
+                + "firm: %s",
+            localDateTime,
+            getDefendantNames(UNREGISTERED, caseData).get(0)
+        );
 
         builder.miscellaneous(
             List.of(
@@ -925,7 +936,7 @@ public class EventHistoryMapper {
         builder
             .acknowledgementOfServiceReceived(
                 List.of(
-                    caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)
+                    SPEC_CLAIM.equals(caseData.getSuperClaimType())
                         ?
                         Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
@@ -935,9 +946,7 @@ public class EventHistoryMapper {
                             .eventDetails(EventDetails.builder()
                                               .acknowledgeService("Acknowledgement of Service")
                                               .build())
-                            .eventDetailsText(format(
-                                "Defendant LR Acknowledgement of Service "
-                            ))
+                            .eventDetailsText("Defendant LR Acknowledgement of Service ")
                             .build()
                         : Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))

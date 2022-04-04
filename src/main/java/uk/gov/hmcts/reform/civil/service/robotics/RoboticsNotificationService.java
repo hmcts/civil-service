@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -36,48 +37,22 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    private final FeatureToggleService toggleService;
 
-    public void notifyRobotics(@NotNull CaseData caseData, boolean multiPartyScenario) {
+    public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
-        EmailData emailData = !multiPartyScenario
-            ? prepareEmailData(caseData) : prepareEmailDataMultiParty(caseData);
+        EmailData emailData = prepareEmailData(caseData, isMultiParty);
         sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
     }
 
-    private EmailData prepareEmailData(CaseData caseData) {
-        RoboticsCaseData roboticsCaseData;
-        RoboticsCaseDataSpec roboticsCaseDataSpec;
-        byte[] roboticsJsonData;
-        try {
-            if (null != caseData.getSuperClaimType() && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                roboticsJsonData = roboticsCaseDataSpec.toJsonString().getBytes();
-            } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
-                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
-            }
-
-            String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
-
-            return EmailData.builder()
-                .message(String.format("Robotics case data JSON is attached for %s", caseData.getLegacyCaseReference()))
-                .subject(String.format("Robotics case data for %s", caseData.getLegacyCaseReference()))
-                .to(roboticsEmailConfiguration.getRecipient())
-                .attachments(of(json(roboticsJsonData, fileName)))
-                .build();
-        } catch (JsonProcessingException e) {
-            throw new RoboticsDataException(e.getMessage(), e);
-        }
-    }
-
-    private EmailData prepareEmailDataMultiParty(CaseData caseData) {
+    private EmailData prepareEmailData(CaseData caseData, boolean isMultiParty) {
 
         byte[] roboticsJsonData;
         try {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())  && toggleService.isLrSpecEnabled()) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
@@ -88,17 +63,31 @@ public class RoboticsNotificationService {
             }
 
             return EmailData.builder()
-                .message(String.format(
-                    "Multiparty claim data for %s",
-                    caseData.getLegacyCaseReference() + " - " + caseData.getCcdState()))
-                .subject(String.format("Multiparty claim data for %s", caseData.getLegacyCaseReference()
-                    + " - " + caseData.getCcdState() + " - " + triggerEvent))
-                .to(roboticsEmailConfiguration.getMultipartyrecipient())
+                .message(getMessage(caseData, isMultiParty))
+                .subject(getSubject(caseData, triggerEvent, isMultiParty))
+                .to(getRoboticsEmailRecipient(isMultiParty))
                 .attachments(of(json(roboticsJsonData, fileName)))
                 .build();
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
+    }
+
+    private String getMessage(CaseData caseData, boolean isMultiParty) {
+        return isMultiParty ? String.format("Multiparty claim data for %s - %s", caseData.getLegacyCaseReference(),
+            caseData.getCcdState()) : String.format("Robotics case data JSON is attached for %s",
+                caseData.getLegacyCaseReference());
+    }
+
+    private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
+        return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
+            caseData.getCcdState(), triggerEvent) : String.format("Robotics case data for %s",
+                caseData.getLegacyCaseReference());
+    }
+
+    private String getRoboticsEmailRecipient(boolean isMultiParty) {
+        return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
