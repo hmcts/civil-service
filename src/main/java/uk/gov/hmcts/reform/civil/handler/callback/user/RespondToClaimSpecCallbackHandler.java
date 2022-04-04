@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -75,6 +76,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private final PostcodeValidator postcodeValidator;
     private final PaymentDateValidator paymentDateValidator;
     private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
+    private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -256,8 +258,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             &&
             (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-               || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-               || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM
+                .equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART)
                 .build();
         }
@@ -464,9 +467,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             caseData
         );
 
+        String header = CaseDataToTextGenerator.getTextFor(
+            confirmationHeaderGenerators.stream(),
+            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            caseData
+        );
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(
-                format("# You've submitted your response%n## Claim number: %s", claimNumber))
+            .confirmationHeader(header)
             .confirmationBody(body)
             .build();
     }
@@ -494,39 +502,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private Optional<String> getPartialAdmitPaidLessSummary(CaseData caseData) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            return Optional.empty();
-        }
-
-        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
-        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
-
-        if (howMuchWasPaid == null || totalClaimAmount == null
-            || howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) >= 0) {
-            return Optional.empty();
-        }
-
-        String applicantName = caseData.getApplicant1().getPartyName();
-
-        String sb = "<br>You told us you've paid the &#163;"
-            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
-            + ". We've sent "
-            + applicantName
-            + " this response."
-            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " accepts your response</h3>"
-            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " rejects your response</h3>"
-            + "<p>The court will review the case. You may have to go to a hearing.</p>"
-            + "<p>We'll contact you to tell you what to do next.</p>";
-        return Optional.of(sb);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {

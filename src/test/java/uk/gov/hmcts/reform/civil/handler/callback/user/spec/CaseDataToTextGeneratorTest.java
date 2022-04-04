@@ -28,7 +28,8 @@ public class CaseDataToTextGeneratorTest {
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(
-        new RespondToClaimConfirmationTextSpecGeneratorTest()
+        new RespondToClaimConfirmationTextSpecGeneratorTest(),
+        new RespondToClaimConfirmationHeaderSpecGeneratorTest()
     );
 
     /**
