@@ -7,7 +7,7 @@ on:
       - combine-prs
     inputs:
       branchPrefix:
-        description: 'Branch prefix to find combinable PRs based on'
+        description: 'Branch prefix to find PRs based on'
         required: true
         default: 'dependabot'
       mustBeGreen:
