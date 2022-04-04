@@ -120,8 +120,16 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
-        listData.add(caseData.getRespondent1().getIndividualFirstName() + " "
+        listData.add(caseData.getRespondent1().getIndividualFirstName()
+                         + " "
                          + caseData.getRespondent1().getIndividualLastName());
+        if (nonNull(caseData.getRespondent2())) {
+            listData.add(caseData.getRespondent2().getIndividualFirstName()
+                             + " "
+                             + caseData.getRespondent2().getIndividualLastName());
+            listData.add("Both Defendants");
+            caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
+        }
         caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

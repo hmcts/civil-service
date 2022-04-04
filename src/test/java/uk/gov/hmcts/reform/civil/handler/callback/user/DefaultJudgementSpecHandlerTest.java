@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -84,6 +85,18 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedOneDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+        }
+
+        @Test
+        void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedTwoDefendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
