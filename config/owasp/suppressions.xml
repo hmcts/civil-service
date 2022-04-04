@@ -25,7 +25,7 @@
     <cve>CVE-2018-1271</cve>
     <cve>CVE-2018-1272</cve>
     <cve>CVE-2020-5421</cve>
-  </suppress>,
+  </suppress>
   <suppress>
     <notes><![CDATA[
    file name: jackson-databind-2.12.6.jar
