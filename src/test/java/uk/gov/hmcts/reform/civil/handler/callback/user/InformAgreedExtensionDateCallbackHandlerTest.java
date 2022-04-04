@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -287,6 +289,28 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldReturnNoErrorLRSpec_whenValuesAreValid() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent(InformAgreedExtensionDateCallbackHandler
+                                                       .SPEC_ACKNOWLEDGEMENT_OF_SERVICE)
+                                     .build())
+                .build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldReturnExpectedError_whenValuesAreInvalidMultiparty() {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -448,6 +472,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     class SubmittedCallback {
 
         private static final String BODY = "<br />You must respond to the claimant by %s";
+        private static final String BODY_SPEC =
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s";
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
@@ -463,6 +489,26 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Extension deadline submitted")
                     .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
+                                          + exitSurveyContentService.respondentSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponseLRSpec_whenInvoked() {
+            LocalDateTime responseDeadline = now().atTime(END_OF_BUSINESS_DAY);
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ResponseDeadline(responseDeadline)
+                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader("# Extension deadline submitted")
+                    .confirmationBody(format(BODY_SPEC, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
                                           + exitSurveyContentService.respondentSurvey())
                     .build());
         }
