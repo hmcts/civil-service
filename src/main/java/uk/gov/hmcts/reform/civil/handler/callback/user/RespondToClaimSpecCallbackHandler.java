@@ -318,6 +318,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
+            .state("AWAITING_APPLICANT_INTENTION")
             .build();
     }
 

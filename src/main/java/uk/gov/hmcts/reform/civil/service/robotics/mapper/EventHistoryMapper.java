@@ -260,7 +260,8 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            if(SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                //TODO cover unit test to this block
                 switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
                     case COUNTER_CLAIM:
                         defaultText = "RPA Reason: Defendant rejects and counter claims.";
