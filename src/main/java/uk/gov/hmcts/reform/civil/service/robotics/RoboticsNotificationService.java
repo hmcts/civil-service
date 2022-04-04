@@ -86,7 +86,7 @@ public class RoboticsNotificationService {
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty) {
-        return isMultiParty && !featureToggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+        return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 

@@ -138,7 +138,15 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder().build();
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                .miscellaneous(Event.builder()
+                   .eventDetailsText(lastEventText)
+                   .dateReceived(LocalDateTime.now())
+                   .build())
+                .build())
+            .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
         service.notifyRobotics(caseData, false);
 
@@ -247,6 +255,7 @@ class RoboticsNotificationServiceTest {
             ).build())
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         service.notifyRobotics(caseData, multiPartyScenario);
