@@ -132,6 +132,33 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailLRSpec_whenCaseDataIsProvided() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder().build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        service.notifyRobotics(caseData, false);
+
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("Robotics case data for %s", reference);
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    @Test
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
 
         assertThrows(NullPointerException.class, () ->

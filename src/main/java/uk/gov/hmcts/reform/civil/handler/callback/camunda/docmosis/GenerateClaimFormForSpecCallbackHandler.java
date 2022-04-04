@@ -9,14 +9,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
@@ -34,19 +32,16 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM_SPEC);
     private static final String TASK_ID = "GenerateClaimFormForSpec";
 
-    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
 
     @Override
@@ -71,7 +66,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
@@ -81,8 +76,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
-                                                                                 caseDataBuilder, callbackParams);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim);
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
@@ -99,12 +93,15 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
     }
 
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument,
-                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CallbackParams callbackParams) {
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
+        DocumentMetaData documentMetaData = new DocumentMetaData(
+            caseData.getSpecClaimTemplateDocumentFiles(),
+            "doc1",
+            "doc1"
+        );
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
                                                       "Sealed Claim form",
@@ -124,21 +121,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             ));
         }
 
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-            || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
-
-            CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            documentMetaDataList.add(new DocumentMetaData(
-                lipForm.getDocumentLink(),
-                "Litigant in person claim form",
-                LocalDate.now().toString()
-            ));
-
-        }
         return documentMetaDataList;
     }
 }

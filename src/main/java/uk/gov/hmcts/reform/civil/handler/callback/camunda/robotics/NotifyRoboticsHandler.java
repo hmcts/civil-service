@@ -34,8 +34,6 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final FeatureToggleService toggleService;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-        RoboticsCaseData roboticsCaseData = null;
-        RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;
 
         CaseData caseData = callbackParams.getCaseData();
@@ -44,13 +42,13 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 if (toggleService.isLrSpecEnabled()) {
-                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }
             } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
@@ -53,7 +54,8 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::makePbaPayment
+            callbackKey(ABOUT_TO_SUBMIT), this::makePbaPaymentBackwardsCompatible,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::makePbaPayment
         );
     }
 
@@ -64,6 +66,36 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private CallbackResponse makePbaPaymentBackwardsCompatible(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> errors = new ArrayList<>();
+        try {
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
+            caseData = caseData.toBuilder()
+                .paymentDetails(PaymentDetails.builder().status(SUCCESS).reference(paymentReference).build())
+                .paymentSuccessfulDate(time.now())
+                .build();
+        } catch (FeignException e) {
+            log.info(String.format("Http Status %s ", e.status()), e);
+            if (e.status() == 403) {
+                caseData = updateWithBusinessErrorBackwardsCompatible(caseData, e);
+            } else if (e.status() == 400) {
+                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
+                                        caseData.getCcdCaseReference(), e.contentUTF8()
+                ));
+                caseData = updateWithDuplicatePaymentError(caseData, e);
+            } else {
+                errors.add(ERROR_MESSAGE);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CaseData updateWithDuplicatePaymentError(CaseData caseData, FeignException e) {
@@ -113,6 +145,25 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
             .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
+    }
+
+    private CaseData updateWithBusinessErrorBackwardsCompatible(CaseData caseData, FeignException e) {
+        try {
+            var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
+            var statusHistory = paymentDto.getStatusHistories()[0];
+            return caseData.toBuilder()
+                .paymentDetails(PaymentDetails.builder()
+                                    .status(FAILED)
+                                    .errorCode(statusHistory.getErrorCode())
+                                    .errorMessage(statusHistory.getErrorMessage())
+                                    .build())
+                .build();
+        } catch (JsonProcessingException jsonException) {
+            log.error(String.format("Unknown payment error for case: %s, response body: %s",
+                                    caseData.getCcdCaseReference(), e.contentUTF8()
+            ));
+            throw e;
+        }
     }
 
     private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {

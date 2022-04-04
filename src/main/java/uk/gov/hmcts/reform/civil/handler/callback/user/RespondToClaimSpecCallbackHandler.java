@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -73,10 +74,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private final DeadlinesCalculator deadlinesCalculator;
     private final PostcodeValidator postcodeValidator;
     private final PaymentDateValidator paymentDateValidator;
+    private final FeatureToggleService toggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

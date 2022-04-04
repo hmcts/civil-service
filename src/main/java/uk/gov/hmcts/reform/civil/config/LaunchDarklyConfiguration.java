@@ -90,7 +90,7 @@ public class LaunchDarklyConfiguration {
             if (file.startsWith("/")) {
                 flagFile = Paths.get(file);
             } else {
-                flagFile = Paths.get("").resolve(file);
+                flagFile = Paths.get(System.getProperty("user.dir"), file);
             }
             if (Files.exists(flagFile)) {
                 return Optional.of(flagFile);
