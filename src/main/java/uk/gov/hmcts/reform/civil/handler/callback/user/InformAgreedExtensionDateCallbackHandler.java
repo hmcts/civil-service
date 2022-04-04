@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -62,6 +63,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
+    private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
     public static final String ERROR_EXTENSION_DATE_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
@@ -121,8 +123,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
         }
         //TODO: update to get correct deadline as a part of CMC-1346
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
-            var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
+            var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
                 .build();
@@ -171,7 +173,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         String body;
         LocalDateTime responseDeadline = !solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
+        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)
