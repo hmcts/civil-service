@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
 @Component
@@ -108,9 +110,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
                 case FULL_DEFENCE_PROCEED:
-                    return "RPA Reason: Applicant proceeds.";
+                    return "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
-                    return "RPA Reason: Claimant intends not to proceed.";
+                    return "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
                     return "RPA Reason: Only one of the defendants is notified.";
@@ -167,10 +169,41 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                       + "Unregistered defendant solicitor firm: %s.",
                                          StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
                                          StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
+                case FULL_DEFENCE_PROCEED:
+                    return getDescriptionFullDefenceProceed(caseData);
                 default:
                     break;
             }
         }
         return null;
+    }
+
+    private String getDescriptionFullDefenceProceed(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP: {
+                return format(
+                    "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
+                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        ? "proceed" : "not proceed",
+                    caseData.getRespondent1().getPartyName(),
+                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                        ? "proceed" : "not proceed",
+                    caseData.getRespondent2().getPartyName()
+                );
+            }
+            case TWO_V_ONE: {
+                return format(
+                    "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
+                    caseData.getApplicant1().getPartyName(),
+                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed",
+                    caseData.getApplicant2().getPartyName(),
+                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed"
+                );
+            }
+            default: {
+                return null;
+            }
+        }
     }
 }
