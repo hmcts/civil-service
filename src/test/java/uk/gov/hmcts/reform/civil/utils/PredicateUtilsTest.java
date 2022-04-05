@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -20,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -125,7 +122,7 @@ public class PredicateUtilsTest {
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
-            assertTrue(defendant1v2SameSolicitorSameResponse.test(caseData));
+            assertTrue(defendant2ResponseExists.test(caseData));
         }
 
         @Test
@@ -135,30 +132,6 @@ public class PredicateUtilsTest {
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
             assertFalse(defendant2ResponseExists.test(caseData));
-        }
-    }
-
-    @Nested
-    class Defendant2ResponseExists {
-
-        @Test
-        public void when1v2differentSol_thenExists() {
-            CaseData caseData = CaseData.builder()
-                .respondent2(Party.builder().build())
-                .respondent2ResponseDate(LocalDateTime.now())
-                .build();
-            Assertions.assertTrue(defendant2ResponseExists.test(caseData));
-        }
-
-        @Test
-        public void when1v2sameSol_thenExists() {
-            CaseData caseData = CaseData.builder()
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(YES)
-                .respondentResponseIsSame(YES)
-                .respondent1ResponseDate(LocalDateTime.now())
-                .build();
-            Assertions.assertTrue(defendant1v2SameSolicitorSameResponse.test(caseData));
         }
     }
 }
