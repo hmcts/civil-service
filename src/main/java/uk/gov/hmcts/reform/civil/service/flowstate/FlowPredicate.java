@@ -190,10 +190,10 @@ public class FlowPredicate {
                     || (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                     && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
             case TWO_V_ONE:
-                return (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) || FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
-                    && !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) && FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
+                return (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                            || FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
+                        && !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                            && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default:
                 return false;
         }
