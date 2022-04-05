@@ -727,6 +727,10 @@ public class CaseDataBuilder {
                 return atStateNotificationAcknowledged();
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
                 return atStateNotificationAcknowledgedTimeExtension();
+            case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
+                return atStateAwaitingResponseFullDefenceReceived();
+            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                return atStateAwaitingResponseNotFullDefenceReceived();
             case FULL_DEFENCE:
                 return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
             case FULL_ADMISSION:
@@ -1281,12 +1285,37 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
         atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
         claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
+
+    public CaseDataBuilder atStateAwaitingResponseNotFullDefenceReceived() {
+        atStateAwaitingResponseNotFullDefenceReceived(RespondentResponseType.FULL_ADMISSION);
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingResponseNotFullDefenceReceived(RespondentResponseType responseType) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = responseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
 
     public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
