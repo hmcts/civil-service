@@ -876,27 +876,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 (respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
                     && (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM))
-                    || respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION))
-                ||
-                (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
-                ||
-                (respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
-                ||
-                (respondent2Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
-                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
-                ||
-                (respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)))) {
+                    || respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION))) {
                 return true;
             }
         }

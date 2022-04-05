@@ -567,6 +567,72 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationBody(body.toString())
                     .build());
         }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                               claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimPartAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                                                              RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                               claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
     }
 
     @Test
