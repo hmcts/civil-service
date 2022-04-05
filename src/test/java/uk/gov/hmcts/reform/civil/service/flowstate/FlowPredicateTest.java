@@ -230,6 +230,17 @@ class FlowPredicateTest {
     }
 
     @Nested
+    class Respondent2OrgNotRegistered {
+        @Test
+        void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
+                .build();
+            assertTrue(respondent2OrgNotRegistered.test(caseData));
+        }
+    }
+
+    @Nested
     class PaymentFailed {
 
         @Test
@@ -297,8 +308,24 @@ class FlowPredicateTest {
     class NotificationAcknowledged {
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
+        void shouldReturnTrue_whenCaseDataAtStateClaimRespondentOneAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            assertTrue(notificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimRespondentTwoAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2Only()
+                .build();
+            assertTrue(notificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimBothAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .build();
             assertTrue(notificationAcknowledged.test(caseData));
         }
 
@@ -1292,13 +1319,5 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
             assertFalse(claimDismissedByCamunda.test(caseData));
         }
-    }
-
-    @Test
-    void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
-            .build();
-        assertTrue(respondent2OrgNotRegistered.test(caseData));
     }
 }
