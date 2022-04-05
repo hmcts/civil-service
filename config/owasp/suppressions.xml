@@ -27,10 +27,6 @@
     <cve>CVE-2020-5421</cve>
   </suppress>
   <suppress>
-    <notes>spring</notes>
-    <cve>CVE-2022-22965</cve>
-  </suppress>
-  <suppress>
     <notes><![CDATA[
    file name: jackson-databind-2.12.6.jar
    ]]></notes>
