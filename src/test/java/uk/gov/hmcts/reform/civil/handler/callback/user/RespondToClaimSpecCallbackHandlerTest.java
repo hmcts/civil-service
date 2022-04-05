@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -22,13 +24,13 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -60,11 +62,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private PaymentDateValidator validator;
     @Mock
     private UnavailableDateValidator dateValidator;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+    }
+
+    @Test
+    public void ldBlock() {
+        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -489,6 +500,72 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(caseData.getTotalClaimAmount().toString());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                                claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponsePartAdmissionFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.PART_ADMISSION,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                                claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
         }
     }
 

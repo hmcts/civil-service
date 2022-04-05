@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -79,10 +80,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private final DeadlinesCalculator deadlinesCalculator;
     private final PostcodeValidator postcodeValidator;
     private final PaymentDateValidator paymentDateValidator;
+    private final FeatureToggleService toggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -232,7 +238,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         //this logic to be removed when ccd supports AND-OR combinations
-        if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
             }
@@ -242,7 +248,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             }
         }
 
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO).build();
         }
@@ -467,13 +473,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                                 getFullAdmitAlreadyPaidSummary(caseData),
                                 getFullAdmitSetDateSummary(caseData),
                                 getPartialAdmitPaidFullSummary(caseData),
-                                getPartialAdmitPaidLessSummary(caseData)
+                                getPartialAdmitPaidLessSummary(caseData),
+                                get1v2DivergentResponseSummary(caseData)
             )
             .filter(Optional::isPresent).map(Optional::get).findFirst().orElse(getDefaultConfirmationBody(caseData));
 
+        String confirmationHeader = format("# You've submitted your response%n## Claim number: %s", claimNumber);
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            confirmationHeader = format(
+                "# The defendants have chosen their responses%n## Claim number <br>%s",
+                claimNumber
+            );
+        }
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
                 format("# You've submitted your response%n## Claim number: %s", claimNumber))
+            .confirmationHeader(confirmationHeader)
             .confirmationBody(body)
             .build();
     }
@@ -818,6 +833,74 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             + "<p>The court will review the case. You may have to go to a hearing.</p>"
             + "<p>We'll contact you to tell you what to do next.</p>";
         return Optional.of(sb);
+    }
+
+    private Optional<String> get1v2DivergentResponseSummary(CaseData caseData) {
+        if (!isDivergentResponse1v2SameSolicitor(caseData)) {
+            return Optional.empty();
+        }
+        StringBuilder body = new StringBuilder();
+        body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+            .append("<br>Use form N9A to admit, or form N9B to counterclaim. "
+                        + "Do not create a new claim to counterclaim.")
+            .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                  format("https://www.gov.uk/respond-money-claim")))
+            .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                  format("https://www.gov.uk/respond-money-claim")))
+            .append("<br><br>Post the completed form to:")
+            .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+            .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+        return Optional.of(body.toString());
+    }
+
+    private boolean isDivergentResponse1v2SameSolicitor(CaseData caseData) {
+        if (NO.equals(caseData.getRespondentResponseIsSame())
+            && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            RespondentResponseTypeSpec respondent1Response = caseData.getRespondent1ClaimResponseTypeForSpec();
+            RespondentResponseTypeSpec respondent2Response = caseData.getRespondent2ClaimResponseTypeForSpec();
+            if ((respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                && (respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                || respondent2Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                || respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
+                ||
+                (respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    && (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent2Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    || respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
+                ||
+                (respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    && (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent2Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    || respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)))
+                ||
+                (respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    && (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM))
+                    || respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION))
+                ||
+                (respondent2Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
+                ||
+                (respondent2Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
+                ||
+                (respondent2Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)
+                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)))
+                ||
+                (respondent2Response.equals(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    && (respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    || respondent1Response.equals(RespondentResponseTypeSpec.PART_ADMISSION)))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
