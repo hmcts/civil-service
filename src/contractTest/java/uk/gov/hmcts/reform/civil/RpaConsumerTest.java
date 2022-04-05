@@ -852,7 +852,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
                 .legacyCaseReference("000DC031")
                 .build();
@@ -874,7 +874,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenApplicantResponseDeadlinePassedAfterFullDefence() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .legacyCaseReference("000DC032")
                 .build();

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
 public class PredicateUtilsTest {
@@ -32,7 +33,7 @@ public class PredicateUtilsTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .respondent1TimeExtensionDate(LocalDateTime.now())
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now().plusDays(3))
-                .build();
+                .build();EventHistoryMapper.java:201:13
             assertTrue(defendant1ExtensionExists.test(caseData));
         }
 

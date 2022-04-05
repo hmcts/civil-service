@@ -198,7 +198,7 @@ public class EventHistoryMapper {
             buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
                                          respondent1ResponseDate, RESPONDENT_ID);
 
-            if(caseData.getRespondent1ClaimResponseType() != RespondentResponseType.FULL_DEFENCE ) {
+            if (caseData.getRespondent1ClaimResponseType() != RespondentResponseType.FULL_DEFENCE) {
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
                 builder.miscellaneous((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -216,7 +216,7 @@ public class EventHistoryMapper {
             buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
                                          respondent2ResponseDate, RESPONDENT2_ID);
 
-            if(caseData.getRespondent2ClaimResponseType() != RespondentResponseType.FULL_DEFENCE ) {
+            if (caseData.getRespondent2ClaimResponseType() != RespondentResponseType.FULL_DEFENCE) {
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.miscellaneous((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))

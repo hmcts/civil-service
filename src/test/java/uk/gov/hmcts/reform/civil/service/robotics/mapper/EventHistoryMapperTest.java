@@ -926,7 +926,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
@@ -2375,7 +2375,8 @@ class EventHistoryMapperTest {
                 var eventHistory = mapper.buildEvents(caseData);
 
                 assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory).extracting("defenceFiled").asList().containsExactly(expectedDefenceFiled.get(0));
+                assertThat(eventHistory).extracting("defenceFiled").asList()
+                    .containsExactly(expectedDefenceFiled.get(0));
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList().containsExactly(
                     expectedDirectionsQuestionnaireFiled.get(0));
                 assertEmptyEvents(eventHistory,
@@ -2393,9 +2394,18 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareExpectedEvents_whenDefendantResponseFullAdmits() {
-                CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors().atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED).build();
-                Event expectedReceiptOfAdmission = Event.builder().eventSequence(3).eventCode("40").dateReceived(
-                    caseData.getRespondent1ResponseDate()).litigiousPartyID("002").build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                    .build();
+
+                Event expectedReceiptOfAdmission = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("40")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .build();
+
                 var eventHistory = mapper.buildEvents(caseData);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("receiptOfAdmission").asList().containsExactly(
@@ -3960,7 +3970,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenPastApplicantResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .build();
             Event expectedDefenceFiled = Event.builder()
