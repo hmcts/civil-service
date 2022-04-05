@@ -53,17 +53,32 @@ public class EventHistorySequencer {
                     builder.receiptOfAdmission(List.of(event));
                     break;
                 case REPLY_TO_DEFENCE:
-                    builder.replyToDefence(List.of(event));
+                    builder.replyDefence(event);
                     break;
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
                     builder.directionsQuestionnaire(event);
                     break;
                 default:
-                    throw new IllegalStateException("Un expected event type: " + eventType);
+                    throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
         if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
             builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefenceFiled())) {
+            builder.defenceFiled(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReceiptOfAdmission())) {
+            builder.receiptOfAdmission(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReceiptOfPartAdmission())) {
+            builder.receiptOfPartAdmission(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefenceAndCounterClaim())) {
+            builder.defenceAndCounterClaim(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReplyToDefence())) {
+            builder.replyToDefence(List.of(Event.builder().build()));
         }
         return builder
             .build();
