@@ -711,7 +711,8 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnNotificationAcknowledgedTimeExtension_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -1872,7 +1873,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnAwaitingCamundaState_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -1895,7 +1896,7 @@ class StateFlowEngineTest {
 
         @Test
         void shouldReturnClaimDismissed_whenDeadlinePassedAfterNotificationAckTimeExtensionAndProcessedByCamunda() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
