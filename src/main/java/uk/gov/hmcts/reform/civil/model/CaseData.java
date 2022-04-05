@@ -230,6 +230,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final YesOrNo specDefenceAdmittedRequired;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     private final OrganisationService organisationService;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,7 +64,11 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse notifyRespondentSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
