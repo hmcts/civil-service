@@ -2003,6 +2003,10 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension() {
+        return atStateNotificationAcknowledgedRespondent1TimeExtension(1);
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledgedTimeExtension_1v2DS() {
         atStateNotificationAcknowledged_1v2_BothDefendants();
         respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(1);
@@ -2012,10 +2016,6 @@ public class CaseDataBuilder {
         respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
         return this;
-    }
-
-    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension() {
-        return atStateNotificationAcknowledgedRespondent1TimeExtension(1);
     }
 
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension(int numberOfHoursAfterCurrentDate) {
