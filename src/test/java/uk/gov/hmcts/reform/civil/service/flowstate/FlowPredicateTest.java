@@ -314,7 +314,8 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledged() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
             assertTrue(notificationAcknowledged.and(respondentTimeExtension).test(caseData));
         }
 
@@ -1189,10 +1190,10 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
-            assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+            assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
 
         @Test
