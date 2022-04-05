@@ -197,31 +197,37 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
                                          respondent1ResponseDate, RESPONDENT_ID);
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.miscellaneous((Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(respondent1ResponseDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build()));
+
+            if(caseData.getRespondent1ClaimResponseType() != RespondentResponseType.FULL_DEFENCE ) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+                builder.miscellaneous((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(respondent1ResponseDate)
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()));
+            }
         }
 
         if (defendant2ResponseExists.test(caseData)) {
             buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
                                          respondent2ResponseDate, RESPONDENT2_ID);
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.miscellaneous((Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(respondent2ResponseDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build()));
+
+            if(caseData.getRespondent2ClaimResponseType() != RespondentResponseType.FULL_DEFENCE ) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+                builder.miscellaneous((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(respondent2ResponseDate)
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()));
+            }
         }
     }
 

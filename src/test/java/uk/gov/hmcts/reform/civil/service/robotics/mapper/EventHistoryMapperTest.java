@@ -2107,13 +2107,13 @@ class EventHistoryMapperTest {
                 .litigiousPartyID("002")
                 .build();
             Event expectedDefenceFiled = Event.builder()
-                    .eventSequence(5)
+                    .eventSequence(4)
                     .eventCode("50")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID("003")
                     .build();
             Event expectedDirectionsQuestionnaireFiled = Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(5)
                     .eventCode("197")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID("003")
@@ -2147,16 +2147,8 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
-                    .build());
+                    .build()
+            );
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2169,7 +2161,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2272,19 +2264,19 @@ class EventHistoryMapperTest {
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
-                .eventSequence(5)
+                .eventSequence(4)
                 .eventCode("40")
                 .dateReceived(caseData.getRespondent1ResponseDate())
                 .litigiousPartyID("002")
                 .build();
             Event expectedDefenceFiled = Event.builder()
-                .eventSequence(4)
+                .eventSequence(3)
                 .eventCode("50")
                 .dateReceived(caseData.getRespondent2ResponseDate())
                 .litigiousPartyID("003")
                 .build();
             Event expectedDirectionsQuestionnaireFiled = Event.builder()
-                .eventSequence(6)
+                .eventSequence(5)
                 .eventCode("197")
                 .dateReceived(caseData.getRespondent2ResponseDate())
                 .litigiousPartyID("003")
@@ -2318,15 +2310,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
                     .build());
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -2340,7 +2323,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2351,6 +2334,140 @@ class EventHistoryMapperTest {
                 "acknowledgementOfServiceReceived"
             );
         }
+    }
+
+    @Nested
+    class AwaitingResponses {
+        //Only happens in 1v2 diff solicitor when only one defendant has replied
+
+        @Nested
+        class FullDefence {
+            @Test
+            void shouldPrepareExpectedEvents_whenDefendantResponseFullDefence() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                    .build();
+                List<Event> expectedDefenceFiled =
+                    List.of(Event.builder()
+                                .eventSequence(2)
+                                .eventCode("50")
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .litigiousPartyID("002")
+                                .build());
+                List<Event> expectedDirectionsQuestionnaireFiled =
+                    List.of(Event.builder()
+                                .eventSequence(3)
+                                .eventCode("197")
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .litigiousPartyID("002")
+                                .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                    caseData.getRespondent1DQ(),
+                                    caseData,
+                                    true,
+                                    caseData.getRespondent1()))
+                                .eventDetails(EventDetails.builder()
+                                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                                  .preferredCourtCode(
+                                                      mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                                  .preferredCourtName("").build()).build());
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("defenceFiled").asList().containsExactly(expectedDefenceFiled.get(0));
+                assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList().containsExactly(
+                    expectedDirectionsQuestionnaireFiled.get(0));
+                assertEmptyEvents(eventHistory,
+                                  "receiptOfAdmission",
+                                  "receiptOfPartAdmission",
+                                  "acknowledgementOfServiceReceived",
+                                  "replyToDefence",
+                                  "consentExtensionFilingDefence"
+                );
+            }
+        }
+
+        @Nested
+        class NotFullDefence {
+
+            @Test
+            void shouldPrepareExpectedEvents_whenDefendantResponseFullAdmits() {
+                CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors().atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED).build();
+                Event expectedReceiptOfAdmission = Event.builder().eventSequence(3).eventCode("40").dateReceived(
+                    caseData.getRespondent1ResponseDate()).litigiousPartyID("002").build();
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("receiptOfAdmission").asList().containsExactly(
+                    expectedReceiptOfAdmission);
+                assertEmptyEvents(eventHistory,
+                                  "receiptOfPartAdmission",
+                                  "acknowledgementOfServiceReceived",
+                                  "replyToDefence",
+                                  "defenceFiled",
+                                  "directionsQuestionnaireFiled",
+                                  "consentExtensionFilingDefence"
+                );
+            }
+
+            @Test
+            void shouldPrepareExpectedEvents_whenDefendantResponsePartAdmits() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateAwaitingResponseNotFullDefenceReceived(PART_ADMISSION)
+                    .build();
+
+                Event expectedReceiptOfPartAdmission = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("60")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .build();
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
+                    .containsExactly(expectedReceiptOfPartAdmission);
+
+                assertEmptyEvents(eventHistory,
+                                  "receiptOfAdmission",
+                                  "acknowledgementOfServiceReceived",
+                                  "replyToDefence",
+                                  "defenceFiled",
+                                  "directionsQuestionnaireFiled",
+                                  "consentExtensionFilingDefence"
+                );
+            }
+
+            @Test
+            void shouldPrepareExpectedEvents_whenDefendantResponseCounterClaim() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateAwaitingResponseNotFullDefenceReceived(COUNTER_CLAIM)
+                    .build();
+
+                Event expectedDefenceAndCounterClaim = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("52")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("defenceAndCounterClaim").asList()
+                    .containsExactly(expectedDefenceAndCounterClaim);
+
+                assertEmptyEvents(eventHistory,
+                                  "receiptOfAdmission",
+                                  "acknowledgementOfServiceReceived",
+                                  "replyToDefence",
+                                  "defenceFiled",
+                                  "directionsQuestionnaireFiled",
+                                  "consentExtensionFilingDefence"
+                );
+            }
+        }
+
     }
 
     @Nested
