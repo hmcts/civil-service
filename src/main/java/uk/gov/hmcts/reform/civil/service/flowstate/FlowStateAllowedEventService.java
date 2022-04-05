@@ -487,6 +487,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMISSION.fullName(),
             List.of(
+                CLAIMANT_RESPONSE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
@@ -499,6 +500,7 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMISSION.fullName(),
             List.of(
+                CLAIMANT_RESPONSE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
