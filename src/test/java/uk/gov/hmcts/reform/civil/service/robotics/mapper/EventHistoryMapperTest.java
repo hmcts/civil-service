@@ -586,7 +586,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentFullAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
@@ -3503,7 +3503,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenPastApplicantResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .build();
             Event expectedDefenceFiled = Event.builder()
