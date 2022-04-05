@@ -201,10 +201,4 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             RESPONDENTSOLICITORTWO
         );
     }
-
-    private boolean existingRequestExtension(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        return caseData.getRespondent1PickByTimeExtensionScheduler() != null
-            || caseData.getRespondent2PickByTimeExtensionScheduler() != null;
-    }
 }
