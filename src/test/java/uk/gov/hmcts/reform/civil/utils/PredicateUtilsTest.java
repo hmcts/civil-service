@@ -33,7 +33,7 @@ public class PredicateUtilsTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .respondent1TimeExtensionDate(LocalDateTime.now())
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now().plusDays(3))
-                .build();EventHistoryMapper.java:201:13
+                .build();
             assertTrue(defendant1ExtensionExists.test(caseData));
         }
 

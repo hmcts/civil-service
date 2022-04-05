@@ -38,7 +38,7 @@ public class EventHistorySequencer {
                     builder.acknowledgementOfServiceReceived(event);
                     break;
                 case CONSENT_EXTENSION_FILING_DEFENCE:
-                    builder.consentExtensionFilingDefence(List.of(event));
+                    builder.consentExtensionFilingDefence(event);
                     break;
                 case DEFENCE_FILED:
                     builder.defenceFiled(List.of(event));
