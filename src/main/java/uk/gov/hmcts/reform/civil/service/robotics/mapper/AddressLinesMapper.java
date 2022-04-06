@@ -71,15 +71,14 @@ public class AddressLinesMapper {
         addressLine = StringUtils.normalizeSpace(addressLine);
         if (StringUtils.isEmpty(addressLine)) {
             if (StringUtils.isEmpty(overflow)) {
-                return new LinkedList<>(Arrays.asList(null, STRING_EMPTY));
+                return new LinkedList<>(Arrays.asList(null, null));
             } else if (StringUtils.length(overflow) <= LINE_LIMIT) {
                 return new LinkedList<>(List.of(overflow, STRING_EMPTY));
             }
         }
         if (!overflowAllowed) {
             int addLineLen = StringUtils.length(addressLine);
-            String addressLineCandidate = StringUtils.defaultString(overflow)
-                .concat(ofNullable(addressLine).orElse(STRING_EMPTY));
+            String addressLineCandidate = overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY));
             String returnAddress = StringUtils.length(addressLineCandidate) > LINE_LIMIT
                 ? (addLineLen >= LINE_LIMIT ? addressLine.substring(0, LINE_LIMIT - 1) :
                     overflow.substring(0, LINE_LIMIT - 3 - addLineLen).concat(STRING_COMMA_SPACE)
@@ -90,8 +89,7 @@ public class AddressLinesMapper {
         if (StringUtils.length(overflow) + StringUtils.length(addressLine) > LINE_LIMIT) {
             retained = STRING_EMPTY;
             Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
-                .splitToList(StringUtils.defaultString(overflow).concat(ofNullable(addressLine)
-                                                                            .orElse(STRING_EMPTY))));
+                .splitToList(overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY))));
             while (addressParts.isEmpty() || retained.concat(STRING_SPACE).concat(addressParts.peek())
                 .length() <= LINE_LIMIT) {
                 retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
@@ -105,7 +103,7 @@ public class AddressLinesMapper {
                                                   ? STRING_SPACE : STRING_COMMA_SPACE);
             }
         } else {
-            retained = overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY));
+            retained = addressLine;
             overflow = STRING_EMPTY;
         }
         return new LinkedList<>(List.of(retained.trim(), overflow));
