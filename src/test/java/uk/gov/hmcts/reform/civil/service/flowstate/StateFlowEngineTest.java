@@ -1823,6 +1823,24 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnAwaitingCamundaState_whenDeadlinePassedAfterStateClaimDetailsNotified_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePastClaimDismissedDeadline_1v2().build();
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
+                );
+        }
+
+        @Test
         void shouldReturnClaimDismissedState_whenDeadlinePassedAfterStateClaimDetailsNotifiedAndIsProcessedByCamunda() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

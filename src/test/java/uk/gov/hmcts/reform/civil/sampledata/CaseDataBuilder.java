@@ -1823,6 +1823,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePastClaimDismissedDeadline_1v2() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        claimDismissedDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDismissed() {
         atStatePastClaimDismissedDeadline();
         ccdState = CASE_DISMISSED;
@@ -2005,6 +2011,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNotificationAcknowledged_1v2_BothDefendants() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent1AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2() {
         atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
@@ -2056,6 +2073,17 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension() {
         return atStateNotificationAcknowledgedRespondent1TimeExtension(1);
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedTimeExtension_1v2DS() {
+        atStateNotificationAcknowledged_1v2_BothDefendants();
+        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = respondent2AcknowledgeNotificationDate.plusHours(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
     }
 
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension(int numberOfHoursAfterCurrentDate) {
