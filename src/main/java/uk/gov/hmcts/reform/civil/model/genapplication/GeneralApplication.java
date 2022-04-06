@@ -29,8 +29,8 @@ public class GeneralApplication implements MappableObject {
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
-    private final GASolicitorDetailsGAspec generalAppApplnSolictor;
-    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolictor;
+    private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final String generalAppDeadlineNotification;
     private final YesOrNo isMultiParty;
@@ -56,9 +56,9 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
                        @JsonProperty("generalAppStatementOfTruth") GAStatementOfTruth generalAppStatementOfTruth,
                        @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
-                       @JsonProperty("generalAppApplnSolictor") GASolicitorDetailsGAspec generalAppApplnSolictor,
-                       @JsonProperty("generalAppRespondentSolictor") List<Element<GASolicitorDetailsGAspec>>
-                           generalAppRespondentSolictor,
+                       @JsonProperty("generalAppApplnSolicitor") GASolicitorDetailsGAspec generalAppApplnSolicitor,
+                       @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
+                           generalAppRespondentSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
                        @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
@@ -81,8 +81,8 @@ public class GeneralApplication implements MappableObject {
         this.generalAppUrgencyRequirement = generalAppUrgencyRequirement;
         this.generalAppStatementOfTruth = generalAppStatementOfTruth;
         this.generalAppHearingDetails = generalAppHearingDetails;
-        this.generalAppApplnSolictor = generalAppApplnSolictor;
-        this.generalAppRespondentSolictor = generalAppRespondentSolictor;
+        this.generalAppApplnSolicitor = generalAppApplnSolicitor;
+        this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
         this.generalAppDeadlineNotification = generalAppDeadlineNotification;
         this.isMultiParty = isMultiParty;

@@ -343,7 +343,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.respondent1DQ(dq);
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-                //1v2 same solictor responding to respondents individually
+                //1v2 same Solicitor responding to respondents individually
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
 
                 updatedData

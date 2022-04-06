@@ -83,7 +83,7 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
-            .generalAppApplnSolictor(GASolicitorDetailsGAspec.builder().build())
+            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
     }
 
@@ -123,7 +123,7 @@ public class InitiateGeneralApplicationService {
         Optional<Organisation> org = findOrganisation(authToken);
         if (org.isPresent()) {
             applicationBuilder
-                .generalAppApplnSolictor(GASolicitorDetailsGAspec
+                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
                                              .builder()
                                              .id(userDetails.getId())
                                              .email(userDetails.getEmail())

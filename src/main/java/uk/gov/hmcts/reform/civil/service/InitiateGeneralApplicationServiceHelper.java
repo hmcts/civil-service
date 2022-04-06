@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
@@ -59,10 +60,10 @@ public class InitiateGeneralApplicationServiceHelper {
 
         boolean isGAApplicantSameAsParentCaseRespondent1 = isGA_ApplicantSameAsPC_Respondent(caseData, userDetails);
 
-        if (!isGAApplicantSameAsParentCaseApplicant
+        /*if (!isGAApplicantSameAsParentCaseApplicant
             && !isGAApplicantSameAsParentCaseRespondent1) {
             return applicationBuilder.build();
-        }
+        }*/
 
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
             getCaaAccessToken(),
@@ -74,44 +75,48 @@ public class InitiateGeneralApplicationServiceHelper {
             .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
             .collect(Collectors.toList());
 
-        if (respondentSolicitors != null) {
-
+        if (!CollectionUtils.isEmpty(respondentSolicitors)) {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            respondentSolicitors.stream().forEach((RS) -> {
+            respondentSolicitors.forEach((respSol) -> {
 
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = GASolicitorDetailsGAspec
-                    .builder()
-                    .id(RS.getUserId())
-                    .email(RS.getCaseRole() == caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole()
-                               ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                               : RS.getCaseRole() == caseData.getRespondent1OrganisationPolicy()
-                        .getOrgPolicyCaseAssignedRole()
-                        ? caseData.getRespondentSolicitor1EmailAddress()
-                        : caseData.getRespondentSolicitor2EmailAddress())
-                    .organisationIdentifier(RS.getCaseRole() == caseData.getApplicant1OrganisationPolicy()
-                        .getOrgPolicyCaseAssignedRole()
-                                                ? caseData.getApplicant1OrganisationPolicy().getOrganisation()
-                        .getOrganisationID() : RS.getCaseRole() == caseData.getRespondent1OrganisationPolicy()
-                        .getOrgPolicyCaseAssignedRole()
-                        ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-                        : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()).build();
+                        .builder()
+                        .id(respSol.getUserId())
+                        .email(respSol.getCaseRole() != null
+                                ? (respSol.getCaseRole().equals(caseData.getApplicant1OrganisationPolicy()
+                                .getOrgPolicyCaseAssignedRole())
+                                ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                                : respSol.getCaseRole().equals(caseData.getRespondent1OrganisationPolicy()
+                                .getOrgPolicyCaseAssignedRole())
+                                ? caseData.getRespondentSolicitor1EmailAddress()
+                                : caseData.getRespondentSolicitor2EmailAddress())
+                                : StringUtils.EMPTY)
+                        .organisationIdentifier(respSol.getCaseRole() != null
+                                ? (respSol.getCaseRole().equals(caseData.getApplicant1OrganisationPolicy()
+                                .getOrgPolicyCaseAssignedRole())
+                                ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+                                : respSol.getCaseRole().equals(caseData.getRespondent1OrganisationPolicy()
+                                .getOrgPolicyCaseAssignedRole())
+                                ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+                                : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                                : StringUtils.EMPTY).build();
 
                 respondentSols.add(element(gaSolicitorDetailsGAspec));
             });
-            applicationBuilder.generalAppRespondentSolictor(respondentSols);
+            applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
         return applicationBuilder
-            .respondentSolicitor1EmailAddress(isGAApplicantSameAsParentCaseRespondent1
-                                                  ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                                                  : caseData.getRespondentSolicitor1EmailAddress()).build();
+                .respondentSolicitor1EmailAddress(isGAApplicantSameAsParentCaseRespondent1
+                        ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                        : caseData.getRespondentSolicitor1EmailAddress()).build();
     }
 
     private String getCaaAccessToken() {
         return userService.getAccessToken(
-            crossAccessUserConfiguration.getUserName(),
-            crossAccessUserConfiguration.getPassword()
+                crossAccessUserConfiguration.getUserName(),
+                crossAccessUserConfiguration.getPassword()
         );
     }
 
