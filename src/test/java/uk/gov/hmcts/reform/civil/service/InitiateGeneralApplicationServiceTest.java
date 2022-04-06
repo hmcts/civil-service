@@ -461,6 +461,24 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(givenDate).isEqualTo(actual).isNotNull();
     }
 
+    @Test
+    void shouldPopulatePartyNameDetails() {
+        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
+                any(UserDetails.class))).thenCallRealMethod();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
+
+    }
+
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
