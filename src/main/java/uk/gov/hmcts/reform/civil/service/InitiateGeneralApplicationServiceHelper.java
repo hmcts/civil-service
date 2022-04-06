@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class InitiateGeneralApplicationServiceHelper {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
 
-
     public boolean isPCClaimantEmailIDSameAsLoginUser(String email, UserDetails userDetails) {
 
         return StringUtils.isNotBlank(email)
@@ -44,7 +42,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
         return caseData.getApplicantSolicitor1UserDetails() != null
                 && caseData.getApplicant1OrganisationPolicy() != null
-                && isPCClaimantEmailIDSameAsLoginUser(caseData.getApplicantSolicitor1UserDetails().getEmail(), userDetails);
+                && isPCClaimantEmailIDSameAsLoginUser(caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                userDetails);
     }
 
     public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,

@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -40,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_CONSTANT;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder.STRING_NUM_CONSTANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationServiceHelper.class,
@@ -68,9 +68,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @MockBean
     protected IdamClient idamClient;
-
-    CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-        .getTestCaseData(CaseData.builder().build());
 
     public UserDetails getUserDetails(String email) {
         return UserDetails.builder().id(STRING_NUM_CONSTANT)
@@ -122,8 +119,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .id(STRING_CONSTANT)
                                                     .email(APPLICANT_EMAIL_ID_CONSTANT).build())
-                .generalAppRespondentSolictor(respondentSols)
-                .generalAppApplnSolictor(GASolicitorDetailsGAspec
+                .generalAppRespondentSolicitors(respondentSols)
+                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
                                              .builder()
                                              .id("1")
                                              .email(TEST_USER_EMAILID)
@@ -152,11 +149,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .id(STRING_CONSTANT)
                                                     .email(APPLICANT_EMAIL_ID_CONSTANT).build())
-                .generalAppApplnSolictor(GASolicitorDetailsGAspec
+                .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec
                                              .builder()
                                              .id("1")
                                              .email(TEST_USER_EMAILID)
-                                             .organisationIdentifier("Org1").build())
+                                             .organisationIdentifier("Org1").build()))
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                     .organisationID(STRING_CONSTANT).build())
@@ -194,16 +191,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
             );
 
         assertThat(result).isNotNull();
-        assertThat(result.getGeneralAppRespondentSolictor()).isNotNull();
-        assertThat(result.getGeneralAppRespondentSolictor().size()).isEqualTo(4);
+        assertThat(result.getGeneralAppRespondentSolicitors()).isNotNull();
+        assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
 
         ArrayList<String> userID = new ArrayList<>(Arrays.asList("2", "3", "4", "5"));
 
-        userID.forEach(uid -> assertThat(result.getGeneralAppRespondentSolictor()
+        userID.forEach(uid -> assertThat(result.getGeneralAppRespondentSolicitors()
                                              .stream().filter(e -> uid.equals(e.getValue().getId()))
                                              .count()).isEqualTo(1));
 
-        assertThat(result.getGeneralAppRespondentSolictor()
+        assertThat(result.getGeneralAppRespondentSolicitors()
                        .stream().filter(e -> STRING_NUM_CONSTANT
                 .equals(e.getValue().getId())).count()).isEqualTo(0);
 
@@ -220,8 +217,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .build(),
                     getTestCaseData(CaseData.builder()
                                         .build(), false),
-                    getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
-                );
+                    getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
         } catch (Exception e) {
             assertEquals("java.lang.NullPointerException", e.toString());
         }

@@ -58,7 +58,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
 
     @Autowired
@@ -84,12 +83,6 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
-
-    public UserDetails getUserDetails(String email) {
-        return UserDetails.builder().id(STRING_NUM_CONSTANT)
-            .email(email)
-            .build();
-    }
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -129,7 +122,6 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build()
         );
     }
-
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
@@ -538,13 +530,13 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolictor().getId())
-            .isEqualTo(STRING_NUM_CONSTANT);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolicitor().getId())
+                .isEqualTo(STRING_NUM_CONSTANT);
 
         assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolictor().size()).isEqualTo(4);
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
 
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolictor()
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
                        .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
     }
 
