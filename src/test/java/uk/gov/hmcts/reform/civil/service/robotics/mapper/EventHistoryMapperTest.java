@@ -672,8 +672,10 @@ class EventHistoryMapperTest {
         class OneVTwoTwoLegalRep {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
-                String expectedMiscText1 = "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
-                String expectedMiscText2 = "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                String expectedMiscText1 =
+                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                String expectedMiscText2 =
+                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -716,7 +718,8 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentOneRepAcknowledges() {
-                String expectedMiscText1 = "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                String expectedMiscText1 =
+                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -747,7 +750,8 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentTwoRepAcknowledges() {
-                String expectedMiscText1 = "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                String expectedMiscText1 =
+                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
