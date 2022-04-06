@@ -104,6 +104,11 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return applicant2DQLanguage;
+    }
+
+    @Override
     @JsonProperty("applicant2DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return applicant2DQStatementOfTruth;

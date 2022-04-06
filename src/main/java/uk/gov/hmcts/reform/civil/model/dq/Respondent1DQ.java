@@ -38,6 +38,7 @@ public class Respondent1DQ implements DQ {
     private final HearingSupport respondent1DQHearingSupport;
     private final FurtherInformation respondent1DQFurtherInformation;
     private final WelshLanguageRequirements respondent1DQLanguage;
+    private final WelshLanguageRequirements respondent1DQLanguageLRspec;
     private final StatementOfTruth respondent1DQStatementOfTruth;
     private final FutureApplications respondent1DQFutureApplications;
     private final List<Element<AccountSimple>> respondent1BankAccountList;
@@ -203,5 +204,11 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQFutureApplications")
     public FutureApplications getFutureApplications() {
         return respondent1DQFutureApplications;
+    }
+
+    @Override
+    @JsonProperty("respondent1DQLanguageLRspec")
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return respondent1DQLanguageLRspec;
     }
 }

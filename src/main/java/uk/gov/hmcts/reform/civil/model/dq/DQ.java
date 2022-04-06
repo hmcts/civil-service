@@ -65,5 +65,7 @@ public interface DQ {
 
     WelshLanguageRequirements getWelshLanguageRequirements();
 
+    WelshLanguageRequirements getWelshLanguageRequirementsLRspec();
+
     StatementOfTruth getStatementOfTruth();
 }
