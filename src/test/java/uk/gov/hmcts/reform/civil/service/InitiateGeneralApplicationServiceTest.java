@@ -7,7 +7,12 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -48,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
     JacksonAutoConfiguration.class,
+    InitiateGeneralApplicationServiceHelper.class
 })
 class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder {
 
@@ -58,8 +64,11 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Autowired
     private InitiateGeneralApplicationService service;
 
-    @MockBean
+    @Autowired
     private InitiateGeneralApplicationServiceHelper helper;
+
+    @MockBean
+    private CaseAccessDataStoreApi caseAccessDataStoreApi;
 
     @MockBean
     private GeneralAppsDeadlinesCalculator calc;
@@ -68,26 +77,62 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     private OrganisationApi organisationApi;
 
     @MockBean
+    private UserService userService;
+
+    @MockBean
+    private CrossAccessUserConfiguration crossAccessUserConfiguration;
+
+    @MockBean
     private AuthTokenGenerator authTokenGenerator;
+
+    public UserDetails getUserDetails(String email) {
+        return UserDetails.builder().id(STRING_NUM_CONSTANT)
+            .email(email)
+            .build();
+    }
 
     @BeforeEach
     public void setUp() throws IOException {
         when(calc.calculateApplicantResponseDeadline(
             any(LocalDateTime.class),
-            anyInt()))
+            anyInt()
+        ))
             .thenReturn(weekdayDate);
 
         when(organisationApi.findUserOrganisation(any(), any()))
             .thenReturn(uk.gov.hmcts.reform.prd.model.Organisation
                             .builder().organisationIdentifier("OrgId1").build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+
+        when(userService.getAccessToken(
+            any(), any())).thenReturn(STRING_CONSTANT);
+
+        when(helper.getCaaAccessToken()).thenReturn(STRING_CONSTANT);
+
+        when(authTokenGenerator.generate()).thenReturn(STRING_CONSTANT);
     }
+
+    public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
+        return List.of(
+            CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("3")
+                .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("4")
+                .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("5")
+                .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build()
+        );
+    }
+
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
-
-        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
-                                                            any(CaseData.class), any(UserDetails.class)))
-            .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
@@ -112,74 +157,68 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @Test
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsentInfoNotProvided() {
-        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
-                any(UserDetails.class))).thenCallRealMethod();
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataForConsentUnconsentCheck(null);
+            .getTestCaseDataForConsentUnconsentCheck(null);
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-                .isNull();
+            .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
-                .getReasonsForWithoutNotice()).isNull();
+                       .getReasonsForWithoutNotice()).isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
-                .isNull();
+            .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
-                .isNull();
+            .isNull();
     }
 
     @Test
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
-        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
-                any(UserDetails.class))).thenCallRealMethod();
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-                .isNull();
+            .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
-                .getReasonsForWithoutNotice()).isNull();
+                       .getReasonsForWithoutNotice()).isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
-                .isNull();
+            .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
-                .isNull();
+            .isNull();
     }
 
     @Test
     void shouldPopulateInformOtherPartyAndStatementOfTruthIfUnconsented() {
-        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
-                any(UserDetails.class))).thenCallRealMethod();
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-                .isEqualTo(NO);
+            .isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
-                .getReasonsForWithoutNotice()).isEqualTo(STRING_CONSTANT);
+                       .getReasonsForWithoutNotice()).isEqualTo(STRING_CONSTANT);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
-                .isEqualTo(STRING_CONSTANT);
+            .isEqualTo(STRING_CONSTANT);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
-                .isEqualTo(STRING_CONSTANT);
+            .isEqualTo(STRING_CONSTANT);
     }
 
     //Urgency Date validation
     @Test
     void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-                .generalAppUrgency(YES)
-                .urgentAppConsiderationDate(null)
-                .build();
+            .generalAppUrgency(YES)
+            .urgentAppConsiderationDate(null)
+            .build();
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -190,9 +229,9 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-                .generalAppUrgency(NO)
-                .urgentAppConsiderationDate(LocalDate.now())
-                .build();
+            .generalAppUrgency(NO)
+            .urgentAppConsiderationDate(LocalDate.now())
+            .build();
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -203,9 +242,9 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-                .generalAppUrgency(YES)
-                .urgentAppConsiderationDate(LocalDate.now().minusDays(1))
-                .build();
+            .generalAppUrgency(YES)
+            .urgentAppConsiderationDate(LocalDate.now().minusDays(1))
+            .build();
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -216,9 +255,9 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-                .generalAppUrgency(YES)
-                .urgentAppConsiderationDate(LocalDate.now())
-                .build();
+            .generalAppUrgency(YES)
+            .urgentAppConsiderationDate(LocalDate.now())
+            .build();
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -228,9 +267,9 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
         GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-                .generalAppUrgency(NO)
-                .urgentAppConsiderationDate(null)
-                .build();
+            .generalAppUrgency(NO)
+            .urgentAppConsiderationDate(null)
+            .build();
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -241,12 +280,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenTrialIsScheduledButTrialDateFromIsNull() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(null)
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(null)
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -257,12 +296,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToBeforeIt() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(LocalDate.now().minusDays(1))
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(LocalDate.now().minusDays(1))
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -273,12 +312,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithNullTrialDateTo() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -288,12 +327,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToAfterIt() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(LocalDate.now().plusDays(1))
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(LocalDate.now().plusDays(1))
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
         assertThat(errors).isEmpty();
@@ -302,12 +341,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedAndTrialDateToAreSame() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(LocalDate.now())
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(LocalDate.now())
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -317,12 +356,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenTrialIsNotScheduled() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(NO)
-                .trialDateFrom(null)
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(getValidUnavailableDateList())
-                .build();
+            .trialRequiredYesOrNo(NO)
+            .trialDateFrom(null)
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(getValidUnavailableDateList())
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -333,12 +372,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenUnavailabilityIsSetButNullDateRangeProvided() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(null)
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(null)
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -349,17 +388,17 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasNullDateFrom() {
         GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-                .unavailableTrialDateFrom(null)
-                .unavailableTrialDateTo(null)
-                .build();
+            .unavailableTrialDateFrom(null)
+            .unavailableTrialDateTo(null)
+            .build();
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(wrapElements(range1))
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(wrapElements(range1))
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -370,17 +409,17 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasDateFromAfterDateTo() {
         GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-                .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
-                .unavailableTrialDateTo(LocalDate.now())
-                .build();
+            .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
+            .unavailableTrialDateTo(LocalDate.now())
+            .build();
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(YES)
-                .generalAppUnavailableDates(wrapElements(range1))
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(YES)
+            .generalAppUnavailableDates(wrapElements(range1))
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -391,12 +430,12 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsNotSet() {
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(NO)
-                .trialDateFrom(null)
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(NO)
-                .generalAppUnavailableDates(null)
-                .build();
+            .trialRequiredYesOrNo(NO)
+            .trialDateFrom(null)
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(NO)
+            .generalAppUnavailableDates(null)
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -406,17 +445,17 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithNullDateTo() {
         GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-                .unavailableTrialDateFrom(LocalDate.now())
-                .unavailableTrialDateTo(null)
-                .build();
+            .unavailableTrialDateFrom(LocalDate.now())
+            .unavailableTrialDateTo(null)
+            .build();
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(NO)
-                .generalAppUnavailableDates(wrapElements(range1))
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(NO)
+            .generalAppUnavailableDates(wrapElements(range1))
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -426,16 +465,16 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithSameDateTo() {
         GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-                .unavailableTrialDateFrom(LocalDate.now())
-                .unavailableTrialDateTo(LocalDate.now())
-                .build();
+            .unavailableTrialDateFrom(LocalDate.now())
+            .unavailableTrialDateTo(LocalDate.now())
+            .build();
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(NO)
-                .generalAppUnavailableDates(wrapElements(range1))
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(NO)
+            .generalAppUnavailableDates(wrapElements(range1))
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -445,16 +484,16 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsBeforeDateTo() {
         GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-                .unavailableTrialDateFrom(LocalDate.now())
-                .unavailableTrialDateTo(LocalDate.now().plusDays(1))
-                .build();
+            .unavailableTrialDateFrom(LocalDate.now())
+            .unavailableTrialDateTo(LocalDate.now().plusDays(1))
+            .build();
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
-                .trialRequiredYesOrNo(YES)
-                .trialDateFrom(LocalDate.now())
-                .trialDateTo(null)
-                .unavailableTrialRequiredYesOrNo(NO)
-                .generalAppUnavailableDates(wrapElements(range1))
-                .build();
+            .trialRequiredYesOrNo(YES)
+            .trialDateFrom(LocalDate.now())
+            .trialDateTo(null)
+            .unavailableTrialRequiredYesOrNo(NO)
+            .generalAppUnavailableDates(wrapElements(range1))
+            .build();
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
@@ -476,13 +515,11 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @Test
     void shouldPopulatePartyNameDetails() {
-        when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class), any(CaseData.class),
-                any(UserDetails.class))).thenCallRealMethod();
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
@@ -490,6 +527,25 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
 
+    }
+
+    @Test
+    void shouldPopulateApplicantDetails() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolictor().getId())
+            .isEqualTo(STRING_NUM_CONSTANT);
+
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppRespondentSolictor().size()).isEqualTo(4);
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolictor()
+                       .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
     }
 
     private void assertCaseDateEntries(CaseData caseData) {
@@ -577,9 +633,9 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         assertThat(generalAppHearingDetails.getTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getHearingDetailsEmailID()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
-                .getUnavailableTrialDateFrom()).isEqualTo(APP_DATE_EPOCH);
+                       .getUnavailableTrialDateFrom()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getGeneralAppUnavailableDates().get(0).getValue()
-                .getUnavailableTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
+                       .getUnavailableTrialDateTo()).isEqualTo(APP_DATE_EPOCH);
         assertThat(generalAppHearingDetails.getSupportRequirementOther()).isEqualTo(STRING_CONSTANT);
         assertThat(generalAppHearingDetails.getHearingDetailsTelephoneNumber())
             .isEqualTo(STRING_NUM_CONSTANT);
@@ -590,8 +646,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             .isEqualTo(IN_PERSON);
         assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isEqualTo(YES);
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isEqualTo(STRING_CONSTANT);
-        assertThat(application.getIsMultiParty()).isEqualTo(NO);
-        assertThat(application.getRespondentSolicitor1EmailAddress()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+        assertThat(application.getIsMultiParty()).isEqualTo(YES);
     }
 }
 
