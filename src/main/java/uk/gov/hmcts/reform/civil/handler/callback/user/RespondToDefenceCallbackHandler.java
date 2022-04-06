@@ -85,6 +85,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
 
+        if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+            updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
@@ -216,6 +220,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
+
+        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            builder.respondentSharedClaimResponseDocument(null);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
