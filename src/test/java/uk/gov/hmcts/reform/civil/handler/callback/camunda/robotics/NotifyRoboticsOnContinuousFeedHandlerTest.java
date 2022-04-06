@@ -94,6 +94,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
             caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
