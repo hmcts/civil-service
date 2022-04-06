@@ -41,6 +41,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
+
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 if (toggleService.isLrSpecEnabled()) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
@@ -48,7 +49,11 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
                 } else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }
+            } else {
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
+
             if (errors == null || errors.isEmpty()) {
                 roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
             } else {
