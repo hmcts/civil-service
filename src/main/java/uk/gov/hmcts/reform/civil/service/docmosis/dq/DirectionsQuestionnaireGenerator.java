@@ -54,6 +54,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
@@ -198,7 +199,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .requestedCourt(getRequestedCourt(dq));
@@ -372,7 +373,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
             .statementOfTruth(dq.getStatementOfTruth())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
@@ -396,7 +397,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
             .statementOfTruth(dq.getStatementOfTruth())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
@@ -642,8 +643,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
-        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq, CaseData caseData) {
+        var welshLanguageRequirements = SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            ? dq.getWelshLanguageRequirementsLRspec() : dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
             return WelshLanguageRequirements.builder()
                 .evidence("")

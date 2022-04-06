@@ -40,11 +40,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @SpringBootTest(classes = {
     NotifyRoboticsOnContinuousFeedHandler.class,
     JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
+    RoboticsDataMapperForSpec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
     EventHistorySequencer.class,
@@ -69,8 +71,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
-    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @MockBean
     private Time time;
 
     @Nested
@@ -82,6 +82,18 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
+        }
+
+        @Test
+        void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
