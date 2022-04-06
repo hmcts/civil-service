@@ -58,6 +58,7 @@ public class CoreCaseDataService {
     public CaseData submitUpdate(String caseId, CaseDataContent caseDataContent) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
+        System.out.println("> " + caseDataContent);
         CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
             systemUpdateUser.getUserToken(),
             authTokenGenerator.generate(),
@@ -68,6 +69,7 @@ public class CoreCaseDataService {
             true,
             caseDataContent
         );
+
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 

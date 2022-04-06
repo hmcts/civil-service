@@ -35,6 +35,7 @@ public class TestingSupportController {
         var businessProcess = caseData.getBusinessProcess();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
 
+
         if (businessProcess.getStatus() == STARTED) {
             try {
                 camundaRestEngineClient.findIncidentByProcessInstanceId(businessProcess.getProcessInstanceId())

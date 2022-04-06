@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.BREAK_DOWN_INTEREST;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 
 @Service
@@ -61,7 +60,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getFileName(CaseData caseData) {
-        return String.format(N1.getDocumentTitle(), caseData.getLegacyCaseReference());
+        return String.format(N2.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
     @Override

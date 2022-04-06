@@ -42,6 +42,7 @@ public class CallbackHandlerFactory {
     }
 
     private CallbackResponse processEvent(CallbackHandler handler, CallbackParams callbackParams, String eventId) {
+        System.out.println(handler + "\n" + callbackParams + "\n" + eventId);
         return Optional.ofNullable(callbackParams.getRequest().getCaseDetailsBefore())
             .map(caseDetailsConverter::toCaseData)
             .map(CaseData::getBusinessProcess)

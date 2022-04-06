@@ -88,6 +88,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();
+
         } catch (Exception ex) {
             log.error("Failed uploading file {}", originalFileName, ex);
             throw new DocumentUploadException(originalFileName, ex);
