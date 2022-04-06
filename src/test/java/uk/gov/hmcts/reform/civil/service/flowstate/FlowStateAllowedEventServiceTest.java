@@ -234,6 +234,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -250,6 +251,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -472,6 +474,8 @@ class FlowStateAllowedEventServiceTest {
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
