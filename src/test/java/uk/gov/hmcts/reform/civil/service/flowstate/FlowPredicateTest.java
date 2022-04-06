@@ -1207,16 +1207,42 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimNotifiedExtensionAndDef2Response() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged_1v2_BothDefendants()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
-        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension() {
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension_1v2DS()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
