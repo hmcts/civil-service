@@ -23,8 +23,8 @@ public class DefaultJudgmentForm implements MappableObject {
     private final Party respondent;
     private final String formText;
     private final Party claimantLR;
-    private final BigDecimal debt;
-    private final BigDecimal costs;
-    private final BigDecimal totalCost;
+    private final String debt;
+    private final String costs;
+    private final String totalCost;
 
 }
