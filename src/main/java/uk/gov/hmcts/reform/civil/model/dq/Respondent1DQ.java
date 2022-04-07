@@ -47,6 +47,7 @@ public class Respondent1DQ implements DQ {
     private final List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
     private final YesOrNo responseClaimCourtLocationRequired;
     private final RequestedCourt respondToCourtLocation;
+    private final VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -203,5 +204,11 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQFutureApplications")
     public FutureApplications getFutureApplications() {
         return respondent1DQFutureApplications;
+    }
+
+    @Override
+    @JsonProperty("respondent1DQVulnerabilityQuestions")
+    public VulnerabilityQuestions getVulnerabilityQuestions() {
+        return respondent1DQVulnerabilityQuestions;
     }
 }
