@@ -50,5 +50,5 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/actors/actorId_GET" : "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/_POST" : "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/upload/test-document_POST" : "ignore",
-  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/unassign-user_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/unassign-user_POST" : "ignore"
 }
