@@ -35,15 +35,17 @@ public class InitiateGeneralApplicationServiceHelper {
     public boolean isPCClaimantEmailIDSameAsLoginUser(String email, UserDetails userDetails) {
 
         return StringUtils.isNotBlank(email)
-                && userDetails.getEmail().equals(email);
+            && userDetails.getEmail().equals(email);
     }
 
     public boolean isGA_ApplicantSameAsPC_Claimant(CaseData caseData, UserDetails userDetails) {
 
         return caseData.getApplicantSolicitor1UserDetails() != null
-                && caseData.getApplicant1OrganisationPolicy() != null
-                && isPCClaimantEmailIDSameAsLoginUser(caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                userDetails);
+            && caseData.getApplicant1OrganisationPolicy() != null
+            && isPCClaimantEmailIDSameAsLoginUser(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            userDetails
+        );
     }
 
     public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,
@@ -56,41 +58,42 @@ public class InitiateGeneralApplicationServiceHelper {
         String parentCaseId = caseData.getCcdCaseReference().toString();
 
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-                getCaaAccessToken(),
-                authTokenGenerator.generate(),
-                List.of(parentCaseId)
+            getCaaAccessToken(),
+            authTokenGenerator.generate(),
+            List.of(parentCaseId)
         );
 
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
-                .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
-                .collect(Collectors.toList());
+            .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
+            .collect(Collectors.toList());
         try {
             if (!CollectionUtils.isEmpty(respondentSolicitors)) {
                 List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
+                String applicantOrgCaseRole = caseData.getApplicant1OrganisationPolicy()
+                    .getOrgPolicyCaseAssignedRole();
+                String respondentOrgCaseRole = caseData.getRespondent1OrganisationPolicy()
+                    .getOrgPolicyCaseAssignedRole();
+
                 respondentSolicitors.forEach((respSol) -> {
 
                     GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = GASolicitorDetailsGAspec
-                            .builder()
-                            .id(respSol.getUserId())
-                            .email(respSol.getCaseRole() != null
-                                    ? (respSol.getCaseRole().equals(caseData.getApplicant1OrganisationPolicy()
-                                    .getOrgPolicyCaseAssignedRole())
-                                    ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                                    : respSol.getCaseRole().equals(caseData.getRespondent1OrganisationPolicy()
-                                    .getOrgPolicyCaseAssignedRole())
-                                    ? caseData.getRespondentSolicitor1EmailAddress()
-                                    : caseData.getRespondentSolicitor2EmailAddress())
-                                    : StringUtils.EMPTY)
-                            .organisationIdentifier(respSol.getCaseRole() != null
-                                    ? (respSol.getCaseRole().equals(caseData.getApplicant1OrganisationPolicy()
-                                    .getOrgPolicyCaseAssignedRole())
-                                    ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
-                                    : respSol.getCaseRole().equals(caseData.getRespondent1OrganisationPolicy()
-                                    .getOrgPolicyCaseAssignedRole())
-                                    ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-                                    : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-                                    : StringUtils.EMPTY).build();
+                        .builder()
+                        .id(respSol.getUserId())
+                        .email(respSol.getCaseRole() != null
+                                   ? (respSol.getCaseRole().equals(applicantOrgCaseRole)
+                            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                            : respSol.getCaseRole().equals(respondentOrgCaseRole)
+                            ? caseData.getRespondentSolicitor1EmailAddress()
+                            : caseData.getRespondentSolicitor2EmailAddress())
+                                   : StringUtils.EMPTY)
+                        .organisationIdentifier(respSol.getCaseRole() != null
+                                                    ? (respSol.getCaseRole().equals(applicantOrgCaseRole)
+                            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+                            : respSol.getCaseRole().equals(respondentOrgCaseRole)
+                            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+                            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                                                    : StringUtils.EMPTY).build();
 
                     respondentSols.add(element(gaSolicitorDetailsGAspec));
                 });
@@ -98,9 +101,9 @@ public class InitiateGeneralApplicationServiceHelper {
             }
 
             return applicationBuilder
-                    .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
-                            ? YesOrNo.YES
-                            : YesOrNo.NO).build();
+                .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
+                                               ? YesOrNo.YES
+                                               : YesOrNo.NO).build();
 
         } catch (Exception e) {
             log.error(e.toString());
@@ -110,8 +113,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
     public String getCaaAccessToken() {
         return userService.getAccessToken(
-                crossAccessUserConfiguration.getUserName(),
-                crossAccessUserConfiguration.getPassword()
+            crossAccessUserConfiguration.getUserName(),
+            crossAccessUserConfiguration.getPassword()
         );
     }
 

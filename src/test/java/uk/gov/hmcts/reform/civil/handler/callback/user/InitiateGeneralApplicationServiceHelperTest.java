@@ -121,10 +121,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                     .email(APPLICANT_EMAIL_ID_CONSTANT).build())
                 .generalAppRespondentSolicitors(respondentSols)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                                             .builder()
-                                             .id("1")
-                                             .email(TEST_USER_EMAILID)
-                                             .organisationIdentifier("Org1").build())
+                                              .builder()
+                                              .id("1")
+                                              .email(TEST_USER_EMAILID)
+                                              .organisationIdentifier("Org1").build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                     .organisationID(STRING_CONSTANT).build())
@@ -150,10 +150,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                     .id(STRING_CONSTANT)
                                                     .email(APPLICANT_EMAIL_ID_CONSTANT).build())
                 .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec
-                                             .builder()
-                                             .id("1")
-                                             .email(TEST_USER_EMAILID)
-                                             .organisationIdentifier("Org1").build()))
+                                                                 .builder()
+                                                                 .id("1")
+                                                                 .email(TEST_USER_EMAILID)
+                                                                 .organisationIdentifier("Org1").build()))
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                     .organisationID(STRING_CONSTANT).build())
@@ -207,6 +207,28 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
+    void shouldReturnsTrueifClaimantIDMatchesWithLogin() {
+
+        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
+
+        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
+        )).isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnsfalseifClaimantIDMatchesWithLogin() {
+
+        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
+
+        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            getUserDetails(TEST_USER_EMAILID)
+        )).isEqualTo(false);
+    }
+
+    @Test
     void shouldThrowExceptionIfNoRespondentExits() {
 
         try {
@@ -217,7 +239,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .build(),
                     getTestCaseData(CaseData.builder()
                                         .build(), false),
-                    getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
+                    getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
+                );
         } catch (Exception e) {
             assertEquals("java.lang.NullPointerException", e.toString());
         }
