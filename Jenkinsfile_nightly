@@ -53,7 +53,7 @@ withNightlyPipeline(type, product, component) {
   env.CIVIL_SERVICE_URL = params.CIVIL_SERVICE_URL
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
-  env.TESTS_FOR_ACCESSIBILITY = true
+  env.TESTS_FOR_ACCESSIBILITY = false
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
