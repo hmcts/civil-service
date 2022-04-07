@@ -100,5 +100,8 @@ public class NotificationsProperties {
     private String interimJudgmentRequestedDefendant;
 
     @NotEmpty
+    private String interimJudgmentRequested2Defendants;
+
+    @NotEmpty
     private String interimJudgmentApprovalDefendant;
 }

@@ -133,6 +133,7 @@ notifications:
   interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
   interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
   interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
+  interimJudgmentRequested2Defendants: "64584bf4-f17d-416f-9f1b-91b3aa39a69b"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
