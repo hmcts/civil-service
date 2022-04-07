@@ -148,6 +148,7 @@ public class CaseData implements MappableObject {
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final ResponseDocument respondentSharedClaimResponseDocument;
     private final CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
     private final List<Element<CaseDocument>> defendantResponseDocuments;
@@ -226,6 +227,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final YesOrNo specDefenceAdmittedRequired;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped
