@@ -7,7 +7,6 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
