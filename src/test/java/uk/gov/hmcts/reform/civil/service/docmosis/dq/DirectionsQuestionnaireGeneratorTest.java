@@ -563,7 +563,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     () -> assertEquals(templateData.getHearing(), getHearing(dq)),
                     () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
                     () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
-                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth())
+                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth()),
+                    () -> assertEquals(templateData.getVulnerabilityQuestions(), dq.getVulnerabilityQuestions())
                 );
             }
 
@@ -893,7 +894,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     () -> assertEquals(templateData.getHearing(), getHearing(dq)),
                     () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
                     () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
-                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth())
+                    () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth()),
+                    () -> assertEquals(templateData.getVulnerabilityQuestions(), dq.getVulnerabilityQuestions())
                 );
             }
 
