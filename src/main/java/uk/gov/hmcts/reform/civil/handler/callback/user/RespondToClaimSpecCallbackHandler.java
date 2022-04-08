@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -344,12 +345,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .respondent2Copy(caseData.getRespondent2())
-            .build();
+            .respondent1Copy(caseData.getRespondent1());
+
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedCaseData.respondent2Copy(caseData.getRespondent2());
+            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
@@ -409,9 +415,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
+        Party updatedRespondent1;
+
+        if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
+            updatedRespondent1 = caseData.getRespondent1().toBuilder()
+                .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
+        } else {
+            updatedRespondent1 = caseData.getRespondent1().toBuilder()
+                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
+        }
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
@@ -419,6 +431,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .respondent1ResponseDate(responseDate)
             .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
+
+            Party updatedRespondent2;
+
+            if (caseData.getSpecAoSRespondent2HomeAddressRequired().equals(NO)) {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
+            } else {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+            }
+
+            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+        }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
