@@ -33,11 +33,4 @@
     <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
     <cve>CVE-2020-36518</cve>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: ansi-regex@3.0.0
-   ]]></notes>
-    <packageUrl regex="true">^pkg:npm/ansi\-regex@.*$</packageUrl>
-    <vulnerabilityName>1004946</vulnerabilityName>
-  </suppress>
 </suppressions>
