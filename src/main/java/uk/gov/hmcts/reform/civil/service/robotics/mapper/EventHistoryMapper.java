@@ -791,31 +791,22 @@ public class EventHistoryMapper {
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
         String defaultText;
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        switch (scenario) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-                defaultText = (format(
-                    "RPA Reason:%s Defendant: %s has responded: %s; "
-                        + "preferredCourtCode: %s; stayClaim: %s",
-                    paginatedMessage,
-                    respondent.getPartyName(),
-                    getResponseTypeForRespondent(caseData, respondent),
-                    getPreferredCourtCode(dq),
-                    isStayClaim(dq)
-                ));
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                defaultText = format("RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; "
-                                         + "stayClaim: %s",
-                                     respondent.getPartyName(),
-                                     getResponseTypeForRespondent(caseData, respondent),
-                                     getPreferredCourtCode(dq),
-                                     isStayClaim(dq)
-                );
-                break;
-            default:
-                defaultText = format(
-                "RPA Reason: preferredCourtCode: %s; stayClaim: %s",
+        if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+            String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
+            defaultText = (format(
+                "RPA Reason:%s Defendant: %s has responded: %s; "
+                    + "preferredCourtCode: %s; stayClaim: %s",
+                paginatedMessage,
+                respondent.getPartyName(),
+                getResponseTypeForRespondent(caseData, respondent),
+                getPreferredCourtCode(dq),
+                isStayClaim(dq)
+            ));
+        } else {
+            defaultText = format(
+                "RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; stayClaim: %s",
+                respondent.getPartyName(),
+                getResponseTypeForRespondent(caseData, respondent),
                 getPreferredCourtCode(dq),
                 isStayClaim(dq)
             );
@@ -957,14 +948,14 @@ public class EventHistoryMapper {
                 List<Event> events = new ArrayList<>();
                 if (defendant1AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
-                        "Defendant: %s has acknowledged: %s",
+                        "RPA Reason: Defendant: %s has acknowledged: %s",
                         caseData.getRespondent1().getPartyName(),
                         caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                     )));
                 }
                 if (defendant2AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
-                        "Defendant: %s has acknowledged: %s",
+                        "RPA Reason: Defendant: %s has acknowledged: %s",
                         caseData.getRespondent2().getPartyName(),
                         caseData.getRespondent2ClaimResponseIntentionType().getLabel()
                     )));
