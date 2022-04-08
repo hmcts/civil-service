@@ -22,5 +22,5 @@ spring:
         robotics-notification-recipient: robotics.notification.recipient
         robotics-notification-multipartyrecipient: robotics.notification.multipartyrecipient
         launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
-        os-postcode-lookup-api-key: OS_POSTCODE_LOOKUP_API_KEY
+        ordnance-survey-api-key: OS_POSTCODE_LOOKUP_API_KEY
 

@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,18 +16,20 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AgreedExtensionDateApplicantNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AgreedExtensionDateApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     AgreedExtensionDateApplicantNotificationHandler.class,
@@ -46,60 +47,180 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
     @Nested
     class AboutToSubmitCallback {
 
+        final String templateId = "template-id";
+        final String reference = "agreed-extension-date-applicant-notification-000DC001";
+        Map<String, String> expectedNotificationData;
+        CaseData caseData;
+
         @BeforeEach
         void setup() {
             when(notificationsProperties.getClaimantSolicitorAgreedExtensionDate()).thenReturn("template-id");
         }
 
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE").build())
-                .build();
+        @Nested
+        class WhenRespondent1SubmitsTimeExtension {
 
-            handler.handle(params);
+            @BeforeEach
+            void setup() {
+                caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
+                expectedNotificationData = getNotificationDataMap(
+                    caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+            }
 
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "agreed-extension-date-applicant-notification-000DC001"
-            );
+            @Test
+            void shouldNotifyApplicantSolicitor_whenInvoked() {
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE");
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor1_whenInvoked() {
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor2_whenInvoked() {
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor2TimeExtensionExists() {
+                caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledgedRespondent2TimeExtension(+5)
+                    .atStateNotificationAcknowledgedRespondent1TimeExtension()
+                    .build();
+
+                Map<String, String> expectedNotificationData = getNotificationDataMap(
+                    caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                );
+
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
         }
 
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build())
-                .build();
+        @Nested
+        class WhenRespondent2SubmitsTimeExtension {
 
-            handler.handle(params);
+            @BeforeEach
+            void setup() {
+                caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent2TimeExtension().build();
+                expectedNotificationData = getNotificationDataMap(
+                    caseData.getRespondentSolicitor2AgreedDeadlineExtension());
+            }
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "agreed-extension-date-applicant-notification-000DC001"
-            );
+            @Test
+            void shouldNotifyApplicantSolicitor_whenInvoked() {
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE");
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor1_whenInvoked() {
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyRespondentSolicitor2() {
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor1TimeExtensionExists() {
+                caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledgedRespondent2TimeExtension()
+                    .atStateNotificationAcknowledgedRespondent1TimeExtension()
+                    .build();
+
+                expectedNotificationData = getNotificationDataMap(
+                    caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                );
+
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap(LocalDate extensionDate) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "agreedExtensionDate", formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
+                AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
+        }
+
+        private void invokeAboutToSubmitWithEvent(String eventId) {
+            handler.handle(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(eventId).build()
+            ).build());
         }
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE").build()).build())).isEqualTo(TASK_ID);
+            "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE").build()).build()))
+            .isEqualTo("AgreedExtensionDateNotifyApplicantSolicitor1");
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build()).build())).isEqualTo(TASK_ID_CC);
+            "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC").build()).build()))
+            .isEqualTo("AgreedExtensionDateNotifyRespondentSolicitor1CC");
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC").build()).build()))
+            .isEqualTo("AgreedExtensionDateNotifyRespondentSolicitor2CC");
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -28,7 +30,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
@@ -42,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLA
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
-import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.matcher.IsValidJson.validateJson;
 
@@ -70,7 +70,7 @@ class RpaConsumerTest extends BaseRpaTest {
     @MockBean
     AuthTokenGenerator authTokenGenerator;
     @MockBean
-    IdamClient idamClient;
+    UserService userService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
@@ -392,116 +392,287 @@ class RpaConsumerTest extends BaseRpaTest {
     @Nested
     class FullDefenceNotProceed {
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceNotProceeds() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
-                .legacyCaseReference("000DC016")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class OneVOne {
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceNotProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
+                    .legacyCaseReference("000DC016")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            assertThat(payload, validateJson());
+                assertThat(payload, validateJson());
 
-            String description = "Robotics case data for applicant responded with confirms not to proceeds";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                String description = "Robotics case data for applicant responded with confirms not to proceeds";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceNotProceeds_withMinimalData() {
+                CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceedMinimumData()
+                    .legacyCaseReference("000DC017")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded with not to proceeds - minimal data";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceNotProceeds_withMaximalData() {
+                CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceedMaximumData()
+                    .legacyCaseReference("000DC018")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded with not to proceeds - maximal data";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceNotProceeds_withMinimalData() {
-            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
-                .atStateApplicantRespondToDefenceAndNotProceedMinimumData()
-                .legacyCaseReference("000DC017")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class OneVTwo {
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceNotProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
+                    .atStateApplicantRespondToDefenceAndNotProceed_1v2()
+                    .legacyCaseReference("000DC045")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            assertThat(payload, validateJson());
+                assertThat(payload, validateJson());
 
-            String description = "Robotics case data for applicant responded with not to proceeds - minimal data";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                String description = "Robotics case data when applicant responded with confirms not to proceed "
+                    + "against both defendants";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceNotProceeds_withMaximalData() {
-            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
-                .atStateApplicantRespondToDefenceAndNotProceedMaximumData()
-                .legacyCaseReference("000DC018")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class TwoVOne {
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceNotProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
+                    .multiPartyClaimTwoApplicants()
+                    .atStateApplicantRespondToDefenceAndNotProceed_2v1()
+                    .legacyCaseReference("000DC046")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            assertThat(payload, validateJson());
+                assertThat(payload, validateJson());
 
-            String description = "Robotics case data for applicant responded with not to proceeds - maximal data";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                String description = "Robotics case data when both applicants responded with confirms not to proceed";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
+
     }
 
     @Nested
     class FullDefenceProceed {
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceProceeds() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .legacyCaseReference("000DC019")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class OneVOne {
 
-            assertThat(payload, validateJson());
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                    .legacyCaseReference("000DC019")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            String description = "Robotics case data for applicant responded with confirms to proceeds";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                assertThat(payload, validateJson());
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                String description = "Robotics case data for applicant responded with confirms to proceeds";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceeds_withMinimalData() {
+                CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .legacyCaseReference("000DC020")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded "
+                    + "with confirms to proceeds - minimal data";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceeds_withMaximalData() {
+                CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .legacyCaseReference("000DC036")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded "
+                    + "with confirms to proceeds - maximal data";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceProceeds_withMinimalData() {
-            CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .legacyCaseReference("000DC020")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class OneVTwo {
 
-            assertThat(payload, validateJson());
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceedsAgainstBothDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .legacyCaseReference("000DC039")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            String description = "Robotics case data for applicant responded with confirms to proceeds - minimal data";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                assertThat(payload, validateJson());
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                String description = "Robotics case data for applicant responded with confirms to proceeds "
+                    + "against both defendants (1v2)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceedsAgainstFirstDefendant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                    .legacyCaseReference("000DC040")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded with confirms to proceeds "
+                    + "against first defendants (1v2)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceProceedsAgainstSecondDefendant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .legacyCaseReference("000DC041")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for applicant responded with confirms to proceeds "
+                    + "against second defendants (1v2)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
         }
 
-        @Test
-        @SneakyThrows
-        void shouldGeneratePact_whenFullDefenceProceeds_withMaximalData() {
-            CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .legacyCaseReference("000DC036")
-                .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
-                .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        @Nested
+        class TwoVOne {
 
-            assertThat(payload, validateJson());
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceBothClaimantProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+                    .legacyCaseReference("000DC042")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
-            String description = "Robotics case data for applicant responded with confirms to proceeds - maximal data";
-            PactVerificationResult result = getPactVerificationResult(payload, description);
+                assertThat(payload, validateJson());
 
-            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+                String description = "Robotics case data when both applicants responded with confirms "
+                    + "to proceeds (2v1)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceFirstClaimantProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateApplicant1RespondToDefenceAndProceed_2v1()
+                    .legacyCaseReference("000DC043")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data when first applicant responded with confirms "
+                    + "to proceeds (2v1)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
+
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenFullDefenceSecondClaimantProceeds() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                    .legacyCaseReference("000DC044")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data when second applicant responded with confirms "
+                    + "to proceeds (2v1)";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
     }
 
@@ -681,7 +852,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDate(LocalDateTime.now())
                 .legacyCaseReference("000DC031")
                 .build();
@@ -703,7 +874,7 @@ class RpaConsumerTest extends BaseRpaTest {
         @SneakyThrows
         void shouldGeneratePact_whenApplicantResponseDeadlinePassedAfterFullDefence() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledgedTimeExtension()
+                .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .legacyCaseReference("000DC032")
                 .build();

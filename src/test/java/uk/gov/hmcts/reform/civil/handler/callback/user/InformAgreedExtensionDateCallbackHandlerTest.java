@@ -11,11 +11,14 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -44,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -105,6 +109,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Nested
     class AboutToStartV1Callback {
+        public static final String ERROR_EXTENSION_DATE_SUBMITTED =
+            "This action cannot currently be performed because it has already been completed";
 
         @BeforeEach
         void setup() {
@@ -159,6 +165,93 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("isRespondent1").isEqualTo("No");
         }
+
+        @Test
+        void shouldReturnErrorWhenRespondentRespondsAgain1v1() {
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1TimeExtensionDate(timeExtensionDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnErrorWhenRespondentRespondsAgain2v1() {
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addApplicant2(YES)
+                .respondent1TimeExtensionDate(timeExtensionDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnErrorWhenRespondentRespondsAgain1v2SameSolicitor() {
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1TimeExtensionDate(timeExtensionDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnErrorWhenRespondentRespondsAgain1v2Respondent1() {
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent1TimeExtensionDate(timeExtensionDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnErrorWhenRespondentRespondsAgain1v2Respondent2() {
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2TimeExtensionDate(timeExtensionDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
     }
 
     @Nested
@@ -194,6 +287,51 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnNoErrorLRSpec_whenValuesAreValid() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent(InformAgreedExtensionDateCallbackHandler
+                                                       .SPEC_ACKNOWLEDGEMENT_OF_SERVICE)
+                                     .build())
+                .build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnExpectedError_whenValuesAreInvalidMultiparty() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            LocalDate extensionDateRespondent2 = now().minusDays(2);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .extensionDate(now().minusDays(1))
+                .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors())
+                .containsOnly("The agreed extension date must be a date in the future");
+        }
+
     }
 
     @Nested
@@ -208,6 +346,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             extensionDate = now().plusDays(14);
             when(deadlinesCalculator.calculateFirstWorkingDay(extensionDate)).thenReturn(extensionDate);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
         }
 
         @Test
@@ -304,9 +444,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .doesNotContainKey("businessProcess");
         }
 
         @Test
@@ -324,9 +461,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
-                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -339,6 +474,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     class SubmittedCallback {
 
         private static final String BODY = "<br />You must respond to the claimant by %s";
+        private static final String BODY_SPEC =
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s";
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
@@ -354,6 +491,26 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Extension deadline submitted")
                     .confirmationBody(format(BODY, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
+                                          + exitSurveyContentService.respondentSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponseLRSpec_whenInvoked() {
+            LocalDateTime responseDeadline = now().atTime(END_OF_BUSINESS_DAY);
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ResponseDeadline(responseDeadline)
+                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader("# Extension deadline submitted")
+                    .confirmationBody(format(BODY_SPEC, formatLocalDateTime(responseDeadline, DATE_TIME_AT))
                                           + exitSurveyContentService.respondentSurvey())
                     .build());
         }

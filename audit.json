@@ -45,5 +45,10 @@
   "10096_Timestamp Disclosure - Unix_http://civil-service-aat.service.core-compute-aat.internal/testing-support/assign-case/caseId_POST": "ignore",
   "10096_Timestamp Disclosure - Unix_http://civil-service-aat.service.core-compute-aat.internal/testing-support/case/10/business-process_GET": "ignore",
   "10096_Timestamp Disclosure - Unix_http://civil-service-aat.service.core-compute-aat.internal/testing-support/assign-case/caseId/caseRole_POST": "ignore",
-  "10096_Timestamp Disclosure - Unix_http://civil-service-aat.service.core-compute-aat.internal/cases/callbacks/version/version/callback-type_POST": "ignore"
+  "10096_Timestamp Disclosure - Unix_http://civil-service-aat.service.core-compute-aat.internal/cases/callbacks/version/version/callback-type_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/10_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/actors/actorId_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/upload/test-document_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/unassign-user_POST" : "ignore"
 }

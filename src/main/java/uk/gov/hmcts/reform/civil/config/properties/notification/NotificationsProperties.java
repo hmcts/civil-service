@@ -16,16 +16,13 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimIssueMultipartyEmailTemplate;
 
     @NotEmpty
-    private String respondentSolicitorClaimIssueEmailTemplate;
-
-    @NotEmpty
-    private String respondentSolicitorClaimDetailsEmailTemplate;
-
-    @NotEmpty
     private String respondentSolicitorClaimDetailsEmailTemplateMultiParty;
 
     @NotEmpty
     private String solicitorDefendantResponseCaseTakenOffline;
+
+    @NotEmpty
+    private String solicitorDefendantResponseCaseTakenOfflineMultiparty;
 
     @NotEmpty
     private String claimantSolicitorDefendantResponseFullDefence;
@@ -83,4 +80,13 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String solicitorLitigationFriendAdded;
+
+    @NotEmpty
+    private String claimantSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String sdoOrdered;
 }

@@ -18,6 +18,9 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +29,15 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC);
 
     public static final String TASK_ID = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1";
+    public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
+    private static final String NP_PROCEED_REFERENCE_TEMPLATE
+        = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -44,6 +51,9 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
+        if (isRespondentSolicitor2Notification(callbackParams)) {
+            return Task_ID_RESPONDENT_SOL2;
+        }
         return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
@@ -58,6 +68,23 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
 
+        if (isRespondentSolicitor2Notification(callbackParams)) {
+            recipient = caseData.getRespondentSolicitor2EmailAddress();
+        }
+
+        if ((isRespondentSolicitor2Notification(callbackParams)
+            && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
+            || (!isRespondentSolicitor2Notification(callbackParams)
+            && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
+            notificationService.sendMail(
+                recipient,
+                notificationsProperties.getClaimantSolicitorConfirmsNotToProceed(),
+                addProperties(caseData),
+                String.format(NP_PROCEED_REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         notificationService.sendMail(
             recipient,
             notificationsProperties.getClaimantSolicitorConfirmsToProceed(),
@@ -70,12 +97,18 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
+    }
+
+    private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED.name());
     }
 }

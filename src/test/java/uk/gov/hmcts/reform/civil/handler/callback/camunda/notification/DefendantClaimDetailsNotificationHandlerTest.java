@@ -27,10 +27,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_APP_SOL_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CLAIM_ISSUED_DATE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     DefendantClaimDetailsNotificationHandler.class,
@@ -57,8 +59,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
-                .thenReturn("non-multiparty-template-id");
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty())
                 .thenReturn("multi-party-template-id");
         }
@@ -73,8 +73,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
-                getNotificationDataMap(),
+                "multi-party-template-id",
+                getNotificationDataMap(caseData),
                 REFERENCE
             );
         }
@@ -89,16 +89,17 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
-                "non-multiparty-template-id",
-                getNotificationDataMap(),
+                "multi-party-template-id",
+                getNotificationDataMap(caseData),
                 REFERENCE
             );
         }
 
-        private Map<String, String> getNotificationDataMap() {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "claimDetailsNotificationDeadline", formatLocalDate(CLAIM_ISSUED_DATE, DATE)
+                "claimDetailsNotificationDeadline", formatLocalDate(CLAIM_ISSUED_DATE, DATE),
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
 
@@ -119,8 +120,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "non-multiparty-template-id",
-                getNotificationDataMap(),
+                "multi-party-template-id",
+                getNotificationDataMap(caseData),
                 REFERENCE
             );
         }
@@ -142,16 +143,14 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
-                "non-multiparty-template-id",
-                getNotificationDataMap(),
+                "multi-party-template-id",
+                getNotificationDataMap(caseData),
                 REFERENCE
             );
         }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
-            when(featureToggleService.isMultipartyEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();
@@ -168,7 +167,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "multi-party-template-id",
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 "claim-details-respondent-notification-000DC001"
             );
         }

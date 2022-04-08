@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE);
 
-    public static final String TASK_ID = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
+    public static final String TASK_ID_APPLICANT1 = "DefendantResponseCaseHandedOfflineNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -40,7 +42,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return TASK_ID_APPLICANT1;
     }
 
     @Override
@@ -50,22 +52,29 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private CallbackResponse notifyApplicantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        String templateID = is1v1Or2v1Case(caseData)
+            ? notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()
+            //1v2 template expects different data
+            : notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+
+        sendNotificationToSolicitor(caseData, recipient, templateID);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private void sendNotificationToSolicitor(CaseData caseData, String recipient, String templateID) {
+        notificationService.sendMail(
+            recipient,
+            templateID,
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
-        );
+        return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 }

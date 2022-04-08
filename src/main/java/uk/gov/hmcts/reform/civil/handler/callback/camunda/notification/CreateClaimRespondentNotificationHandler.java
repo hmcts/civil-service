@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -19,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -45,13 +44,11 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForClaimIssue,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::notifyARespondentSolicitorForClaimIssue
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyARespondentSolicitorForClaimIssue
         );
     }
 
@@ -73,19 +70,6 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse notifyRespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-            : caseData.getRespondentSolicitor1EmailAddress();
-
-        sendNotificationToSolicitor(caseData, recipient);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
     }
 
     //    Notify Claim Multiparty:
@@ -135,9 +119,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,
-            featureToggleService.isMultipartyEnabled()
-                ? notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate()
-                : notificationsProperties.getRespondentSolicitorClaimIssueEmailTemplate(),
+            notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -155,12 +137,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE)
+            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
-    }
-
-    private boolean isCcNotification(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC.name());
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -23,8 +26,19 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -46,7 +60,20 @@ public class CaseData implements MappableObject {
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
+    private final GAApplicationType generalAppType;
+    private final GARespondentOrderAgreement generalAppRespondentAgreement;
+    private final GAPbaDetails generalAppPBADetails;
+    private final String generalAppDetailsOfOrder;
+    private final String generalAppReasonsOfOrder;
+    private final GAInformOtherParty generalAppInformOtherParty;
+    private final GAUrgencyRequirement generalAppUrgencyRequirement;
+    private final GAStatementOfTruth generalAppStatementOfTruth;
+    private final GAHearingDetails generalAppHearingDetails;
+    private final List<Element<Document>> generalAppEvidenceDocument;
+    private final List<Element<GeneralApplication>> generalApplications;
+    private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
     private final SolicitorReferences solicitorReferences;
+    private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
     private final Party applicant1;
@@ -60,6 +87,8 @@ public class CaseData implements MappableObject {
     private final Party respondent1Copy;
     private final Party respondent2;
     private final Party respondent2Copy;
+    private final Party respondent1DetailsForClaimDetailsTab;
+    private final Party respondent2DetailsForClaimDetailsTab;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
@@ -109,19 +138,36 @@ public class CaseData implements MappableObject {
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
     private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
+    private final YesOrNo defendantSingleResponseToBothClaimants;
     private final RespondentResponseType respondent1ClaimResponseType;
     private final RespondentResponseType respondent2ClaimResponseType;
+    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
-    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    private final ResponseDocument respondentSharedClaimResponseDocument;
+    private final CaseDocument respondent1GeneratedResponseDocument;
+    private final CaseDocument respondent2GeneratedResponseDocument;
+    private final List<Element<CaseDocument>> defendantResponseDocuments;
 
     private final YesOrNo applicant1ProceedWithClaim;
+    private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimRespondent2;
     private final ResponseDocument applicant1DefenceResponseDocument;
+    private final ResponseDocument claimantDefenceResDocToDefendant2;
+    private final List<Element<CaseDocument>> claimantResponseDocuments;
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
+    /**
+     * money amount in pounds.
+     */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
     private final YesOrNo claimInterest;
@@ -140,6 +186,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
     private final Address specAoSRespondentCorrespondenceAddressdetails;
     private final YesOrNo specRespondent1Represented;
+    private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final String specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
@@ -150,13 +197,26 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
+    /**
+     * money amount in pence.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmount;
+    /**
+     * money amount in pounds.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
@@ -171,6 +231,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final YesOrNo specDefenceAdmittedRequired;
 
     private final String additionalInformationForJudge;
     @JsonUnwrapped
@@ -191,7 +252,13 @@ public class CaseData implements MappableObject {
     private final Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
+    private final Respondent2DQ respondent2DQ;
+
+    @JsonUnwrapped
     private final Applicant1DQ applicant1DQ;
+
+    @JsonUnwrapped
+    private final Applicant2DQ applicant2DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -199,6 +266,7 @@ public class CaseData implements MappableObject {
             || businessProcess.getStatus() == FINISHED;
     }
 
+    private final LitigationFriend genericLitigationFriend;
     private final LitigationFriend respondent1LitigationFriend;
     private final LitigationFriend respondent2LitigationFriend;
 
@@ -210,12 +278,25 @@ public class CaseData implements MappableObject {
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
     private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
-
+    private final DynamicList selectLitigationFriend;
+    private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+    private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
+    private YesOrNo applicantsProceedIntention;
+    private final MultiPartyScenario claimantResponseScenarioFlag;
+    private YesOrNo claimantResponseDocumentToDefendant2Flag;
+    private YesOrNo claimant2ResponseFlag;
+    private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    private YesOrNo specFullAdmissionOrPartAdmission;
+    private YesOrNo sameSolicitorSameResponse;
+    private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
+    private YesOrNo specFullDefenceOrPartAdmission1V1;
+    private YesOrNo specFullDefenceOrPartAdmission;
+    private YesOrNo specDisputesOrPartAdmission;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -231,21 +312,27 @@ public class CaseData implements MappableObject {
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
     private final LocalDateTime respondent1ResponseDate;
-    private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDate;
+    private final LocalDateTime applicant1ResponseDeadline;
     private final LocalDateTime applicant1ResponseDate;
+    private final LocalDateTime applicant2ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
+    private final LocalDateTime respondent2LitigationFriendDate;
+
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
-
-    private final YesOrNo isRespondent1;
-
+    private final LocalDateTime respondent2LitigationFriendCreatedDate;
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+
+    private final YesOrNo isRespondent1;
+    private final YesOrNo isRespondent2;
+    private final YesOrNo isApplicant1;
 }
