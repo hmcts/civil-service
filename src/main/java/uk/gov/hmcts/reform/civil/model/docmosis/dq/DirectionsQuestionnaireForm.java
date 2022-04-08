@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,5 +57,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final AllocatedTrack allocatedTrack;
     private final DisclosureReport disclosureReport;
     private final RequestedCourt requestedCourt;
+    private final VulnerabilityQuestions vulnerabilityQuestions;
 
 }
