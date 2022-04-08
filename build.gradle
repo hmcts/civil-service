@@ -347,7 +347,7 @@ dependencies {
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.67'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.16.0'
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.1'
