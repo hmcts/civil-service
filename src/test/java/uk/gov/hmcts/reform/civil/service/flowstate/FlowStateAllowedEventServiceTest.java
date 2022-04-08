@@ -249,7 +249,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT
                     }
                 ),
                 of(
@@ -265,7 +266,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT
                     }
                 ),
                 of(

@@ -121,8 +121,7 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION,
-                DEFAULT_JUDGEMENT
+                INITIATE_GENERAL_APPLICATION
             )
         ),
 
@@ -612,7 +611,6 @@ public class FlowStateAllowedEventService {
             return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
-            System.out.println("stateFlow.getState().getName() >>"+stateFlow.getState().getName());
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
         }
     }
