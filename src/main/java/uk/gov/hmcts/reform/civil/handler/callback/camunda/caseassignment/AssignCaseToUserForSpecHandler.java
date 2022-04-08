@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,7 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,7 +49,11 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse assignSolicitorCaseRole(CallbackParams callbackParams) {

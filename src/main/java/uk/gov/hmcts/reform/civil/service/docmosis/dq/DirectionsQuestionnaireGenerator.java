@@ -201,6 +201,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq));
 
         return builder.build();
@@ -374,6 +375,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
@@ -398,6 +400,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
