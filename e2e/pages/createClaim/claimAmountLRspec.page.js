@@ -9,12 +9,12 @@ module.exports = {
     },
   },
 
-  async addClaimItem() {
+  async addClaimItem(claimAmount) {
     I.waitForElement(this.fields.claimAmount.id);
     await I.runAccessibilityTest();
     I.click('Add new');
     I.fillField(this.fields.claimAmount.details, 'Test claim item details');
-    I.fillField(this.fields.claimAmount.amount, 1000);
+    I.fillField(this.fields.claimAmount.amount, claimAmount);
     await I.clickContinue();
   },
 };

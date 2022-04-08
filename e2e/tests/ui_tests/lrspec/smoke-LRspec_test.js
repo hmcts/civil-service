@@ -1,4 +1,4 @@
-const config = require('../../config.js');
+const config = require('../../../config.js');
 
 Feature('Smoke tests @smoke-tests-spec');
 

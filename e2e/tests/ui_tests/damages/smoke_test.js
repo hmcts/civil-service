@@ -1,6 +1,6 @@
-const config = require('../config.js');
+const config = require('../../../config.js');
 
-Feature('Smoke tests @smoke-tests');
+Feature('Smoke tests @smoke-tests-unspec');
 
 Scenario('Sign in as solicitor user', async ({I}) => {
   await I.retry(5).login(config.applicantSolicitorUser);

@@ -14,15 +14,13 @@ module.exports = {
     };
   },
 
-  async enterRespondentRepresented(respondent, respondentRepresentedOption) {
+  async enterRespondentRepresented(respondent, respondentRepresented) {
     // eslint-disable-next-line no-prototype-builtins
-    if (!this.fields(respondent).respondentRepresented.options.hasOwnProperty(respondentRepresentedOption)) {
-      throw new Error(`Respondent represented option: ${respondentRepresentedOption} does not exist`);
-    }
     I.waitForElement(this.fields(respondent).respondentRepresented.id);
     await I.runAccessibilityTest();
     await within(this.fields(respondent).respondentRepresented.id, () => {
-      I.click(this.fields(respondent).respondentRepresented.options[respondentRepresentedOption]);
+      const { yes, no } = this.fields(respondent).respondentRepresented.options;
+      I.click(respondentRepresented ? yes : no);
     });
 
     await I.clickContinue();

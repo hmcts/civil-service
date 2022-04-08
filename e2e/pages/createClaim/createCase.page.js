@@ -11,7 +11,7 @@ module.exports = {
 
   async createCase(jurisdiction) {
     await I.retryUntilExists( () => {
-      I.retry(3).click('Create case');
+      I.click('Create case');
     }, `#cc-jurisdiction > option[value="${jurisdiction}"]`);
 
     await I.retryUntilExists(() => {

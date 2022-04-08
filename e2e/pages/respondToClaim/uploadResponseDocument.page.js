@@ -2,16 +2,16 @@ const { I } = inject();
 
 module.exports = {
 
-  fields: {
+  fields: (party) => ({
     respondentResponseDocument: {
-      id: '#respondent1ClaimResponseDocument_file'
+      id: `#${party}ClaimResponseDocument_file`
     }
-  },
+  }),
 
-  async uploadResponseDocuments (file) {
-    I.waitForElement(this.fields.respondentResponseDocument.id);
+  async uploadResponseDocuments (party, file) {
+    I.waitForElement(this.fields(party).respondentResponseDocument.id);
     await I.runAccessibilityTest();
-    await I.attachFile(this.fields.respondentResponseDocument.id, file);
+    await I.attachFile(this.fields(party).respondentResponseDocument.id, file);
     await I.waitForInvisible(locate('.error-message').withText('Uploading...'));
 
     await I.clickContinue();

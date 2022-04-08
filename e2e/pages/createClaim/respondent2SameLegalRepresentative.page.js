@@ -12,11 +12,12 @@ module.exports = {
     },
   },
 
-  async enterRespondent2SameLegalRepresentative() {
+  async enterRespondent2SameLegalRepresentative(sameLegalRepresentative = false) {
     I.waitForElement(this.fields.respondent2SameLegalRepresentative.id);
     await I.runAccessibilityTest();
     await within(this.fields.respondent2SameLegalRepresentative.id, () => {
-      I.click(this.fields.respondent2SameLegalRepresentative.options.no);
+      const { yes, no } = this.fields.respondent2SameLegalRepresentative.options;
+      I.click(sameLegalRepresentative ? yes : no);
     });
 
     await I.clickContinue();

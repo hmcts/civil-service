@@ -1,5 +1,5 @@
-const config = require('../config.js');
-const {waitForFinishedBusinessProcess, assignCaseToDefendant} = require('../api/testingSupport');
+const config = require('../../../config.js');
+const {waitForFinishedBusinessProcess, assignCaseToDefendant} = require('../../../api/testingSupport');
 
 const caseEventMessage = eventName => `Case ${caseNumber} has been updated with event: ${eventName}`;
 const caseId = () => `${caseNumber.split('-').join('').replace(/#/, '')}`;
@@ -10,9 +10,17 @@ let attempt = 1;
 Feature('End-to-end journey @cross-browser-tests');
 
 Scenario('Full end-to-end journey', async ({I}) => {
+  const claimant1 = {
+    litigantInPerson: false
+  };
+  const respondent1 = {
+    represented: true,
+    representativeRegistered: true,
+    representativeOrgNumber: 2
+  };
   console.log(`Test run attempt: #${attempt++}`);
   await I.login(config.applicantSolicitorUser);
-  await I.createCase();
+  await I.createCase(claimant1, null, respondent1, null);
   console.log('Applicant solicitor created claim');
 
   caseNumber = await I.grabCaseNumber();
@@ -45,7 +53,7 @@ Scenario('Full end-to-end journey', async ({I}) => {
 
   await I.login(config.defendantSolicitorUser);
   await I.navigateToCaseDetails(caseNumber);
-  await I.respondToClaim('fullDefence');
+  await I.respondToClaim({defendant1Response: 'fullDefence'});
   console.log('Defendant solicitor responded to claim');
   await I.see(caseEventMessage('Respond to claim'));
 

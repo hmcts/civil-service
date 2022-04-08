@@ -82,5 +82,11 @@ module.exports = {
     id: 'ADD_CASE_NOTE',
     name: 'Add a case note',
     order: 16
+  },
+  CHANGE_SOLICITOR_EMAIL: {
+    description: 'Change solicitor email',
+    id: 'CHANGE_SOLICITOR_EMAIL',
+    name: 'Change solicitor email',
+    order: 17
   }
 };

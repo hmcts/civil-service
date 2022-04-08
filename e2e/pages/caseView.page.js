@@ -20,8 +20,8 @@ module.exports = {
   },
 
   async startEvent(event, caseId) {
-    await waitForFinishedBusinessProcess(caseId);
-    await I.retryUntilExists(async() => {
+      await waitForFinishedBusinessProcess(caseId);
+      await I.retryUntilExists(async() => {
       await I.navigateToCaseDetails(caseId);
       this.start(event);
     }, locate('.govuk-heading-l'));

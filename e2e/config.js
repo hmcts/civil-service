@@ -29,7 +29,7 @@ module.exports = {
   },
   secondDefendantSolicitorUser: {
     password: defaultPassword,
-    email: 'hmcts.civil+organisation.2.solicitor.2@gmail.com',
+    email: 'hmcts.civil+organisation.3.solicitor.1@gmail.com',
     type: 'defendant_solicitor'
   },
   adminUser: {
@@ -43,5 +43,5 @@ module.exports = {
   },
   TestOutputDir: process.env.E2E_OUTPUT_DIR || './output',
   TestForAccessibility: process.env.TESTS_FOR_ACCESSIBILITY === 'true',
-  multipartyTestsEnabled: process.env.MULTIPARTY_TESTS_ENABLED === 'true'
+  runningEnv: process.env.ENVIRONMENT
 };

@@ -3,24 +3,29 @@ const litigationFriend = require('../../fragments/litigationFriend');
 
 module.exports = {
 
-  fields: {
-    childApplicant: {
-      id: '#applicant1LitigationFriendRequired',
-      options: {
-        yes: 'Yes',
-        no: 'No'
-      }
-    },
+  fields: (party) => {
+    return {
+      childApplicant: {
+        id: `#${party}LitigationFriendRequired`,
+        options: {
+          yes: 'Yes',
+          no: 'No'
+        }
+      },
+    };
   },
 
-  async enterLitigantFriendWithDifferentAddressToApplicant(address, file) {
-    I.waitForElement(this.fields.childApplicant.id);
+  async enterLitigantFriend(party = 'applicant1', address, file) {
+    I.waitForElement(this.fields(party).childApplicant.id);
     await I.runAccessibilityTest();
-    await within(this.fields.childApplicant.id, () => {
-      I.click(this.fields.childApplicant.options.yes);
+    await within(this.fields(party).childApplicant.id, () => {
+      const { yes, no } = this.fields(party).childApplicant.options;
+      I.click(address ? yes : no);
     });
 
-   await litigationFriend.enterLitigantFriendWithDifferentAddressToLitigant('applicant1', address, file);
+    if(address) {
+      await litigationFriend.enterLitigantFriendWithDifferentAddressToLitigant(party, address, file);
+    }
 
     await I.clickContinue();
   }

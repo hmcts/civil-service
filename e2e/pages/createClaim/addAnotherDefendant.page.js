@@ -12,11 +12,12 @@ module.exports = {
     },
   },
 
-  async enterAddAnotherDefendant() {
+  async enterAddAnotherDefendant(addAnotherDefendant) {
     I.waitForElement(this.fields.addRespondent2.id);
     await I.runAccessibilityTest();
     await within(this.fields.addRespondent2.id, () => {
-      I.click(this.fields.addRespondent2.options.yes);
+      const { yes, no } = this.fields.addRespondent2.options;
+      I.click(addAnotherDefendant ? yes : no);
     });
 
     await I.clickContinue();

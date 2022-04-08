@@ -9,6 +9,9 @@ module.exports = {
     respondent1DQ: {
       name: 'input[id$="uiStatementOfTruth_name"',
       role: 'input[id$="uiStatementOfTruth_role"',    },
+    respondent2DQ: {
+      name: 'input[id$="uiStatementOfTruth_name"',
+      role: 'input[id$="uiStatementOfTruth_role"',    },
     applicant1DQ: {
       name: 'input[id$="uiStatementOfTruth_name"',
       role: 'input[id$="uiStatementOfTruth_role"',    }
