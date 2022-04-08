@@ -571,12 +571,10 @@ public class EventHistoryMapper {
                               .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                               .eventDetails(EventDetails.builder()
                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                    .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                    .preferredCourtName("")
+    //local change - to be removed  // .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                   // .preferredCourtName("")
                                     .build())
-                              .eventDetailsText(prepareEventDetailsText(
-                                  applicantDetails.get(index).getDq(),
-                                  caseData.getCourtLocation().getApplicantPreferredCourt()))
+                              .eventDetailsText("going to proceed")
                               .build())
             .collect(Collectors.toList());
         builder.directionsQuestionnaireFiled(dqForProceedingApplicants);

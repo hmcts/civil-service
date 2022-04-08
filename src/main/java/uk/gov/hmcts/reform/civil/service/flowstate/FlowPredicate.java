@@ -95,8 +95,9 @@ public class FlowPredicate {
             && caseData.getRespondent2Represented() != NO
             && caseData.getRespondent2OrgRegistered() != NO;
 
+    //local change - to be removed
     public static final Predicate<CaseData> claimNotified = caseData ->
-        !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType()) && null != caseData.getSuperClaimType()
             && caseData.getClaimNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
             || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
@@ -113,8 +114,10 @@ public class FlowPredicate {
         caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
 
+    //local change - to be removed
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
-        caseData.getClaimDetailsNotificationDate() != null
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType()) && null != caseData.getSuperClaimType()
+            && caseData.getClaimDetailsNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
             || hasNotifiedClaimDetailsToBoth.test(caseData));
 
@@ -452,10 +455,12 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 
+    //local change - to be removed
     public static final Predicate<CaseData> fullDefenceSpec = caseData ->
-        SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+       // SPEC_CLAIM.equals(caseData.getSuperClaimType())
+         //   &&
+            caseData.getRespondent1ResponseDate() != null;
+           // && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
 
     private FlowPredicate() {
         //Utility class

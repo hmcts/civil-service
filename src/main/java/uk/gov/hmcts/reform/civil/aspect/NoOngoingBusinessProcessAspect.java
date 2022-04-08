@@ -35,8 +35,8 @@ public class NoOngoingBusinessProcessAspect {
         CaseData caseData = callbackParams.getCaseData();
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
-            || caseData.hasNoOngoingBusinessProcess()
-            || valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
+            || caseData.hasNoOngoingBusinessProcess()//local change - to be removed
+            || valueOf(CaseEvent.CLAIMANT_RESPONSE_SPEC).equals(callbackParams.getRequest().getEventId())
         ) {
             return joinPoint.proceed();
         }

@@ -89,4 +89,17 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrdered;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyToProceedSpec;
+
 }
