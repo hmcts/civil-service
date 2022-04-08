@@ -88,4 +88,18 @@
     <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
     <cve>CVE-2020-36518</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: nanoid:3.1.25
+   ]]></notes>
+    <packageUrl regex="true">^pkg:npm/nanoid@.*$</packageUrl>
+    <vulnerabilityName>1067367</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: follow-redirects:1.14.4
+   ]]></notes>
+    <packageUrl regex="true">^pkg:npm/follow\-redirects@.*$</packageUrl>
+    <vulnerabilityName>1067407</vulnerabilityName>
+  </suppress>
 </suppressions>
