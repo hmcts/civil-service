@@ -10,12 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -37,14 +39,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
-public class RespondToDefenceSpecCallbackHandler extends CallbackHandler implements ExpertsValidator,
-    WitnessesValidator {
+public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
-    private final ExitSurveyContentService exitSurveyContentService;
-    private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final UnavailableDateValidator unavailableDateValidator;
+    private final ExitSurveyContentService exitSurveyContentService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -54,25 +56,30 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler impleme
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
+            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
-    private CallbackResponse populateCaseData(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+    private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
 
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .build();
+        List<String> errors;
+        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            SmallClaimHearing smallClaimHearing = caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing();
+            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
+        } else {
+            HearingLRspec hearingLRspec = caseData.getApplicant1DQ().getApplicant1DQHearingLRspec();
+            errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
@@ -82,16 +89,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler impleme
 
     private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
         return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
-    }
-
-    private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Hearing hearing = caseData.getApplicant1DQ().getHearing();
-        List<String> errors = unavailableDateValidator.validate(hearing);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
@@ -129,6 +126,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler impleme
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse populateCaseData(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
