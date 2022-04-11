@@ -65,12 +65,12 @@ withNightlyPipeline(type, product, component) {
   //enableSecurityScan()
 
   enableFullFunctionalTest(200)
- // after('fullFunctionalTest') {
-    //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
+  after('fullFunctionalTest') {
+    sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
    // sh """ ./gradlew runApiAndEndToEndUnspecTests """
- //   archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
- //   env.TESTS_FOR_ACCESSIBILITY = false
- // }
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    env.TESTS_FOR_ACCESSIBILITY = false
+  }
 
 //  enableCrossBrowserTest()
 //
