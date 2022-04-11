@@ -562,22 +562,48 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
         builder.replyToDefence(replyDefenceForProceedingApplicants);
 
-        List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                              .dateReceived(applicantDetails.get(index).getResponseDate())
-                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                              .eventDetails(EventDetails.builder()
-                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-    //local change - to be removed  // .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                   // .preferredCourtName("")
-                                    .build())
-                              .eventDetailsText("going to proceed")
-                              .build())
-            .collect(Collectors.toList());
-        builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
+                .mapToObj(index ->
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode("")
+                                                    .preferredCourtName("")
+                                                    .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      ""
+                                  ))
+                                  .build())
+                .collect(Collectors.toList());
+            builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
+        } else {
+            List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
+                .mapToObj(index ->
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                        .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                        .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                        .preferredCourtName("")
+                                        .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      caseData.getCourtLocation().getApplicantPreferredCourt()
+                                  ))
+                                  .build())
+                .collect(Collectors.toList());
+            builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
+        }
+
 
         List<Event> miscText = IntStream.range(0, miscEventText.size())
             .mapToObj(index ->
