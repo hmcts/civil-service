@@ -30,7 +30,7 @@
     "test:crossbrowser": "./e2e/run-crossbrowser-tests.sh",
     "test:AATFunctional": "./e2e/run-prod-functional-tests.sh",
     "test:DemoFunctional": "./e2e/run-features-flag-enabled-functional-tests.sh",
-    "test:fullfunctional": "MOCHAWESOME_REPORTFILENAME=api npx codeceptjs run --grep @api-unspec --reporter mocha-multi --verbose",
+    "test:fullfunctional": "./e2e/run-features-flag-enabled-functional-tests.sh",
     "test:sdo": "MOCHAWESOME_REPORTFILENAME=functional npx codeceptjs run --grep @sdo --reporter mocha-multi --verbose",
     "prepare": "husky install"
   },
