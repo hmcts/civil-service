@@ -921,7 +921,6 @@ class StateFlowEngineTest {
         @Nested
         class DefendantResponseMultiparty {
 
-            @Disabled
             @Test
             //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
@@ -953,7 +952,6 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Disabled
             @Test
             //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
@@ -985,7 +983,6 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Disabled
             @Test
             //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
@@ -1017,7 +1014,6 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Disabled
             @Test
             //1v2 Different solicitor scenario-first party acknowledges, not responds
             // second party submits response FullDefence
@@ -1293,7 +1289,6 @@ class StateFlowEngineTest {
                                                                         entry("RPA_CONTINUOUS_FEED", true));
         }
 
-        @Disabled
         @Test
         //1v2 Different solicitor scenario-first response FullDefence received and with time extension
         void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAndTimeExtension() {
@@ -1326,7 +1321,6 @@ class StateFlowEngineTest {
             );
         }
 
-        @Disabled
         @Test
         //1v2 Different solicitor scenario-first response FullDefence received and with time extension
         void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAfterAcknowledgeClaimAndTimeExtension() {
