@@ -27,6 +27,7 @@ public class Applicant1DQ implements DQ {
     private final FurtherInformation applicant1DQFurtherInformation;
     private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
+    private final VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
     private final FutureApplications applicant1DQFutureApplications;
     private final WelshLanguageRequirements applicant1DQLanguageLRspec;
 
@@ -110,6 +111,12 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return applicant1DQStatementOfTruth;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQVulnerabilityQuestions")
+    public VulnerabilityQuestions getVulnerabilityQuestions() {
+        return applicant1DQVulnerabilityQuestions;
     }
 
     @Override

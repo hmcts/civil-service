@@ -135,9 +135,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
             responseBuilder.confirmationBody(
-                "<br>You've chosen to proceed with the claim. "
-                    + "This means that your claim cannot continue online."
-                    + "<br><br>We'll review the case and contact you about what to do next.")
+                    "<br>You've chosen to proceed with the claim. "
+                        + "This means that your claim cannot continue online."
+                        + "<br><br>We'll review the case and contact you about what to do next.")
                 .confirmationHeader(format(
                     "# You have submitted your intention to proceed%n## Claim number: %s",
                     claimNumber));
