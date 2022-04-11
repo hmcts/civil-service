@@ -25,7 +25,9 @@ public class Respondent2DQ implements DQ {
     private final HearingSupport respondent2DQHearingSupport;
     private final FurtherInformation respondent2DQFurtherInformation;
     private final WelshLanguageRequirements respondent2DQLanguage;
+    private final WelshLanguageRequirements respondent2DQLanguageLRspec;
     private final StatementOfTruth respondent2DQStatementOfTruth;
+    private final VulnerabilityQuestions respondent2DQVulnerabilityQuestions;
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
@@ -109,5 +111,17 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return respondent2DQStatementOfTruth;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQVulnerabilityQuestions")
+    public VulnerabilityQuestions getVulnerabilityQuestions() {
+        return respondent2DQVulnerabilityQuestions;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQLanguageLRspec")
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return respondent2DQLanguageLRspec;
     }
 }
