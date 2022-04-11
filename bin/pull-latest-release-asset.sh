@@ -17,5 +17,5 @@ curl -L \
   --output $assetName \
   https://api.github.com/repos/hmcts/${repoName}/releases/assets/${latestAssetId} \
 
-unzip $assetName
+unzip -o $assetName
 rm $assetName
