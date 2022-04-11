@@ -61,26 +61,26 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
-  //enableFortifyScan()
-  //enableSecurityScan()
+  enableFortifyScan()
+  enableSecurityScan()
 
   enableFullFunctionalTest(200)
+
   after('fullFunctionalTest') {
     //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
-   // sh """ ./gradlew runApiAndEndToEndUnspecTests """
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    //sh """ ./gradlew runApiAndEndToEndUnspecTests """
+   // archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
    // env.TESTS_FOR_ACCESSIBILITY = false
   }
 
-//  enableCrossBrowserTest()
-//
-//  after('crossBrowserTest') {
-//    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
-//  }
+  enableCrossBrowserTest()
 
-//  after('fortify-scan') {
-//    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-//  }
+  after('crossBrowserTest') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+  }
 
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 }
 
