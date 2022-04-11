@@ -567,7 +567,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .doesNotContain(caseData.getApplicant1().getPartyName())
             .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
         assertThat(response.getConfirmationHeader())
-            .contains("You have chosen to counterclaim");
+            .contains("You've chosen to counterclaim");
     }
 
     @Nested

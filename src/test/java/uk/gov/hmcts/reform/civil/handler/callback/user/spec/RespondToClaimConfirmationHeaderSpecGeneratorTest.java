@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.CounterClaimConfirmationHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +23,13 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
     @Override
     public List<Pair<CaseData,
         Class<? extends RespondToClaimConfirmationHeaderSpecGenerator>>> getCasesToExpectedImplementation() {
-        List<Pair<CaseData, Class<? extends RespondToClaimConfirmationHeaderSpecGenerator>>> list = new ArrayList<>();
-        get2v1DifferentResponseCase().forEach(caseData ->
-                                                  list.add(Pair.of(
-                                                      caseData,
-                                                      SpecResponse2v1DifferentHeaderText.class
-                                                  )));
+        List<Pair<CaseData, Class<? extends RespondToClaimConfirmationHeaderSpecGenerator>>> list = new ArrayList<>(
+            List.of(
+                Pair.of(getCounterClaim(), CounterClaimConfirmationHeaderText.class)
+            ));
+        get2v1DifferentResponseCase().forEach(caseData -> list.add(
+            Pair.of(caseData, SpecResponse2v1DifferentHeaderText.class))
+        );
         return list;
     }
 
@@ -53,4 +56,13 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
         }
         return cases;
     }
+
+    private CaseData getCounterClaim() {
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+    }
+
 }

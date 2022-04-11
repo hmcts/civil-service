@@ -192,7 +192,7 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                 Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
                 Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
                 Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
-                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class)
+                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
                 Pair.of(getCounterClaim(), CounterClaimConfirmationText.class)
             ));
         get2v1DifferentResponseCase().forEach(caseData -> list.add(
