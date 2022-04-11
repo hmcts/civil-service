@@ -339,12 +339,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getConfirmationBody())
-                .contains("chosen to proceed with the claim",
-                          "your claim cannot continue online",
-                          "review the case",
-                          "contact you about what to do next");
+                .contains("contact you about what to do next");
             assertThat(response.getConfirmationHeader())
-                .contains("intention to proceed",
+                .contains("decided to proceed",
                           caseData.getLegacyCaseReference());
         }
 
@@ -362,7 +359,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getConfirmationBody())
-                .contains("not to proceed with the claim");
+                .contains("not to proceed");
             assertThat(response.getConfirmationHeader())
                 .contains("not to proceed",
                           caseData.getLegacyCaseReference());
