@@ -191,7 +191,7 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
+  commandLine '/usr/bin/yarn', 'test:api-unspec'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
