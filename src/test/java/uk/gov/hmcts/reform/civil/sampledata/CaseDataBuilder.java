@@ -241,7 +241,7 @@ public class CaseDataBuilder {
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
-    private Address specAoSApplicantCorrespondenceAddressdetails;
+    private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
 
@@ -2381,13 +2381,15 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
+        YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
         this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
         return this;
     }
 
-    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressdetails(Address specAoSApplicantCorrespondenceAddressdetails) {
-        this.specAoSApplicantCorrespondenceAddressdetails = specAoSApplicantCorrespondenceAddressdetails;
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressDetails(
+        Address specAoSApplicantCorrespondenceAddressDetails) {
+        this.specAoSApplicantCorrespondenceAddressDetails = specAoSApplicantCorrespondenceAddressDetails;
         return this;
     }
 
@@ -2551,7 +2553,7 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
             .specAoSApplicantCorrespondenceAddressRequired(specAoSApplicantCorrespondenceAddressRequired)
-            .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressdetails)
+            .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressDetails)
             .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
             .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
             .build();

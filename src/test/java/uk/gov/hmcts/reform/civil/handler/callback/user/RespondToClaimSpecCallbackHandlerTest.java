@@ -50,7 +50,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -632,7 +634,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressdetails(AddressBuilder.maximal().build())
+                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -642,11 +644,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
             assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
             assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
         }
 
         @Test
@@ -670,11 +675,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
             assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
             assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
         }
     }
 }
