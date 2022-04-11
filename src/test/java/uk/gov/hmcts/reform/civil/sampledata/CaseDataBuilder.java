@@ -240,6 +240,10 @@ public class CaseDataBuilder {
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
+    private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
+    private Address specAoSApplicantCorrespondenceAddressdetails;
+    private YesOrNo specAoSRespondent2HomeAddressRequired;
+    private Address specAoSRespondent2HomeAddressDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2377,6 +2381,26 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
+        this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressdetails(Address specAoSApplicantCorrespondenceAddressdetails) {
+        this.specAoSApplicantCorrespondenceAddressdetails = specAoSApplicantCorrespondenceAddressdetails;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSRespondent2HomeAddressRequired(YesOrNo specAoSRespondent2HomeAddressRequired) {
+        this.specAoSRespondent2HomeAddressRequired = specAoSRespondent2HomeAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSRespondent2HomeAddressDetails(Address specAoSRespondent2HomeAddressDetails) {
+        this.specAoSRespondent2HomeAddressDetails = specAoSRespondent2HomeAddressDetails;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -2526,6 +2550,10 @@ public class CaseDataBuilder {
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
+            .specAoSApplicantCorrespondenceAddressRequired(specAoSApplicantCorrespondenceAddressRequired)
+            .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressdetails)
+            .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
+            .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
             .build();
     }
 }
