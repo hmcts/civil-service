@@ -530,8 +530,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                INITIATE_GENERAL_APPLICATION,
-                CLAIMANT_RESPONSE_SPEC//local change - to be removed
+                INITIATE_GENERAL_APPLICATION
             )
         ),
 
@@ -543,8 +542,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                INITIATE_GENERAL_APPLICATION,
-                CLAIMANT_RESPONSE_SPEC//local change - to be removed
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
