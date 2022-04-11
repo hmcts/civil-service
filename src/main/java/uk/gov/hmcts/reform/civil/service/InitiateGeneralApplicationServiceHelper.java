@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -66,49 +66,57 @@ public class InitiateGeneralApplicationServiceHelper {
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
             .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
             .collect(Collectors.toList());
-        try {
-            if (!CollectionUtils.isEmpty(respondentSolicitors)) {
-                List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-                String applicantOrgCaseRole = caseData.getApplicant1OrganisationPolicy()
-                    .getOrgPolicyCaseAssignedRole();
-                String respondentOrgCaseRole = caseData.getRespondent1OrganisationPolicy()
-                    .getOrgPolicyCaseAssignedRole();
+        if (!CollectionUtils.isEmpty(respondentSolicitors)) {
+            List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-                respondentSolicitors.forEach((respSol) -> {
-
-                    GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = GASolicitorDetailsGAspec
-                        .builder()
-                        .id(respSol.getUserId())
-                        .email(respSol.getCaseRole() != null
-                                   ? (respSol.getCaseRole().equals(applicantOrgCaseRole)
-                            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                            : respSol.getCaseRole().equals(respondentOrgCaseRole)
-                            ? caseData.getRespondentSolicitor1EmailAddress()
-                            : caseData.getRespondentSolicitor2EmailAddress())
-                                   : StringUtils.EMPTY)
-                        .organisationIdentifier(respSol.getCaseRole() != null
-                                                    ? (respSol.getCaseRole().equals(applicantOrgCaseRole)
-                            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
-                            : respSol.getCaseRole().equals(respondentOrgCaseRole)
-                            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-                            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-                                                    : StringUtils.EMPTY).build();
-
-                    respondentSols.add(element(gaSolicitorDetailsGAspec));
-                });
-                applicationBuilder.generalAppRespondentSolicitors(respondentSols);
+            if (caseData.getApplicant1OrganisationPolicy() == null
+                || caseData.getRespondent1OrganisationPolicy() == null
+                || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
+                throw new IllegalArgumentException("Solicitor Org details are not set correctly.");
             }
+            String applicantOrgCaseRole = caseData.getApplicant1OrganisationPolicy()
+                .getOrgPolicyCaseAssignedRole();
+            String respondentOrgCaseRole = caseData.getRespondent1OrganisationPolicy()
+                .getOrgPolicyCaseAssignedRole();
 
-            return applicationBuilder
-                .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
-                                               ? YesOrNo.YES
-                                               : YesOrNo.NO).build();
+            respondentSolicitors.forEach((respSol) -> {
+                GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder specBuilder = GASolicitorDetailsGAspec
+                    .builder();
 
-        } catch (Exception e) {
-            log.error(e.toString());
-            throw e;
+                specBuilder.id(respSol.getUserId());
+                if (respSol.getCaseRole() != null) {
+                    if (respSol.getCaseRole().equals(applicantOrgCaseRole)) {
+                        if (caseData.getApplicantSolicitor1UserDetails() != null) {
+                            specBuilder.email(caseData.getApplicantSolicitor1UserDetails().getEmail());
+                        }
+
+                        specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
+                                                               .getOrganisation().getOrganisationID());
+                    } else if (respSol.getCaseRole().equals(respondentOrgCaseRole)) {
+                        specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
+                        specBuilder.organisationIdentifier(caseData.getRespondent1OrganisationPolicy()
+                                                               .getOrganisation().getOrganisationID());
+                    } else {
+                        specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
+                        specBuilder.organisationIdentifier(caseData.getRespondent2OrganisationPolicy()
+                                                               .getOrganisation().getOrganisationID());
+                    }
+                } else {
+                    specBuilder.email(StringUtils.EMPTY);
+                    specBuilder.organisationIdentifier(StringUtils.EMPTY);
+                }
+
+                GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
+                respondentSols.add(element(gaSolicitorDetailsGAspec));
+            });
+            applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
+
+        return applicationBuilder
+            .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
+                                           ? YES
+                                           : YesOrNo.NO).build();
     }
 
     public String getCaaAccessToken() {
