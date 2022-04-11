@@ -8,9 +8,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
@@ -28,8 +26,7 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
             .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
 
-        if (Stream.of(howMuchWasPaid, totalClaimAmount)
-            .anyMatch(Objects::isNull)) {
+        if (howMuchWasPaid == null || totalClaimAmount == null) {
             return Optional.empty();
         }
 

@@ -19,6 +19,7 @@ public class Applicant1DQ implements DQ {
     private final Experts applicant1DQExperts;
     private final Witnesses applicant1DQWitnesses;
     private final Hearing applicant1DQHearing;
+    private final HearingLRspec applicant1DQHearingLRspec;
     private final SmallClaimHearing applicant1DQSmallClaimHearing;
     private final Document applicant1DQDraftDirections;
     private final RequestedCourt applicant1DQRequestedCourt;
@@ -26,6 +27,9 @@ public class Applicant1DQ implements DQ {
     private final FurtherInformation applicant1DQFurtherInformation;
     private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
+    private final VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
+    private final FutureApplications applicant1DQFutureApplications;
+    private final WelshLanguageRequirements applicant1DQLanguageLRspec;
 
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
@@ -107,5 +111,17 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return applicant1DQStatementOfTruth;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQVulnerabilityQuestions")
+    public VulnerabilityQuestions getVulnerabilityQuestions() {
+        return applicant1DQVulnerabilityQuestions;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQLanguageLRspec")
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return applicant1DQLanguageLRspec;
     }
 }

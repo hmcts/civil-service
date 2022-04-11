@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -233,6 +234,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -249,6 +251,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -471,6 +474,8 @@ class FlowStateAllowedEventServiceTest {
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
@@ -577,6 +582,16 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.getAllowedStates(caseEvent))
                 .containsExactlyInAnyOrder(flowStates);
         }
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
+        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
+            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
+                .isEmpty();
+            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
+                .isNotEmpty();
+        }
     }
 
     static class GetAllowedStatesForCaseDetailsArguments implements ArgumentsProvider {
@@ -672,6 +687,19 @@ class FlowStateAllowedEventServiceTest {
                 expected = false;
             }
             //work around ends.
+
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
+                .isEqualTo(expected);
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
+        void shouldReturnValidStates_whenCaseEventIsGiven_spec(
+            boolean expected,
+            CaseDetails caseDetails,
+            CaseEvent caseEvent
+        ) {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
 
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);

@@ -13,10 +13,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -51,7 +55,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -69,10 +77,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private final PostcodeValidator postcodeValidator;
     private final PaymentDateValidator paymentDateValidator;
     private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
+    private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
+    private final FeatureToggleService toggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -96,6 +110,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
+            .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .build();
     }
 
@@ -108,8 +123,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
+
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
+            if (caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+                == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+            } else {
+                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+            }
+            if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+                != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+                caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+            } else {
+                caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
+            }
             return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -131,6 +163,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
             caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
                 .build();
+        }
+        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
+            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+        }
+        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+            caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
@@ -163,11 +211,81 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
      */
     private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+
+        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+            &&
+            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART)
+                .build();
+        }
+        //this logic to be removed when ccd supports AND-OR combinations
+        if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
+            }
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION).build();
+            }
+        }
+
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && caseData.getRespondentResponseIsSame().equals(NO)) {
+            updatedData.sameSolicitorSameResponse(NO).build();
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
+        }
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specFullAdmissionOrPartAdmission(YES).build();
+        }
+        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            &&
+            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+               || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+               || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART)
+                .build();
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission1V1(YES).build();
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission(YES).build();
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specDefenceFullAdmittedRequired(NO).build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
@@ -186,6 +304,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                     .respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
+        } else {
+            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
         }
         return caseData;
     }
@@ -223,6 +343,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .respondent2Copy(caseData.getRespondent2())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -344,7 +465,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
-        String header;
 
         String body = CaseDataToTextGenerator.getTextFor(
             confirmationTextSpecGenerators.stream(),
@@ -352,15 +472,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             caseData
         );
 
-        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            header = "# You have chosen to counterclaim%n## Claim number: %s";
-        } else {
-            header = "# You've submitted your response%n## Claim number: %s";
-        }
+        String header = CaseDataToTextGenerator.getTextFor(
+            confirmationHeaderGenerators.stream(),
+            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            caseData
+        );
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(
-                format(header, claimNumber))
+            .confirmationHeader(header)
             .confirmationBody(body)
             .build();
     }
@@ -388,39 +507,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private Optional<String> getPartialAdmitPaidLessSummary(CaseData caseData) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            return Optional.empty();
-        }
-
-        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
-        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
-
-        if (howMuchWasPaid == null || totalClaimAmount == null
-            || howMuchWasPaid.compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount))) >= 0) {
-            return Optional.empty();
-        }
-
-        String applicantName = caseData.getApplicant1().getPartyName();
-
-        String sb = "<br>You told us you've paid the &#163;"
-            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
-            + ". We've sent "
-            + applicantName
-            + " this response."
-            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " accepts your response</h3>"
-            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " rejects your response</h3>"
-            + "<p>The court will review the case. You may have to go to a hearing.</p>"
-            + "<p>We'll contact you to tell you what to do next.</p>";
-        return Optional.of(sb);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
