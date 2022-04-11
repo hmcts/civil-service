@@ -501,6 +501,11 @@ public class FlowPredicate {
         isDivergentResponsesWithDQAndGoOfflineSpec(caseData);
 
     private static boolean isDivergentResponsesWithDQAndGoOfflineSpec(CaseData caseData) {
+
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
                 //scenario: only one of them have submitted full defence response
@@ -534,6 +539,11 @@ public class FlowPredicate {
         isDivergentResponsesGoOfflineSpec(caseData);
 
     private static boolean isDivergentResponsesGoOfflineSpec(CaseData caseData) {
+
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return !caseData.getRespondent1ClaimResponseTypeForSpec()
