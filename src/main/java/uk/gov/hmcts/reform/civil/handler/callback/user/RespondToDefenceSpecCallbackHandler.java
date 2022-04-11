@@ -135,19 +135,28 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
             responseBuilder.confirmationBody(
-                    "<br>You've chosen to proceed with the claim. "
-                        + "This means that your claim cannot continue online."
-                        + "<br><br>We'll review the case and contact you about what to do next.")
+                    "<br><h2 class=\"govuk-heading-m\">What happens next</h2>"
+                        + "<br>We will review the case and contact you about what to do next. "
+                        + format(
+                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    ))
                 .confirmationHeader(format(
-                    "# You have submitted your intention to proceed%n## Claim number: %s",
-                    claimNumber));
+                    "# You have decided to proceed with the claim%n## Claim number: %s",
+                    claimNumber
+                ));
         } else {
             responseBuilder.confirmationBody(
-                    "<br>You've decided not to proceed with the claim. "
-                        + "We'll contact the defendant to tell them your decision.")
+                    "<br><h2 class=\"govuk-heading-m\">What happens next</h2>"
+                        + "<br>You have decided not to proceed and the case will end. "
+                        + format(
+                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    ))
                 .confirmationHeader(format(
-                    "# You have chosen not to proceed%n## Claim number: %s",
-                    claimNumber));
+                    "# You have decided not to proceed with the claim%n## Claim number: %s",
+                    claimNumber
+                ));
         }
 
         return responseBuilder.build();
