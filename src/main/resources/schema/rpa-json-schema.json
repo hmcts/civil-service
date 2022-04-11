@@ -48,6 +48,7 @@
           "type": "string",
           "enum": [
             "PERSONAL INJURY",
+            "SPECIFIED CLAIM",
             "TBD2",
             "TBD3",
             ""

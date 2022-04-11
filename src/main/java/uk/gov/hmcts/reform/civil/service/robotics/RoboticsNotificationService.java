@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,13 +19,18 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataExceptio
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Slf4j
@@ -54,7 +60,7 @@ public class RoboticsNotificationService {
 
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())  && toggleService.isLrSpecEnabled()) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
@@ -91,6 +97,39 @@ public class RoboticsNotificationService {
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
+        List<Event> events = flatEvents(eventHistory);
+        events.sort(Comparator.comparing(Event::getDateReceived));
+
+        List<Event> lastMiscellaneousEvent = events.stream()
+            .filter(event ->
+                        event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
+                        && event.getEventCode().equals(MISCELLANEOUS.getCode()))
+            .collect(Collectors.toList());
+
+        return lastMiscellaneousEvent.size() == 1 ?  lastMiscellaneousEvent.get(0).getEventDetailsText()
+            : events.get(events.size() - 1).getEventDetailsText();
+    }
+
+    private static List<Event> flatEvents(EventHistory eventHistory) {
+        List<List<Event>> eventsList = Lists.newArrayList(
+            eventHistory.getMiscellaneous(),
+            eventHistory.getAcknowledgementOfServiceReceived(),
+            eventHistory.getConsentExtensionFilingDefence(),
+            eventHistory.getDefenceFiled(),
+            eventHistory.getDefenceAndCounterClaim(),
+            eventHistory.getReceiptOfPartAdmission(),
+            eventHistory.getReceiptOfAdmission(),
+            eventHistory.getReplyToDefence(),
+            eventHistory.getDirectionsQuestionnaireFiled()
+        );
+        return eventsList.stream()
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(event -> event.getDateReceived() != null)
+            .collect(Collectors.toList());
+    }
+
+    public static String findLatestEventTriggerReasonSpec(EventHistory eventHistory) {
 
         List<Event> event = eventHistory.getMiscellaneous();
         String triggerReason = getLastDetailsText(event).orElse(null);

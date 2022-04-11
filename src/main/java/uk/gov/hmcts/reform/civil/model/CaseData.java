@@ -143,11 +143,13 @@ public class CaseData implements MappableObject {
     private final ServedDocumentFiles servedDocumentFiles;
 
     private final YesOrNo respondentResponseIsSame;
+    private final YesOrNo defendantSingleResponseToBothClaimants;
     private final RespondentResponseType respondent1ClaimResponseType;
     private final RespondentResponseType respondent2ClaimResponseType;
     private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     private final ResponseDocument respondent1ClaimResponseDocument;
     private final ResponseDocument respondent2ClaimResponseDocument;
+    private final ResponseDocument respondentSharedClaimResponseDocument;
     private final CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
     private final List<Element<CaseDocument>> defendantResponseDocuments;
@@ -195,6 +197,9 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private final String defenceRouteRequired;
@@ -289,6 +294,13 @@ public class CaseData implements MappableObject {
     private final MultiPartyScenario claimantResponseScenarioFlag;
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
+    private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    private YesOrNo specFullAdmissionOrPartAdmission;
+    private YesOrNo sameSolicitorSameResponse;
+    private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
+    private YesOrNo specFullDefenceOrPartAdmission1V1;
+    private YesOrNo specFullDefenceOrPartAdmission;
+    private YesOrNo specDisputesOrPartAdmission;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -327,4 +339,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
+
+    private final YesOrNo claimStarted;
 }

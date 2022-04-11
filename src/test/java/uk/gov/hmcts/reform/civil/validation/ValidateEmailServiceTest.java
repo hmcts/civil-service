@@ -33,7 +33,6 @@ class ValidateEmailServiceTest {
             "email@domain.com",
             "email@domain.COM",
             "firstname.lastname@domain.com",
-            "firstname.o'lastname@domain.com",
             "email@subdomain.domain.com",
             "firstname+lastname@domain.com",
             "1234567890@domain.com",
@@ -87,6 +86,7 @@ class ValidateEmailServiceTest {
             "brackets(in)local@domain.com",
             ".Douglas.@hmcts.net",
             "Douglas.@hmcts.net",
+            "firstname.o'lastname@domain.com",
             format("%s@example.com", "a".repeat(65)),
             format("email-too-long-%s@example.com", "a".repeat(320)));
     }

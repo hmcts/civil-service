@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -56,7 +59,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::emptyCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -121,5 +124,41 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        String claimNumber = caseData.getLegacyCaseReference();
+
+        SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
+            SubmittedCallbackResponse.builder();
+
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+            responseBuilder.confirmationBody(
+                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                        + "We will review the case and contact you about what to do next. "
+                        + format(
+                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    ))
+                .confirmationHeader(format(
+                    "# You have decided to proceed with the claim%n## Claim number: %s",
+                    claimNumber
+                ));
+        } else {
+            responseBuilder.confirmationBody(
+                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                        + "You have decided not to proceed and the case will end. "
+                        + format(
+                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    ))
+                .confirmationHeader(format(
+                    "# You have decided not to proceed with the claim%n## Claim number: %s",
+                    claimNumber
+                ));
+        }
+
+        return responseBuilder.build();
     }
 }

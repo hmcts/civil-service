@@ -13,21 +13,22 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 abstract class DQTest {
 
     protected DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments() {
         return DisclosureOfNonElectronicDocuments.builder()
-            .directionsForDisclosureProposed(YesOrNo.YES)
-            .standardDirectionsRequired(YesOrNo.YES)
+            .directionsForDisclosureProposed(YES)
+            .standardDirectionsRequired(YES)
             .bespokeDirections("non electronic documents")
             .build();
     }
 
     protected Witnesses witnesses() {
         return Witnesses.builder()
-            .witnessesToAppear(YesOrNo.YES)
+            .witnessesToAppear(YES)
             .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
             .build();
     }
@@ -43,7 +44,7 @@ abstract class DQTest {
         return RequestedCourt.builder()
             .responseCourtCode("343")
             .reasonForHearingAtSpecificCourt("reason for court")
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
+            .requestHearingAtSpecificCourt(YES)
             .build();
     }
 
@@ -60,14 +61,14 @@ abstract class DQTest {
         return Hearing.builder()
             .hearingLength(HearingLength.LESS_THAN_DAY)
             .hearingLengthHours("1")
-            .unavailableDatesRequired(YesOrNo.YES)
+            .unavailableDatesRequired(YES)
             .unavailableDates(wrapElements(UnavailableDate.builder().who("John Smith").date(LocalDate.now()).build()))
             .build();
     }
 
     protected FurtherInformation furtherInformation() {
         return FurtherInformation.builder()
-            .futureApplications(YesOrNo.YES)
+            .futureApplications(YES)
             .otherInformationForJudge("Other information")
             .reasonForFutureApplications("Reason for future applications")
             .build();
@@ -76,7 +77,7 @@ abstract class DQTest {
     protected FileDirectionsQuestionnaire fileDirectionsQuestionnaire() {
         return FileDirectionsQuestionnaire.builder()
             .explainedToClient(List.of("yes"))
-            .oneMonthStayRequested(YesOrNo.YES)
+            .oneMonthStayRequested(YES)
             .reactionProtocolCompliedWith(YesOrNo.NO)
             .reactionProtocolNotCompliedWithReason("Not complied with reason")
             .build();
@@ -84,9 +85,9 @@ abstract class DQTest {
 
     protected Experts experts() {
         return Experts.builder()
-            .expertRequired(YesOrNo.YES)
+            .expertRequired(YES)
             .expertReportsSent(ExpertReportsSent.YES)
-            .jointExpertSuitable(YesOrNo.YES)
+            .jointExpertSuitable(YES)
             .details(wrapElements(Expert.builder()
                                       .name("John Smith")
                                       .fieldOfExpertise("Science")
@@ -106,15 +107,15 @@ abstract class DQTest {
 
     protected DisclosureReport disclosureReport() {
         return DisclosureReport.builder()
-            .disclosureFormFiledAndServed(YesOrNo.YES)
-            .disclosureProposalAgreed(YesOrNo.YES)
+            .disclosureFormFiledAndServed(YES)
+            .disclosureProposalAgreed(YES)
             .draftOrderNumber("order number")
             .build();
     }
 
     protected DisclosureOfElectronicDocuments disclosureOfElectronicDocuments() {
         return DisclosureOfElectronicDocuments.builder()
-            .agreementLikely(YesOrNo.YES)
+            .agreementLikely(YES)
             .reachedAgreement(YesOrNo.NO)
             .reasonForNoAgreement("reason")
             .build();
@@ -125,6 +126,13 @@ abstract class DQTest {
             .court(Language.WELSH)
             .documents(Language.WELSH)
             .evidence(Language.WELSH)
+            .build();
+    }
+
+    protected VulnerabilityQuestions vulnerabilityQuestions() {
+        return VulnerabilityQuestions.builder()
+            .vulnerabilityAdjustmentsRequired(YES)
+            .vulnerabilityAdjustments("required adjustments")
             .build();
     }
 }
