@@ -80,6 +80,11 @@ public class ValidateEmailService {
             return false;
         }
 
+        if (emailAddress.contains("'")) {
+            log.warn("Email contains apostrophe");
+            return false;
+        }
+
         final Matcher emailMatcher = EMAIL_PATTERN.matcher(emailAddress);
 
         if (!emailMatcher.matches()) {
