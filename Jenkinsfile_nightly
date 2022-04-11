@@ -3,6 +3,7 @@
 properties([
   pipelineTriggers([cron('H 19 * * *')]),
   parameters([
+    string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
     string(name: 'FRONTEND_URL', defaultValue: 'https://manage-case.aat.platform.hmcts.net',
       description: 'The URL you want to run the full functional tests against'),
     string(name: 'IDAM_API_URL', defaultValue: 'https://idam-api.aat.platform.hmcts.net',
@@ -54,6 +55,9 @@ withNightlyPipeline(type, product, component) {
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
+  overrideVaultEnvironments([
+  'aat': params.ENVIRONMENT
+  ])
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
@@ -63,8 +67,8 @@ withNightlyPipeline(type, product, component) {
   enableFullFunctionalTest(200)
 
   after('fullFunctionalTest') {
-    sh """ ./gradlew runRpaHandOffTests """
-    sh """ ./gradlew runNightlyMultipartyTests """
+    //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
+    sh """ ./gradlew runApiAndEndToEndUnspecTests """
     archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
   }
