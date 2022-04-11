@@ -20,7 +20,8 @@ public class SpecResponse2v1DifferentText implements RespondToClaimConfirmationT
      */
     private static final String TEXT =
         "<br>The defendant has chosen different responses for each claimant and the claim cannot continue online."
-            + "Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to counterclaim.<br><br>"
+            + "&nbsp;Use form N9A to admit, or form N9B to counterclaim."
+            + "&nbsp;Do not create a new claim to counterclaim.<br><br>"
             + "<a href=\"http://www.gov.uk/respond-money-claim\" target=\"_blank\">"
             + "Download form N9A (opens in a new tab)</a><br>"
             + "<a href=\"http://www.gov.uk/respond-money-claim\" target=\"_blank\">"
