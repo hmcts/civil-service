@@ -470,6 +470,11 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseTypeForSpec() == responseType;
 
         boolean predicate = false;
+
+        if(!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
                 predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
