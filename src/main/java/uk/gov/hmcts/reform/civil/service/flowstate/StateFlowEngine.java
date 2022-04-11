@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
@@ -179,9 +180,10 @@ public class StateFlowEngine {
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec)
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec)
                 .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec)
-                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED).onlyIf(awaitingResponsesFullDefenceReceived)
+                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                    .onlyIf(awaitingResponsesFullDefenceReceived.and(specClaim))
                 .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesNonFullDefenceReceived)
+                    .onlyIf(awaitingResponsesNonFullDefenceReceived.and(specClaim))
             .state(CLAIM_NOTIFIED)
                 .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)

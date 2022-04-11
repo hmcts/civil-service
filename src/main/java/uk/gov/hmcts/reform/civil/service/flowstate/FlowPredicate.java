@@ -604,6 +604,9 @@ public class FlowPredicate {
         }
     }
 
+    public static final Predicate<CaseData> specClaim = caseData ->
+        SPEC_CLAIM.equals(caseData.getSuperClaimType());
+
     private FlowPredicate() {
         //Utility class
     }

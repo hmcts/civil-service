@@ -19,57 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.*;
 
 class FlowPredicateTest {
 
@@ -1366,9 +1316,17 @@ class FlowPredicateTest {
     @Nested
     class SpecOneVOneScenarios {
 
+        CaseDataBuilder caseDataBuilder;
+
+        @BeforeEach
+        void setup() {
+            caseDataBuilder = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim();
+        }
+
         @Test
         void shouldReturnTrue_whenDefendantResponseFullDefence() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = caseDataBuilder.build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
@@ -1377,13 +1335,13 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenNoDefendantResponseFullDefence() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertFalse(fullDefenceSpec.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenDefendantResponseFullAdmission() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = caseDataBuilder.build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
@@ -1392,13 +1350,13 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenNoDefendantResponseFullAdmission() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertFalse(fullAdmissionSpec.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenDefendantResponsePartAdmission() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = caseDataBuilder.build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
@@ -1407,13 +1365,13 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenNoDefendantResponsePartAdmission() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertFalse(partAdmissionSpec.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenDefendantResponseCounterClaim() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = caseDataBuilder.build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
@@ -1422,8 +1380,14 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnFalse_whenNoDefendantResponseCounterClaim() {
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertFalse(counterClaimSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenSuperClaimTypeIsSpec_Claim() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertTrue(specClaim.test(caseData));
         }
     }
 
@@ -1439,7 +1403,9 @@ class FlowPredicateTest {
 
                 @BeforeEach
                 void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoApplicants();
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .setSuperClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1528,7 +1494,9 @@ class FlowPredicateTest {
 
                 @BeforeEach
                 void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors();
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .setSuperClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1670,7 +1638,9 @@ class FlowPredicateTest {
 
                 @BeforeEach
                 void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor();
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimOneDefendantSolicitor()
+                        .setSuperClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1805,7 +1775,9 @@ class FlowPredicateTest {
 
                 @BeforeEach
                 void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoApplicants();
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .setSuperClaimTypeToSpecClaim();
                 }
 
                 @Test
