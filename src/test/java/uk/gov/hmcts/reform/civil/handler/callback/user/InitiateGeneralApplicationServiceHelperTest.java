@@ -232,15 +232,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     void shouldThrowExceptionIfNoRespondentExits() {
 
         try {
-            helper
-                .setApplicantAndRespondentDetailsIfExits(
-                    GeneralApplication
-                        .builder()
-                        .build(),
-                    getTestCaseData(CaseData.builder()
-                                        .build(), false),
-                    getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
-                );
+            helper.setApplicantAndRespondentDetailsIfExits(
+                GeneralApplication.builder().build(), getTestCaseData(CaseData.builder().build(), false),
+                getUserDetails(APPLICANT_EMAIL_ID_CONSTANT));
         } catch (Exception e) {
             assertEquals("java.lang.NullPointerException", e.toString());
         }
