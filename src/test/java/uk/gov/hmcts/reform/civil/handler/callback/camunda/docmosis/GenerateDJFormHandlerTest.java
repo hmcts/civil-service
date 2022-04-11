@@ -102,112 +102,6 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
-
-        }
-
-        @Test
-        public void shouldNotGenerateOneForm_when1v1Specified() {
-            CaseDocument document = CaseDocument.builder()
-                .createdBy("John")
-                .documentName("document name")
-                .documentSize(0L)
-                .documentType(DEFAULT_JUDGMENT)
-                .createdDatetime(LocalDateTime.now())
-                .documentLink(Document.builder()
-                                  .documentUrl("fake-url")
-                                  .documentFileName("file-name")
-                                  .documentBinaryUrl("binary-url")
-                                  .build())
-                .build();
-
-            List<CaseDocument> documents = new ArrayList<>();
-            documents.add(document);
-            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
-                                                       eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"),
-                                                          eq(GENERATE_DJ_FORM.name()));
-
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
-
-        }
-
-        @Test
-        public void shouldGenerateTwoForm_when1v2Specified() {
-            CaseDocument document = CaseDocument.builder()
-                .createdBy("John")
-                .documentName("document name")
-                .documentSize(0L)
-                .documentType(DEFAULT_JUDGMENT)
-                .createdDatetime(LocalDateTime.now())
-                .documentLink(Document.builder()
-                                  .documentUrl("fake-url")
-                                  .documentFileName("file-name")
-                                  .documentBinaryUrl("binary-url")
-                                  .build())
-                .build();
-
-            List<CaseDocument> documents = new ArrayList<>();
-            documents.add(document);
-            documents.add(document);
-            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
-                                                       eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().setEventId(GENERATE_DJ_FORM.name());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"),
-                                                          eq(GENERATE_DJ_FORM.name()));
-
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
-
-        }
-
-        @Test
         public void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -226,7 +120,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isNull();
 
         }
 

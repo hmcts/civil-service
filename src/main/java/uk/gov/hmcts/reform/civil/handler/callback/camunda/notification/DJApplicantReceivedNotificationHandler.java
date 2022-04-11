@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -33,9 +32,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-applicant-received-notification-%s";
-    private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-applicant-requested-notification-%s";
-    private String templateReference;
+    private static final String REFERENCE_TEMPLATE = "default-judgment-applicant-received-notification-%s";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -52,68 +49,15 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         return TASK_ID;
     }
 
-    private String identifyTemplate(CaseData caseData) {
-        String template = null;
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
-            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
-            templateReference = REFERENCE_TEMPLATE_RECEIVED;
-        }
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
-            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
-            templateReference = REFERENCE_TEMPLATE_REQUESTED;
-        }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
-            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
-            templateReference = REFERENCE_TEMPLATE_RECEIVED;
-        }
-        return template;
-    }
-
     private CallbackResponse notifyApplicantSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                identifyTemplate(caseData),
-                addProperties1v2FirstDefendant(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
-            );
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                identifyTemplate(caseData),
-                addProperties1v2SecondDefendant(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
-            );
-        }
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                identifyTemplate(caseData),
-                addProperties2(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
-            );
-        }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                identifyTemplate(caseData),
-                addProperties(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
-            );
-        }
+        //Send email to applicant solicitor
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -121,40 +65,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                               .getOrganisation()
-                                                               .getOrganisationID(), caseData),
+                                                                        .getOrganisation()
+                                                                        .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> addProperties2(CaseData caseData) {
-        return Map.of(
-            LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()
-        );
-    }
-
-    public Map<String, String> addProperties1v2FirstDefendant(CaseData caseData) {
-        return Map.of(
-            LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> addProperties1v2SecondDefendant(CaseData caseData) {
-        return Map.of(
-            LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
         );
     }
 
