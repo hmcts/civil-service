@@ -17,10 +17,10 @@ public class EventHistory {
 
     @Singular("miscellaneous")
     private List<Event> miscellaneous;
-    @Builder.Default
-    private List<Event> acknowledgementOfServiceReceived = List.of(Event.builder().build());
-    @Builder.Default
-    private List<Event> consentExtensionFilingDefence = List.of(Event.builder().build());
+    @Singular("acknowledgementOfServiceReceived")
+    private List<Event> acknowledgementOfServiceReceived;
+    @Singular("consentExtensionFilingDefence")
+    private List<Event> consentExtensionFilingDefence;
     @Singular("defenceFiled")
     private List<Event> defenceFiled;
     @Singular("defenceAndCounterClaim")
@@ -29,8 +29,8 @@ public class EventHistory {
     private List<Event> receiptOfPartAdmission;
     @Singular("receiptOfAdmission")
     private List<Event> receiptOfAdmission;
-    @Builder.Default
-    private List<Event> replyToDefence = List.of(Event.builder().build());
+    @Singular("replyDefence")
+    private List<Event> replyToDefence;
     @Singular("directionsQuestionnaire")
     private List<Event> directionsQuestionnaireFiled;
 

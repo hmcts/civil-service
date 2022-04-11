@@ -39,6 +39,8 @@ public class GAHearingDetails {
     private final String generalAppHearingMinutes;
     private final YesOrNo unavailableTrialRequiredYesOrNo;
     private final List<Element<GAUnavailabilityDates>> generalAppUnavailableDates;
+    private final YesOrNo vulnerabilityQuestionsYesOrNo;
+    private final String vulnerabilityQuestion;
     private final List<GAHearingSupportRequirements> supportRequirement;
     private final String supportRequirementSignLanguage;
     private final String supportRequirementLanguageInterpreter;
@@ -65,6 +67,8 @@ public class GAHearingDetails {
                      @JsonProperty("unavailableTrialRequiredYesOrNo") YesOrNo unavailableTrialRequiredYesOrNo,
                      @JsonProperty("generalAppUnavailableDates") List<Element<GAUnavailabilityDates>>
                              generalAppUnavailableDates,
+                     @JsonProperty("vulnerabilityQuestionsYesOrNo") YesOrNo vulnerabilityQuestionsYesOrNo,
+                     @JsonProperty("vulnerabilityQuestion") String vulnerabilityQuestion,
                      @JsonProperty("SupportRequirement") List<GAHearingSupportRequirements> supportRequirement,
                      @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
                      @JsonProperty("SupportRequirementLanguageInterpreter")
@@ -89,6 +93,8 @@ public class GAHearingDetails {
         this.generalAppHearingMinutes = generalAppHearingMinutes;
         this.unavailableTrialRequiredYesOrNo = unavailableTrialRequiredYesOrNo;
         this.generalAppUnavailableDates = generalAppUnavailableDates;
+        this.vulnerabilityQuestionsYesOrNo = vulnerabilityQuestionsYesOrNo;
+        this.vulnerabilityQuestion = vulnerabilityQuestion;
         this.supportRequirement = supportRequirement;
         this.supportRequirementSignLanguage = supportRequirementSignLanguage;
         this.supportRequirementLanguageInterpreter = supportRequirementLanguageInterpreter;
