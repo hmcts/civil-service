@@ -471,7 +471,7 @@ public class FlowPredicate {
 
         boolean predicate = false;
 
-        if(!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             return false;
         }
 
