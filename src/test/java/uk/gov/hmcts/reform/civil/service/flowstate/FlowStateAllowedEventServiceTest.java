@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
@@ -193,8 +194,9 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL
                     }
                 ),
                 of(
@@ -210,8 +212,10 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL
+
                     }
                 ),
                 of(
@@ -227,8 +231,10 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
-                        CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT,
+                        CHANGE_SOLICITOR_EMAIL
+
                     }
                 ),
                 of(
