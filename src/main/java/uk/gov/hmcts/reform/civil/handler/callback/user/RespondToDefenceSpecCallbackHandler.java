@@ -136,7 +136,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
             responseBuilder.confirmationBody(
                     "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                        + "We will review the case and contact you about what to do next. "
+                        + "We will review the case and contact you about what to do next.<br>"
                         + format(
                         "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
                         format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
@@ -148,7 +148,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         } else {
             responseBuilder.confirmationBody(
                     "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                        + "You have decided not to proceed and the case will end. "
+                        + "You have decided not to proceed and the case will end.<br>"
                         + format(
                         "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
                         format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
