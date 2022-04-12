@@ -364,4 +364,5 @@ public class CaseData implements MappableObject {
   
     private final YesOrNo claimStarted;
 
+
 }
