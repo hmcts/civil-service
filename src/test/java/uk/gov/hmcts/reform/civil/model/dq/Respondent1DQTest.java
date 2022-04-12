@@ -38,6 +38,7 @@ class Respondent1DQTest extends DQTest {
         assertEquals(statementOfTruth(), dq.getStatementOfTruth());
         assertEquals(witnesses(), dq.getWitnesses());
         assertEquals(welshLanguageRequirements(), dq.getWelshLanguageRequirements());
+        assertEquals(vulnerabilityQuestions(), dq.getVulnerabilityQuestions());
     }
 
     private Respondent1DQ buildRespondent1Dq() {
@@ -55,6 +56,7 @@ class Respondent1DQTest extends DQTest {
             .respondent1DQStatementOfTruth(statementOfTruth())
             .respondent1DQWitnesses(witnesses())
             .respondent1DQLanguage(welshLanguageRequirements())
+            .respondent1DQVulnerabilityQuestions(vulnerabilityQuestions())
             .build();
     }
 

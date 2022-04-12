@@ -28,6 +28,7 @@ class Applicant1DQTest extends DQTest {
         assertEquals(statementOfTruth(), dq.getStatementOfTruth());
         assertEquals(witnesses(), dq.getWitnesses());
         assertEquals(welshLanguageRequirements(), dq.getWelshLanguageRequirements());
+        assertEquals(vulnerabilityQuestions(), dq.getVulnerabilityQuestions());
     }
 
     private Applicant1DQ buildApplicant1Dq() {
@@ -45,6 +46,7 @@ class Applicant1DQTest extends DQTest {
             .applicant1DQStatementOfTruth(statementOfTruth())
             .applicant1DQWitnesses(witnesses())
             .applicant1DQLanguage(welshLanguageRequirements())
+            .applicant1DQVulnerabilityQuestions(vulnerabilityQuestions())
             .build();
     }
 
