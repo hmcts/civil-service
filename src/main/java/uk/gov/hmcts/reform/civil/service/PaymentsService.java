@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -11,6 +13,8 @@ import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.prd.model.Organisation;
+
+import java.util.HashMap;
 
 import static java.util.Optional.ofNullable;
 
@@ -23,7 +27,10 @@ public class PaymentsService {
     private final OrganisationService organisationService;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
-        return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
+        Request request = Request.create(Request.HttpMethod.GET, "url", new HashMap<>(), null, new RequestTemplate());
+        throw new FeignException.UnprocessableEntity("", request, null);
+
+        //return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
     private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
