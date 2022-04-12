@@ -337,8 +337,7 @@ public class CaseData implements MappableObject {
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
 
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
+    private final String detailsOfDirection;
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
@@ -363,10 +362,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
     private final String currentDefendant;
-
-
-
     private final YesOrNo claimStarted;
-
 
 }
