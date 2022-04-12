@@ -54,7 +54,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
 
     private CallbackResponse notifyAllPartiesInterimJudgmentApproved(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if(caseData.getAddRespondent2().equals(YesOrNo.YES)){
+        if(caseData.getAddRespondent2()!=null &&
+            caseData.getAddRespondent2().equals(YesOrNo.YES)){
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getInterimJudgmentRequestedClaimant(),
