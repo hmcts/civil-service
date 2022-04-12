@@ -141,10 +141,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        caseDataBuilder.bothDefendantsSpec("One");
+        // populate the title of next screen if only one defendant chosen
+        var currentDefendantString = ("Has "+ caseData.getDefendantDetailsSpec()
+            .getValue().getLabel() +  " paid some of the amount owed?");
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            caseDataBuilder.bothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
+            // populate the title of next screen if both defendants chosen
+            currentDefendantString = ("Have the defendants paid some of the amount owed?");
+        }
+        caseDataBuilder.currentDefendant(currentDefendantString);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

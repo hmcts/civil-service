@@ -343,6 +343,7 @@ public class CaseData implements MappableObject {
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String bothDefendantsSpec;
     private final String partialPaymentAmount;
     private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
@@ -361,7 +362,10 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
-  
+    private final String currentDefendant;
+
+
+
     private final YesOrNo claimStarted;
 
 
