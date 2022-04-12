@@ -92,7 +92,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
         }
 
-
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedTwoDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
