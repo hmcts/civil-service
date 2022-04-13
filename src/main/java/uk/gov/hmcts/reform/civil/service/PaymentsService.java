@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -21,7 +22,7 @@ public class PaymentsService {
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
 
-    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) {
+    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
