@@ -393,7 +393,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(1010))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -437,7 +441,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(499))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -480,7 +488,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(999))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and"
@@ -521,10 +533,61 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .paymentSetDate(LocalDate.now().minusDays(15))
                     .partialPaymentAmount("100")
                     .totalClaimAmount(BigDecimal.valueOf(5001))
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £5001.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £5002.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £5001.00";
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountGreaterthan5000And1v2() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(0)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(5001))
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .label("Test User2")
+                                                         .label("Both Defendants")
+                                                         .build())
+                                              .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                String test = "The judgment will order the defendants to pay £5001.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £5001.00\n"
