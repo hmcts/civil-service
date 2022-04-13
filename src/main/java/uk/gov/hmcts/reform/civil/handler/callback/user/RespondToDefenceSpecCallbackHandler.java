@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -44,6 +47,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UnavailableDateValidator unavailableDateValidator;
+    private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
+    private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -128,37 +133,56 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String claimNumber = caseData.getLegacyCaseReference();
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
 
-        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
-            responseBuilder.confirmationBody(
-                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                        + "We'll review the case and contact you about what to do next.<br>"
-                        + format(
-                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-                    ))
-                .confirmationHeader(format(
-                    "# You have decided to proceed with the claim%n## Claim number: %s",
-                    claimNumber
+        responseBuilder.confirmationBody(
+                CaseDataToTextGenerator.getTextFor(
+                    confirmationTextGenerators.stream(),
+                    () -> getDefaultConfirmationText(caseData),
+                    caseData
+                ))
+            .confirmationHeader(
+                CaseDataToTextGenerator.getTextFor(
+                    confirmationHeaderGenerators.stream(),
+                    () -> getDefaultConfirmationHeader(caseData),
+                    caseData
                 ));
-        } else {
-            responseBuilder.confirmationBody(
-                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                        + "You've decided not to proceed and the case will end.<br>"
-                        + format(
-                        "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                        format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-                    ))
-                .confirmationHeader(format(
-                    "# You have decided not to proceed with the claim%n## Claim number: %s",
-                    claimNumber
-                ));
-        }
 
         return responseBuilder.build();
+    }
+
+    private String getDefaultConfirmationText(CaseData caseData) {
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+            return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "We'll review the case and contact you about what to do next.<br>"
+                + format(
+                "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        } else {
+            return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "You've decided not to proceed and the case will end.<br>"
+                + format(
+                "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        }
+    }
+
+    private String getDefaultConfirmationHeader(CaseData caseData) {
+        String claimNumber = caseData.getLegacyCaseReference();
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+            return format(
+                "# You have decided to proceed with the claim%n## Claim number: %s",
+                claimNumber
+            );
+        } else {
+            return format(
+                "# You have decided not to proceed with the claim%n## Claim number: %s",
+                claimNumber
+            );
+        }
     }
 }
