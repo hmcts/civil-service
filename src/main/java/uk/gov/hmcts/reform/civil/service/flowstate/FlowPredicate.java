@@ -95,7 +95,6 @@ public class FlowPredicate {
             && caseData.getRespondent2Represented() != NO
             && caseData.getRespondent2OrgRegistered() != NO;
 
-
     public static final Predicate<CaseData> claimNotified = caseData ->
         !SPEC_CLAIM.equals(caseData.getSuperClaimType())
             && caseData.getClaimNotificationDate() != null
@@ -113,7 +112,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
-
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
         !SPEC_CLAIM.equals(caseData.getSuperClaimType())
@@ -454,7 +452,6 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
-
 
     public static final Predicate<CaseData> fullDefenceSpec = caseData ->
         SPEC_CLAIM.equals(caseData.getSuperClaimType())

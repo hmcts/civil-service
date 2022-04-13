@@ -604,7 +604,6 @@ public class EventHistoryMapper {
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
 
-
         List<Event> miscText = IntStream.range(0, miscEventText.size())
             .mapToObj(index ->
                           Event.builder()
