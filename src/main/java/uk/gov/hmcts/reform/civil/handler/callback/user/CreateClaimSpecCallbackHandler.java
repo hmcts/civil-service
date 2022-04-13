@@ -363,10 +363,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-        }
+        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
