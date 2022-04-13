@@ -17,9 +17,13 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.List;
 
@@ -37,12 +41,16 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCES
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     NoOngoingBusinessProcessAspect.class,
-    JacksonAutoConfiguration.class
-})
+    FlowStateAllowedEventService.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    StateFlowEngine.class})
 class NoOngoingBusinessProcessAspectTest {
 
     @Autowired
     NoOngoingBusinessProcessAspect aspect;
+    @MockBean
+    FeatureToggleService featureToggleService;
 
     @Nested
     class UserEvent {
