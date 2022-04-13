@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -48,8 +49,8 @@ public class InitiateGeneralApplicationServiceHelper {
         );
     }
 
-    public GeneralApplication setApplicantAndRespondentDetailsIfExits(GeneralApplication generalApplication,
-                                                                      CaseData caseData, UserDetails userDetails) {
+    public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
+                                                            CaseData caseData, UserDetails userDetails) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
@@ -63,6 +64,7 @@ public class InitiateGeneralApplicationServiceHelper {
             List.of(parentCaseId)
         );
 
+        /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
             .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
             .collect(Collectors.toList());
@@ -85,7 +87,10 @@ public class InitiateGeneralApplicationServiceHelper {
                     .builder();
 
                 specBuilder.id(respSol.getUserId());
+
                 if (respSol.getCaseRole() != null) {
+                    /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
+                details if case role of collected user matches with case role of Applicant 1*/
                     if (respSol.getCaseRole().equals(applicantOrgCaseRole)) {
                         if (caseData.getApplicantSolicitor1UserDetails() != null) {
                             specBuilder.email(caseData.getApplicantSolicitor1UserDetails().getEmail());
@@ -93,18 +98,27 @@ public class InitiateGeneralApplicationServiceHelper {
 
                         specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                .getOrganisation().getOrganisationID());
+                        /*Populate the GA respondent solicitor details in accordance with civil case Respondent
+                        Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondentOrgCaseRole)) {
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(caseData.getRespondent1OrganisationPolicy()
                                                                .getOrganisation().getOrganisationID());
+                        /*Populate the GA respondent solicitor details in accordance with civil case Respondent
+                        Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
                         specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
                         specBuilder.organisationIdentifier(caseData.getRespondent2OrganisationPolicy()
                                                                .getOrganisation().getOrganisationID());
                     }
+                    /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {
-                    specBuilder.email(StringUtils.EMPTY);
-                    specBuilder.organisationIdentifier(StringUtils.EMPTY);
+                    String errorMsg = String.format(
+                        "Invalid User (userId [%s]): Without Case Role ",
+                        respSol.getUserId()
+                    );
+                    log.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
                 }
 
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();

@@ -507,7 +507,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
 
-            when(helper.setApplicantAndRespondentDetailsIfExits(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
                                                                 any(CaseData.class), any(UserDetails.class)))
                 .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 

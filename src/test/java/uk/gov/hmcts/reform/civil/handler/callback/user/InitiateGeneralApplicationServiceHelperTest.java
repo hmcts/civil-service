@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,7 +141,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
     void shouldReturnsFourRespondents() {
 
         GeneralApplication result = helper
-            .setApplicantAndRespondentDetailsIfExits(
+            .setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
@@ -171,32 +170,12 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsersWithEmptyRole()).build());
 
-        GeneralApplication result = helper
-            .setApplicantAndRespondentDetailsIfExits(
+        assertThrows(IllegalArgumentException.class, () -> helper
+            .setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
-            );
-
-        assertThat(result).isNotNull();
-        assertThat(result.getGeneralAppRespondentSolicitors()).isNotNull();
-        assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(1);
-
-        ArrayList<String> userID = new ArrayList<>(Collections.singletonList("2"));
-
-        userID.forEach(uid -> assertThat(result.getGeneralAppRespondentSolicitors()
-                                             .stream().filter(e -> uid.equals(e.getValue().getId()))
-                                             .count()).isEqualTo(1));
-
-        assertThat(result.getGeneralAppRespondentSolicitors()
-                       .stream().filter(e -> STRING_NUM_CONSTANT
-                .equals(e.getValue().getId())).count()).isEqualTo(0);
-
-        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
-                       .getEmail()).isEqualTo(StringUtils.EMPTY);
-
-        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
-                       .getOrganisationIdentifier()).isEqualTo(StringUtils.EMPTY);
+            ));
 
     }
 
@@ -206,7 +185,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> helper
-                .setApplicantAndRespondentDetailsIfExits(
+                .setRespondentDetailsIfPresent(
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L).build(),
                     getUserDetails(APPLICANT_EMAIL_ID_CONSTANT)
@@ -221,7 +200,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> helper
-                .setApplicantAndRespondentDetailsIfExits(
+                .setRespondentDetailsIfPresent(
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
@@ -237,7 +216,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> helper
-                .setApplicantAndRespondentDetailsIfExits(
+                .setRespondentDetailsIfPresent(
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
@@ -255,7 +234,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsers()).build());
 
-        GeneralApplication result = helper.setApplicantAndRespondentDetailsIfExits(
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
@@ -296,7 +275,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
 
-        GeneralApplication result = helper.setApplicantAndRespondentDetailsIfExits(
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -341,7 +320,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
 
-        GeneralApplication result = helper.setApplicantAndRespondentDetailsIfExits(
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()

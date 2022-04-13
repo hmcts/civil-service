@@ -147,7 +147,7 @@ public class InitiateGeneralApplicationService {
                                        .build())
             .build();
 
-        return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
