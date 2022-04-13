@@ -391,6 +391,23 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventStartClaimCallback {
+
+        private static final String PAGE_ID = "start-claim";
+
+        @Test
+        void shouldAddClaimStartedFlagToData_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("claimStarted")
+                .isEqualTo("Yes");
+        }
+    }
+
+    @Nested
     class MidEventGetIdamEmailCallback {
 
         private static final String PAGE_ID = "idam-email";
@@ -816,6 +833,15 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CREATE_CLAIM.name(), "READY");
+        }
+
+        @Test
+        void shouldClearClaimStartedFlag_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .doesNotContainEntry("claimStarted", YES);
         }
 
         @Nested

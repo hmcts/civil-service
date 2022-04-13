@@ -28,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -138,7 +140,11 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE,
+
+                DEFAULT_JUDGEMENT,
+
                 CHANGE_SOLICITOR_EMAIL,
+
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -156,11 +162,13 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
+
                 INITIATE_GENERAL_APPLICATION
+
             )
         ),
-
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
@@ -173,6 +181,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION
@@ -182,6 +191,7 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
+                ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -192,13 +202,15 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                DEFAULT_JUDGEMENT
             )
         ),
 
         entry(
             NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
             List.of(
+                ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -209,7 +221,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                DEFAULT_JUDGEMENT
             )
         ),
 
@@ -419,6 +432,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -437,6 +451,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -451,6 +466,7 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -465,6 +481,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
