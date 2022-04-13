@@ -262,7 +262,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 theOverallTotal);
         }
         else {
-            repaymentBreakdown.append("The judgment will order the defendant to pay £").append(
+            repaymentBreakdown.append("The judgment will order "+caseData
+                .getDefendantDetailsSpec()
+                .getValue().getLabel()+" to pay £").append(
                 theOverallTotal);
         }
 
