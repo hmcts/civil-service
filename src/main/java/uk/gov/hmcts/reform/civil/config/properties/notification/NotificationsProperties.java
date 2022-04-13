@@ -70,6 +70,9 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnline1v2TwoLRsForSpec;
+
+    @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty

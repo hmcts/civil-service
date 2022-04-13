@@ -22,6 +22,8 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -67,9 +69,13 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
 
         CaseData caseData = callbackParams.getCaseData();
 
+        String emailTemplateID = getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+            ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2TwoLRsForSpec()
+            : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec();
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec(),
+            emailTemplateID,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -79,14 +85,33 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
-        );
+
+        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                    caseData.getApplicant1OrganisationPolicy()
+                        .getOrganisation().getOrganisationID(),
+                    caseData
+                ),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+                RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
+            );
+        } else {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                    caseData.getApplicant1OrganisationPolicy()
+                        .getOrganisation().getOrganisationID(),
+                    caseData
+                ),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
+            );
+        }
     }
 
     public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
