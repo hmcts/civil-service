@@ -363,5 +363,6 @@ public class CaseData implements MappableObject {
     private final YesOrNo isApplicant1;
     private final String currentDefendant;
     private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
 }
