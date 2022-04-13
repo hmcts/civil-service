@@ -923,7 +923,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .getNumberOfElevenToFifteen().contains(".")
                 || caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
                 .getNumberOfSixteenToNineteen().contains(".")) {
-                errors.add("Number Of Children must be a whole number, for example, 1.");
+                errors.add("Number of children must be a whole number, for example, 1.");
             }
         }
 

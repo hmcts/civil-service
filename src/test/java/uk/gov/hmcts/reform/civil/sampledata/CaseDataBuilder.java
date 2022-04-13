@@ -13,32 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CloseClaim;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -238,6 +213,7 @@ public class CaseDataBuilder {
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
 
@@ -2377,6 +2353,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent1PartnerAndDependent(
+        PartnerAndDependentsLRspec respondent1PartnerAndDependent) {
+        this.respondent1PartnerAndDependent = respondent1PartnerAndDependent;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -2515,6 +2497,7 @@ public class CaseDataBuilder {
             .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1PartnerAndDependent(respondent1PartnerAndDependent)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(
