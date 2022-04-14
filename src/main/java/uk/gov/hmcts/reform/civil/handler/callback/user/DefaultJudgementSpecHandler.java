@@ -153,7 +153,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.bothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
             // populate the title of next screen if both defendants chosen
             currentDefendantString = ("Have the defendants paid some of the amount owed?");
-            currentDefendantName = ("the defendants");
+            currentDefendantName = ("both defendants");
         }
         caseDataBuilder.currentDefendant(currentDefendantString);
         caseDataBuilder.currentDefendantName(currentDefendantName);
