@@ -45,7 +45,8 @@ public class NotificationUtils {
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             String responseTypeToApplicant2 = SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
-                ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue() : caseData.getRespondent1ClaimResponseTypeToApplicant2().getDisplayedValue();
+                ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                : caseData.getRespondent1ClaimResponseTypeToApplicant2().getDisplayedValue();
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())

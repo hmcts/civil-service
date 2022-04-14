@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -195,9 +198,9 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 RespondentResponseTypeSpec respondent1SpecResponseType =
-                MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ?
-                    caseData.getClaimant1ClaimResponseTypeForSpec() :
-                    caseData.getRespondent1ClaimResponseTypeForSpec();
+                    MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                        ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                        : caseData.getRespondent1ClaimResponseTypeForSpec();
 
                 buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
                                              respondent1ResponseDate, RESPONDENT_ID);
@@ -345,9 +348,9 @@ public class EventHistoryMapper {
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 //TODO cover unit test to this block
-                switch (MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ?
-                    caseData.getClaimant1ClaimResponseTypeForSpec() :
-                    caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                switch (MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                    ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                    : caseData.getRespondent1ClaimResponseTypeForSpec()) {
                     case COUNTER_CLAIM:
                         defaultText = "RPA Reason: Defendant rejects and counter claims.";
                         break;
