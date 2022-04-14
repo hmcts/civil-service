@@ -568,8 +568,13 @@ public class FlowPredicate {
                     && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
             case TWO_V_ONE:
-                return !(RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
-                    || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()));
+                if ((!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()) &&
+                    !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
+                && (caseData.getClaimant1ClaimResponseTypeForSpec() != null &&
+                    caseData.getClaimant2ClaimResponseTypeForSpec() != null)) {
+                    return true;
+                }
+                return false;
             default:
                 return false;
         }

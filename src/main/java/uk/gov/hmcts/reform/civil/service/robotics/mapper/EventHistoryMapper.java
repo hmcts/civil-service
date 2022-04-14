@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -195,8 +193,18 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                         respondent1ResponseDate, RESPONDENT_ID);
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                RespondentResponseTypeSpec respondent1SpecResponseType =
+                MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ?
+                    caseData.getClaimant1ClaimResponseTypeForSpec() :
+                    caseData.getRespondent1ClaimResponseTypeForSpec();
+
+                buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            } else {
+                buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            }
 
             if (caseData.getRespondent1ClaimResponseType() != RespondentResponseType.FULL_DEFENCE) {
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -281,13 +289,65 @@ public class EventHistoryMapper {
         }
     }
 
+    private void buildRespondentResponseEventForSpec(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              RespondentResponseTypeSpec respondentResponseTypeSpec,
+                                              LocalDateTime respondentResponseDate,
+                                              String respondentID) {
+        switch (respondentResponseTypeSpec) {
+            case FULL_DEFENCE:
+                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+                if (respondentID.equals(RESPONDENT_ID)) {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+                } else {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
+                }
+                break;
+            case COUNTER_CLAIM:
+                builder.defenceAndCounterClaim(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case PART_ADMISSION:
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case FULL_ADMISSION:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            default:
+                break;
+        }
+    }
+
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 //TODO cover unit test to this block
-                switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                switch (MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ?
+                    caseData.getClaimant1ClaimResponseTypeForSpec() :
+                    caseData.getRespondent1ClaimResponseTypeForSpec()) {
                     case COUNTER_CLAIM:
                         defaultText = "RPA Reason: Defendant rejects and counter claims.";
                         break;
