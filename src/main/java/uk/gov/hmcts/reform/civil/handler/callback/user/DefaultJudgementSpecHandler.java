@@ -257,19 +257,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if(caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
             repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
                 theOverallTotal);
-        }
-        else {
-            repaymentBreakdown.append("The judgment will order "+caseData
-                .getDefendantDetailsSpec()
-                .getValue().getLabel()+" to pay £").append(
+        } else {
+            repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
+                .getValue().getLabel() + " to pay £").append(
                 theOverallTotal);
         }
 
        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
-        .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
+           .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
