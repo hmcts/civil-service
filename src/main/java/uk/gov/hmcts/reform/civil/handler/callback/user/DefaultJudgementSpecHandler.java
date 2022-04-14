@@ -266,8 +266,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 theOverallTotal);
         }
 
-       repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
-           .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
+            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
