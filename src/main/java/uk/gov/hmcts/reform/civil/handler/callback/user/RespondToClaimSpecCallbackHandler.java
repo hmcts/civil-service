@@ -381,6 +381,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
         Party respondent = callbackParams.getCaseData().getRespondent1();
+        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
+            respondent = callbackParams.getCaseData().getRespondent2();
+        }
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
