@@ -22,8 +22,23 @@ public class EventHistorySequencer {
     public EventHistory sortEvents(EventHistory eventHistory) {
         requireNonNull(eventHistory);
         List<Event> events = flatEvents(eventHistory);
-        events.sort(Comparator.comparing(Event::getDateReceived));
+        events.sort(getComparator());
         return prepareEventHistory(prepareSequenceId(events));
+    }
+
+    private Comparator<Event> getComparator() {
+        return (event1, event2) -> {
+            if (event1.getDateReceived().isAfter(event2.getDateReceived())) {
+                return 1;
+            } else if (event1.getDateReceived().isBefore(event2.getDateReceived())) {
+                return -1;
+            } else {
+                if ("999".equals(event1.getEventCode()) || "999".equals(event2.getEventCode())) {
+                    return event1.getEventCodeInt().compareTo(event2.getEventCodeInt());
+                }
+                return 0;
+            }
+        };
     }
 
     private EventHistory prepareEventHistory(List<Event> events) {
