@@ -111,7 +111,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
-            .put(callbackKey(MID, "validate-partner-dependents"), this::validatePartnerAndDependents)
+//            .put(callbackKey(MID, "validate-partner-dependents"), this::validatePartnerAndDependents)
             .build();
     }
 
@@ -547,32 +547,35 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CallbackResponse validatePartnerAndDependents(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
+    //Remove or change after confirmation for error part
 
-        if (caseData.getRespondent1PartnerAndDependent() != null
-            && caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup() != null) {
-            if (caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
-                .getNumberOfUnderEleven().contains(".")
-                || caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
-                .getNumberOfElevenToFifteen().contains(".")
-                || caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
-                .getNumberOfSixteenToNineteen().contains(".")) {
-                errors.add("Number of children must be a whole number, for example, 1.");
-            }
-        }
+//    private CallbackResponse validatePartnerAndDependents(CallbackParams callbackParams) {
+//        CaseData caseData = callbackParams.getCaseData();
+//        List<String> errors = new ArrayList<>();
+//
+//        if (caseData.getRespondent1PartnerAndDependent() != null
+//            && caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup() != null) {
+//            if (caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
+//                .getNumberOfUnderEleven().contains(".")
+//                || caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
+//                .getNumberOfElevenToFifteen().contains(".")
+//                || caseData.getRespondent1PartnerAndDependent().getHowManyChildrenByAgeGroup()
+//                .getNumberOfSixteenToNineteen().contains(".")) {
+//                errors.add("Number of children must be a whole number, for example, 1.");
+//            }
+//        }
+//
+//        if (caseData.getRespondent1PartnerAndDependent() != null
+//            && caseData.getRespondent1PartnerAndDependent().getSupportPeopleNumber() != null) {
+//            if (caseData.getRespondent1PartnerAndDependent().getSupportPeopleNumber()
+//                .contains(".")) {
+//                errors.add("Number of people must be a whole number, for example, 1.");
+//            }
+//        }
+//
+//        return AboutToStartOrSubmitCallbackResponse.builder()
+//            .errors(errors)
+//            .build();
+//    }
 
-        if (caseData.getRespondent1PartnerAndDependent() != null
-            && caseData.getRespondent1PartnerAndDependent().getSupportPeopleNumber() != null) {
-            if (caseData.getRespondent1PartnerAndDependent().getSupportPeopleNumber()
-                .contains(".")) {
-                errors.add("Number of people must be a whole number, for example, 1.");
-            }
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
 }
