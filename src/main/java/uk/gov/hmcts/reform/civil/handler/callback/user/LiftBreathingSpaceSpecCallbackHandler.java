@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
@@ -22,9 +23,9 @@ import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
-public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
+public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.ENTER_BREATHING_SPACE_SPEC);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.LIFT_BREATHING_SPACE_SPEC);
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -45,9 +46,13 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getEnterBreathing() != null) {
+        if (caseData.getEnterBreathing() == null) {
             responseBuilder.errors(Collections.singletonList(
-                "A claim can enter breathing space only once."
+                "A claim must enter breathing space before it can be lifted."
+            ));
+        } else if (caseData.getLiftBreathing() != null) {
+            responseBuilder.errors(Collections.singletonList(
+                "This claim is not in breathing space anymore."
             ));
         }
         return responseBuilder.build();
@@ -58,14 +63,17 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getEnterBreathing().getStart() != null
-            && caseData.getEnterBreathing().getStart().isAfter(LocalDate.now())) {
-            errors.add("Start date must be today or before.");
-        }
-
-        if (caseData.getEnterBreathing().getExpectedEnd() != null
-            && !caseData.getEnterBreathing().getExpectedEnd().isAfter(LocalDate.now())) {
-            errors.add("Expected end date must be in the future.");
+        if (caseData.getLiftBreathing().getExpectedEnd() != null) {
+            if (caseData.getLiftBreathing().getExpectedEnd().isAfter(LocalDate.now())) {
+                errors.add("End date must be today or in the past.");
+            } else if (caseData.getEnterBreathing() != null
+                && caseData.getEnterBreathing().getStart() != null
+                && caseData.getEnterBreathing().getStart().isAfter(
+                caseData.getLiftBreathing().getExpectedEnd()
+            )) {
+                errors.add("End date must be after " + DateFormatHelper
+                    .formatLocalDate(caseData.getEnterBreathing().getStart(), DateFormatHelper.DATE));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -77,11 +85,9 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = "<br>We have sent you a confirmation email."
-            + "<h2 class=\"govuk-heading-m\">What happens next</h2>Breathing space will now be active until you "
-            + "<u>lift breathing space.</u>";
+        String body = "<br>We have sent you a confirmation email.";
 
-        String header = format("# Breathing Space Entered%n## Claim number%n# %s", claimNumber);
+        String header = format("# Breathing Space Lifted%n## Claim number%n# %s", claimNumber);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
