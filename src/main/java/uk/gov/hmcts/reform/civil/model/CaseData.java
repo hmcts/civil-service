@@ -219,10 +219,13 @@ public class CaseData implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
     private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
+    private final PaymentUponCourtOrder respondent2CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
+    private final RepaymentPlanLRspec respondent2RepaymentPlan;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployerRespondent2;
     private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
@@ -335,7 +338,9 @@ public class CaseData implements MappableObject {
     private final List<IdValue<Bundle>> caseBundles;
 
     private final Respondent1DebtLRspec specDefendant1Debts;
+    private final Respondent1DebtLRspec specDefendant2Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+    private final Respondent1SelfEmploymentLRspec specDefendant2SelfEmploymentDetails;
 
     private final String detailsOfDirectionDisposal;
     private final String detailsOfDirectionTrial;
@@ -361,7 +366,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
-  
+
     private final YesOrNo claimStarted;
 
 
