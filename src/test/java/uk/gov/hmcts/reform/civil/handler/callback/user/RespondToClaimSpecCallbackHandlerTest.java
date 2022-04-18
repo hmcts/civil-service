@@ -35,7 +35,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -333,75 +335,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-        // Remove or change when confirmed error part
+        @Test
+        public void testValidateDefendant2RepaymentDate() {
+            CaseData caseData = CaseDataBuilder.builder().generateDefendant2RepaymentDateForAdmitPartResponse().build();
+            CallbackParams params = callbackParamsOf(caseData, MID,
+                                                     "validate-repayment-plan-2", "DEFENDANT_RESPONSE_SPEC"
+            );
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
 
-//        @Test
-//        void testValidatePartnerAndDependentsChildrenNumberWithError() {
-//            ChildrenByAgeGroupLRspec childrenAgeGroup = ChildrenByAgeGroupLRspec.builder()
-//                .numberOfUnderEleven("1")
-//                .numberOfElevenToFifteen("2.1")
-//                .numberOfSixteenToNineteen("0")
-//                .build();
-//
-//            PartnerAndDependentsLRspec respondent1PartnerAndDependent = PartnerAndDependentsLRspec.builder()
-//                .partnerAgedOver(YES)
-//                .haveAnyChildrenRequired(YES)
-//                .howManyChildrenByAgeGroup(childrenAgeGroup)
-//                .receiveDisabilityPayments(YES)
-//                .supportedAnyoneFinancialRequired(NO)
-//                .build();
-//
-//            CaseData caseData = CaseDataBuilder.builder()
-//                .atStateRespondentAdmitPartOfClaimFastTrack()
-//                .atStateRespondent1PartnerAndDependent(respondent1PartnerAndDependent)
-//                .build();
-//            CallbackParams params = callbackParamsOf(caseData, MID,
-//                                                     "validate-partner-dependents", "DEFENDANT_RESPONSE_SPEC"
-//            );
-//
-//            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-//                .handle(params);
-//
-//            List<String> expectedErrorArray = new ArrayList<>();
-//            expectedErrorArray.add("Number of children must be a whole number, for example, 1.");
-//
-//            assertThat(response).isNotNull();
-//            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
-//        }
-//
-//        @Test
-//        void testValidatePartnerAndDependentsSupportPeopleWithError() {
-//            ChildrenByAgeGroupLRspec childrenAgeGroup = ChildrenByAgeGroupLRspec.builder()
-//                .numberOfUnderEleven("0")
-//                .numberOfElevenToFifteen("0")
-//                .numberOfSixteenToNineteen("0")
-//                .build();
-//
-//            PartnerAndDependentsLRspec respondent1PartnerAndDependent = PartnerAndDependentsLRspec.builder()
-//                .partnerAgedOver(YES)
-//                .haveAnyChildrenRequired(NO)
-//                .supportedAnyoneFinancialRequired(YES)
-//                .supportPeopleDetails("test")
-//                .supportPeopleNumber("2.1")
-//                .build();
-//
-//            CaseData caseData = CaseDataBuilder.builder()
-//                .atStateRespondentAdmitPartOfClaimFastTrack()
-//                .atStateRespondent1PartnerAndDependent(respondent1PartnerAndDependent)
-//                .build();
-//            CallbackParams params = callbackParamsOf(caseData, MID,
-//                                                     "validate-partner-dependents", "DEFENDANT_RESPONSE_SPEC"
-//            );
-//
-//            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-//                .handle(params);
-//
-//            List<String> expectedErrorArray = new ArrayList<>();
-//            expectedErrorArray.add("Number of people must be a whole number, for example, 1.");
-//
-//            assertThat(response).isNotNull();
-//            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
-//        }
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertEquals("Validation error", response.getErrors().get(0));
+
+        }
     }
 
     @Nested
