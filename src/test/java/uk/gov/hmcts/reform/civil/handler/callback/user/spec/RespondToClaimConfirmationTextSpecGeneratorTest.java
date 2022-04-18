@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse2v1DifferentText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,7 +61,6 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getPartialAdmitPayImmediately() {
         BigDecimal admitted = BigDecimal.valueOf(1000);
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         return CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build().toBuilder()
@@ -149,19 +151,43 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         return RespondToClaimConfirmationTextSpecGenerator.class;
     }
 
+    private List<CaseData> get2v1DifferentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party applicant2 = Party.builder().build();
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .applicant2(applicant2)
+                                  .claimant1ClaimResponseTypeForSpec(r1)
+                                  .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
+    }
+
     @Override
     public List<Pair<CaseData,
         Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> getCasesToExpectedImplementation() {
-        return List.of(
-            Pair.of(getFullAdmitAlreadyPaidCase(), FullAdmitAlreadyPaidConfirmationText.class),
-            Pair.of(getPartialAdmitSetDate(), PartialAdmitSetDateConfirmationText.class),
-            Pair.of(getPartialAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
-            Pair.of(getFullAdmitRepayPlan(), RepayPlanConfirmationText.class),
-            Pair.of(getPartialAdmitRepayPlan(), RepayPlanConfirmationText.class),
-            Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
-            Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
-            Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
-            Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class)
+        List<Pair<CaseData, Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> list = new ArrayList<>(
+            List.of(
+                Pair.of(getFullAdmitAlreadyPaidCase(), FullAdmitAlreadyPaidConfirmationText.class),
+                Pair.of(getPartialAdmitSetDate(), PartialAdmitSetDateConfirmationText.class),
+                Pair.of(getPartialAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
+                Pair.of(getFullAdmitRepayPlan(), RepayPlanConfirmationText.class),
+                Pair.of(getPartialAdmitRepayPlan(), RepayPlanConfirmationText.class),
+                Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
+                Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
+                Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
+                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class)
+            ));
+        get2v1DifferentResponseCase().forEach(caseData -> list.add(
+            Pair.of(caseData, SpecResponse2v1DifferentText.class))
         );
+        return list;
     }
 }
