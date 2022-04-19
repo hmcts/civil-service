@@ -1473,6 +1473,66 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateSpec1v1ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        addRespondent2 = NO;
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSpec2v1ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        addRespondent2 = NO;
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        multiPartyClaimTwoApplicants();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSpec1v2ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        multiPartyClaimOneDefendantSolicitor();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v1FullAdmissionSpec() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1FullAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1PartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1CounterClaim() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1SecondFullDefence_FirstPartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent2v1FirstFullDefence_SecondPartAdmission() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
@@ -1494,6 +1554,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_CounterClaimX2() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2FullAdmission() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
         return this;
     }
 
@@ -2296,6 +2362,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build();
+        return this;
+    }
+
+    public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
+        this.superClaimType = SPEC_CLAIM;
         return this;
     }
 
