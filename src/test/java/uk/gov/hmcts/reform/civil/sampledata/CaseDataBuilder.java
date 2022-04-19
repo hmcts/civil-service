@@ -243,6 +243,7 @@ public class CaseDataBuilder {
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
@@ -2600,6 +2601,7 @@ public class CaseDataBuilder {
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
             .respondent1PartnerAndDependent(respondent1PartnerAndDependent)
+            .respondent2PartnerAndDependent(respondent2PartnerAndDependent)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .respondent2RepaymentPlan(respondent2RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)

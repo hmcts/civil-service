@@ -565,5 +565,4 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .errors(errors)
             .build();
     }
-
 }
