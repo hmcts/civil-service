@@ -323,7 +323,7 @@ public class EventHistoryMapper {
                 paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
-                "RPA Reason:%s Defendant: %s has responded: %s;",
+                "RPA Reason: %sDefendant: %s has responded: %s;",
                 paginatedMessage,
                 respondent.getPartyName(),
                 getResponseTypeForRespondent(caseData, respondent)
@@ -808,29 +808,20 @@ public class EventHistoryMapper {
     }
 
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
-        String defaultText;
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        String paginatedMessage = "";
         if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-            String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-            defaultText = (format(
-                "RPA Reason:%s Defendant: %s has responded: %s; "
-                    + "preferredCourtCode: %s; stayClaim: %s",
-                paginatedMessage,
-                respondent.getPartyName(),
-                getResponseTypeForRespondent(caseData, respondent),
-                getPreferredCourtCode(dq),
-                isStayClaim(dq)
-            ));
-        } else {
-            defaultText = format(
-                "RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; stayClaim: %s",
-                respondent.getPartyName(),
-                getResponseTypeForRespondent(caseData, respondent),
-                getPreferredCourtCode(dq),
-                isStayClaim(dq)
-            );
+            paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
         }
-        return defaultText;
+        return (format(
+            "%sDefendant: %s has responded: %s; "
+                + "preferredCourtCode: %s; stayClaim: %s",
+            paginatedMessage,
+            respondent.getPartyName(),
+            getResponseTypeForRespondent(caseData, respondent),
+            getPreferredCourtCode(dq),
+            isStayClaim(dq)
+        ));
     }
 
     private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
@@ -841,7 +832,7 @@ public class EventHistoryMapper {
             index = isRespondent1 ? 1 : 2;
         }
         return format(
-            " [%d of 2 - %s] ",
+            "[%d of 2 - %s] ",
             index,
             time.now().toLocalDate().toString()
         );
