@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
@@ -19,12 +21,15 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.ENTER_BREATHING_SPACE_SPEC);
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -36,7 +41,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
             callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSubmit,
             callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
         );
     }
@@ -45,11 +50,11 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getEnterBreathing() != null) {
-            responseBuilder.errors(Collections.singletonList(
-                "A claim can enter breathing space only once."
-            ));
-        }
+//        if (caseData.getEnterBreathing() != null) {
+//            responseBuilder.errors(Collections.singletonList(
+//                "A claim can enter breathing space only once."
+//            ));
+//        }
         return responseBuilder.build();
     }
 
@@ -86,6 +91,17 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
             .confirmationBody(body)
+            .build();
+    }
+
+    private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 }
