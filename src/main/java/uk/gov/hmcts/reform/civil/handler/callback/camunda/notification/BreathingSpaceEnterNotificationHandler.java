@@ -23,7 +23,9 @@ import java.util.Map;
 public class BreathingSpaceEnterNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER
+        CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER,
+        CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER,
+        CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER
     );
 
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
@@ -45,14 +47,35 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
 
     private CallbackResponse notifyRespondentSolicitor(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if ("".equals(callbackParams.getRequest().getEventId())) {
-            // choose recipients and mail body
+
+        String templateId;
+        String recipient;
+        Map<String, String> templateProperties = addProperties(caseData);
+        if (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
+            .equals(callbackParams.getRequest().getEventId())) {
+            templateId = "";
+            recipient = caseData.getRespondentSolicitor1EmailAddress();
+        } else if (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name()
+            .equals(callbackParams.getRequest().getEventId())) {
+            // TODO tbd in the future, when we include MP in BS, same template for the time being
+            templateId = "";
+            recipient = caseData.getRespondentSolicitor2EmailAddress();
+        } else if (CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
+            .equals(callbackParams.getRequest().getEventId())) {
+            templateId = "";
+            recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else {
+            throw new UnsupportedOperationException("Unexpected value "
+            + callbackParams.getRequest().getEventId()
+            + " for case event field");
         }
 
+//        notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()
+
 //        notificationService.sendMail(
-//            "TODO recipient",
-//            notificationsProperties.getClaimantSolicitorConfirmsNotToProceed(), // email template
-//            addProperties(caseData),
+//            recipient,
+//            templateId,
+//            templateProperties,
 //            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
 //        );
 
