@@ -17,8 +17,8 @@ public class CounterClaimConfirmationText implements RespondToClaimConfirmationT
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<br>You've chosen to counterclaim - this means your defence cannot continue online."
-                      + " Use form N9B to counterclaim, do not create a new claim.");
+        sb.append("<br>You've chosen to counterclaim - this means your defence cannot continue online.");
+        sb.append(" Use form N9B to counterclaim, do not create a new claim.");
         sb.append("<br><br><a href=\"https://www.gov.uk/respond-money-claim\" target=\"_blank\">Download form N9B (opens in a new tab)</a>");
         return Optional.of(sb.toString());
     }
