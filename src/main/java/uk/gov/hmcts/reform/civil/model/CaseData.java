@@ -231,9 +231,11 @@ public class CaseData implements MappableObject {
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
     private final SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
+    private final SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
     private final YesOrNo applicant1ClaimExpertSpecRequired;
+    private final YesOrNo applicantMPClaimExpertSpecRequired;
     private final String responseClaimWitnesses;
     private final String applicant1ClaimWitnesses;
     private final YesOrNo smallClaimHearingInterpreterRequired;
