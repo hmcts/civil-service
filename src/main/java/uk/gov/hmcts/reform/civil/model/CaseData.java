@@ -22,8 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -366,6 +365,5 @@ public class CaseData implements MappableObject {
 
     private final YesOrNo claimStarted;
 
-    private final BreathingSpaceEnterInfo enterBreathing;
-    private final BreathingSpaceLiftInfo liftBreathing;
+    private final BreathingSpaceInfo breathing;
 }

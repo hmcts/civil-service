@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -8,13 +9,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 
 import java.time.LocalDate;
 
 public class LiftBreathingSpaceSpecCallbackHandlerTest {
 
-    private final LiftBreathingSpaceSpecCallbackHandler callbackHandler = new LiftBreathingSpaceSpecCallbackHandler();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final LiftBreathingSpaceSpecCallbackHandler callbackHandler =
+        new LiftBreathingSpaceSpecCallbackHandler(objectMapper);
 
     @Test
     public void cantEnterIfNoBreathingSpaceYet() {
@@ -32,7 +36,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void canEnterIfWithinBreathingSpace() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder().build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder().build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -47,8 +53,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void cantEnterIfAlreadyLifted() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder().build())
-            .liftBreathing(BreathingSpaceLiftInfo.builder().build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder().build())
+                           .lift(BreathingSpaceLiftInfo.builder().build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -63,9 +71,12 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenEndDateIsFuture_thenReturnError() {
         CaseData caseData = CaseData.builder()
-            .liftBreathing(BreathingSpaceLiftInfo.builder()
-                               .expectedEnd(LocalDate.now().plusDays(1))
-                               .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder().build())
+                           .lift(BreathingSpaceLiftInfo.builder()
+                                     .expectedEnd(LocalDate.now().plusDays(1))
+                                     .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -81,9 +92,12 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenEndDateIsNotFuture_thenReturnNoError() {
         CaseData caseData = CaseData.builder()
-            .liftBreathing(BreathingSpaceLiftInfo.builder()
-                               .expectedEnd(LocalDate.now())
-                               .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder().build())
+                           .lift(BreathingSpaceLiftInfo.builder()
+                                     .expectedEnd(LocalDate.now())
+                                     .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -99,12 +113,14 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenDatesDoNotMatch_thenReturnError() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder()
-                                .start(LocalDate.now().minusDays(30))
-                                .build())
-            .liftBreathing(BreathingSpaceLiftInfo.builder()
-                               .expectedEnd(LocalDate.now().minusDays(31))
-                               .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .start(LocalDate.now().minusDays(30))
+                                      .build())
+                           .lift(BreathingSpaceLiftInfo.builder()
+                                     .expectedEnd(LocalDate.now().minusDays(31))
+                                     .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()

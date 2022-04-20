@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 
 import java.time.LocalDate;
 
@@ -31,7 +32,9 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void cantEnterTwice() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder().build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder().build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -46,9 +49,11 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenStartDateIsNotPast_thenReturnError() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder()
-                                .start(LocalDate.now().plusDays(1))
-                                .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .start(LocalDate.now().plusDays(1))
+                                      .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -64,9 +69,11 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenStartDateIsPast_thenReturnNoError() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder()
-                                .start(LocalDate.now())
-                                .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .start(LocalDate.now())
+                                      .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -82,9 +89,11 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenEndDateIsNotFuture_thenReturnError() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder()
-                                .expectedEnd(LocalDate.now())
-                                .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .expectedEnd(LocalDate.now())
+                                      .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
@@ -100,9 +109,11 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     public void whenEndDateIsFuture_thenReturnNoError() {
         CaseData caseData = CaseData.builder()
-            .enterBreathing(BreathingSpaceEnterInfo.builder()
-                                .expectedEnd(LocalDate.now().plusDays(1))
-                                .build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .expectedEnd(LocalDate.now().plusDays(1))
+                                      .build())
+                           .build())
             .build();
 
         CallbackParams params = CallbackParams.builder()
