@@ -146,6 +146,19 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            if (NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.equals(caseEvent)) {
+                return Map.of(
+                    DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                );
+            } else {
+                return Map.of(
+                    CLAIM_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                );
+            }
+        }
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
