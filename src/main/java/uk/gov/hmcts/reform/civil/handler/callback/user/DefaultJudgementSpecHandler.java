@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
     //    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
     //        + "%n%n * The time for responding to the claim has expired. "
     //        + "%n%n * The Defendant has not responded to the claim."
