@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
  * claimant.
  */
 @Component
-public class SpecResponse1v2HeaderText implements RespondToClaimConfirmationHeaderSpecGenerator {
+public class SpecResponse1v2DivergentHeaderText implements RespondToClaimConfirmationHeaderSpecGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {

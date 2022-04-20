@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -24,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
@@ -32,7 +32,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -74,7 +76,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UnavailableDateValidator dateValidator;
     @Mock
     private FeatureToggleService toggleService;
-    @Spy
+
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
         new FullAdmitSetDateConfirmationText(),
@@ -82,13 +84,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         new PartialAdmitPaidLessConfirmationText(),
         new PartialAdmitPayImmediatelyConfirmationText(),
         new PartialAdmitSetDateConfirmationText(),
-        new RepayPlanConfirmationText()
+        new RepayPlanConfirmationText(),
+        new SpecResponse1v2DivergentText()
+    );
+
+    private List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderSpecGenerators = List.of(
+        new SpecResponse1v2DivergentHeaderText(),
+        new SpecResponse2v1DifferentHeaderText()
     );
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
+                                     confirmationTextGenerators);
+        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
+                                     confirmationHeaderSpecGenerators);
     }
 
     @Test
