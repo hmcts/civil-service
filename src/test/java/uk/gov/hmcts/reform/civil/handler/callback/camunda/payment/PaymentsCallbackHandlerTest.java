@@ -98,8 +98,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {403})
-        void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
+        @ValueSource(ints = {403, 422, 504})
+        void shouldUpdateFailureReason_whenSpecificFeignExceptionsThrown(int status) {
             doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -127,7 +127,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {404, 422, 504})
+        @ValueSource(ints = {401, 404, 409})
         void shouldAddError_whenOtherExceptionThrown(int status) {
             doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 

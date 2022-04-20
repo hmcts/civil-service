@@ -19,16 +19,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_SDO_TRIGGERED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED;
 
 @Service
 @RequiredArgsConstructor
-public class CreateSDOApplicantNotificationHandler extends CallbackHandler implements NotificationData {
+public class CreateSDORespondent2NotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_SDO_TRIGGERED);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED);
 
-    private static final String REFERENCE_TEMPLATE = "create-sdo-applicant-notification-%s";
-    public static final String TASK_ID = "CreateSDONotifyApplicantSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-2-notification-%s";
+    public static final String TASK_ID = "CreateSDONotifyRespondentSolicitor2";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -37,7 +37,7 @@ public class CreateSDOApplicantNotificationHandler extends CallbackHandler imple
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorSDOTriggered
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitor2SDOTriggered
         );
     }
 
@@ -51,15 +51,17 @@ public class CreateSDOApplicantNotificationHandler extends CallbackHandler imple
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantSolicitorSDOTriggered(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitor2SDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSdoOrdered(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.getRespondentSolicitor2EmailAddress() != null) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor2EmailAddress(),
+                notificationsProperties.getSdoOrdered(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -68,14 +70,18 @@ public class CreateSDOApplicantNotificationHandler extends CallbackHandler imple
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                 .getOrganisation().getOrganisationID(), caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondent2LegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
         );
     }
 
-    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+    public String getRespondent2LegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        String respondentLegalOrganizationName = null;
+        if (organisation.isPresent()) {
+            respondentLegalOrganizationName = organisation.get().getName();
+        }
+        return respondentLegalOrganizationName;
     }
 }
+

@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -27,35 +26,37 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDORespondentNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJRespondentReceivedNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
-    CreateSDORespondentNotificationHandler.class,
+    DJRespondentReceivedNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-
-public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class DJRespondentReceivedNotificationHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
-    private NotificationsProperties notificationsProperties;
+    NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
     @Autowired
-    private CreateSDORespondentNotificationHandler handler;
+    private DJRespondentReceivedNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
+            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
+                .thenReturn("test-template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
 
         @Test
@@ -67,26 +68,27 @@ public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHand
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "template-id",
+                "test-template-id",
                 getNotificationDataMap(caseData),
-                "create-sdo-respondent-notification-000DC001"
+                "default-judgment-respondent-received-notification-000DC001"
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                LEGAL_ORG_SPECIFIED, "Test Org Name",
+                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             );
         }
+
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED").build()).build())).isEqualTo(TASK_ID);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
+                                                                                         .builder().eventId(
+                "NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED").build()).build())).isEqualTo(TASK_ID);
     }
 }
-
-
