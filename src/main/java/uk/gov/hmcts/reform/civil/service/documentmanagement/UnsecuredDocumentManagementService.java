@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
+import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -25,7 +26,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -78,7 +79,10 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTime.now())
+                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
+                                                                  .toInstant()
+                                                                  .atZone(ZoneId.systemDefault())
+                                                                  .toLocalDateTime()))
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();
