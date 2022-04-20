@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -115,13 +116,9 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
-        String emailTemplate;
-        emailTemplate = caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)
-            ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
-            : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
         notificationService.sendMail(
             recipient,
-            emailTemplate,
+            addEmailTemplatesSpec(caseData, caseEvent),
             addPropertiesSpec(caseData, caseEvent),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -154,6 +151,22 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
+    }
+
+    public String addEmailTemplatesSpec(CaseData caseData, CaseEvent caseEvent) {
+        if (NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC.equals(caseEvent)) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                return notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
+            } else {
+                return notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            }
+        } else {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                return notificationsProperties.getClaimantSolicitorCounterClaimForSpec();
+            } else {
+                return notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            }
+        }
     }
 
     //finding legal org name

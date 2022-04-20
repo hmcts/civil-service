@@ -96,4 +96,9 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentSolicitor1DefaultJudgmentReceived;
 
+    @NotEmpty
+    private String claimantSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorCounterClaimForSpec;
 }
