@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -27,6 +29,8 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
                                                       caseData,
                                                       SpecResponse2v1DifferentHeaderText.class
                                                   )));
+        get1v2DivergentResponseCase().forEach(caseData ->
+            list.add(Pair.of(caseData, SpecResponse1v2DivergentHeaderText.class)));
         return list;
     }
 
@@ -47,6 +51,30 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
                                   .applicant2(applicant2)
                                   .claimant1ClaimResponseTypeForSpec(r1)
                                   .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
+    }
+
+    private List<CaseData> get1v2DivergentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party respondent1 = Party.builder().build();
+        Party respondent2 = Party.builder().build();
+
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .respondent1(respondent1)
+                                  .respondent2(respondent2)
+                                  .respondent2SameLegalRepresentative(YesOrNo.YES)
+                                  .respondentResponseIsSame(YesOrNo.NO)
+                                  .respondent1ClaimResponseTypeForSpec(r1)
+                                  .respondent2ClaimResponseTypeForSpec(r2)
                                   .build());
                 }
             }
