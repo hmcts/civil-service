@@ -452,10 +452,45 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 
+    public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_ADMISSION);
+
+    public static final Predicate<CaseData> partAdmissionSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.PART_ADMISSION);
+
+    public static final Predicate<CaseData> counterClaimSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.COUNTER_CLAIM);
+
     public static final Predicate<CaseData> fullDefenceSpec = caseData ->
-        SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_DEFENCE);
+
+    private static boolean getPredicateForResponseTypeSpec(CaseData caseData, RespondentResponseTypeSpec responseType) {
+
+        boolean basePredicate = caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == responseType;
+
+        boolean predicate = false;
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
+                    || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                predicate = basePredicate
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
+                break;
+            case ONE_V_ONE:
+                predicate = basePredicate;
+                break;
+            case TWO_V_ONE:
+                predicate = responseType.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                    && responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec());
+                break;
+            default:
+                break;
+        }
+        return predicate;
+    }
 
     private FlowPredicate() {
         //Utility class
