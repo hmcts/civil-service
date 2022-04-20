@@ -14,8 +14,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -37,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -44,12 +48,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -76,6 +82,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UnavailableDateValidator dateValidator;
     @Mock
     private FeatureToggleService toggleService;
+    @Mock
+    private PostcodeValidator postcodeValidator;
 
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
@@ -108,6 +116,28 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         Assertions.assertTrue(handler.handledEvents().isEmpty());
         Assertions.assertFalse(handler.handledEvents().isEmpty());
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
+                                                              .postCode(postCode)
+                                                              .build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        List<String> errors = Collections.singletonList("error 1");
+        Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
+
+        CallbackResponse response = handler.handle(params);
+        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
     @Nested

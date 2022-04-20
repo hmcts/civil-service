@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
@@ -66,7 +67,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimSpecCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
+public class RespondToClaimSpecCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
@@ -337,18 +339,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
-                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                    caseData.getSpecAoSApplicantCorrespondenceAddressdetails().getPostCode());
-
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .build();
-            }
+            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
