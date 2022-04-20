@@ -150,7 +150,7 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getCounterClaim() {
         return CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
+            .atStateRespondentCounterClaim()
             .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();

@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.CounterClaimConfirmationHeaderText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -87,7 +87,7 @@ public class RespondToClaimConfirmationHeaderSpecGeneratorTest
 
     private CaseData getCounterClaim() {
         return CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
+            .atStateRespondentCounterClaim()
             .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
