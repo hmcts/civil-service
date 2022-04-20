@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -111,9 +112,9 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, PartyUtils.buildPartiesReferences(caseData)
-        );
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(PARTY_REFERENCES, PartyUtils.buildPartiesReferences(caseData));
+        return properties;
     }
 }
