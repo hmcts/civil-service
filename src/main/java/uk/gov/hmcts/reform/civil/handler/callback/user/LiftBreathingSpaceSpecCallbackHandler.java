@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -27,6 +28,8 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.LIFT_BREATHING_SPACE_SPEC);
 
+    private final ObjectMapper objectMapper;
+
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
@@ -46,16 +49,17 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getEnterBreathing() == null) {
+        if (caseData.getBreathing() == null || caseData.getBreathing().getEnter() == null) {
             responseBuilder.errors(Collections.singletonList(
                 "A claim must enter breathing space before it can be lifted."
             ));
-        } else if (caseData.getLiftBreathing() != null) {
+        } else if (caseData.getBreathing().getLift() != null) {
             responseBuilder.errors(Collections.singletonList(
                 "This claim is not in breathing space anymore."
             ));
         }
-        return responseBuilder.build();
+
+        return responseBuilder.data(caseData.toMap(objectMapper)).build();
     }
 
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
@@ -63,16 +67,15 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getLiftBreathing().getExpectedEnd() != null) {
-            if (caseData.getLiftBreathing().getExpectedEnd().isAfter(LocalDate.now())) {
+        if (caseData.getBreathing().getLift().getExpectedEnd() != null) {
+            if (caseData.getBreathing().getLift().getExpectedEnd().isAfter(LocalDate.now())) {
                 errors.add("End date must be today or in the past.");
-            } else if (caseData.getEnterBreathing() != null
-                && caseData.getEnterBreathing().getStart() != null
-                && caseData.getEnterBreathing().getStart().isAfter(
-                caseData.getLiftBreathing().getExpectedEnd()
+            } else if (caseData.getBreathing().getEnter().getStart() != null
+                && caseData.getBreathing().getEnter().getStart().isAfter(
+                caseData.getBreathing().getLift().getExpectedEnd()
             )) {
                 errors.add("End date must be after " + DateFormatHelper
-                    .formatLocalDate(caseData.getEnterBreathing().getStart(), DateFormatHelper.DATE));
+                    .formatLocalDate(caseData.getBreathing().getEnter().getStart(), DateFormatHelper.DATE));
             }
         }
 

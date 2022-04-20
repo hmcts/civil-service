@@ -50,7 +50,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getEnterBreathing() != null) {
+        if (caseData.getBreathing() != null) {
             responseBuilder.errors(Collections.singletonList(
                 "A claim can enter breathing space only once."
             ));
@@ -63,13 +63,13 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getEnterBreathing().getStart() != null
-            && caseData.getEnterBreathing().getStart().isAfter(LocalDate.now())) {
+        if (caseData.getBreathing().getEnter().getStart() != null
+            && caseData.getBreathing().getEnter().getStart().isAfter(LocalDate.now())) {
             errors.add("Start date must be today or before.");
         }
 
-        if (caseData.getEnterBreathing().getExpectedEnd() != null
-            && !caseData.getEnterBreathing().getExpectedEnd().isAfter(LocalDate.now())) {
+        if (caseData.getBreathing().getEnter().getExpectedEnd() != null
+            && !caseData.getBreathing().getEnter().getExpectedEnd().isAfter(LocalDate.now())) {
             errors.add("Expected end date must be in the future.");
         }
 
