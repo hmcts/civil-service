@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -58,6 +58,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -246,7 +248,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .build();
         }
         //this logic to be removed when ccd supports AND-OR combinations
-        if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
             }
@@ -256,7 +258,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             }
         }
 
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO).build();
         }
@@ -441,10 +443,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
 
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+            && isAwaitingAnotherDefendantResponse(caseData)) {
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
-            .state("AWAITING_APPLICANT_INTENTION")
+            .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
     }
 
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {

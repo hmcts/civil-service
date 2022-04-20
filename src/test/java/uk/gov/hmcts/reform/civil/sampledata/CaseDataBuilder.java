@@ -1539,12 +1539,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondent2v1SecondFullDefence_FirstPartAdmission() {
-        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
-        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
-        return this;
-    }
-
     public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
@@ -2362,11 +2356,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build();
-        return this;
-    }
-
-    public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
-        this.superClaimType = SPEC_CLAIM;
         return this;
     }
 

@@ -18,7 +18,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allRespo
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -181,9 +183,9 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec)
                 .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec)
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesFullDefenceReceived.and(specClaim))
+                    .onlyIf(awaitingResponsesFullDefenceReceivedSpec.and(specClaim))
                 .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesNonFullDefenceReceived.and(specClaim))
+                    .onlyIf(awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim))
                 .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
                     .onlyIf(divergentRespondWithDQAndGoOfflineSpec.and(specClaim))
                 .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
