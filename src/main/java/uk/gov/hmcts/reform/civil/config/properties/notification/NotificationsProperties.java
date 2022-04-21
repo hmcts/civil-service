@@ -102,4 +102,10 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentSolicitorNotifyToProceedSpec;
 
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentReceived;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentReceived;
+
 }

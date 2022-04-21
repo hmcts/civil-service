@@ -9,10 +9,12 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -69,6 +72,8 @@ public class CaseData implements MappableObject {
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
+    private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final List<Element<GeneralApplication>> generalApplications;
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
@@ -112,7 +117,6 @@ public class CaseData implements MappableObject {
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
-
     private final OrganisationPolicy applicant1OrganisationPolicy;
     private final OrganisationPolicy applicant2OrganisationPolicy;
     private final OrganisationPolicy respondent1OrganisationPolicy;
@@ -336,9 +340,32 @@ public class CaseData implements MappableObject {
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
 
+    private final String detailsOfDirectionDisposal;
+    private final String detailsOfDirectionTrial;
+    private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final DynamicList defendantDetailsSpec;
+    private final DynamicList defendantDetails;
+    private final String bothDefendants;
+    private final String partialPaymentAmount;
+    private final YesOrNo partialPayment;
+    private final LocalDate paymentSetDate;
+    private final String repaymentSummaryObject;
+    private final YesOrNo paymentConfirmationDecisionSpec;
+    private final String repaymentDue;
+    private final String repaymentSuggestion;
+    private final String currentDatebox;
+    private final LocalDate repaymentDate;
+    private final List<Element<CaseDocument>> defaultJudgmentDocuments;
+    private final String hearingSelection;
+    // for default judgment specified tab
+    private final DJPaymentTypeSelection paymentTypeSelection;
+    private final RepaymentFrequencyDJ repaymentFrequency;
+    // for default judgment specified tab
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
-
+  
     private final YesOrNo claimStarted;
+
+
 }
