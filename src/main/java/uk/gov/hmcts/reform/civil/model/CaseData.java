@@ -368,5 +368,6 @@ public class CaseData implements MappableObject {
 
     private final YesOrNo claimStarted;
 
+    @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
 }

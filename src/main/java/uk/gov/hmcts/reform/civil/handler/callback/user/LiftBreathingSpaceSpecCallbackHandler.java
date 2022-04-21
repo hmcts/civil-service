@@ -59,7 +59,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             ));
         }
 
-        return responseBuilder.data(caseData.toMap(objectMapper)).build();
+        return responseBuilder.build();
     }
 
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
