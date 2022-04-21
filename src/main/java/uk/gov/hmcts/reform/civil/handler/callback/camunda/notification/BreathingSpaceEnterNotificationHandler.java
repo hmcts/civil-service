@@ -62,7 +62,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
             templateId = notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate();
             recipient = caseData.getRespondentSolicitor1EmailAddress();
             String defendantLR = getOrganisationName(caseData.getRespondent1OrganisationPolicy(), null);
-            templateProperties.put("defendantLR", defendantLR);
+            templateProperties.put(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, defendantLR);
             templateProperties.put("defendantName", caseData.getRespondent1().getPartyName());
         } else if (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
@@ -70,7 +70,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
             templateId = notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate();
             recipient = caseData.getRespondentSolicitor2EmailAddress();
             String defendantLR = getOrganisationName(caseData.getRespondent2OrganisationPolicy(), null);
-            templateProperties.put("defendantLR", defendantLR);
+            templateProperties.put(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, defendantLR);
             templateProperties.put("defendantName", caseData.getRespondent2().getPartyName());
         } else if (CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
@@ -80,7 +80,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
                 caseData.getApplicant1OrganisationPolicy(),
                 caseData.getApplicantSolicitor1ClaimStatementOfTruth()::getName
             );
-            templateProperties.put("claimantLR", claimantLR);
+            templateProperties.put(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, claimantLR);
         } else {
             throw new UnsupportedOperationException("Unexpected value "
                                                         + callbackParams.getRequest().getEventId()
