@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -49,7 +48,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UnavailableDateValidator unavailableDateValidator;
-    private final ExitSurveyContentService exitSurveyContentService;
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
 
@@ -144,38 +142,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
-    }
-
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        YesOrNo proceeding = caseData.getApplicant1ProceedWithClaim();
-
-        String claimNumber = caseData.getLegacyCaseReference();
-        String title = getTitle(proceeding);
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format(title, claimNumber))
-            .confirmationBody(getBody(proceeding))
-            .build();
-    }
-
-    private String getTitle(YesOrNo proceeding) {
-        if (proceeding == YES) {
-            return "# You have chosen to proceed with the claim%n## Claim number: %s";
-        }
-        return "# You have chosen not to proceed with the claim%n## Claim number: %s";
-    }
-
-    private String getBody(YesOrNo proceeding) {
-        String dqLink = "http://www.google.com";
-
-        if (proceeding == YES) {
-            return format(
-                "<br />We will review the case and contact you to tell you what to do next.%n%n"
-                    + "[Download directions questionnaire](%s)", dqLink)
-                + exitSurveyContentService.applicantSurvey();
-        }
-        return exitSurveyContentService.applicantSurvey();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
