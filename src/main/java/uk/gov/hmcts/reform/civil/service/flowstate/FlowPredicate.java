@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -491,16 +490,6 @@ public class FlowPredicate {
         }
         return predicate;
     }
-
-    public static final Predicate<CaseData> partAdmissionSpec = caseData ->
-        SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
-
-    public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
-        SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION;
 
     private FlowPredicate() {
         //Utility class

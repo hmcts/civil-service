@@ -288,7 +288,7 @@ public class EventHistoryMapper {
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        String defaultText;
+        String defaultText = getDefaultTextVs1(caseData);
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 //TODO cover unit test to this block
