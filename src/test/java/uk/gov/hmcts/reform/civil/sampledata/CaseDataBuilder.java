@@ -2030,6 +2030,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                                       RespondentResponseTypeSpec respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent2RespondsSpec(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2RespondsSpec(RespondentResponseTypeSpec responseType) {
+        this.respondent2ClaimResponseTypeForSpec = responseType;
+        this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
