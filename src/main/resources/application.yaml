@@ -57,6 +57,8 @@ payments:
   api:
     site_id: AAA7
     service: CIVIL
+    spec_site_id: AAA6
+    spec_service: SPEC
 
 idam:
   s2s-auth:

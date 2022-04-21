@@ -36,6 +36,8 @@ class PaymentsServiceTest {
 
     private static final String SERVICE = "service";
     private static final String SITE_ID = "site_id";
+    private static final String SPEC_SERVICE = "spec_service";
+    private static final String SPEC_SITE_ID = "spec_site_id";
     private static final String AUTH_TOKEN = "Bearer token";
     private static final PaymentDto PAYMENT_DTO = PaymentDto.builder().reference("RC-1234-1234-1234-1234").build();
     private static final Organisation ORGANISATION = Organisation.builder()
@@ -61,6 +63,8 @@ class PaymentsServiceTest {
         given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
         given(paymentsConfiguration.getService()).willReturn(SERVICE);
         given(paymentsConfiguration.getSiteId()).willReturn(SITE_ID);
+        given(paymentsConfiguration.getSpecService()).willReturn(SPEC_SERVICE);
+        given(paymentsConfiguration.getSiteId()).willReturn(SPEC_SITE_ID);
         given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));
     }
 
