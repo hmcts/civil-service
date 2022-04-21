@@ -442,8 +442,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
+        if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
 
             Party updatedRespondent2;
 

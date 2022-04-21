@@ -25,18 +25,10 @@ public class CounterClaimConfirmationHeaderText implements RespondToClaimConfirm
     }
 
     private boolean isCounterClaim(CaseData caseData) {
-        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            if (caseData.getRespondent2() == null) {
-                return true;
-            } else {
-                if (YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-                    return true;
-                } else {
-                    return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(
-                        caseData.getRespondent2ClaimResponseTypeForSpec());
-                }
-            }
-        }
-        return false;
+        return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null
+            || YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            );
     }
 }

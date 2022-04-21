@@ -11,32 +11,24 @@ import java.util.Optional;
 @Component
 public class CounterClaimConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
+    private static final String TEXT =
+        "<br>You've chosen to counterclaim - this means your defence cannot continue online."
+        + " Use form N9B to counterclaim, do not create a new claim."
+        + "<br><br><a href=\"https://www.gov.uk/respond-money-claim\" target=\"_blank\">Download form N9B (opens in a new tab)</a>";
+
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (!isCounterClaim(caseData)) {
             return Optional.empty();
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<br>You've chosen to counterclaim - this means your defence cannot continue online.");
-        sb.append(" Use form N9B to counterclaim, do not create a new claim.");
-        sb.append("<br><br><a href=\"https://www.gov.uk/respond-money-claim\" target=\"_blank\">Download form N9B (opens in a new tab)</a>");
-        return Optional.of(sb.toString());
+        return Optional.of(TEXT);
     }
 
     private boolean isCounterClaim(CaseData caseData) {
-        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            if (caseData.getRespondent2() == null) {
-                return true;
-            } else {
-                if (YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-                    return true;
-                } else {
-                    return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(
-                        caseData.getRespondent2ClaimResponseTypeForSpec());
-                }
-            }
-        }
-        return false;
+        return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null
+            || YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            );
     }
 }
