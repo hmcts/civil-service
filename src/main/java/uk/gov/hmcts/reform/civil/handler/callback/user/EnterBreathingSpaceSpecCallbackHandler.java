@@ -50,7 +50,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getBreathing() != null) {
+        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
             responseBuilder.errors(Collections.singletonList(
                 "A claim can enter breathing space only once."
             ));
