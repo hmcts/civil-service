@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -81,6 +83,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -163,6 +168,41 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("claimantResponseScenarioFlag"))
                 .isEqualTo("ONE_V_TWO_TWO_LEGAL_REP");
+        }
+
+        @Nested
+        class OneVTwo {
+
+            @Test
+            void shouldSetRespondentSharedClaimResponseDocumentSameSolicitorScenario_WhenAboutToStartIsInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isNull();
+                assertThat(response.getData().get("respondentSharedClaimResponseDocument"))
+                    .isEqualTo(caseData.toMap(mapper).get("respondent1ClaimResponseDocument"));
+            }
+
+            @Test
+            void shouldNotSetRespondentSharedClaimResponseDocumentDiffSolicitorScenario_WhenAboutToStartIsInvoked() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getErrors()).isNull();
+                assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
+            }
         }
     }
 
@@ -424,19 +464,23 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                        .file(DocumentBuilder.builder().documentName("claimant-response-def1.pdf").build())
-                        .build())
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
                 .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                        .file(DocumentBuilder.builder().documentName("claimant-response-def2.pdf").build())
-                        .build())
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
                 .applicant1DQ(Applicant1DQ.builder()
-                        .applicant1DQDraftDirections(DocumentBuilder.builder().documentName("claimant-1-draft-dir.pdf")
-                                                         .build())
-                        .build())
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
                 .applicant2DQ(Applicant2DQ.builder()
-                        .applicant2DQDraftDirections(DocumentBuilder.builder().documentName("claimant-2-draft-dir.pdf")
-                                                         .build())
-                        .build())
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
                 .build();
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -489,6 +533,25 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .extracting("name", "role")
                     .containsExactly(null, null);
+            }
+        }
+
+        @Nested
+        class OneVTwo {
+            @Test
+            void shouldRemoveRespondentSharedClaimResponseDocument_whenInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData.toBuilder().respondentSharedClaimResponseDocument(
+                            caseData.getRespondent1ClaimResponseDocument()).build(), ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
             }
         }
     }

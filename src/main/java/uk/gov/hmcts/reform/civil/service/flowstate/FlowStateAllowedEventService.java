@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -72,6 +76,7 @@ public class FlowStateAllowedEventService {
     private final StateFlowEngine stateFlowEngine;
 
     private final CaseDetailsConverter caseDetailsConverter;
+    private final FeatureToggleService toggleService;
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
@@ -135,7 +140,11 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE,
+
+                DEFAULT_JUDGEMENT,
+
                 CHANGE_SOLICITOR_EMAIL,
+
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -153,11 +162,13 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
+
                 INITIATE_GENERAL_APPLICATION
+
             )
         ),
-
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
@@ -170,6 +181,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                DEFAULT_JUDGEMENT,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION
@@ -179,6 +191,7 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
+                ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -189,13 +202,15 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                DEFAULT_JUDGEMENT
             )
         ),
 
         entry(
             NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
             List.of(
+                ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -206,7 +221,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                DEFAULT_JUDGEMENT
             )
         ),
 
@@ -416,6 +432,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -434,6 +451,7 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -448,6 +466,7 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -462,6 +481,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION
             )
         ),
@@ -590,10 +610,13 @@ public class FlowStateAllowedEventService {
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        if ((caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM))
-            || caseEvent.equals(CREATE_CLAIM_SPEC)) {
-            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
-            return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) || CREATE_CLAIM_SPEC.equals(caseEvent)) {
+            if (toggleService.isLrSpecEnabled()) {
+                StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
+                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
+            } else {
+                return false;
+            }
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
@@ -602,10 +625,14 @@ public class FlowStateAllowedEventService {
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
         if (caseEvent.equals(CREATE_CLAIM_SPEC)) {
-            return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
-                .filter(entry -> entry.getValue().contains(caseEvent))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+            if (toggleService.isLrSpecEnabled()) {
+                return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
+                    .filter(entry -> entry.getValue().contains(caseEvent))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+            } else {
+                return Collections.emptyList();
+            }
         }
         return ALLOWED_EVENTS_ON_FLOW_STATE.entrySet().stream()
             .filter(entry -> entry.getValue().contains(caseEvent))

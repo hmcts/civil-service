@@ -13,8 +13,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -25,13 +31,13 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
@@ -50,17 +56,22 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimSpecCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
+public class RespondToClaimSpecCallbackHandler extends CallbackHandler
+    implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
-    private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -68,16 +79,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private final DeadlinesCalculator deadlinesCalculator;
     private final PostcodeValidator postcodeValidator;
     private final PaymentDateValidator paymentDateValidator;
+    private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
+    private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
+    private final FeatureToggleService toggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
@@ -95,6 +113,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
+            .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+            .build();
+    }
+
+    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.superClaimType(SPEC_CLAIM);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
@@ -107,8 +135,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .errors(errors)
                 .build();
         }
+
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
+            if (caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+                == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+            } else {
+                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+            }
+            if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+                != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+                caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+            } else {
+                caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
+            }
             return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -130,6 +175,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                 .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
             caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
                 .build();
+        }
+        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
+            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+        }
+        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+            caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+        } else {
+            caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
@@ -162,11 +223,86 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
      */
     private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+
+        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+            &&
+            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        }
+        //this logic to be removed when ccd supports AND-OR combinations
+        if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+            }
+        }
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        } else {
+            updatedData.specFullAdmissionOrPartAdmission(NO);
+        }
+
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && caseData.getRespondentResponseIsSame().equals(NO)) {
+            updatedData.sameSolicitorSameResponse(NO);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+        }
+
+        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            &&
+            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+               || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission1V1(YES);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission(YES);
+        } else {
+            updatedData.specFullDefenceOrPartAdmission(NO);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specDefenceFullAdmittedRequired(NO);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
@@ -185,6 +321,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                     .respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
+        } else {
+            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
         }
         return caseData;
     }
@@ -201,18 +339,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
-                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                    caseData.getSpecAoSApplicantCorrespondenceAddressdetails().getPostCode());
-
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .build();
-            }
+            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
@@ -222,6 +349,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .respondent2Copy(caseData.getRespondent2())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -308,6 +436,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
+            .state("AWAITING_APPLICANT_INTENTION")
             .build();
     }
 
@@ -342,10 +471,29 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = format(
+        String body = CaseDataToTextGenerator.getTextFor(
+            confirmationTextSpecGenerators.stream(),
+            () -> getDefaultConfirmationBody(caseData),
+            caseData
+        );
+
+        String header = CaseDataToTextGenerator.getTextFor(
+            confirmationHeaderGenerators.stream(),
+            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            caseData
+        );
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(header)
+            .confirmationBody(body)
+            .build();
+    }
+
+    private String getDefaultConfirmationBody(CaseData caseData) {
+        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+        return format(
             "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
                 + "We will let you know when they respond."
@@ -353,12 +501,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
             formatLocalDateTime(responseDeadline, DATE),
             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
         );
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(
-                format("# You've submitted your response%n## Claim number: %s", claimNumber))
-            .confirmationBody(body)
-            .build();
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {

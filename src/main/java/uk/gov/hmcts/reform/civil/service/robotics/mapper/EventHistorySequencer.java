@@ -22,8 +22,23 @@ public class EventHistorySequencer {
     public EventHistory sortEvents(EventHistory eventHistory) {
         requireNonNull(eventHistory);
         List<Event> events = flatEvents(eventHistory);
-        events.sort(Comparator.comparing(Event::getDateReceived));
+        events.sort(getComparator());
         return prepareEventHistory(prepareSequenceId(events));
+    }
+
+    private Comparator<Event> getComparator() {
+        return (event1, event2) -> {
+            if (event1.getDateReceived().isAfter(event2.getDateReceived())) {
+                return 1;
+            } else if (event1.getDateReceived().isBefore(event2.getDateReceived())) {
+                return -1;
+            } else {
+                if ("999".equals(event1.getEventCode()) || "999".equals(event2.getEventCode())) {
+                    return event1.getEventCodeInt().compareTo(event2.getEventCodeInt());
+                }
+                return 0;
+            }
+        };
     }
 
     private EventHistory prepareEventHistory(List<Event> events) {
@@ -35,10 +50,10 @@ public class EventHistorySequencer {
                     builder.miscellaneous(event);
                     break;
                 case ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED:
-                    builder.acknowledgementOfServiceReceived(List.of(event));
+                    builder.acknowledgementOfServiceReceived(event);
                     break;
                 case CONSENT_EXTENSION_FILING_DEFENCE:
-                    builder.consentExtensionFilingDefence(List.of(event));
+                    builder.consentExtensionFilingDefence(event);
                     break;
                 case DEFENCE_FILED:
                     builder.defenceFiled(List.of(event));
@@ -53,13 +68,13 @@ public class EventHistorySequencer {
                     builder.receiptOfAdmission(List.of(event));
                     break;
                 case REPLY_TO_DEFENCE:
-                    builder.replyToDefence(List.of(event));
+                    builder.replyDefence(event);
                     break;
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
                     builder.directionsQuestionnaire(event);
                     break;
                 default:
-                    throw new IllegalStateException("Un expected event type: " + eventType);
+                    throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
         if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
@@ -76,6 +91,15 @@ public class EventHistorySequencer {
         }
         if (isEmpty(builder.build().getDefenceAndCounterClaim())) {
             builder.defenceAndCounterClaim(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getAcknowledgementOfServiceReceived())) {
+            builder.acknowledgementOfServiceReceived(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getConsentExtensionFilingDefence())) {
+            builder.consentExtensionFilingDefence(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getReplyToDefence())) {
+            builder.replyToDefence(List.of(Event.builder().build()));
         }
         return builder
             .build();

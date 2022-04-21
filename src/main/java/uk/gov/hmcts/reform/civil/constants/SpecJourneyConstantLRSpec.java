@@ -11,6 +11,7 @@ public final class SpecJourneyConstantLRSpec {
     public static final String DEFENDANT_RESPONSE_SPEC = "DEFENDANT_RESPONSE_SPEC";
     public static final String SINGLE_DATE = "SINGLE_DATE";
     public static final String DATE_RANGE = "DATE_RANGE";
+    public static final String DISPUTES_THE_CLAIM = "DISPUTES_THE_CLAIM";
     public static final String TEST_CONSTANT = "DATE_RANGE";
 
 }

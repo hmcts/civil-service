@@ -98,10 +98,10 @@ class AddressLinesMapperTest {
     }
 
     @Nested
-    class ShouldReturnOriginalAddress {
+    class ShouldReturnSpaceBasedSplitAddressLines {
 
         @Test
-        void shouldReturnOriginalAddress_whenSplittingSpreadsOverThreeLines() {
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines() {
             Address address = Address.builder()
                 .addressLine1("12345678901234567890")
                 .addressLine2("I am the second line")
@@ -110,11 +110,109 @@ class AddressLinesMapperTest {
 
             Address result = mapper.splitLongerLines(address);
 
-            assertThat(result).isEqualTo(address);
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo(address.getAddressLine2());
+            assertThat(result.getAddressLine3()).isEqualTo("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm");
         }
 
         @Test
-        void shouldReturnOriginalAddress_whenSplittingLeavesIndividualLineExceedingLimit() {
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines_ExcessOccupiesAbsentAddLine4() {
+            Address address = Address.builder()
+                .addressLine1("denhamdrivdenhamdrivdenhamdrivden, denhamdrivdenhamdrivdenhamdriv,")
+                .addressLine2("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd")
+                .addressLine3("drivdenhamdrivdenhamdrivdenh adsdsdsdsb")
+                .county("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd")
+                .postCode("wcwec2c33x ff3")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("denhamdrivdenhamdrivdenhamdrivden,");
+            assertThat(result.getAddressLine2()).isEqualTo("denhamdrivdenhamdrivdenhamdriv,");
+            assertThat(result.getAddressLine3()).isEqualTo("drivdenhamdrivdenhamdrivdenh");
+            assertThat(result.getPostTown()).isEqualTo("sdsdsdsdsd, drivdenhamdrivdenham, ");
+            assertThat(result.getCounty()).isEqualTo("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd");
+            assertThat(result.getPostCode()).isEqualTo("wcwec2c33x ff3");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines_OverflowInLimit() {
+            Address address = Address.builder()
+                .addressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road")
+                .addressLine2("Barkingside South")
+                .addressLine3("Barkingside South")
+                .postTown("Ilford")
+                .county("Essex")
+                .postCode("IG11 6QW")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("Flat 3 Knighton court, second");
+            assertThat(result.getAddressLine2()).isEqualTo("floor, 823-827 Cranbrook Road,");
+            assertThat(result.getAddressLine3()).isEqualTo("Barkingside South, Barkingside");
+            assertThat(result.getPostTown()).isEqualTo("South, Ilford");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingExcessOverflowIgnored() {
+            Address address = Address.builder()
+                .addressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road")
+                .addressLine2("Flat 4 Knighton court, second floor, 823-827 Cran")
+                .addressLine3("Flat 5 Knighton court, second floor, 823-827 Cran")
+                .postTown("Ilford")
+                .county("Essex")
+                .postCode("IG11 6QW")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("Flat 3 Knighton court, second");
+            assertThat(result.getAddressLine2()).isEqualTo("floor, 823-827 Cranbrook Road,");
+            assertThat(result.getAddressLine3()).isEqualTo("Flat 4 Knighton court, second");
+            assertThat(result.getPostTown()).isEqualTo("floor, 823-827 Cran, Flat , Ilford");
+            assertThat(result.getCounty()).isEqualTo("Essex");
+            assertThat(result.getCountry()).isEqualTo("United Kingdom");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverFourLines_ExcessOverflowIgnore() {
+
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890")
+                .addressLine2("I am the second line")
+                .addressLine3("abcdefghijk12345678901234567890 zxcvbnmzxcvbnm")
+                .postTown("there is something here")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo(address.getAddressLine2());
+            assertThat(result.getAddressLine3()).isEqualTo("abcdefghijk12345678901234567890");
+            assertThat(result.getPostTown()).isEqualTo("zxcvbnmzx, there is something here");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
+            Address address = Address.builder()
+                .addressLine1("1234567890 1234567890")
+                .addressLine2("I am the    second   line")
+                .addressLine3("abcdefghijk 1234567890   1234567890 1234567899,zxcvbnmzxcvbnm 12345")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2()).isEqualTo("I am the second line");
+            assertThat(result.getAddressLine3()).isEqualTo("abcdefghijk 1234567890 1234567890");
+            assertThat(result.getPostTown()).isEqualTo("1234567899,zxcvbnmzxcvbnm 12345, ");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingLeavesIndividualLineExceedingLimit() {
             Address address = Address.builder()
                 .addressLine1("12345678901234567890")
                 .addressLine2("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
@@ -122,8 +220,34 @@ class AddressLinesMapperTest {
 
             Address result = mapper.splitLongerLines(address);
 
-            assertThat(result).isEqualTo(address);
+            assertThat(result.getAddressLine1()).isEqualTo(address.getAddressLine1());
+            assertThat(result.getAddressLine2())
+                .isEqualTo("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm");
+            assertThat(result.getAddressLine3()).isEqualTo(null);
         }
+
+        @Test
+        void shouldSplitAddressBySpace_whenSplittingBySpaceLeavesIndividualLineExceedingLimit() {
+            Address address = Address.builder()
+                .addressLine1("12345678901234567890abcdefghijk 12345678901234567890, zxcvbnmzxcvbnm")
+                .addressLine2("123456789012345678901")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).extracting("addressLine1")
+                .isEqualTo("12345678901234567890abcdefghijk");
+            assertThat(result).extracting("addressLine2")
+                .isEqualTo("12345678901234567890,");
+            assertThat(result).extracting("addressLine3")
+                .isEqualTo("zxcvbnmzxcvbnm,");
+            assertThat(result).extracting("postTown")
+                .isEqualTo("123456789012345678901, ");
+        }
+    }
+
+    @Nested
+    class ShouldReturnOriginalAddressLines {
 
         @Test
         void shouldReturnOriginalAddress_whenNoNeedToSplit() {

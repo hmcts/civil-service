@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -343,7 +345,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData.respondent1DQ(dq);
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-                //1v2 same solictor responding to respondents individually
+                //1v2 same Solicitor responding to respondents individually
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
 
                 updatedData
@@ -447,6 +449,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData);
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -459,6 +462,23 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
+    }
+
+    private void retainSolicitorReferences(Map<String, Object> beforeCaseData, CaseData.CaseDataBuilder updatedData) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
+            .map(refs -> objectMapper.convertValue(refs, HashMap.class))
+                .orElse(null);
+        SolicitorReferences solicitorReferences = ofNullable(solicitorRefs)
+            .map(refMap -> SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(refMap.getOrDefault("applicantSolicitor1Reference", null))
+                    .respondentSolicitor1Reference(refMap.getOrDefault("respondentSolicitor1Reference", null))
+                    .respondentSolicitor2Reference(refMap.getOrDefault("respondentSolicitor2Reference", null))
+                    .build())
+                .orElse(null);
+        updatedData.solicitorReferences(solicitorReferences);
+        updatedData.respondentSolicitor2Reference(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
+            .map(Object::toString).orElse(null));
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {

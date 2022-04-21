@@ -3,31 +3,59 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidLessConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitSetDateConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -37,6 +65,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -51,12 +81,63 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UnavailableDateValidator dateValidator;
     @Mock
-    private ExitSurveyContentService exitSurveyContentService;
+    private FeatureToggleService toggleService;
+    @Mock
+    private PostcodeValidator postcodeValidator;
+
+    private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
+        new FullAdmitAlreadyPaidConfirmationText(),
+        new FullAdmitSetDateConfirmationText(),
+        new PartialAdmitPaidFullConfirmationText(),
+        new PartialAdmitPaidLessConfirmationText(),
+        new PartialAdmitPayImmediatelyConfirmationText(),
+        new PartialAdmitSetDateConfirmationText(),
+        new RepayPlanConfirmationText(),
+        new SpecResponse1v2DivergentText()
+    );
+
+    private List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderSpecGenerators = List.of(
+        new SpecResponse1v2DivergentHeaderText(),
+        new SpecResponse2v1DifferentHeaderText()
+    );
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
+                                     confirmationTextGenerators);
+        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
+                                     confirmationHeaderSpecGenerators);
+    }
+
+    @Test
+    public void ldBlock() {
+        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
+                                                              .postCode(postCode)
+                                                              .build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        List<String> errors = Collections.singletonList("error 1");
+        Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
+
+        CallbackResponse response = handler.handle(params);
+        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
     @Nested
@@ -323,6 +404,405 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
                     .confirmationBody(body)
                     .build());
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitNotPay() {
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondToClaimAdmitPartLRspec(
+                    RespondToClaimAdmitPartLRspec.builder()
+                        .whenWillThisAmountBePaid(whenWillPay)
+                        .build()
+                )
+                .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(admitted.toString())
+                .contains(caseData.getTotalClaimAmount().toString())
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediately() {
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
+        void specificSummary_whenRepayPlanFullAdmit() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("repayment plan");
+        }
+
+        @Test
+        void specificSummary_whenRepayPlanPartialAdmit() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("repayment plan");
+        }
+
+        @Test
+        void specificSummary_whenFullAdmitAlreadyPaid() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(caseData.getTotalClaimAmount().toString())
+                .contains("you've paid");
+        }
+
+        @Test
+        void specificSummary_whenFullAdmitBySetDate() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(
+                    RespondToClaimAdmitPartLRspec.builder()
+                        .whenWillThisAmountBePaid(whenWillPay)
+                        .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(" and your explanation of why you cannot pay before then.")
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE))
+                .doesNotContain(caseData.getTotalClaimAmount().toString());
+
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPaidFull() {
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YesOrNo.YES)
+                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+                .totalClaimAmount(totalClaimAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(caseData.getTotalClaimAmount().toString());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                                claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponsePartAdmissionFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.PART_ADMISSION,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                                claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                               claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimPartAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                                                              RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            StringBuilder body = new StringBuilder();
+            body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
+                .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
+                            + "counterclaim.")
+                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                                      format("https://www.gov.uk/respond-money-claim")))
+                .append("<br><br>Post the completed form to:")
+                .append("<br><br>County Court Business Centre<br>St. Katherine's House")
+                .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
+                                               claimNumber))
+                    .confirmationBody(body.toString())
+                    .build());
+        }
+    }
+
+    @Test
+    void specificSummary_whenPartialAdmitPaidLess() {
+        BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+        BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.YES)
+            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+            .totalClaimAmount(totalClaimAmount)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response.getConfirmationBody())
+            .contains(caseData.getApplicant1().getPartyName())
+            .contains("The claim will be settled. We'll contact you when they respond.")
+            .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
+                          .toString());
+    }
+
+    @Nested
+    class MidEventSetGenericResponseTypeFlagCallback {
+
+        private static final String PAGE_ID = "set-generic-response-type-flag";
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("FULL_DEFENCE");
+            assertThat(response.getData()).extracting("sameSolicitorSameResponse")
+                .isEqualTo("No");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_AdmitAll_OR_Admit_Part_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2AdmitAll_AdmitPart()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_FullDefence_OR_AdmitAll_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2FullDefence_AdmitPart()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("FULL_DEFENCE");
         }
     }
 }
