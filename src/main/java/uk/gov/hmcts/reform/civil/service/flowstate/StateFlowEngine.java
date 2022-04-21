@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOnlyOneRespondentRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
@@ -171,14 +172,14 @@ public class StateFlowEngine {
             .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
 
             .state(CLAIM_ISSUED)
-            .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
-            .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
-            .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
-            .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec)
-            .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec)
-            .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec)
-
+                .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
+                .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
+                .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec)
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec)
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec)
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec)
             .state(CLAIM_NOTIFIED)
             .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
             .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)

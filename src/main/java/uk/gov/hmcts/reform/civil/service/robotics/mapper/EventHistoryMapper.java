@@ -290,7 +290,38 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText;
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            defaultText = getDefaultTextVs1(caseData);
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                //TODO cover unit test to this block
+                switch (scenario.equals(TWO_V_ONE)
+                    ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                    : caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                    case COUNTER_CLAIM:
+                        defaultText = "RPA Reason: Defendant rejects and counter claims.";
+                        break;
+                    case FULL_ADMISSION:
+                        defaultText = "RPA Reason: Defendant fully admits.";
+                        break;
+                    case PART_ADMISSION:
+                        defaultText = "RPA Reason: Defendant partial admission.";
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (caseData.getRespondent1ClaimResponseType()) {
+                    case COUNTER_CLAIM:
+                        defaultText = "RPA Reason: Defendant rejects and counter claims.";
+                        break;
+                    case FULL_ADMISSION:
+                        defaultText = "RPA Reason: Defendant fully admits.";
+                        break;
+                    case PART_ADMISSION:
+                        defaultText = "RPA Reason: Defendant partial admission.";
+                        break;
+                    default:
+                        break;
+                }
+            }
         } else {
             String paginatedMessage = "";
             if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {

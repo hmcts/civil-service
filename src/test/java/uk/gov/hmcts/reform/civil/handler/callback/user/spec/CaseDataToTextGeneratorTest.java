@@ -81,6 +81,7 @@ public class CaseDataToTextGeneratorTest {
             Assertions.assertEquals(1, suitable.size(),
                                     "There should be exactly 1 suitable generator per case."
                                         + "Case in position " + i + " has " + suitable.size()
+                                    + ", it was expecting " + cases.get(i).getRight().getSimpleName()
             );
             //noinspection ConstantConditions
             Assertions.assertTrue(
