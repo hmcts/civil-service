@@ -19,16 +19,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED;
 
 @Service
 @RequiredArgsConstructor
-public class CreateSDORespondentNotificationHandler extends CallbackHandler implements NotificationData {
+public class CreateSDORespondent2NotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED);
 
-    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-notification-%s";
-    public static final String TASK_ID = "CreateSDONotifyRespodentSolicitor1";
+    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-2-notification-%s";
+    public static final String TASK_ID = "CreateSDONotifyRespondentSolicitor2";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -37,7 +37,7 @@ public class CreateSDORespondentNotificationHandler extends CallbackHandler impl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorSDOTriggered
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitor2SDOTriggered
         );
     }
 
@@ -51,15 +51,17 @@ public class CreateSDORespondentNotificationHandler extends CallbackHandler impl
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondentSolicitorSDOTriggered(CallbackParams callbackParams) {
+    private CallbackResponse notifyRespondentSolicitor2SDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getSdoOrdered(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.getRespondentSolicitor2EmailAddress() != null) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor2EmailAddress(),
+                notificationsProperties.getSdoOrdered(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -68,12 +70,12 @@ public class CreateSDORespondentNotificationHandler extends CallbackHandler impl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondent2LegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
         );
     }
 
-    public String getRespondentLegalOrganizationName(String id) {
+    public String getRespondent2LegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         String respondentLegalOrganizationName = null;
         if (organisation.isPresent()) {

@@ -62,7 +62,12 @@ public class GeneralApplicationDetailsBuilder {
         urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
         GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -128,7 +133,12 @@ public class GeneralApplicationDetailsBuilder {
                     .generalAppInformOtherParty(null);
         }
         return caseDataBuilder
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
@@ -179,9 +189,14 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())
@@ -250,7 +265,12 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
         return caseData.toBuilder()
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
@@ -331,7 +351,12 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())

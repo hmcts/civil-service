@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
+public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler implements DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ACKNOWLEDGEMENT_OF_SERVICE);
 
@@ -89,19 +90,8 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("ACKNOWLEDGEMENT_OF_SERVICE")) {
-            CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getSpecAoSApplicantCorrespondenceAddressRequired().equals(NO)) {
-                List<String> errors = postcodeValidator.validatePostCodeForDefendant(
-                    caseData.getSpecAoSApplicantCorrespondenceAddressdetails().getPostCode());
-
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .build();
-            }
+        if ("ACKNOWLEDGEMENT_OF_SERVICE".equals(callbackParams.getRequest().getEventId())) {
+            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

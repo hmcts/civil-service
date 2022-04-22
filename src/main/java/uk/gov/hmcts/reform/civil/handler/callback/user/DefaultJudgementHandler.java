@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
         + "%n%n Judgment has been entered and your case will be referred to a judge for directions.";
     public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "

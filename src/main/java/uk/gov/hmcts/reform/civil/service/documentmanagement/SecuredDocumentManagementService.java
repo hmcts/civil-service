@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
+import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -25,7 +26,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,7 +85,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTime.now())
+                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
+                                                                 .toInstant()
+                                                                 .atZone(ZoneId.systemDefault())
+                                                                 .toLocalDateTime()))
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();

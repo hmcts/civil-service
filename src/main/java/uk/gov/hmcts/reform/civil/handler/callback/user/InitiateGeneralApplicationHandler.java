@@ -76,40 +76,40 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers)).build());
+                                                 .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers)).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private List<String> getPbaAccounts(String authToken) {
         return organisationService.findOrganisation(authToken)
-                .map(Organisation::getPaymentAccount)
-                .orElse(emptyList());
+            .map(Organisation::getPaymentAccount)
+            .orElse(emptyList());
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAUrgencyRequirement generalAppUrgencyRequirement = caseData.getGeneralAppUrgencyRequirement();
         List<String> errors = generalAppUrgencyRequirement != null
-                ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
-                : Collections.emptyList();
+            ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
+            : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse gaValidateHearingScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
         List<String> errors = hearingDetails != null
-                ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
-                : Collections.emptyList();
+            ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
+            : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse setApplicationFees(CallbackParams callbackParams) {
@@ -118,9 +118,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
         Fee applicationFees = Fee.builder().code("FEE0210").build();
         boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
-                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                && caseData.getGeneralAppInformOtherParty() != null
-                && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+            && caseData.getGeneralAppInformOtherParty() != null
+            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
 
         if (isNotified) {
             applicationFees.setCalculatedAmountInPence(getFeeInPence(275));
@@ -131,14 +131,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         caseDataBuilder.generalAppPBADetails(pbaDetails.toBuilder().fee(applicationFees).build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .errors(Collections.emptyList())
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(Collections.emptyList())
+            .build();
     }
 
     private BigDecimal getFeeInPence(int fee) {
         return BigDecimal.valueOf(fee).multiply(PENCE_PER_POUND)
-                .setScale(0, RoundingMode.UNNECESSARY);
+            .setScale(0, RoundingMode.UNNECESSARY);
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -155,9 +155,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService.buildCaseData(dataBuilder, caseData, userDetails)
-                      .toMap(objectMapper))
-            .build();
+            .data(initiateGeneralApplicationService
+                      .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                          .toString()).toMap(objectMapper)).build();
     }
 
     /**
