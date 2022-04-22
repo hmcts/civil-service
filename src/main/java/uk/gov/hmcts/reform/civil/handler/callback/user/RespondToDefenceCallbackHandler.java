@@ -225,6 +225,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.respondentSharedClaimResponseDocument(null);
         }
 
+        //Set to null because there are no more deadlines
+        builder.nextDeadline(null);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
