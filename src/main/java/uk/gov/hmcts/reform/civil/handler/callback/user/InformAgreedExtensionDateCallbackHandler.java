@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -74,7 +75,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateIsRespondent1Flag,
             callbackKey(MID, "extension-date"), this::validateExtensionDate,
-            callbackKey(ABOUT_TO_SUBMIT), this::setResponseDeadline,
+            callbackKey(ABOUT_TO_SUBMIT), this::oldSetResponseDeadline,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -134,6 +136,39 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
                 .build();
         }
+    }
+
+    private CallbackResponse oldSetResponseDeadline(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
+            ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+            : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
+            .atTime(END_OF_BUSINESS_DAY);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().isRespondent1(null);
+
+        if (caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+
+            caseDataBuilder
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
+                .respondent1TimeExtensionDate(time.now())
+                .respondent1ResponseDeadline(newDeadline);
+        } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            caseDataBuilder
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
+                .respondent2TimeExtensionDate(time.now())
+                .respondent2ResponseDeadline(newDeadline);
+        } else {
+            caseDataBuilder.respondent1TimeExtensionDate(time.now())
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
+                .respondent1ResponseDeadline(newDeadline);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
