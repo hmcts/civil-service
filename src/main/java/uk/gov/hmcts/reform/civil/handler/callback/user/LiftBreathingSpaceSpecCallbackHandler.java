@@ -55,7 +55,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             ));
         } else if (caseData.getBreathing().getLift() != null) {
             responseBuilder.errors(Collections.singletonList(
-                "This claim is not in Breathing Space anymore."
+                "This claim is not in Breathing Space."
             ));
         }
 
@@ -90,7 +90,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         String body = "<br>We have sent you a confirmation email.";
 
-        String header = format("# Breathing Space Lifted%n## Claim number%n# %s", claimNumber);
+        String header = format("# Breathing Space lifted%n## Claim number%n# %s", claimNumber);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
