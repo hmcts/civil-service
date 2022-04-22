@@ -333,7 +333,12 @@
         "receiptOfPartAdmission",
         "receiptOfAdmission",
         "replyToDefence",
-        "directionsQuestionnaireFiled"
+        "directionsQuestionnaireFiled",
+        "statesPaid",
+        "breathingSpaceEntered",
+        "breathingSpaceLifted",
+        "breathingSpaceMentalHealthEntered",
+        "breathingSpaceMentalHealthLifted"
       ],
       "properties": {
         "miscellaneous": {
@@ -442,6 +447,66 @@
             }
           ],
           "description": ""
+        },
+        "statesPaid": {
+          "$id": "#/properties/events/properties/statesPaid",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/statesPaidFiledEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "breathingSpaceEntered": {
+          "$id": "#/properties/events/properties/breathingSpaceEntered",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/breathingSpaceEnteredEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "breathingSpaceLifted": {
+          "$id": "#/properties/events/properties/breathingSpaceLifted",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/breathingSpaceLiftedEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "breathingSpaceMentalHealthEntered": {
+          "$id": "#/properties/events/properties/breathingSpaceMentalHealthEntered",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/breathingSpaceMentalHealthEnteredEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "breathingSpaceMentalHealthLifted": {
+          "$id": "#/properties/events/properties/breathingSpaceMentalHealthLifted",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/breathingSpaceMentalHealthLiftedEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
         }
       },
       "additionalProperties": false
@@ -475,7 +540,7 @@
     "solicitorIDType": {
       "$id": "#/definitions/solicitorIDType",
       "type": ["string",
-      "null"],
+        "null"],
       "description": "Identifies the solicitor object in the json document.",
       "default": ""
     },
@@ -1213,6 +1278,281 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "statesPaidFiledEventType": {
+      "$id": "#/definitions/statesPaidFiledEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/statesPaidFiledEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "49",
+            "description": "The CASEMAN code for the states paid event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "breathingSpaceEnteredEventType": {
+      "$id": "#/definitions/breathingSpaceEnteredEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/breathingSpaceEnteredEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "720",
+            "description": "The CASEMAN code for the states paid event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "breathingSpaceLiftedEventType": {
+      "$id": "#/definitions/breathingSpaceLiftedEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/breathingSpaceLiftedEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "721",
+            "description": "The CASEMAN code for the states paid event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "breathingSpaceMentalHealthEnteredEventType": {
+      "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "723",
+            "description": "The CASEMAN code for the states paid event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "breathingSpaceMentalHealthLiftedEventType": {
+      "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "724",
+            "description": "The CASEMAN code for the states paid event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
