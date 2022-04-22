@@ -302,7 +302,7 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-                                "RPA Reason: [2 of 2 - 2020-08-01]  Defendant: Mr. John Rambo has responded: "
+                                "[2 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
                                     + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
