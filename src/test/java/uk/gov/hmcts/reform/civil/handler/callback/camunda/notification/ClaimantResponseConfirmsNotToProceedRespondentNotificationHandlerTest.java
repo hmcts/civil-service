@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
@@ -39,6 +40,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
     @MockBean
     private NotificationService notificationService;
+    @MockBean
+    private OrganisationService organisationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
