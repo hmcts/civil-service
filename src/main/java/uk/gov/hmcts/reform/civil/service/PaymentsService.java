@@ -39,7 +39,7 @@ public class PaymentsService {
             .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType()))  {
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType()))  {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
