@@ -13,7 +13,6 @@ public class PaymentsConfiguration {
     private final String specSiteId;
     private final String specService;
 
-
     public PaymentsConfiguration(@Value("${payments.api.site_id}") String siteId,
                                  @Value("${payments.api.service}") String service,
                                  @Value("${payments.api.spec_site_id}") String specSiteId,
