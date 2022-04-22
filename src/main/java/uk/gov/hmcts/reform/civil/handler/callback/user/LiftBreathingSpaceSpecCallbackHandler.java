@@ -51,11 +51,11 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
         if (caseData.getBreathing() == null || caseData.getBreathing().getEnter() == null) {
             responseBuilder.errors(Collections.singletonList(
-                "A claim must enter breathing space before it can be lifted."
+                "A claim must enter Breathing Space before it can be lifted."
             ));
         } else if (caseData.getBreathing().getLift() != null) {
             responseBuilder.errors(Collections.singletonList(
-                "This claim is not in breathing space anymore."
+                "This claim is not in Breathing Space anymore."
             ));
         }
 
