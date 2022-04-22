@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
@@ -44,8 +46,12 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -63,6 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -77,14 +84,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondToClaimSpecCallbackHandler handler;
 
     @Mock
+    private Time time;
+    @Mock
     private PaymentDateValidator validator;
     @Mock
     private UnavailableDateValidator dateValidator;
     @Mock
+    private ExitSurveyContentService exitSurveyContentService;
+    @Mock
     private FeatureToggleService toggleService;
     @Mock
     private PostcodeValidator postcodeValidator;
-
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
+    @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
         new FullAdmitSetDateConfirmationText(),
@@ -93,12 +106,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         new PartialAdmitPayImmediatelyConfirmationText(),
         new PartialAdmitSetDateConfirmationText(),
         new RepayPlanConfirmationText(),
-        new SpecResponse1v2DivergentText()
+        new SpecResponse1v2DivergentText(),
+        new RepayPlanConfirmationText(),
+        new CounterClaimConfirmationText()
     );
 
     private List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderSpecGenerators = List.of(
         new SpecResponse1v2DivergentHeaderText(),
         new SpecResponse2v1DifferentHeaderText()
+
     );
 
     @BeforeEach
@@ -718,6 +734,85 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .contains("The claim will be settled. We'll contact you when they respond.")
             .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
                           .toString());
+
+    }
+
+    @Test
+    void specificSummary_whenCounterClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        assertThat(response.getConfirmationBody())
+            .doesNotContain(caseData.getApplicant1().getPartyName())
+            .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
+    }
+
+    @Nested
+    class AboutToSubmitTests {
+
+        @Test
+        void updateRespondent1AddressWhenUpdated() {
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+        }
+
+        @Test
+        void updateRespondent2AddressWhenUpdated() {
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+        }
     }
 
     @Nested

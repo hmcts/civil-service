@@ -139,6 +139,8 @@ public class CaseData implements MappableObject {
     private final Address specApplicantCorrespondenceAddressdetails;
     private final YesOrNo specRespondentCorrespondenceAddressRequired;
     private final Address specRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondent2HomeAddressRequired;
+    private final Address specAoSRespondent2HomeAddressDetails;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;

@@ -362,6 +362,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1Represented(respondent1Represented);
         }
 
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
