@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -250,8 +251,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
-            }
-            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
             }
@@ -275,12 +277,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
         }
 
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        }
         if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             &&
             (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+               || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
         }
@@ -348,12 +354,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .respondent2Copy(caseData.getRespondent2())
-            .build();
+            .respondent1Copy(caseData.getRespondent1());
+
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        ofNullable(caseData.getRespondent2()).ifPresent(r2 ->
+            updatedCaseData.respondent2Copy(r2).respondent2DetailsForClaimDetailsTab(r2)
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
@@ -413,9 +423,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
+        Party updatedRespondent1;
+
+        if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
+            updatedRespondent1 = caseData.getRespondent1().toBuilder()
+                .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
+        } else {
+            updatedRespondent1 = caseData.getRespondent1().toBuilder()
+                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
+        }
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
@@ -423,6 +439,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1ResponseDate(responseDate)
             .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
+
+        if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
+
+            Party updatedRespondent2;
+
+            if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
+            } else {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+            }
+
+            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+        }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
