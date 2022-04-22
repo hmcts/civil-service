@@ -101,4 +101,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String breathingSpaceEnterApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedRespondentEmailTemplate;
 }
