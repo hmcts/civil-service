@@ -943,6 +943,45 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
+        @Nested
+        class GetAllPartyNames {
+            @Test
+            void oneVOne() {
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader");
+            }
+
+            @Test
+            void oneVTwo() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
+            }
+
+            @Test
+            void twoVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
+            }
+        }
+
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
             CaseData data = caseData.toBuilder()

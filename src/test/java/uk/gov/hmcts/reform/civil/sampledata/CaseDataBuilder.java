@@ -1525,6 +1525,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses() {
         atStateRespondentFullDefence();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
@@ -1702,6 +1703,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE.plusDays(2);
         return this;
     }
 

@@ -324,6 +324,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate, allocatedTrack);
 
         // 1v2 same legal rep - will respond for both and set applicant 1 response deadline
         if (respondent2HasSameLegalRep(caseData)) {
@@ -334,7 +335,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
 
                 // moving statement of truth value to correct field, this was not possible in mid event.
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
@@ -352,7 +354,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
 
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
                 if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
@@ -390,7 +393,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
+            } else {
+                updatedData.nextDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
             }
 
             // 1v1, 2v1
@@ -412,7 +418,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             if (respondent2NotPresent(caseData)
                 || applicant2Present(caseData)
                 || caseData.getRespondent2ResponseDate() != null) {
-                updatedData.applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                updatedData
+                    .applicant1ResponseDeadline(applicant1Deadline)
+                    .nextDeadline(applicant1Deadline.toLocalDate());
             }
             // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
             if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -423,8 +431,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                 updatedData
                     .respondent2(updatedRespondent2)
-                    .respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+                    .respondent2Copy(null)
+                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+
+                if (caseData.getRespondent2ResponseDate() == null) {
+                    updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
+                }
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline

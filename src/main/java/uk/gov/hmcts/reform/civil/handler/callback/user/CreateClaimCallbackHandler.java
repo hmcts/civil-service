@@ -306,6 +306,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
+        dataBuilder.allPartyNames(getAllPartyNames(caseData));
+
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
@@ -315,6 +317,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getAllPartyNames(CaseData caseData) {
+        return format("%s%s V %s%s",
+                      caseData.getApplicant1().getPartyName(),
+                      YES.equals(caseData.getAddApplicant2())
+                          ? ", " + caseData.getApplicant2().getPartyName() : "",
+                      caseData.getRespondent1().getPartyName(),
+                      YES.equals(caseData.getAddRespondent2())
+                          ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

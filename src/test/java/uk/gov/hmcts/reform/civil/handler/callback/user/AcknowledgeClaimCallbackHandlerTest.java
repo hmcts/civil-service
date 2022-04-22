@@ -220,12 +220,15 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         private LocalDateTime newDeadline;
+        private LocalDateTime nextDeadline;
         private LocalDateTime acknowledgementDate;
 
         @BeforeEach
         void setup() {
             newDeadline = LocalDateTime.now().plusDays(14);
+            nextDeadline = LocalDateTime.now().plusDays(7);
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(newDeadline);
+            when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
             acknowledgementDate = LocalDateTime.now();
             when(time.now()).thenReturn(acknowledgementDate);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -281,6 +284,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -307,6 +313,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -336,6 +345,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -368,6 +380,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline").isEqualTo(newDeadline.toLocalDate().toString());
         }
 
         @Test
@@ -399,6 +414,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
         }
     }
 
