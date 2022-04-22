@@ -6,7 +6,7 @@ resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = var.location
 
-  tags = var.common_tags
+  tags = local.common_tags
 }
 
 module "key-vault" {
@@ -18,7 +18,7 @@ module "key-vault" {
   object_id               = var.jenkins_AAD_objectId
   resource_group_name     = azurerm_resource_group.rg.name
   product_group_object_id = "ca5067a5-f554-4f6a-9eda-e93a1190d7ec"
-  common_tags             = var.common_tags
+  common_tags             = local.common_tags
   create_managed_identity = true
 }
 
