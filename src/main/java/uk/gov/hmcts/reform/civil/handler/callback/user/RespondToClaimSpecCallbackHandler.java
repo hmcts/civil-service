@@ -515,7 +515,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
-            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
             caseData
         );
 
