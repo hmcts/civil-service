@@ -68,7 +68,7 @@ withNightlyPipeline(type, product, component) {
 
   after('fullFunctionalTest') {
     //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
-    sh """ ./gradlew runApiAndEndToEndUnspecTests """
+    sh """ ./gradlew runEndToEndUnspecTests """
     archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
   }
