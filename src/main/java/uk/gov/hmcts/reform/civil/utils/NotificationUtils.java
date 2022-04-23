@@ -63,8 +63,12 @@ public class NotificationUtils {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_ONE_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                    ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                    ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }

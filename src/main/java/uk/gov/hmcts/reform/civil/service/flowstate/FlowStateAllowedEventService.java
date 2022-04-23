@@ -600,6 +600,12 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION
             )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC
+            )
         )
     );
 

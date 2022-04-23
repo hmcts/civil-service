@@ -520,6 +520,8 @@ public class FlowPredicate {
                 //scenario: latest response is full defence
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ResponseDate() != null
+                    && caseData.getRespondent2ResponseDate() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     && ((RespondentResponseTypeSpec.FULL_DEFENCE
@@ -551,6 +553,8 @@ public class FlowPredicate {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ResponseDate() != null
+                    && caseData.getRespondent2ResponseDate() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     //scenario: latest response is not full defence
