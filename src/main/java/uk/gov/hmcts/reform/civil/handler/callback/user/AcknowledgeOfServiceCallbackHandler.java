@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -101,10 +100,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         Party respondent = callbackParams.getCaseData().getRespondent1();
         List<String> errors = dateOfBirthValidator.validate(respondent);
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired().equals(NO)) {
+        /*if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired().equals(NO)) {
             errors = postcodeValidator.validatePostCodeForDefendant(
                 caseData.getSpecAoSRespondentCorrespondenceAddressdetails().getPostCode());
-        }
+        }*/
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -120,10 +119,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            /*.specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
             .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
-            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())*/
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -145,10 +144,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
             .respondent1(updatedRespondent1)
             .respondent1Copy(null)
-            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
+            /*.specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
             .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
-            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())*/
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

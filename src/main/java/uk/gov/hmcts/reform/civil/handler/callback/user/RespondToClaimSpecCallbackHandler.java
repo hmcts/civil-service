@@ -425,13 +425,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
-        if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
+        /*if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
         }
+*/
+        updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
@@ -446,14 +449,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             Party updatedRespondent2;
 
-            if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
-                updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
-            } else {
-                updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
-            }
-
+            updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }

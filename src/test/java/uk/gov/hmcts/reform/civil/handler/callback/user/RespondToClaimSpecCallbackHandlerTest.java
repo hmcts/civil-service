@@ -15,11 +15,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -42,11 +39,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -61,7 +56,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -69,7 +63,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -134,7 +127,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
-    @Test
+    /*@Test
     void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
@@ -154,7 +147,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackResponse response = handler.handle(params);
         assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
-    }
+    }*/
 
     @Nested
     class DefendAllOfClaimTests {
@@ -751,68 +744,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getConfirmationBody())
             .doesNotContain(caseData.getApplicant1().getPartyName())
             .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
-    }
-
-    @Nested
-    class AboutToSubmitTests {
-
-        @Test
-        void updateRespondent1AddressWhenUpdated() {
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
-        }
-
-        @Test
-        void updateRespondent2AddressWhenUpdated() {
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
-        }
     }
 
     @Nested
