@@ -53,9 +53,12 @@ jobs:
               const branch = pull['head']['ref'];
               console.log('Pull for branch: ' + branch);
               if (branch.startsWith('${{env.branchPrefix}}')
-            && branch != 'dependabot/gradle/org.flywaydb.flyway-8.5.8'
-            && branch != 'dependabot/gradle/jakarta.xml.bind-jakarta.xml.bind-api-4.0.0'
-            && branch != 'dependabot/gradle/io.freefair.lombok-6.4.2') {
+            && branch != 'dependabot/gradle/org.mockito-mockito-inline-4.5.1'
+            && branch != 'dependabot/gradle/org.jetbrains.kotlin-kotlin-stdlib-common-1.6.21'
+            && branch != 'dependabot/gradle/org.mockito-mockito-junit-jupiter-4.5.1'
+            && branch != 'dependabot/gradle/org.jetbrains.kotlin-kotlin-stdlib-1.6.21'
+            && branch != 'dependabot/gradle/com.launchdarkly-launchdarkly-java-server-sdk-5.8.0'
+            && branch != 'dependabot/gradle/org.postgresql-postgresql-42.3.4') {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
                 console.log('Checking labels: ' + branch);
