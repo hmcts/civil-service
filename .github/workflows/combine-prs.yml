@@ -52,7 +52,13 @@ jobs:
             for (const pull of pulls) {
               const branch = pull['head']['ref'];
               console.log('Pull for branch: ' + branch);
-              if (branch.startsWith('${{env.branchPrefix}}')) {
+              if (branch.startsWith('${{env.branchPrefix}}')
+                  && !branch.equals('dependabot/gradle/org.jetbrains.kotlin-kotlin-reflect-1.6.21')
+            && !branch.equals('dependabot/gradle/org.owasp.dependencycheck-7.1.0.1')
+            && !branch.equals('dependabot/gradle/org.springframework.security-spring-security-core-5.6.3')
+            && !branch.equals('dependabot/gradle/org.flywaydb.flyway-8.5.9')
+            && !branch.equals('dependabot/gradle/com.nimbusds-nimbus-jose-jwt-9.22')
+                  ) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
                 console.log('Checking labels: ' + branch);
