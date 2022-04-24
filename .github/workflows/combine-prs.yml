@@ -55,8 +55,7 @@ jobs:
               if (branch.startsWith('${{env.branchPrefix}}')
             && branch != 'dependabot/gradle/org.flywaydb.flyway-8.5.8'
             && branch != 'dependabot/gradle/jakarta.xml.bind-jakarta.xml.bind-api-4.0.0'
-            && branch != 'dependabot/gradle/io.freefair.lombok-6.4.2'
-            && branch != 'dependabot/gradle/org.springframework.boot-spring-boot-starter-oauth2-resource-server-2.6.6') {
+            && branch != 'dependabot/gradle/io.freefair.lombok-6.4.2') {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
                 console.log('Checking labels: ' + branch);
