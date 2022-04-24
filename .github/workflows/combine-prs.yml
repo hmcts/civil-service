@@ -54,6 +54,13 @@ jobs:
               console.log('Pull for branch: ' + branch);
               if (branch.startsWith('${{env.branchPrefix}}')
               && branch == 'dependabot/gradle/org.jetbrains.kotlin-kotlin-reflect-1.6.21'
+              && branch == 'dependabot/gradle/org.owasp.dependencycheck-7.1.0.1'
+              && branch == 'dependabot/gradle/org.springframework.security-spring-security-core-5.6.3'
+              && branch == 'dependabot/gradle/org.flywaydb.flyway-8.5.9'
+              && branch == 'dependabot/gradle/com.nimbusds-nimbus-jose-jwt-9.22'
+              && branch == 'dependabot/gradle/org.mockito-mockito-core-4.5.1'
+              && branch == 'dependabot/gradle/com.networknt-json-schema-validator-1.0.69'
+              && branch == 'dependabot/gradle/io.freefair.lombok-6.4.3'
             ) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
