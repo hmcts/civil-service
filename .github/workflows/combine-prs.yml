@@ -120,6 +120,7 @@ jobs:
           git branch $COMBINE_BRANCH_NAME $basebranch
           echo "reached after master"
           git checkout $COMBINE_BRANCH_NAME
+          echo "check out"
           git pull origin $sourcebranches --no-edit
           echo "merging now"
           git push origin $COMBINE_BRANCH_NAME
