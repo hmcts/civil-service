@@ -445,7 +445,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
         void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
+            // TODO: remove V_1 after merging
             var params = callbackParamsOf(
+                V_1,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -482,7 +484,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                    .build())
                                   .build())
                 .build();
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -517,9 +520,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .toBuilder()
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
-
+                // TODO: remove V_1 after merging
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
+                        V_1,
                         caseData,
                         ABOUT_TO_SUBMIT
                     ));
@@ -545,8 +549,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(YES)
                     .build();
 
+                // TODO: remove V_1 after merging
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
+                        V_1,
                         caseData.toBuilder().respondentSharedClaimResponseDocument(
                             caseData.getRespondent1ClaimResponseDocument()).build(), ABOUT_TO_SUBMIT
                     ));

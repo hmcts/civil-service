@@ -66,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -788,7 +789,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // TODO: remove V_1 after merging
+            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -945,6 +947,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class GetAllPartyNames {
+            @BeforeEach
+            void setup() {
+                // TODO: remove V_1 after merging
+                params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            }
+
             @Test
             void oneVOne() {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -961,7 +969,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+                    // TODO: remove V_1 after merging
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
@@ -975,7 +984,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+                    // TODO: remove V_1 after merging
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");

@@ -363,7 +363,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .addRespondent2(NO)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -398,7 +399,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent2SameLegalRepresentative(NO)
                 .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -422,7 +424,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent2SameLegalRepresentative(YES)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -454,7 +457,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                     .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                     .build();
 
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                // TODO: remove V_1 after merging
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -473,7 +477,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                     .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                     .build();
 
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                // TODO: remove V_1 after merging
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -492,7 +497,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                     .respondent2SameLegalRepresentative(NO)
                     .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                // TODO: remove V_1 after merging
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
