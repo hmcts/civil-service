@@ -55,6 +55,7 @@ jobs:
               if (branch.startsWith('${{env.branchPrefix}}')
               && branch != 'dependabot/gradle/jakarta.xml.bind-jakarta.xml.bind-api-4.0.0'
               && branch != 'dependabot/gradle/org.postgresql-postgresql-42.3.4'
+              && branch != 'dependabot/gradle/com.launchdarkly-launchdarkly-java-server-sdk-5.8.0'
             ) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
@@ -110,13 +111,14 @@ jobs:
           git config pull.rebase false
           git config user.name github-actions
           git config user.email github-actions@github.com
-          echo "reached here"
           git fetch origin $basebranch:$basebranch
           git branch $COMBINE_BRANCH_NAME $basebranch
           echo "reached after master"
           git checkout $COMBINE_BRANCH_NAME
           git pull origin $sourcebranches --no-edit
+          echo "merging now"
           git push origin $COMBINE_BRANCH_NAME
+          echo "pushing now"
           echo "finished the creation job"
       # Creates a PR with the new combined branch
       - uses: actions/github-script@v3
