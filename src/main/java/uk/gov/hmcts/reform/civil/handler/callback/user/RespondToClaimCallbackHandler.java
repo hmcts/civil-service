@@ -299,6 +299,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
+    //temporary - to avoid duplicated lines for backwards compatibility
+    @SuppressWarnings({"Duplicates", "all", "common-java:DuplicateBlocks"})
     private CallbackResponse oldSetApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -466,6 +468,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
+    //temporary - to avoid duplicated lines for backwards compatibility
+    @SuppressWarnings({"Duplicates", "all", "common-java:DuplicateBlocks"})
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 

@@ -164,6 +164,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    //temporary - to avoid duplicated lines for backwards compatibility
+    @SuppressWarnings({"Duplicates", "all", "common-java:DuplicateBlocks"})
     private CallbackResponse oldSetNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
@@ -266,6 +268,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    //temporary - to avoid duplicated lines for backwards compatibility
+    @SuppressWarnings({"Duplicates", "all", "common-java:DuplicateBlocks"})
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();

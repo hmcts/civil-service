@@ -432,7 +432,132 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmitCallback {
+    class OldAboutToSubmitCallback {
+        private final LocalDateTime localDateTime = now();
+
+        @BeforeEach
+        void setup() {
+            when(time.now()).thenReturn(localDateTime);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atState(flowState).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build();
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(4, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentName=claimant-2-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+        }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("John Smith", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(null, null);
+            }
+        }
+
+        @Nested
+        class OneVTwo {
+            @Test
+            void shouldRemoveRespondentSharedClaimResponseDocument_whenInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData.toBuilder().respondentSharedClaimResponseDocument(
+                            caseData.getRespondent1ClaimResponseDocument()).build(), ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
+            }
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackV1 {
         private final LocalDateTime localDateTime = now();
 
         @BeforeEach

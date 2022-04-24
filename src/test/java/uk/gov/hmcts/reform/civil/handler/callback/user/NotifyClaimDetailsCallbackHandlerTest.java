@@ -176,7 +176,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmit {
+    class OldAboutToSubmit {
         private LocalDateTime localDateTime;
         private LocalDateTime newDate;
         private LocalDateTime sixMonthDate;
@@ -217,6 +217,65 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS.name(), "READY");
+
+            assertThat(response.getData())
+                .containsEntry("claimDetailsNotificationDate", localDateTime.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
+                .containsEntry("respondent2ResponseDeadline", newDate.format(ISO_DATE_TIME))
+                .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
+        }
+    }
+
+    @Nested
+    class AboutToSubmitV1 {
+        private LocalDateTime localDateTime;
+        private LocalDateTime newDate;
+        private LocalDateTime sixMonthDate;
+
+        @BeforeEach
+        void setup() {
+            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            newDate = LocalDateTime.of(2020, 1, 15, 16, 0, 0);
+            sixMonthDate = LocalDateTime.of(2020, 7, 1, 0, 0, 0);
+            when(time.now()).thenReturn(localDateTime);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(localDateTime)).thenReturn(newDate);
+            when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, localDateTime.toLocalDate()))
+                .thenReturn(sixMonthDate);
+        }
+
+        @Test
+        void shouldUpdateBusinessProcess_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS.name(), "READY");
+
+            assertThat(response.getData())
+                .containsEntry("claimDetailsNotificationDate", localDateTime.format(ISO_DATE_TIME))
+                .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
+                .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
+        }
+
+        @Test
+        void shouldUpdateBusinessProcess_whenInvoked1v2DifferentSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+            // TODO: remove V_1 after merging
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())

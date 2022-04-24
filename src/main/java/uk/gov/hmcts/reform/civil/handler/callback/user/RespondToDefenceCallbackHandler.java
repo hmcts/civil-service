@@ -184,48 +184,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse oldAboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
 
-        if (multiPartyScenario == TWO_V_ONE) {
-            builder.applicant2ResponseDate(currentTime);
-        }
-
-        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-
-            if (caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-                Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                    .applicant1DQStatementOfTruth(statementOfTruth)
-                    .build();
-
-                builder.applicant1DQ(dq);
-            }
-
-            if (caseData.getApplicant2DQ() != null
-                && caseData.getApplicant2DQ().getApplicant2DQFileDirectionsQuestionnaire() != null) {
-                Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
-                    .applicant2DQStatementOfTruth(statementOfTruth)
-                    .build();
-
-                builder.applicant2DQ(dq);
-            }
-
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        }
-
-        assembleResponseDocuments(caseData, builder);
-
-        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
-            builder.respondentSharedClaimResponseDocument(null);
-        }
+        temporaryForBackwardsCompatibility(caseData, builder, currentTime);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -234,12 +199,25 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
+
+        temporaryForBackwardsCompatibility(caseData, builder, currentTime);
+
+        //Set to null because there are no more deadlines
+        builder.nextDeadline(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void temporaryForBackwardsCompatibility(CaseData caseData, CaseData.CaseDataBuilder builder,
+                                                    LocalDateTime currentTime) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
@@ -276,13 +254,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
         }
-
-        //Set to null because there are no more deadlines
-        builder.nextDeadline(null);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
