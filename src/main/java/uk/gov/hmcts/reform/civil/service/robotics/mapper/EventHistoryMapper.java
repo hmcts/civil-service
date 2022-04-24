@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -222,8 +225,9 @@ public class EventHistoryMapper {
 
         if (defendant2ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                buildRespondentResponseEventForSpec(builder, caseData, caseData.getRespondent2ClaimResponseTypeForSpec(),
-                                             respondent2ResponseDate, RESPONDENT2_ID);
+                buildRespondentResponseEventForSpec(builder, caseData,
+                                                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                                                    respondent2ResponseDate, RESPONDENT2_ID);
             } else {
                 buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
                                              respondent2ResponseDate, RESPONDENT2_ID);
