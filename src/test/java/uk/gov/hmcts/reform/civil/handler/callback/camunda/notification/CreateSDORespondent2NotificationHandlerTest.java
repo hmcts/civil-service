@@ -27,17 +27,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDORespondentNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDORespondent2NotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CreateSDORespondentNotificationHandler.class,
+    CreateSDORespondent2NotificationHandler.class,
     JacksonAutoConfiguration.class
 })
 
-public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -46,7 +46,7 @@ public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHand
     @MockBean
     private OrganisationService organisationService;
     @Autowired
-    private CreateSDORespondentNotificationHandler handler;
+    private CreateSDORespondent2NotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -66,10 +66,10 @@ public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHand
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+                "respondentsolicitor2@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
-                "create-sdo-respondent-notification-000DC001"
+                "create-sdo-respondent-2-notification-000DC001"
             );
         }
 
@@ -85,8 +85,9 @@ public class CreateSDORespondentNotificationHandlerTest extends BaseCallbackHand
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED").build()).build())).isEqualTo(TASK_ID);
+            "NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED").build()).build())).isEqualTo(TASK_ID);
     }
 }
+
 
 
