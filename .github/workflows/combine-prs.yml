@@ -56,6 +56,7 @@ jobs:
               && branch != 'dependabot/gradle/jakarta.xml.bind-jakarta.xml.bind-api-4.0.0'
               && branch != 'dependabot/gradle/org.postgresql-postgresql-42.3.4'
               && branch != 'dependabot/gradle/com.launchdarkly-launchdarkly-java-server-sdk-5.8.0'
+              && branch != 'dependabot/gradle/org.jetbrains.kotlin-kotlin-stdlib-1.6.21'
             ) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
