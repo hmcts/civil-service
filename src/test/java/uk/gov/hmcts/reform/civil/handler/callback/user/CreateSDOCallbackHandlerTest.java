@@ -36,7 +36,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -47,6 +49,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     ValidationAutoConfiguration.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    public static final String REFERENCE_NUMBER = "000DC001";
 
     @MockBean
     private Time time;
@@ -108,20 +112,81 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponse() {
+        void shouldReturnExpectedSubmittedCallbackResponse_1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            String header = format(
+                CONFIRMATION_HEADER,
+                REFERENCE_NUMBER
+            );
+
             String body = format(
-                CONFIRMATION_SUMMARY,
+                CONFIRMATION_SUMMARY_1v1,
                 "Mr. John Rambo",
                 "Mr. Sole Trader"
             );
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(CONFIRMATION_HEADER)
+                    .confirmationHeader(header)
+                    .confirmationBody(body)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String header = format(
+                CONFIRMATION_HEADER,
+                REFERENCE_NUMBER
+            );
+
+            String body = format(
+                CONFIRMATION_SUMMARY_1v2,
+                "Mr. John Rambo",
+                "Mr. Sole Trader",
+                "Mr. John Rambo"
+            );
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(header)
+                    .confirmationBody(body)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoApplicants()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String header = format(
+                CONFIRMATION_HEADER,
+                REFERENCE_NUMBER
+            );
+
+            String body = format(
+                CONFIRMATION_SUMMARY_2v1,
+                "Mr. John Rambo",
+                "Mr. Jason Rambo",
+                "Mr. Sole Trader"
+            );
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(header)
                     .confirmationBody(body)
                     .build());
         }

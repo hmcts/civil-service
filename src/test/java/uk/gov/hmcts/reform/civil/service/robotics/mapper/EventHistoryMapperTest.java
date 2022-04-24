@@ -1205,6 +1205,239 @@ class EventHistoryMapperTest {
     }
 
     @Nested
+    class RespondentFullAdmissionSpec {
+        @Test
+        void shouldPrepareExpectedEvents_when1v1ClaimWithRespondentFullAdmissionToBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec()
+                .build();
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(1)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant fully admits.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant fully admits.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentFullAdmissionToBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec2v1ClaimSubmitted()
+                .atStateRespondent2v1FullAdmission()
+                .build();
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(1)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant fully admits.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant fully admits.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_when1v2ClaimWithRespondentFullAdmissionToBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec1v2ClaimSubmitted()
+                .atStateRespondent1v2FullAdmission()
+                .build();
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(1)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                                + "Defendant: Mr. Sole Trader has responded: null")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+    }
+
+    @Nested
+    class RespondentPartAdmissionSpec {
+
+        @Test
+        void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentPartAdmissionToBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec2v1ClaimSubmitted()
+                .atStateRespondent2v1PartAdmission()
+                .build();
+
+            Event expectedReceiptOfPartAdmission = Event.builder()
+                .eventSequence(1)
+                .eventCode("60")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant partial admission.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant partial admission.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
+                .containsExactly(expectedReceiptOfPartAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "consentExtensionFilingDefence",
+                "defenceAndCounterClaim",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
+    class RespondentCounterClaimSpec {
+
+        @Test
+        void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentCounterClaimToBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec2v1ClaimSubmitted()
+                .atStateRespondent2v1CounterClaim()
+                .build();
+
+            Event expectedDefenceAndCounterClaim = Event.builder()
+                .eventSequence(1)
+                .eventCode("52")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant rejects and counter claims.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("defenceAndCounterClaim").asList()
+                .containsExactly(expectedDefenceAndCounterClaim);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "receiptOfAdmission",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "consentExtensionFilingDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+    }
+
+    @Nested
     class RespondentPartAdmission {
 
         @Test
@@ -2101,6 +2334,8 @@ class EventHistoryMapperTest {
 
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
@@ -2149,6 +2384,15 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(6)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
                     .build()
             );
 
@@ -2163,7 +2407,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                                 expectedMiscellaneousEvents.get(1),
+                                 expectedMiscellaneousEvents.get(2));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2312,7 +2557,17 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build());
+                    .build(),
+                Event.builder()
+                    .eventSequence(6)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+                );
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2325,7 +2580,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                                 expectedMiscellaneousEvents.get(1),
+                                 expectedMiscellaneousEvents.get(2));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2421,9 +2677,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION;")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION;")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -2472,9 +2728,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION;")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION;")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                                           .build())
                         .build()
                 );
