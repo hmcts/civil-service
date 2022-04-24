@@ -79,7 +79,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.21'
       // CVE-2020-29582
 
       // CVE-2021-29425
@@ -190,6 +190,14 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
+task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
+}
+
+
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
@@ -202,8 +210,8 @@ task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multipa
   commandLine '/usr/bin/yarn', '--silent', 'test:nightly-multiparty'
 }
 
-task runApiAndEndToEndUnspecTests(type: Exec, description: 'Runs Api and E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:AATFunctional'
+task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:e2e-unspec'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
@@ -222,7 +230,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runApiTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSpecApiTests, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
