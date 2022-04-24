@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.service.WorkingDayIndicator;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -131,7 +130,7 @@ class DeadlineExtensionValidatorTest {
 
             assertThat(errors).contains("The agreed extension date must be after the current deadline");
         }
-
+        /*
         @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsBeyond42DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
@@ -183,5 +182,6 @@ class DeadlineExtensionValidatorTest {
 
             assertThat(errors).contains("Date must be Weekday/Working Day");
         }
+         */
     }
 }
