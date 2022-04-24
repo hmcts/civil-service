@@ -60,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONESPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -403,7 +404,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
         }
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && YES.equals(caseData.getAddRespondent2())) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                //work around: treat this as if it was a 1v2 same solicitor single response
+                updatedData.sameSolicitorSameResponse(NO).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(YES).build();
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && YES.equals(caseData.getAddRespondent2())) {
+            if (NO.equals(caseData.getRespondentResponseIsSame())) {
+                updatedData.sameSolicitorSameResponse(NO).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(YES).build();
+            }
+
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -501,6 +523,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
                     .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                     .build();
             }
+        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVoneDivergent(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                .build();
         } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVoneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
