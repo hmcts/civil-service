@@ -56,7 +56,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
-        CaseDocument sealedForm = generateSealedClaim(
+        CaseDocument sealedForm = formGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
@@ -78,10 +78,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
-    }
-
-    private CaseDocument generateSealedClaim(CaseData caseData, String authorization) {
-        return formGenerator.generate(caseData, authorization);
     }
 
     /**
