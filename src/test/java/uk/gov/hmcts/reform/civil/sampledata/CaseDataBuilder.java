@@ -2471,6 +2471,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder generateDefendant2RepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
         UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
         this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
