@@ -19,10 +19,10 @@ public enum DocmosisTemplates {
                                             "%s_directions_questionnaire_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC("CV-SPEC-RES-ENG-00001.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v1(
-        "1v1 Defendant response.docx", "%s_response_sealed_form.pdf"
+        "CV-SPEC-RES-ENG-00002.docx", "%s_response_sealed_form.pdf"
     ),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
-        "1v2 Defendant response.docx", "%s_response_sealed_form.pdf"
+        "CV-SPEC-RES-ENG-00003.docx", "%s_response_sealed_form.pdf"
     );
 
     private final String template;
