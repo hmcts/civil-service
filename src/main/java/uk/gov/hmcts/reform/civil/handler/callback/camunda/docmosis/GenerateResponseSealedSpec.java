@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -15,10 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +37,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
-    // TODO true if stitching is online
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
-    /* TODO add a configuration flag so we are able to locally test without depending on stitching,
-            since stitching is not in the default docker images and it's still blocked.
-            Default should possibly be true though, but that may require changes on demo env,
-            we need to see it on Monday
-Check that the above flag works as expected. Since we don't have stitching url in local, value should be false
-         */
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -98,7 +93,37 @@ Check that the above flag works as expected. Since we don't have stitching url i
      *     and all files uploaded during the response
      */
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedClaim) {
-        // TODO select documents uploaded during response AND DQ; see as example GenerateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData()
-        return Collections.emptyList();
+        List<DocumentMetaData> documents = new ArrayList<>();
+
+        documents.add(new DocumentMetaData(
+            sealedClaim.getDocumentLink(),
+            "Sealed Claim form",
+            LocalDate.now().toString()
+        ));
+        if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
+            documents.add(new DocumentMetaData(
+                caseData.getSpecResponseTimelineDocumentFiles().getFile(),
+                "Claim timeline",
+                LocalDate.now().toString()
+            ));
+        }
+        if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+            documents.add(new DocumentMetaData(
+                caseData.getRespondent1SpecDefenceResponseDocument().getFile(),
+                "Supported docs",
+                LocalDate.now().toString()
+            ));
+        }
+        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+            .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+            .map(cd ->
+                     new DocumentMetaData(
+                         cd.getDocumentLink(),
+                         "Directions Questionnaire",
+                         LocalDate.now().toString()
+                     )
+            ).forEach(documents::add);
+
+        return documents;
     }
 }
