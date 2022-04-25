@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import javax.validation.constraints.NotNull;
+
 public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-00727.docx", "sealed_claim_form_%s.pdf"),
     N2("CV-SPEC-CLM-ENG-00001-v01.docx", "sealed_claim_form_spec%s.pdf"),
@@ -15,12 +17,18 @@ public enum DocmosisTemplates {
     N181_2V1("CV-UNS-HRN-ENG-00970.docx", "%s_directions_questionnaire_form_%s.pdf"),
     N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR("CV-UNS-HRN-ENG-00971.docx",
                                             "%s_directions_questionnaire_form_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC("CV-SPEC-RES-ENG-00001.docx", "%s_directions_questionnaire_form_%s.pdf");
+    DEFENDANT_RESPONSE_SPEC("CV-SPEC-RES-ENG-00001.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1v1(
+        "1v1 Defendant response.docx", "%s_response_sealed_form.pdf"
+    ),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
+        "1v2 Defendant response.docx", "%s_response_sealed_form.pdf"
+    );
 
     private final String template;
     private final String documentTitle;
 
-    DocmosisTemplates(String template, String documentTitle) {
+    DocmosisTemplates(String template, @NotNull String documentTitle) {
         this.template = template;
         this.documentTitle = documentTitle;
     }
