@@ -9,6 +9,7 @@ resource "azurerm_resource_group" "rg" {
   tags = var.common_tags
 }
 
+
 module "key-vault" {
   source                  = "git@github.com:hmcts/cnp-module-key-vault?ref=master"
   name                    = "civil-${var.env}"
