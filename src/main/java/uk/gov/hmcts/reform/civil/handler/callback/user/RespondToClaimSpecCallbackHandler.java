@@ -516,29 +516,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
+            updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
-        if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
+            if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
+                Party updatedRespondent2;
 
-            Party updatedRespondent2;
+                if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
+                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                        .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
+                } else {
+                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+                }
 
-            if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
-                updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
-            } else {
-                updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+                updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
             }
 
-            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
-        }
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-            .respondent1DQStatementOfTruth(statementOfTruth)
-            .build();
+            // moving statement of truth value to correct field, this was not possible in mid event.
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+                .respondent1DQStatementOfTruth(statementOfTruth)
+                .build();
 
             updatedData.respondent1DQ(dq);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
