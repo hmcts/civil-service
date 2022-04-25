@@ -200,18 +200,16 @@ public class EventHistoryMapper {
                                          respondent1ResponseDate, RESPONDENT_ID
             );
 
-            if (caseData.getRespondent1ClaimResponseType() != RespondentResponseType.FULL_DEFENCE) {
-                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-                builder.miscellaneous((Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(respondent1ResponseDate)
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build()));
-            }
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(respondent1ResponseDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build()));
         }
 
         if (defendant2ResponseExists.test(caseData)) {
@@ -219,18 +217,16 @@ public class EventHistoryMapper {
                                          respondent2ResponseDate, RESPONDENT2_ID
             );
 
-            if (caseData.getRespondent2ClaimResponseType() != RespondentResponseType.FULL_DEFENCE) {
-                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.miscellaneous((Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(respondent2ResponseDate)
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build()));
-            }
+            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(respondent2ResponseDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build()));
         }
     }
 
@@ -328,7 +324,7 @@ public class EventHistoryMapper {
                 paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
-                "RPA Reason:%s Defendant: %s has responded: %s;",
+                "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
                 getResponseTypeForRespondent(caseData, respondent)
@@ -858,29 +854,20 @@ public class EventHistoryMapper {
     }
 
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
-        String defaultText;
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        String paginatedMessage = "";
         if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-            String paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-            defaultText = (format(
-                "RPA Reason:%s Defendant: %s has responded: %s; "
-                    + "preferredCourtCode: %s; stayClaim: %s",
-                paginatedMessage,
-                respondent.getPartyName(),
-                getResponseTypeForRespondent(caseData, respondent),
-                getPreferredCourtCode(dq),
-                isStayClaim(dq)
-            ));
-        } else {
-            defaultText = format(
-                "RPA Reason: Defendant: %s has responded: %s; preferredCourtCode: %s; stayClaim: %s",
-                respondent.getPartyName(),
-                getResponseTypeForRespondent(caseData, respondent),
-                getPreferredCourtCode(dq),
-                isStayClaim(dq)
-            );
+            paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
         }
-        return defaultText;
+        return (format(
+            "%sDefendant: %s has responded: %s; "
+                + "preferredCourtCode: %s; stayClaim: %s",
+            paginatedMessage,
+            respondent.getPartyName(),
+            getResponseTypeForRespondent(caseData, respondent),
+            getPreferredCourtCode(dq),
+            isStayClaim(dq)
+        ));
     }
 
     private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
@@ -891,7 +878,7 @@ public class EventHistoryMapper {
             index = isRespondent1 ? 1 : 2;
         }
         return format(
-            " [%d of 2 - %s] ",
+            "[%d of 2 - %s] ",
             index,
             time.now().toLocalDate().toString()
         );
