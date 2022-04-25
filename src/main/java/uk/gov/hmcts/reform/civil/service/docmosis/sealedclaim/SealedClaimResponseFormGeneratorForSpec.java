@@ -52,12 +52,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             caseData.getRespondent1(),
             representativeService.getRespondent1Representative(caseData)
         ));
-        Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 ->
-                                                                     builder.respondent2(getSpecifiedParty(
-                                                                         respondent2,
-                                                                         representativeService.getRespondent2Representative(
-                                                                             caseData)
-                                                                     )));
+        Optional.ofNullable(caseData.getRespondent2()).ifPresent(
+            respondent2 ->
+                builder.respondent2(getSpecifiedParty(
+                    respondent2,
+                    representativeService.getRespondent2Representative(
+                        caseData)
+                )));
 
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(builder::solicitorReferences);
@@ -95,7 +96,6 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
 
-
         return builder.build();
     }
 
@@ -108,9 +108,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private boolean isRespondent2(CaseData caseData) {
-        return (caseData.getRespondent2ResponseDate() != null) &&
-            (caseData.getRespondent1ResponseDate() == null
-                || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
+        return (caseData.getRespondent2ResponseDate() != null)
+            && (caseData.getRespondent1ResponseDate() == null
+            || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
 
     private SpecifiedParty getSpecifiedParty(Party party, Representative representative) {
@@ -124,7 +124,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private List<TimelineOfEventDetails> getTimeLine(CaseData caseData) {
         if (caseData.getSpecResponseTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getSpecResponseTimelineOfEvents();
-            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<TimelineOfEventDetails>();
+            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
                     = new TimelineOfEventDetails(
