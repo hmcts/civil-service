@@ -15,7 +15,7 @@ public class DefendProceedConfHeader implements RespondToResponseConfirmationHea
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+        if (YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim())
             || !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }
