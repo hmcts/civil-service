@@ -117,7 +117,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
-                         .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
+                         .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
                          .build())
             .build();
 
@@ -129,7 +129,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-                    && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
+                    && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
     }
@@ -166,7 +166,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
-                         .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
+                         .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
                          .build())
             .build();
 
@@ -177,8 +177,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(templateId),
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
-                    && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(solicitorName)
-                    && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
+                    && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
     }
