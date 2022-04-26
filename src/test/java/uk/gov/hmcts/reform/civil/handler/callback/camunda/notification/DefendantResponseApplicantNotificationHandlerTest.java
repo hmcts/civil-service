@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -64,6 +66,10 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .thenReturn("spec-claimant-template-id");
         when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
             .thenReturn("spec-respondent-template-id");
+        when(notificationsProperties.getClaimantSolicitorCounterClaimForSpec())
+            .thenReturn("spec-claimant-counter-claim-template-id");
+        when(notificationsProperties.getRespondentSolicitorCounterClaimForSpec())
+            .thenReturn("spec-respondent-counter-claim-template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
     }
@@ -287,6 +293,33 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             }
         }
 
+        @Nested
+        class SpecJourneyScenario {
+            @Test
+            void shouldNotifyRespondentSolicitorCounterClaimSpec_whenInvokedWithCcEvent() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    .build();
+                caseData = caseData
+                    .toBuilder().superClaimType(SPEC_CLAIM)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "spec-respondent-counter-claim-template-id",
+                    getNotificationDataMapSpec(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+        }
+
+
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
                 || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
@@ -309,6 +342,12 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         }
 
         private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                return Map.of(
+                    "defendantLR", "Signer Name",
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                );
+            }
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
