@@ -120,9 +120,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
@@ -130,6 +127,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
@@ -559,12 +559,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                     .build();
             }
-        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVoneDivergent(caseData)) {
+        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVsOneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
-        } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVoneDivergent(caseData)) {
+        } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVsOneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
@@ -582,7 +582,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
     }
 
-    private boolean twoVoneDivergent(CaseData caseData) {
+    private boolean twoVsOneDivergent(CaseData caseData) {
         return (!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
                 && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
             || (!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
