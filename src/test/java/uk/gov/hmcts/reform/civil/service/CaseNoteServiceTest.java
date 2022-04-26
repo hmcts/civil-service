@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +75,7 @@ class CaseNoteServiceTest {
 
     @Test
     void shouldAddNoteToListWithNewestAtTop_WhenExistingNotes() {
-        LocalDate today = LocalDate.now();
+        LocalDateTime today = LocalDateTime.now();
         CaseNote newNote = caseNoteWithDate(today);
         CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
 
@@ -87,15 +88,15 @@ class CaseNoteServiceTest {
         return CaseNote.builder()
             .note(note)
             .createdBy(USER_DETAILS.getFullName())
-            .createdOn(LocalDate.now())
+            .createdOn(LocalDateTime.now())
             .build();
     }
 
-    private CaseNote caseNoteWithDate(LocalDate date) {
+    private CaseNote caseNoteWithDate(LocalDateTime timestamp) {
         return CaseNote.builder()
             .note("note")
             .createdBy(USER_DETAILS.getFullName())
-            .createdOn(date)
+            .createdOn(timestamp)
             .build();
     }
 }

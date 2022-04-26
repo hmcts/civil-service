@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -25,7 +26,7 @@ public class CaseNoteService {
 
         return CaseNote.builder()
             .createdBy(userDetails.getFullName())
-            .createdOn(LocalDate.now())
+            .createdOn(LocalDateTime.now())
             .note(note)
             .build();
     }

@@ -4527,7 +4527,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
                 .caseNotes(CaseNote.builder()
-                               .createdOn(LocalDate.now().plusDays(3))
+                               .createdOn(LocalDateTime.now().plusDays(3))
                                .createdBy("createdBy")
                                .note("my note")
                                .build())
