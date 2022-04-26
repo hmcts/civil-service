@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -138,6 +139,8 @@ public class CaseData implements MappableObject {
     private final Address specApplicantCorrespondenceAddressdetails;
     private final YesOrNo specRespondentCorrespondenceAddressRequired;
     private final Address specRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondent2HomeAddressRequired;
+    private final Address specAoSRespondent2HomeAddressDetails;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
@@ -364,8 +367,9 @@ public class CaseData implements MappableObject {
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
-  
+
     private final YesOrNo claimStarted;
 
-
+    @JsonUnwrapped(suffix = "Breathing")
+    private final BreathingSpaceInfo breathing;
 }

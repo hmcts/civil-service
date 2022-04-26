@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitAlreadyPaidConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.FullAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPaidFullConfirmationText;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitSetDateConfirmationText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.RepayPlanConfirmationText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse2v1DifferentText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -146,6 +148,14 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .build();
     }
 
+    private CaseData getCounterClaim() {
+        return CaseDataBuilder.builder()
+            .atStateRespondentCounterClaim()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+    }
+
     @Override
     public Class<RespondToClaimConfirmationTextSpecGenerator> getIntentionInterface() {
         return RespondToClaimConfirmationTextSpecGenerator.class;
@@ -170,6 +180,30 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
         return cases;
     }
 
+    private List<CaseData> get1v2DivergentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party respondent1 = Party.builder().build();
+        Party respondent2 = Party.builder().build();
+
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .respondent1(respondent1)
+                                  .respondent2(respondent2)
+                                  .respondent2SameLegalRepresentative(YesOrNo.YES)
+                                  .respondentResponseIsSame(YesOrNo.NO)
+                                  .respondent1ClaimResponseTypeForSpec(r1)
+                                  .respondent2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
+    }
+
     @Override
     public List<Pair<CaseData,
         Class<? extends RespondToClaimConfirmationTextSpecGenerator>>> getCasesToExpectedImplementation() {
@@ -183,11 +217,15 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                 Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
                 Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
                 Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
-                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class)
+                Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
+                Pair.of(getCounterClaim(), CounterClaimConfirmationText.class)
             ));
         get2v1DifferentResponseCase().forEach(caseData -> list.add(
             Pair.of(caseData, SpecResponse2v1DifferentText.class))
         );
+        get1v2DivergentResponseCase().forEach(caseData -> list.add(
+            Pair.of(caseData, SpecResponse1v2DivergentText.class)
+        ));
         return list;
     }
 }
