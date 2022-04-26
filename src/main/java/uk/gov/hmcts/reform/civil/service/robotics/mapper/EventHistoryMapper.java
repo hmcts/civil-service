@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -331,39 +330,6 @@ public class EventHistoryMapper {
             ));
         }
         return defaultText;
-    }
-
-    /**
-     * Gets the right respondent default response text for 1v1 and 2v1 claims attending to claim type spec/unspec and
-     * respondent 1 response.
-     *
-     * @param caseData case's data
-     * @return respondent default response text for 1v1 and 2v1
-     */
-    private String getDefaultTextVs1(CaseData caseData) {
-        if (SuperClaimType.UNSPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            switch (caseData.getRespondent1ClaimResponseType()) {
-                case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
-                case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
-                default:
-                    return "";
-            }
-        } else {
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
-                case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
-                default:
-                    return "";
-            }
-        }
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
