@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -339,7 +340,7 @@ public class EventHistoryMapper {
      * @param caseData case's data
      * @return respondent default response text for 1v1 and 2v1
      */
-    /*private String getDefaultTextVs1(CaseData caseData) {
+    private String getDefaultTextVs1(CaseData caseData) {
         if (SuperClaimType.UNSPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             switch (caseData.getRespondent1ClaimResponseType()) {
                 case COUNTER_CLAIM:
@@ -363,7 +364,7 @@ public class EventHistoryMapper {
                     return "";
             }
         }
-    }*/
+    }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
