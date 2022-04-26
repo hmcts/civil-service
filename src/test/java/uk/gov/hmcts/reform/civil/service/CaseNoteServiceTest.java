@@ -11,12 +11,13 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -52,7 +53,10 @@ class CaseNoteServiceTest {
             String note = "new note";
             CaseNote caseNote = caseNoteService.buildCaseNote(BEARER_TOKEN, note);
 
-            assertThat(caseNote).isEqualTo(caseNoteForToday(note));
+            assertThat(caseNote.getNote()).isEqualTo(caseNoteForToday(note).getNote());
+            assertThat(caseNote.getCreatedBy()).isEqualTo(caseNoteForToday(note).getCreatedBy());
+            assertThat(caseNote.getCreatedOn()).isCloseTo(caseNoteForToday(note).getCreatedOn(),
+                                                          within(1, ChronoUnit.SECONDS));
             verify(idamClient).getUserDetails(BEARER_TOKEN);
         }
     }

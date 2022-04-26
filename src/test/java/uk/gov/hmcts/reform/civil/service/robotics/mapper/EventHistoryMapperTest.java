@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -4547,10 +4546,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+            var noteCreatedAt = LocalDateTime.now().plusDays(3);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
                 .caseNotes(CaseNote.builder()
-                               .createdOn(LocalDateTime.now().plusDays(3))
+                               .createdOn(noteCreatedAt)
                                .createdBy("createdBy")
                                .note("my note")
                                .build())
@@ -4577,7 +4577,7 @@ class EventHistoryMapperTest {
             Event caseNoteEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
-                .dateReceived(LocalDate.now().plusDays(3).atStartOfDay())
+                .dateReceived(noteCreatedAt)
                 .eventDetailsText("case note added: my note")
                 .eventDetails(EventDetails.builder()
                                   .miscText("case note added: my note")

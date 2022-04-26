@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
