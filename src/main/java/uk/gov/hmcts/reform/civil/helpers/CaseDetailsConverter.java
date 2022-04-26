@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LRSpec.LRSpecCaseDataExtension;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +27,12 @@ public class CaseDetailsConverter {
         if (caseDetails.getState() != null) {
             data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
         }
-        return objectMapper.convertValue(data, CaseData.class);
+        LRSpecCaseDataExtension extension = objectMapper.convertValue(data, LRSpecCaseDataExtension.class);
+        CaseData caseData = objectMapper.convertValue(data, CaseData.class);
+        caseData.builder().caseDataExtension(extension);
+        return caseData;
     }
+
 
     public CaseData toCaseData(Map<String, Object> caseDataMap) {
         return objectMapper.convertValue(caseDataMap, CaseData.class);

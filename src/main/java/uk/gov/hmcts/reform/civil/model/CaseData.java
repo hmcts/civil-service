@@ -248,6 +248,7 @@ public class CaseData implements MappableObject {
 
     private final String additionalInformationForJudge;
     private final String applicantAdditionalInformationForJudge;
+
     @JsonUnwrapped
     private final ExpertRequirements respondToClaimExperts;
 
@@ -372,6 +373,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo isApplicant1;
 
     private final YesOrNo claimStarted;
+    private final LRSpecCaseDataExtension caseDataExtension;
 
 
 }

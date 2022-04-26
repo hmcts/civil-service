@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.LRSpec;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 @Data
 @Builder(toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LRSpecCaseDataExtension  implements MappableObject {
 
     private final String generalAppDeadlineNotification;
