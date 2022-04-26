@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -139,7 +140,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                         caseData.getSystemGeneratedCaseDocuments();
                     systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
                     caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-                    caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+                    if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                        caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+                    }
                 }
 
                 if (caseData.getRespondent2DQ() != null
@@ -201,7 +204,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+        }
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
