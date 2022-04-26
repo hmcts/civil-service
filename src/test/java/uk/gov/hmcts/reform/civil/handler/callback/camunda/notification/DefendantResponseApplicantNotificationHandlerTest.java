@@ -139,7 +139,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "spec-claimant-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(params),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -158,7 +158,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(params),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -312,7 +312,31 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-counter-claim-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(params),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyClaimantSolicitorCounterClaimSpec_whenInvokedWithCcEvent() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    .build();
+                caseData = caseData
+                    .toBuilder().superClaimType(SPEC_CLAIM)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId(
+                            "NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    "spec-claimant-counter-claim-template-id",
+                    getNotificationDataMapSpec(params),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -339,12 +363,22 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             }
         }
 
-        private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapSpec(CallbackParams params) {
+            CaseData caseData = params.getCaseData();
             if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                return Map.of(
-                    "defendantLR", "Signer Name",
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-                );
+                if (("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                    .equals(params.getRequest().getEventId())) {
+                    return Map.of(
+                        "defendantLR", "Signer Name",
+                        CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    );
+                } else {
+                    return Map.of(
+                        "claimantLR", "Signer Name",
+                        CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    );
+                }
+
             }
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
