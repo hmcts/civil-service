@@ -1328,10 +1328,10 @@ class EventHistoryMapperTest {
                 .eventSequence(2)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01]  Defendant: Mr. Sole Trader has responded: null;")
+                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
                 .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01]  "
-                                                + "Defendant: Mr. Sole Trader has responded: null;")
+                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                                + "Defendant: Mr. Sole Trader has responded: null")
                                   .build())
                 .build();
 
@@ -2349,6 +2349,8 @@ class EventHistoryMapperTest {
 
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
@@ -2397,6 +2399,15 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(6)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
                     .build()
             );
 
@@ -2411,7 +2422,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                                 expectedMiscellaneousEvents.get(1),
+                                 expectedMiscellaneousEvents.get(2));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2560,7 +2572,17 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build());
+                    .build(),
+                Event.builder()
+                    .eventSequence(6)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+                );
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2573,7 +2595,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                                 expectedMiscellaneousEvents.get(1),
+                                 expectedMiscellaneousEvents.get(2));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2669,9 +2692,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION;")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION;")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -2720,9 +2743,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION;")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION;")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                                           .build())
                         .build()
                 );
