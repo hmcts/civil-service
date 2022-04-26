@@ -286,7 +286,6 @@ public class EventHistoryMapper {
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                //TODO cover unit test to this block
                 switch (scenario.equals(TWO_V_ONE)
                     ? caseData.getClaimant1ClaimResponseTypeForSpec()
                     : caseData.getRespondent1ClaimResponseTypeForSpec()) {
