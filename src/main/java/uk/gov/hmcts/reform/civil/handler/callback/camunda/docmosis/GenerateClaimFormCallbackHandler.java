@@ -55,7 +55,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseDataBuilder.build(),

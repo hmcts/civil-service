@@ -252,7 +252,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData =
+        CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         var isRespondent1 = YES;
@@ -306,7 +306,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
@@ -465,7 +465,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-    private void retainSolicitorReferences(Map<String, Object> beforeCaseData, CaseData.CaseDataBuilder updatedData) {
+    private void retainSolicitorReferences(Map<String, Object> beforeCaseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         @SuppressWarnings("unchecked")
         Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
             .map(refs -> objectMapper.convertValue(refs, HashMap.class))
@@ -482,7 +482,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .map(Object::toString).orElse(null));
     }
 
-    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
