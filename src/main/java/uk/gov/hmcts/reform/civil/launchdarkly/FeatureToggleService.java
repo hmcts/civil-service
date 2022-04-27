@@ -50,6 +50,10 @@ public class FeatureToggleService {
             .custom("environment", environment);
     }
 
+    public boolean isNoticeOfChangeEnabled() {
+        return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+    }
+
     private void close() {
         try {
             internalClient.close();
