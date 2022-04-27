@@ -114,7 +114,8 @@ public class FlowPredicate {
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
-        caseData.getClaimDetailsNotificationDate() != null
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getClaimDetailsNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
             || hasNotifiedClaimDetailsToBoth.test(caseData));
 
