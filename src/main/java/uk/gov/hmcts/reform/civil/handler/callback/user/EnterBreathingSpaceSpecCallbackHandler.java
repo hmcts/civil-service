@@ -50,9 +50,9 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getBreathing() != null) {
+        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
             responseBuilder.errors(Collections.singletonList(
-                "A claim can enter breathing space only once."
+                "A claim can enter Breathing Space only once."
             ));
         }
         return responseBuilder.build();
@@ -83,8 +83,8 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = "<br>We have sent you a confirmation email."
-            + "<h2 class=\"govuk-heading-m\">What happens next</h2>Breathing space will now be active until you "
-            + "<u>lift breathing space.</u>";
+            + "<h2 class=\"govuk-heading-m\">What happens next</h2><p>Breathing space will now be active until you "
+            + "<u>lift Breathing Space.</u></p>";
 
         String header = format("# Breathing Space Entered%n## Claim number%n# %s", claimNumber);
 

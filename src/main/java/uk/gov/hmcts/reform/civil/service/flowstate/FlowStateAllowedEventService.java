@@ -518,6 +518,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMISSION.fullName(),
             List.of(
+                CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -532,6 +533,7 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMISSION.fullName(),
             List.of(
+                CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,

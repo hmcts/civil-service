@@ -55,15 +55,15 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
         if (caseData.getBreathing() == null || caseData.getBreathing().getEnter() == null) {
             responseBuilder.errors(Collections.singletonList(
-                "A claim must enter breathing space before it can be lifted."
+                "A claim must enter Breathing Space before it can be lifted."
             ));
         } else if (caseData.getBreathing().getLift() != null) {
             responseBuilder.errors(Collections.singletonList(
-                "This claim is not in breathing space anymore."
+                "This claim is not in Breathing Space."
             ));
         }
 
-        return responseBuilder.data(caseData.toMap(objectMapper)).build();
+        return responseBuilder.build();
     }
 
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
@@ -104,7 +104,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = "<br>We have sent you a confirmation email.";
-        String header = format("# Breathing Space Lifted%n## Claim number%n# %s", claimNumber);
+        String header = format("# Breathing Space lifted%n## Claim number%n# %s", claimNumber);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
