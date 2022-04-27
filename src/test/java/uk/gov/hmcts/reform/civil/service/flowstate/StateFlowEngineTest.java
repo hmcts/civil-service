@@ -1528,9 +1528,10 @@ class StateFlowEngineTest {
                     FULL_DEFENCE.fullName()
                 );
             verify(featureToggleService).isRpaContinuousFeedEnabled();
-            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("RPA_CONTINUOUS_FEED", true),
+                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true)
             );
         }
