@@ -196,7 +196,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      * @param caseData        current case data
      * @param caseDataBuilder builder for the modified case data
      */
-    private void singleResponseFile(String bearerToken, CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void singleResponseFile(String bearerToken, CaseData caseData,
+                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             bearerToken

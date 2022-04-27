@@ -465,7 +465,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-    private void retainSolicitorReferences(Map<String, Object> beforeCaseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void retainSolicitorReferences(Map<String, Object> beforeCaseData,
+                                           CaseData.CaseDataBuilder<?, ?> updatedData) {
         @SuppressWarnings("unchecked")
         Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
             .map(refs -> objectMapper.convertValue(refs, HashMap.class))
