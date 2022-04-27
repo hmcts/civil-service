@@ -470,8 +470,16 @@ public class EventHistoryMapper {
         }
     }
 
+    private boolean rpaEnabledForClaim(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return featureToggleService.isSpecRpaContinuousFeedEnabled();
+        } else {
+            return featureToggleService.isRpaContinuousFeedEnabled();
+        }
+    }
+
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()) {
+        if (rpaEnabledForClaim(caseData)) {
             String miscText = "Claim issued in CCD.";
             builder.miscellaneous(
                 Event.builder()
@@ -484,21 +492,6 @@ public class EventHistoryMapper {
                                       .build())
                     .build());
         }
-    }
-
-    private void buildMiscellaneousClaimIssued(EventHistory.EventHistoryBuilder builder,
-                                                                    CaseData caseData) {
-        String miscText = "Claim issued in CCD.";
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getIssueDate().atStartOfDay())
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
