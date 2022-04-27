@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -71,6 +73,8 @@ public class CaseData implements MappableObject {
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
+    private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final List<Element<GeneralApplication>> generalApplications;
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
@@ -135,6 +139,8 @@ public class CaseData implements MappableObject {
     private final Address specApplicantCorrespondenceAddressdetails;
     private final YesOrNo specRespondentCorrespondenceAddressRequired;
     private final Address specRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondent2HomeAddressRequired;
+    private final Address specAoSRespondent2HomeAddressDetails;
 
     private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
@@ -369,5 +375,6 @@ public class CaseData implements MappableObject {
 
     private final YesOrNo claimStarted;
 
-
+    @JsonUnwrapped(suffix = "Breathing")
+    private final BreathingSpaceInfo breathing;
 }
