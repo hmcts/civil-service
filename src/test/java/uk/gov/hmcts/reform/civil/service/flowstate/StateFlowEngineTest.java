@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -1384,6 +1385,46 @@ class StateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+            );
+        }
+
+        @Test
+        //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+        void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
+                .atStateRespondentFullDefence()
+                .respondent2Responds(RespondentResponseType.FULL_DEFENCE)
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(FULL_DEFENCE.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(11)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    ALL_RESPONSES_RECEIVED.fullName(),
+                    FULL_DEFENCE.fullName()
                 );
             verify(featureToggleService).isRpaContinuousFeedEnabled();
             assertThat(stateFlow.getFlags()).hasSize(3).contains(

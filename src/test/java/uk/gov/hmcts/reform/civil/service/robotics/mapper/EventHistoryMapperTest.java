@@ -934,7 +934,7 @@ class EventHistoryMapperTest {
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
             Event expectedReceiptOfAdmission = Event.builder()
-                .eventSequence(3)
+                .eventSequence(4)
                 .eventCode("40")
                 .dateReceived(caseData.getRespondent1ResponseDate())
                 .litigiousPartyID("002")
@@ -950,7 +950,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(4)
+                    .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText("RPA Reason: Defendant fully admits.")
@@ -974,6 +974,20 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
+            Event expectedConsentExtensionFilingDefence = Event.builder()
+                .eventSequence(3)
+                .eventCode("45")
+                .dateReceived(caseData.getRespondent1TimeExtensionDate())
+                .litigiousPartyID("002")
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(format("agreed extension date: %s", caseData
+                    .getRespondentSolicitor1AgreedDeadlineExtension()
+                    .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
+                .build();
+
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
@@ -983,13 +997,14 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
                 .containsExactly(expectedAcknowledgementOfServiceReceived);
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .containsExactly(expectedConsentExtensionFilingDefence);
 
             assertEmptyEvents(
                 eventHistory,
                 "defenceFiled",
                 "defenceAndCounterClaim",
                 "receiptOfPartAdmission",
-                "consentExtensionFilingDefence",
                 "replyToDefence",
                 "directionsQuestionnaireFiled"
             );

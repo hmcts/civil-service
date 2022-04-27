@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -137,8 +138,15 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
-        (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
-            || (caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2ResponseDate() == null);
+        getPredicateForTimeExtension(caseData);
+
+    private static boolean getPredicateForTimeExtension(CaseData caseData) {
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getRespondent1TimeExtensionDate() != null
+                || caseData.getRespondent2TimeExtensionDate() != null;
+        }
+        return caseData.getRespondent1TimeExtensionDate() != null;
+    }
 
     public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null

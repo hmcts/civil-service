@@ -385,12 +385,12 @@ class FlowPredicateTest {
             }
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
                 Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
-                assertFalse(predicate.test(caseData));
+                assertTrue(predicate.test(caseData));
             }
 
             @Test
@@ -418,12 +418,12 @@ class FlowPredicateTest {
         class TransitionClaimDetailsNotifiedTimeExtension {
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
                 Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
-                assertFalse(predicate.test(caseData));
+                assertTrue(predicate.test(caseData));
             }
 
             @Test
@@ -485,7 +485,7 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
                     .build();
-                Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
+                Predicate<CaseData> predicate = notificationAcknowledged.and(respondentTimeExtension).and(
                     allResponsesReceived);
                 assertTrue(predicate.test(caseData));
             }
