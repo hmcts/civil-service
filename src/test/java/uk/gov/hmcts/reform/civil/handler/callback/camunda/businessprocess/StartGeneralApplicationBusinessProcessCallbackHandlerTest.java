@@ -175,7 +175,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(((List)(response.getData().get("generalApplications"))).size()).isEqualTo(0);
+        assertThat(((List)(response.getData().get("generalApplications"))).size()).isZero();
     }
 
     @Test
