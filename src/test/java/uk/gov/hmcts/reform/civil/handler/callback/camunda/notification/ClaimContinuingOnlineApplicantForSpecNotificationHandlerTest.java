@@ -41,11 +41,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -191,7 +188,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                     CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
                     CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                     ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-                    CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)));
+                    CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+                    formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
                 )
             );
 
