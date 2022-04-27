@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -113,7 +114,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
-            .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .build();
     }
@@ -570,13 +572,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CallbackResponse validateDefendant1RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent1RepaymentPlan());
+    }
+
+    private CallbackResponse validateDefendant2RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent2RepaymentPlan());
+    }
+
+    private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
         List<String> errors;
 
-        if (caseData.getRespondent1RepaymentPlan() != null
-            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+        if (repaymentPlan != null
+            && repaymentPlan.getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
                                                                             .getFirstRepaymentDate());
         } else {
             errors = new ArrayList<>();
