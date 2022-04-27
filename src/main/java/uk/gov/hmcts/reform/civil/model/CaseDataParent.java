@@ -13,8 +13,8 @@ public class CaseDataParent implements MappableObject {
 
     private final SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private final YesOrNo applicantMPClaimExpertSpecRequired;
-    private final String respondent1PartnerAndDependent; //marked as string (Kenneth will change them to object type)
-    private final String respondent2PartnerAndDependent; //marked as string (Kenneth will change them to object type)
+    private final PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private final PartnerAndDependentsLRspec respondent2PartnerAndDependent;
 
     private final PaymentUponCourtOrder respondent2CourtOrderPayment;
     private final RepaymentPlanLRspec respondent2RepaymentPlan;

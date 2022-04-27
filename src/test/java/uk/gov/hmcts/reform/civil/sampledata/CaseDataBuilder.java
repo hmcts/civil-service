@@ -251,7 +251,6 @@ public class CaseDataBuilder {
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
-    private RepaymentPlanLRspec respondent2RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2471,7 +2470,6 @@ public class CaseDataBuilder {
 
         respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
-
 
         return this;
     }

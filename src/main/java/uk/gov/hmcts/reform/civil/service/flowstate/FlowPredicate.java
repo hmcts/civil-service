@@ -482,9 +482,9 @@ public class FlowPredicate {
                 predicate = basePredicate;
                 break;
             case TWO_V_ONE:
-                predicate = basePredicate && (caseData.getDefendantSingleResponseToBothClaimants() == YES
+                predicate = (basePredicate && caseData.getDefendantSingleResponseToBothClaimants() == YES)
                     || (responseType.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
-                    && responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec())));
+                    && responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec()));
                 break;
             default:
                 break;
