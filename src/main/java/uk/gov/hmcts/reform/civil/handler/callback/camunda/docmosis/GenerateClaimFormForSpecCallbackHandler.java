@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM_SPEC);

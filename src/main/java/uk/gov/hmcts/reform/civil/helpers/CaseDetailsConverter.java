@@ -26,7 +26,8 @@ public class CaseDetailsConverter {
         if (caseDetails.getState() != null) {
             data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
         }
-        return objectMapper.convertValue(data, CaseData.class);
+        CaseData caseData = objectMapper.convertValue(data, CaseData.class);
+        return caseData;
     }
 
     public CaseData toCaseData(Map<String, Object> caseDataMap) {

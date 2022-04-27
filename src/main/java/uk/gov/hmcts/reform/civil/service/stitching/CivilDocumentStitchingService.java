@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocu
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class CivilDocumentStitchingService implements DocumentStitcher {
 
     private final BundleRequestExecutor bundleRequestExecutor;

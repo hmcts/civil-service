@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_ACKNOWLEDGEMENT_OF_CLAIM_SPEC);

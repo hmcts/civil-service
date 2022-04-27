@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
