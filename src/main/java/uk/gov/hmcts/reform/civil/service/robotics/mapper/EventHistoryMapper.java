@@ -471,16 +471,18 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousClaimIssued(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousClaimIssued(builder, caseData);
-            }
+        if (featureToggleService.isRpaContinuousFeedEnabled()) {
+            String miscText = "Claim issued in CCD.";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
         }
     }
 
