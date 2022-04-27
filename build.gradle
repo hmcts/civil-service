@@ -274,7 +274,7 @@ def versions = [
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.0.0.M2',
   springfoxSwagger   : '2.9.2',
-  lombok             : '1.18.12',
+  lombok             : '1.18.24',
   pact               : '3.5.24'
 ]
 
@@ -374,6 +374,8 @@ dependencies {
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  compile group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.1.0'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
