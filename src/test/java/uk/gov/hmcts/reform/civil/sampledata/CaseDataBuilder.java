@@ -1168,6 +1168,18 @@ public class CaseDataBuilder {
         addRespondent2 = YES;
         respondent2Represented = YES;
         respondent2SameLegalRepresentative = YES;
+        respondent1OrganisationPolicy =
+            OrganisationPolicy.builder()
+                .organisation(Organisation.builder().organisationID("org1").build())
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                .orgPolicyReference("org1PolicyReference")
+                .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndSameUnregisteredRepresentative() {
+        atStateClaimIssued1v2AndSameRepresentative();
+        respondent1OrgRegistered = NO;
         return this;
     }
 
