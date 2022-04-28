@@ -27,6 +27,7 @@ public interface NotificationData {
     String RESPONDENT_TWO_NAME = "defendantTwoName";
     String RESPONDENT_ONE_RESPONSE = "defendantOneResponse";
     String RESPONDENT_TWO_RESPONSE = "defendantTwoResponse";
+    String APPLICANT_ONE_NAME = "Claimant name";
 
     //Default judgment
     String LEGAL_ORG_SPECIFIED = "legalOrg";
