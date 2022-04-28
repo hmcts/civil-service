@@ -59,8 +59,7 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo responseClaimExpertSpecRequired2;
     private final YesOrNo responseClaimCourtLocation2Required;
     private final String responseClaimWitnesses2;
-    private final YesOrNo SmallClaimHearingInterpreter2Required;
-    private final String SmallClaimHearingInterpreterDescription2;
+    private final String smallClaimHearingInterpreterDescription2;
     private final String additionalInformationForJudge2;
     private final String responseClaimAdmitPartOfClaimWhenToPaySpecLabel2;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired2;
