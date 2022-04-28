@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
@@ -37,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     BreathingSpaceLiftedNotificationHandler.class,
     JacksonAutoConfiguration.class,
@@ -62,7 +59,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
     public static final String RESPONDENT_ID = "respondent-template-id";
 
     @Nested
-    class AboutToSubmitCallback {
+    class AboutToSubmitCallbackTest {
 
         @BeforeEach
         void setup() {
@@ -95,6 +92,52 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
                 REFERENCE
             );
         }
+
+        @Test
+        public void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
+            when(organisationService.findOrganisationById(
+                anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                RESPONDENT_ID,
+                addPropertiesForRespondent(caseData),
+                REFERENCE
+            );
+        }
+
+        @Test
+        public void assertThatCorrectActivityIdIsHandledByCallback() {
+
+            assertThat(handler.camundaActivityId(
+                CallbackParamsBuilder.builder()
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
+                                 .build())
+                    .build()))
+                .isEqualTo(APPLICANT_TASK_ID);
+
+            assertThat(handler.camundaActivityId(
+                CallbackParamsBuilder.builder()
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
+                                 .build())
+                    .build()))
+                .isEqualTo(RESPONDENT_TASK_ID);
+        }
     }
 
     private Map<String, String> addPropertiesForApplicant(CaseData caseData) {
@@ -111,32 +154,6 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
 
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
-    }
-
-    @Test
-    public void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
-        when(organisationService.findOrganisationById(
-            anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimSubmitted()
-            .build();
-
-        CallbackParams params = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder()
-                         .eventId(NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
-                         .build())
-            .build();
-
-        handler.handle(params);
-
-        verify(notificationService).sendMail(
-            "respondentsolicitor@example.com",
-            RESPONDENT_ID,
-            addPropertiesForRespondent(caseData),
-            REFERENCE
-        );
     }
 
     private Map<String, String> addPropertiesForRespondent(CaseData caseData) {
@@ -156,25 +173,5 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
-    }
-
-    @Test
-    public void assertThatCorrectActivityIdIsHandledByCallback() {
-
-        assertThat(handler.camundaActivityId(
-            CallbackParamsBuilder.builder()
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
-                             .build())
-                .build()))
-            .isEqualTo(APPLICANT_TASK_ID);
-
-        assertThat(handler.camundaActivityId(
-            CallbackParamsBuilder.builder()
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED.name())
-                             .build())
-                .build()))
-            .isEqualTo(RESPONDENT_TASK_ID);
     }
 }
