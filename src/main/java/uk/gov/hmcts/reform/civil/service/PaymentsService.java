@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -36,18 +37,35 @@ public class PaymentsService {
         String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::getCustomerReference)
             .orElse(caseData.getPaymentReference());
+        CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        return CreditAccountPaymentRequest.builder()
-            .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-            .amount(claimFee.getCalculatedAmount())
-            .caseReference(caseData.getLegacyCaseReference())
-            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-            .customerReference(customerReference)
-            .description("Claim issue payment")
-            .organisationName(organisationName)
-            .service(paymentsConfiguration.getService())
-            .siteId(paymentsConfiguration.getSiteId())
-            .fees(new FeeDto[]{claimFee})
-            .build();
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType()))  {
+            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
+                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+                .amount(claimFee.getCalculatedAmount())
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .customerReference(customerReference)
+                .description("Claim issue payment")
+                .organisationName(organisationName)
+                .service(paymentsConfiguration.getService())
+                .siteId(paymentsConfiguration.getSiteId())
+                .fees(new FeeDto[]{claimFee})
+                .build();
+        } else if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
+                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+                .amount(claimFee.getCalculatedAmount())
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .customerReference(customerReference)
+                .description("Claim issue payment")
+                .organisationName(organisationName)
+                .service(paymentsConfiguration.getSpecService())
+                .siteId(paymentsConfiguration.getSpecSiteId())
+                .fees(new FeeDto[]{claimFee})
+                .build();
+        }
+        return creditAccountPaymentRequest;
     }
 }
