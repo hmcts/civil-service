@@ -189,6 +189,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .errors(errors)
                 .build();
         }
+        if (YES.equals(caseData.getSpecDefenceFullAdmittedRequired())
+            || YES.equals(caseData.getSpecDefenceFullAdmitted2Required())
+        ) {
+            caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(YES).build();
+        }
+        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())
+            || YES.equals(caseData.getSpecDefenceAdmitted2Required())
+        ) {
+            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(YES).build();
+        }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
             BigDecimal valuePounds = MonetaryConversions
                 .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
@@ -288,6 +298,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO);
         }
+
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+            }
+            if (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            }
+        }
+
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
@@ -324,6 +346,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             updatedData.specDefenceFullAdmittedRequired(NO);
         }
+
+        if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
+            && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
+            .equals(caseData.getMultiPartyResponseTypeFlags())
+            && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
+                .equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))
+                || (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
+                .equals(caseData.getRespondent2ClaimResponsePaymentAdmissionForSpec()))) {
+            updatedData.showHowToAddTimeLinePage(YES);
+        }
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -422,17 +455,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         // because we don't have AC around this date field validation in ROC-9455
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors;
-        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+        /*if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
 
         } else {
             HearingLRspec hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
             errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
-        }
+        }*/
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            //.errors(errors)
             .build();
     }
 
