@@ -331,6 +331,7 @@ dependencies {
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.3'
@@ -374,8 +375,6 @@ dependencies {
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-
-  compile group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.1.0'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
