@@ -67,7 +67,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)

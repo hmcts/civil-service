@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -138,6 +139,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .superClaimType(SPEC_CLAIM)
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))

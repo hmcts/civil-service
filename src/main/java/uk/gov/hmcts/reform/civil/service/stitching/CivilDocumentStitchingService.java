@@ -106,7 +106,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             );
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<IdValue<Bundle>> idValueList = new ArrayList<>();
         idValueList.add(new IdValue<>(
