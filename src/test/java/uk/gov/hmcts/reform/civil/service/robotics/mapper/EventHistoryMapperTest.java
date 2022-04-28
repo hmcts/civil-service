@@ -4756,10 +4756,11 @@ class EventHistoryMapperTest {
 
     @Test
     void specShouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimNotified_1v1()
             .caseNotes(CaseNote.builder()
-                           .createdOn(LocalDate.now().plusDays(3))
+                           .createdOn(noteCreatedOn)
                            .createdBy("createdBy")
                            .note("my note")
                            .build())
@@ -4793,7 +4794,7 @@ class EventHistoryMapperTest {
         Event caseNoteEvent = Event.builder()
             .eventSequence(3)
             .eventCode("999")
-            .dateReceived(LocalDate.now().plusDays(3).atStartOfDay())
+            .dateReceived(noteCreatedOn)
             .eventDetailsText("case note added: my note")
             .eventDetails(EventDetails.builder()
                               .miscText("case note added: my note")
@@ -4822,10 +4823,11 @@ class EventHistoryMapperTest {
 
     @Test
     void specShouldPrepareFriendEvent_whenRespondent2Friend() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimNotified_1v1()
             .caseNotes(CaseNote.builder()
-                           .createdOn(LocalDate.now().plusDays(3))
+                           .createdOn(noteCreatedOn)
                            .createdBy("createdBy")
                            .note("my note")
                            .build())
@@ -4863,7 +4865,7 @@ class EventHistoryMapperTest {
         Event caseNoteEvent = Event.builder()
             .eventSequence(3)
             .eventCode("999")
-            .dateReceived(LocalDate.now().plusDays(3).atStartOfDay())
+            .dateReceived(noteCreatedOn)
             .eventDetailsText("case note added: my note")
             .eventDetails(EventDetails.builder()
                               .miscText("case note added: my note")

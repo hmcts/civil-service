@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -352,7 +351,7 @@ public class EventHistoryMapper {
                      Event.builder()
                          .eventSequence(prepareEventSequence(builder.build()))
                          .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn().atStartOfDay())
+                         .dateReceived(caseNote.getCreatedOn())
                          .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                          .eventDetails(EventDetails.builder()
                                            .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
@@ -652,7 +651,8 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                                    .preferredCourtCode(caseData.getCourtLocation()
+                                                                            .getApplicantPreferredCourt())
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
