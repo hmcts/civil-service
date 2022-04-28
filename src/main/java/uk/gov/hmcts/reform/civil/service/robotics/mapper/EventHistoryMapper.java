@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -287,7 +286,6 @@ public class EventHistoryMapper {
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                //TODO cover unit test to this block
                 switch (scenario.equals(TWO_V_ONE)
                     ? caseData.getClaimant1ClaimResponseTypeForSpec()
                     : caseData.getRespondent1ClaimResponseTypeForSpec()) {
@@ -333,39 +331,6 @@ public class EventHistoryMapper {
         return defaultText;
     }
 
-    /**
-     * Gets the right respondent default response text for 1v1 and 2v1 claims attending to claim type spec/unspec and
-     * respondent 1 response.
-     *
-     * @param caseData case's data
-     * @return respondent default response text for 1v1 and 2v1
-     */
-    private String getDefaultTextVs1(CaseData caseData) {
-        if (SuperClaimType.UNSPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            switch (caseData.getRespondent1ClaimResponseType()) {
-                case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
-                case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
-                default:
-                    return "";
-            }
-        } else {
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
-                case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
-                default:
-                    return "";
-            }
-        }
-    }
-
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
             List<Event> events = unwrapElements(caseData.getCaseNotes())
@@ -374,7 +339,7 @@ public class EventHistoryMapper {
                          Event.builder()
                              .eventSequence(prepareEventSequence(builder.build()))
                              .eventCode("999")
-                             .dateReceived(caseNote.getCreatedOn().atStartOfDay())
+                             .dateReceived(caseNote.getCreatedOn())
                              .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                              .eventDetails(EventDetails.builder()
                                                .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
@@ -615,26 +580,47 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
         builder.replyToDefence(replyDefenceForProceedingApplicants);
 
-        List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                              .dateReceived(applicantDetails.get(index).getResponseDate())
-                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                              .eventDetails(EventDetails.builder()
-                                                .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                .preferredCourtCode(caseData.getCourtLocation()
-                                                                        .getApplicantPreferredCourt())
-                                                .preferredCourtName("")
-                                                .build())
-                              .eventDetailsText(prepareEventDetailsText(
-                                  applicantDetails.get(index).getDq(),
-                                  caseData.getCourtLocation().getApplicantPreferredCourt()
-                              ))
-                              .build())
-            .collect(Collectors.toList());
-        builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
+                .mapToObj(index ->
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode("")
+                                                    .preferredCourtName("")
+                                                    .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      ""
+                                  ))
+                                  .build())
+                .collect(Collectors.toList());
+            builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
+        } else {
+            List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
+                .mapToObj(index ->
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                        .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                        .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                        .preferredCourtName("")
+                                        .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      caseData.getCourtLocation().getApplicantPreferredCourt()
+                                  ))
+                                  .build())
+                .collect(Collectors.toList());
+            builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
+        }
 
         List<Event> miscText = IntStream.range(0, miscEventText.size())
             .mapToObj(index ->
