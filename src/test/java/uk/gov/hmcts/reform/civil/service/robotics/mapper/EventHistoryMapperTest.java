@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -1217,6 +1216,95 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled",
                 "consentExtensionFilingDefence",
                 "acknowledgementOfServiceReceived"
+            );
+        }
+    }
+
+    @Nested
+    class RespondentFullDefenceSpec {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v1WithoutOptionalEvents() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.FULL_DEFENCE)
+                .atStateRespondent1v1FullDefenceSpec()
+                .applicant1ProceedWithClaim(YES)
+                .respondent1AcknowledgeNotificationDate(null)
+                .build();
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("50")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(2)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID("002")
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build(),
+                        Event.builder()
+                            .eventSequence(4)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID("002")
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(
+                                                  mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build()
+            );
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason: Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Claimant proceeds.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("defenceFiled").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "receiptOfAdmission",
+                "receiptOfPartAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
             );
         }
     }
@@ -4564,10 +4652,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+            var noteCreatedAt = LocalDateTime.now().plusDays(3);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
                 .caseNotes(CaseNote.builder()
-                               .createdOn(LocalDate.now().plusDays(3))
+                               .createdOn(noteCreatedAt)
                                .createdBy("createdBy")
                                .note("my note")
                                .build())
@@ -4594,7 +4683,7 @@ class EventHistoryMapperTest {
             Event caseNoteEvent = Event.builder()
                 .eventSequence(3)
                 .eventCode("999")
-                .dateReceived(LocalDate.now().plusDays(3).atStartOfDay())
+                .dateReceived(noteCreatedAt)
                 .eventDetailsText("case note added: my note")
                 .eventDetails(EventDetails.builder()
                                   .miscText("case note added: my note")
