@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -201,7 +203,17 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
+
+        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
+        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
+            && caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
+            state = "JUDICIAL_REFERRAL";
+        }
+
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
