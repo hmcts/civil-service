@@ -82,4 +82,6 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
     private final String responseToClaimAdmitPartWhyNotPayLRspecLabel2;
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
+    private final YesOrNo neitherCompanyNorOrganisation;
+    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
 }

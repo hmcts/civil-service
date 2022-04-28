@@ -194,6 +194,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         ) {
             caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(YES).build();
         }
+        if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
+            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).build();
+        } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
+            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2()).build();
+        }
         if (YES.equals(caseData.getSpecDefenceAdmittedRequired())
             || YES.equals(caseData.getSpecDefenceAdmitted2Required())
         ) {
@@ -437,6 +442,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.respondent2Copy(r2).respondent2DetailsForClaimDetailsTab(r2)
         );
 
+        if ((caseData.getRespondent1Copy() != null
+            && ("Company".equals(caseData.getRespondent1Copy().getPartyTypeDisplayValue())
+            || "Organisation".equals(caseData.getRespondent1Copy().getPartyTypeDisplayValue())))
+            || (caseData.getRespondent2Copy() != null
+            && ("Company".equals(caseData.getRespondent2Copy().getPartyTypeDisplayValue())
+            || "Organisation".equals(caseData.getRespondent2Copy().getPartyTypeDisplayValue())))) {
+            updatedCaseData.neitherCompanyNorOrganisation(NO);
+        } else {
+            updatedCaseData.neitherCompanyNorOrganisation(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -458,6 +474,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         List<String> errors;
         if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
+            if (YES.equals(caseData.getIsRespondent2())) {
+                smallClaimHearing = caseData.getRespondent2DQ().getRespondent2DQHearingSmallClaim();
+            }
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
 
         } else {
