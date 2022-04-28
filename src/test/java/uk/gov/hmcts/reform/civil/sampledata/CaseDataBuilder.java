@@ -69,6 +69,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -2380,10 +2381,39 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimOneClaimant1ClaimResponseType() {
+        this.claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2Spec() {
+        this.respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build();
         return this;
+    }
+
+    private List<CaseData> get2v1DifferentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party applicant2 = Party.builder().build();
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .applicant2(applicant2)
+                                  .claimant1ClaimResponseTypeForSpec(r1)
+                                  .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
     }
 
     public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
