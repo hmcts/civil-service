@@ -65,7 +65,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONESPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONESPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -121,6 +123,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+            .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
@@ -363,6 +366,29 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
+    }
+
+    private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        var updatedCaseData = caseData.toBuilder();
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONESPEC)) {
+            updatedCaseData.isRespondent1(YES);
+            updatedCaseData.isRespondent2(NO);
+            updatedCaseData.isApplicant1(NO);
+        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+            updatedCaseData.isRespondent1(NO);
+            updatedCaseData.isRespondent2(YES);
+            updatedCaseData.isApplicant1(NO);
+        } else if (solicitorHasCaseRole(callbackParams, APPLICANTSOLICITORONESPEC)) {
+            updatedCaseData.isRespondent1(NO);
+            updatedCaseData.isRespondent2(NO);
+            updatedCaseData.isApplicant1(YES);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
@@ -620,6 +646,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
             && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+
+    private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
             userInfo.getUid(),
             caseRole
