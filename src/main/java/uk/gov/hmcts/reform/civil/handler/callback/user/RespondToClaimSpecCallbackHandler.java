@@ -193,16 +193,33 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             || YES.equals(caseData.getSpecDefenceFullAdmitted2Required())
         ) {
             caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(YES).build();
+        } else {
+            caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(NO).build();
         }
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
-            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).build();
-        } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
-            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2()).build();
+            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).build();
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
+            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired2()).build();
         }
-        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())
-            || YES.equals(caseData.getSpecDefenceAdmitted2Required())
-        ) {
+
+        if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
             caseData = caseData.toBuilder().partAdmittedByEitherRespondents(YES).build();
+        } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
+            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(YES).build();
+        } else {
+            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(NO).build();
+        }
+
+        if (YES.equals(caseData.getDefenceAdmitPartEmploymentTypeRequired())) {
+            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
+                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec()).build();
+        }
+        if (YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
+            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
+                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2()).build();
         }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
             BigDecimal valuePounds = MonetaryConversions
@@ -387,6 +404,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
         }
+
+        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
+            && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
+            // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
+            int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
+            if (comparison < 0) {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+            } else {
+                caseData = caseData.toBuilder()
+                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+            }
+        } else {
+            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+        }
         return caseData;
     }
 
@@ -426,6 +461,26 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.isApplicant1(YES);
         }
 
+        if (YES.equals(caseData.getIsRespondent2())) {
+            if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
+                && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(
+                    caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+                updatedCaseData.neitherCompanyNorOrganisation(NO);
+            } else {
+                updatedCaseData.neitherCompanyNorOrganisation(YES);
+            }
+        } else {
+            if ((caseData.getRespondent1DetailsForClaimDetailsTab() != null
+                && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(
+                    caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())))) {
+                updatedCaseData.neitherCompanyNorOrganisation(NO);
+            } else {
+                updatedCaseData.neitherCompanyNorOrganisation(YES);
+            }
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -441,17 +496,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         ofNullable(caseData.getRespondent2()).ifPresent(r2 ->
             updatedCaseData.respondent2Copy(r2).respondent2DetailsForClaimDetailsTab(r2)
         );
-
-        if ((caseData.getRespondent1Copy() != null
-            && ("Company".equals(caseData.getRespondent1Copy().getPartyTypeDisplayValue())
-            || "Organisation".equals(caseData.getRespondent1Copy().getPartyTypeDisplayValue())))
-            || (caseData.getRespondent2Copy() != null
-            && ("Company".equals(caseData.getRespondent2Copy().getPartyTypeDisplayValue())
-            || "Organisation".equals(caseData.getRespondent2Copy().getPartyTypeDisplayValue())))) {
-            updatedCaseData.neitherCompanyNorOrganisation(NO);
-        } else {
-            updatedCaseData.neitherCompanyNorOrganisation(YES);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))

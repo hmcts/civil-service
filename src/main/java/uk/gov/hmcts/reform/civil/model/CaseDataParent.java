@@ -33,16 +33,19 @@ public class CaseDataParent implements MappableObject {
     private final Address specAoSRespondent2CorrespondenceAddressdetails;
     private final String defenceRouteRequired2;
     private final RespondentResponseTypeSpecPaidStatus respondent2ClaimResponsePaymentAdmissionForSpec;
+    private final RespondentResponseTypeSpecPaidStatus claimResponsePaymentAdmissionForSpecGeneric;
 
     private final YesOrNo showHowToAddTimeLinePage;
     private final YesOrNo fullAdmissionAndFullAmountPaid;
     private final YesOrNo specDefenceFullAdmitted2Required;
     private final YesOrNo partAdmittedByEitherRespondents;
     private final YesOrNo specDefenceAdmitted2Required;
+    private final YesOrNo specDefenceAdmittedGeneric;
 
     private final String specDefenceRouteAmountClaimed2Label;
     private final String specDefenceRouteAdmittedAmountClaimed2Label;
     private final RespondToClaim respondToAdmittedClaim2;
+    private final RespondToClaim respondToClaim2;
     /**
      * money amount in pence.
      */
@@ -84,4 +87,5 @@ public class CaseDataParent implements MappableObject {
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
 }
