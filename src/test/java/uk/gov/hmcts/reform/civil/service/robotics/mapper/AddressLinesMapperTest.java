@@ -95,10 +95,89 @@ class AddressLinesMapperTest {
             assertThat(result).extracting("addressLine3")
                 .isNull();
         }
+
+        @Test
+        void shouldSplitAddressBySpace_Line2MissingButLine3Present() {
+            Address address = Address.builder()
+                .addressLine1("21 Belgian Place")
+                .addressLine3("Gateshead")
+                .postTown("Newcastle upon Tyne")
+                .postCode("NW10 3PX")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("21 Belgian Place");
+            assertThat(result.getAddressLine2()).isEqualTo("Gateshead");
+            assertThat(result.getAddressLine3()).isEqualTo(null);
+            assertThat(result.getPostTown()).isEqualTo("Newcastle upon Tyne");
+            assertThat(result.getPostCode()).isEqualTo("NW10 3PX");
+            assertThat(result.getCountry()).isEqualTo("United Kingdom");
+        }
     }
 
     @Nested
     class ShouldReturnSpaceBasedSplitAddressLines {
+
+        @Test
+        void shouldSplitAddressBySpace_LongLine1Line3Missing() {
+            Address address = Address.builder()
+                .addressLine1("The aaaa bbbbbb and Aesthetics uuuuuu")
+                .addressLine2("10Z Stockwell Door")
+                .postTown("Edinburgh")
+                .postCode("NE23 8ZZ")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("The aaaa bbbbbb and Aesthetics");
+            assertThat(result.getAddressLine2()).isEqualTo("uuuuuu, 10Z Stockwell Door");
+            assertThat(result.getAddressLine3()).isEqualTo(null);
+            assertThat(result.getPostTown()).isEqualTo("Edinburgh");
+            assertThat(result.getPostCode()).isEqualTo("NE23 8ZZ");
+            assertThat(result.getCountry()).isEqualTo("United Kingdom");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_LongLine1Line2MissingLine3Present() {
+            Address address = Address.builder()
+                .addressLine1("ttttttttttt Group, ttttttttttt House, Unit 77, Nelson Court")
+                .addressLine3("Broadbridge")
+                .postTown("Manchester")
+                .postCode("NW12 3AC")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("ttttttttttt Group, ttttttttttt");
+            assertThat(result.getAddressLine2()).isEqualTo("House, Unit 77, Nelson Court, ");
+            assertThat(result.getAddressLine3()).isEqualTo("Broadbridge");
+            assertThat(result.getPostTown()).isEqualTo("Manchester");
+            assertThat(result.getPostCode()).isEqualTo("NW12 3AC");
+            assertThat(result.getCountry()).isEqualTo("United Kingdom");
+        }
+
+        @Test
+        void shouldSplitAddressBySpace_LongLine1Line2And3Missing() {
+            Address address = Address.builder()
+                .addressLine1("vvvvv zzzzzzzz, 7th Floor, Rusmore Building, 70 Rusmore Circus")
+                .postTown("Birmingham")
+                .postCode("N32 3AX")
+                .country("United Kingdom")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result.getAddressLine1()).isEqualTo("vvvvv zzzzzzzz, 7th Floor, Rusmore");
+            assertThat(result.getAddressLine2()).isEqualTo("Building, 70 Rusmore Circus, ");
+            assertThat(result.getAddressLine3()).isEqualTo(null);
+            assertThat(result.getPostTown()).isEqualTo("Birmingham");
+            assertThat(result.getPostCode()).isEqualTo("N32 3AX");
+            assertThat(result.getCountry()).isEqualTo("United Kingdom");
+        }
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines() {
