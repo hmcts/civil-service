@@ -130,23 +130,23 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
         if (applicant1ToCourtLocation != null || YesOrNo.YES.equals(applicant1ClaimCourtLocationRequired)) {
-            Optional<RequestedCourt> optRespondentDQ = Optional.ofNullable(this.applicant1DQRequestedCourt);
-            Optional<RequestedCourt> optRespond = Optional.ofNullable(this.applicant1ToCourtLocation);
+            Optional<RequestedCourt> optApplicantDQ = Optional.ofNullable(this.applicant1DQRequestedCourt);
+            Optional<RequestedCourt> optApplicant = Optional.ofNullable(this.applicant1ToCourtLocation);
 
             YesOrNo requestHearingAtSpecificCourt = Stream.of(
-                optRespondentDQ.map(RequestedCourt::getRequestHearingAtSpecificCourt),
+                optApplicantDQ.map(RequestedCourt::getRequestHearingAtSpecificCourt),
                 Optional.ofNullable(applicant1ClaimCourtLocationRequired),
-                optRespond.map(RequestedCourt::getRequestHearingAtSpecificCourt)
+                optApplicant.map(RequestedCourt::getRequestHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
 
             String responseCourtCode = Stream.of(
-                optRespondentDQ.map(RequestedCourt::getResponseCourtCode),
-                optRespond.map(RequestedCourt::getResponseCourtCode)
+                optApplicantDQ.map(RequestedCourt::getResponseCourtCode),
+                optApplicant.map(RequestedCourt::getResponseCourtCode)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
             String reasonForHearingAtSpecificCourt = Stream.of(
-                optRespondentDQ.map(RequestedCourt::getReasonForHearingAtSpecificCourt),
-                optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
+                optApplicantDQ.map(RequestedCourt::getReasonForHearingAtSpecificCourt),
+                optApplicant.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
             return RequestedCourt.builder()
