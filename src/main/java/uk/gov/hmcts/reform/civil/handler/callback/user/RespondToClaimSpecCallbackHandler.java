@@ -428,7 +428,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.specDefenceFullAdmittedRequired(NO);
         }
 
-        if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
+        /*if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
             && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
             .equals(caseData.getMultiPartyResponseTypeFlags())
             && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
@@ -436,9 +436,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 || (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
                 .equals(caseData.getRespondent2ClaimResponsePaymentAdmissionForSpec()))) {
             updatedData.showHowToAddTimeLinePage(YES);
-        }
+        }*/
 
         if (YES.equals(caseData.getIsRespondent1())
+            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            updatedData.showHowToAddTimeLinePage(NO);
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.showHowToAddTimeLinePage(NO);
+        } else {
+            updatedData.showHowToAddTimeLinePage(YES);
+        }
+
+        /*if (YES.equals(caseData.getIsRespondent1())
             && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
@@ -446,7 +456,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        }
+        }*/
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
             updatedData.partAdmittedByEitherRespondents(YES);
