@@ -469,22 +469,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
         }
 
-        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
-            && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
-            // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
-            int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
-            if (comparison < 0) {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+        if (YES.equals(caseData.getIsRespondent2())) {
+            if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
+                && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
+                // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
+                int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
+                    .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
+                if (comparison < 0) {
+                    caseData = caseData.toBuilder()
+                        .respondent1ClaimResponsePaymentAdmissionForSpec(
+                            RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+                } else {
+                    caseData = caseData.toBuilder()
+                        .respondent1ClaimResponsePaymentAdmissionForSpec(
+                            RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                }
             } else {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
             }
-        } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
         }
         return caseData;
     }
