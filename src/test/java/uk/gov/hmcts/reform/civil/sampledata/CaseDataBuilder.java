@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -241,13 +242,15 @@ public class CaseDataBuilder {
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
+    private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
-    private RepaymentPlanLRspec respondent2RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2488,9 +2491,16 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
-        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
+    public CaseDataBuilder generateDefendant2RepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
         return this;
     }
 
@@ -2654,6 +2664,8 @@ public class CaseDataBuilder {
             .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1PartnerAndDependent(respondent1PartnerAndDependent)
+            .respondent2PartnerAndDependent(respondent2PartnerAndDependent)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
             .respondent2RepaymentPlan(respondent2RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)

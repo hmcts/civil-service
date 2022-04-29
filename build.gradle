@@ -291,7 +291,7 @@ ext.libraries = [
 configurations.all {
   resolutionStrategy.eachDependency { details ->
     if (details.requested.group == 'org.projectlombok') {
-      details.useVersion "1.18.24"
+      details.useVersion versions.lombok
     }
   }
 }
