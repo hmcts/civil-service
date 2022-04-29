@@ -71,7 +71,7 @@ public class AddressLinesMapper {
         addressLine = StringUtils.normalizeSpace(addressLine);
         if (StringUtils.isEmpty(addressLine)) {
             if (StringUtils.isEmpty(overflow)) {
-                return new LinkedList<>(Arrays.asList(null, null));
+                return new LinkedList<>(Arrays.asList(null, STRING_EMPTY));
             } else if (StringUtils.length(overflow) <= LINE_LIMIT) {
                 return new LinkedList<>(List.of(overflow, STRING_EMPTY));
             }
@@ -105,7 +105,7 @@ public class AddressLinesMapper {
                                                   ? STRING_SPACE : STRING_COMMA_SPACE);
             }
         } else {
-            retained = addressLine;
+            retained = overflow.concat(ofNullable(addressLine).orElse(STRING_EMPTY));
             overflow = STRING_EMPTY;
         }
         return new LinkedList<>(List.of(retained.trim(), overflow));
