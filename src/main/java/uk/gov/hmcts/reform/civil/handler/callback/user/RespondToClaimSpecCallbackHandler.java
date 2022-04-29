@@ -309,17 +309,44 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
-            &&
-            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        }
-        //this logic to be removed when ccd supports AND-OR combinations
-        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+                &&
+                (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            }
+        } else if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            if (YES.equals(caseData.getIsRespondent1())
+                && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (YES.equals(caseData.getIsRespondent2())
+                && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            }
+
+            if (YES.equals(caseData.getIsRespondent1())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            } else if (YES.equals(caseData.getIsRespondent2())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            }
+        } else if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            if (caseData.getRespondentResponseIsSame().equals(NO)) {
+                updatedData.sameSolicitorSameResponse(NO);
+            }
+        } else if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            //this logic to be removed when ccd supports AND-OR combinations
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
             } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
@@ -340,33 +367,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.specFullAdmissionOrPartAdmission(YES);
         } else {
             updatedData.specFullAdmissionOrPartAdmission(NO);
-        }
-
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && caseData.getRespondentResponseIsSame().equals(NO)) {
-            updatedData.sameSolicitorSameResponse(NO);
-        }
-
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
-            /*if (YES.equals(caseData.getIsRespondent1())
-                && RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                    caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION.FULL_ADMISSION);
-            } else if (YES.equals(caseData.getIsRespondent2())
-                && RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                    caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION.FULL_ADMISSION);
-            }*/
-
-            if (YES.equals(caseData.getIsRespondent1())
-                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
-                    caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
-            } else if (YES.equals(caseData.getIsRespondent2())
-                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
-                    caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
-            }
         }
 
         if (YES.equals(caseData.getIsRespondent2())) {
@@ -402,15 +402,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
             }
         }
-        /*if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            &&
-            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-               || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-               || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        }*/
+
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
             || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
             updatedData.specFullDefenceOrPartAdmission1V1(YES);
@@ -428,16 +420,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.specDefenceFullAdmittedRequired(NO);
         }
 
-        /*if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
-            && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
-            .equals(caseData.getMultiPartyResponseTypeFlags())
-            && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
-                .equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))
-                || (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
-                .equals(caseData.getRespondent2ClaimResponsePaymentAdmissionForSpec()))) {
-            updatedData.showHowToAddTimeLinePage(YES);
-        }*/
-
         if (YES.equals(caseData.getIsRespondent1())
             && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
@@ -447,16 +429,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedData.showHowToAddTimeLinePage(YES);
         }
-
-        /*if (YES.equals(caseData.getIsRespondent1())
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            updatedData.showHowToAddTimeLinePage(NO);
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        } else if (YES.equals(caseData.getIsRespondent2())
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.showHowToAddTimeLinePage(NO);
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        }*/
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
             updatedData.partAdmittedByEitherRespondents(YES);
