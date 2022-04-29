@@ -87,8 +87,6 @@ public class RoboticsDataMapperForSpec {
             ? caseData.getTotalInterest() : BigDecimal.ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         return ClaimDetails.builder()
-            .totalInterest(claimInterest)
-            .totalClaimAmountWithInterest(amountClaimedWithInterest)
             .amountClaimed(amountClaimedWithInterest)
             .courtFee(ofNullable(caseData.getClaimFee())
                           .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))

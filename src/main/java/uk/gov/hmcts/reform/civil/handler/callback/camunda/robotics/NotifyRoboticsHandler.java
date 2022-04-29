@@ -45,7 +45,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 if (toggleService.isLrSpecEnabled()) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                    errors = jsonSchemaValidationService.validateWithSpecSchema(roboticsCaseDataSpec.toJsonString());
+                    errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }

@@ -78,6 +78,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked() {
+        var noticeOfChangeKey = "notice-of-change";
+        givenToggle(noticeOfChangeKey, true);
+
+        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isTrue();
+        verifyBoolVariationCalled(noticeOfChangeKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
         var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
         givenToggle(organisationOnboardedFeatureKey, true);
