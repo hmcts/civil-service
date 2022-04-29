@@ -46,7 +46,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .statementOfTruth(caseData.getUiStatementOfTruth());
+            .statementOfTruth(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth());
 
         builder.respondent1(getSpecifiedParty(
             caseData.getRespondent1(),

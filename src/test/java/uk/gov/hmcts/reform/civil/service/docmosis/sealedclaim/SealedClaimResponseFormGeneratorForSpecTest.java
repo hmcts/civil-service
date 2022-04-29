@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
@@ -34,10 +35,14 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
-            .uiStatementOfTruth(StatementOfTruth.builder()
-                                    .name("sot name")
-                                    .role("sot role")
-                                    .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQStatementOfTruth(
+                                   StatementOfTruth.builder()
+                                       .name("sot name")
+                                       .role("sot role")
+                                       .build()
+                               )
+                               .build())
             .applicant1(Party.builder()
                             .type(Party.Type.COMPANY)
                             .companyName("applicant name")
@@ -54,9 +59,9 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         Assert.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
         Assert.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
                             templateData.getWhyDisputeTheClaim());
-        Assert.assertEquals(caseData.getUiStatementOfTruth().getName(),
+        Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName(),
                             templateData.getStatementOfTruth().getName());
-        Assert.assertEquals(caseData.getUiStatementOfTruth().getRole(),
+        Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
                             templateData.getStatementOfTruth().getRole());
     }
 }
