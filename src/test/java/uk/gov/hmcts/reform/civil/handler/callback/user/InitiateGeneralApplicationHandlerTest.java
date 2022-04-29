@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -84,6 +85,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected IdamClient idamClient;
+
+    @MockBean
+    protected GeneralAppFeesService feesService;
 
     private static final String STRING_CONSTANT = "this is a string";
     private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();

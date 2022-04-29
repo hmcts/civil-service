@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -44,6 +45,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
+    private static final String CALL_FEES_SERVICE = "ga-fees";
     private static final String SET_FEES_FOR_APPLICATION = "ga-set-application-fees";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
@@ -52,6 +54,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
+    private final GeneralAppFeesService feesService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,6 +62,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::getPbaAccounts,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
+            callbackKey(MID, CALL_FEES_SERVICE), this::calculateFee,
             callbackKey(MID, SET_FEES_FOR_APPLICATION), this::setApplicationFees,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
@@ -110,6 +114,22 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private CallbackResponse calculateFee(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
+                .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers))
+                .fee(feesService.getFeeForGA(caseData))
+                .build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     private CallbackResponse setApplicationFees(CallbackParams callbackParams) {
