@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.css.Counter;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -13,7 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -167,7 +172,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
                     != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
                     && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
-                    || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+                    || caseData.getRespondent2ClaimResponseTypeForSpec()
+                    == RespondentResponseTypeSpec.PART_ADMISSION)) {
                     caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
                 } else {
                     caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
@@ -176,7 +182,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
                     != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
                     && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-                    || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+                    || caseData.getRespondent1ClaimResponseTypeForSpec()
+                    == RespondentResponseTypeSpec.PART_ADMISSION)) {
                     caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
                 } else {
                     caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
@@ -321,10 +328,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (YES.equals(caseData.getIsRespondent1()) && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+        if (YES.equals(caseData.getIsRespondent1()) && caseData.getRespondent1ClaimResponseTypeForSpec()
+            == RespondentResponseTypeSpec.PART_ADMISSION
             || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
             updatedData.specFullAdmissionOrPartAdmission(YES);
-        } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+        } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getRespondent2ClaimResponseTypeForSpec()
+            == RespondentResponseTypeSpec.PART_ADMISSION
             || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
             updatedData.specFullAdmissionOrPartAdmission(YES);
         } else {
@@ -396,10 +405,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.showHowToAddTimeLinePage(YES);
         }
 
-        if (YES.equals(caseData.getIsRespondent1()) && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+        if (YES.equals(caseData.getIsRespondent1())
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        } else if (YES.equals(caseData.getIsRespondent2()) && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
         }
@@ -420,7 +431,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedData.fullAdmissionAndFullAmountPaid(NO);
         }
-
 
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
             updatedData.defenceAdmitPartPaymentTimeRouteGeneric(
