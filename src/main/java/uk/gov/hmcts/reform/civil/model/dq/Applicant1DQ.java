@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Setter
 @Data
@@ -29,6 +33,8 @@ public class Applicant1DQ implements DQ {
     private final StatementOfTruth applicant1DQStatementOfTruth;
     private final VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
     private final FutureApplications applicant1DQFutureApplications;
+    private final YesOrNo applicant1ClaimCourtLocationRequired;
+    private final RequestedCourt applicant1ToCourtLocation;
     private final WelshLanguageRequirements applicant1DQLanguageLRspec;
 
     @Override
@@ -85,11 +91,6 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
-    public RequestedCourt getRequestedCourt() {
-        return null;
-    }
-
-    @Override
     @JsonProperty("applicant1DQHearingSupport")
     public HearingSupport getHearingSupport() {
         return applicant1DQHearingSupport;
@@ -123,5 +124,37 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return applicant1DQLanguageLRspec;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQRequestedCourt")
+    public RequestedCourt getRequestedCourt() {
+        if (applicant1ToCourtLocation != null || YesOrNo.YES.equals(applicant1ClaimCourtLocationRequired)) {
+            Optional<RequestedCourt> optRespondentDQ = Optional.ofNullable(this.applicant1DQRequestedCourt);
+            Optional<RequestedCourt> optRespond = Optional.ofNullable(this.applicant1ToCourtLocation);
+
+            YesOrNo requestHearingAtSpecificCourt = Stream.of(
+                optRespondentDQ.map(RequestedCourt::getRequestHearingAtSpecificCourt),
+                Optional.ofNullable(applicant1ClaimCourtLocationRequired),
+                optRespond.map(RequestedCourt::getRequestHearingAtSpecificCourt)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
+
+            String responseCourtCode = Stream.of(
+                optRespondentDQ.map(RequestedCourt::getResponseCourtCode),
+                optRespond.map(RequestedCourt::getResponseCourtCode)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+
+            String reasonForHearingAtSpecificCourt = Stream.of(
+                optRespondentDQ.map(RequestedCourt::getReasonForHearingAtSpecificCourt),
+                optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
+                .responseCourtCode(responseCourtCode)
+                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+                .build();
+        }
+        return applicant1DQRequestedCourt;
     }
 }
