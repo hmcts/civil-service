@@ -90,4 +90,5 @@ public class CaseDataParent implements MappableObject {
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
     private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
+    private final YesOrNo showStatementOfTruth;
 }

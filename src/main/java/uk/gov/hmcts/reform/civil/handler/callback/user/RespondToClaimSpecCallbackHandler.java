@@ -12,13 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -191,6 +185,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
                 }
             }
+
+            if (YES.equals(caseData.getIsRespondent1())
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.equals(
+                caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
+                caseData = caseData.toBuilder().showHowToAddTimeLinePage(YES).build();
+            } else if (YES.equals(caseData.getIsRespondent2())
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
+                || RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.equals(
+                caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
+                caseData = caseData.toBuilder().showHowToAddTimeLinePage(YES).build();
+            }
             return populateAllocatedTrack(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -234,13 +240,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             caseData = caseData.toBuilder().partAdmittedByEitherRespondents(NO).build();
         }
 
-        if (YES.equals(caseData.getDefenceAdmitPartEmploymentTypeRequired())) {
+
+
+        if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getDefenceAdmitPartEmploymentTypeRequired())) {
             caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
                 caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec()).build();
-        }
-        if (YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
+        } else if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
             caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
                 caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2()).build();
+        } else {
+            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(null).build();
+            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspec(null).build();
+            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspec2(null).build();
         }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
             BigDecimal valuePounds = MonetaryConversions
@@ -433,13 +444,27 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         if (YES.equals(caseData.getIsRespondent1())
-            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))) {
             updatedData.showHowToAddTimeLinePage(NO);
         } else if (YES.equals(caseData.getIsRespondent2())
-            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            &&  (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.showHowToAddTimeLinePage(NO);
         } else {
             updatedData.showHowToAddTimeLinePage(YES);
+        }
+
+        if (YES.equals(caseData.getIsRespondent1())
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            updatedData.showStatementOfTruth(NO);
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.showStatementOfTruth(NO);
+        } else {
+            updatedData.showStatementOfTruth(YES);
         }
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
@@ -540,6 +565,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
 
         var updatedCaseData = caseData.toBuilder();
+        updatedCaseData.respondentResponseIsSame(NO);
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONESPEC)) {
             updatedCaseData.isRespondent1(YES);
             updatedCaseData.isRespondent2(NO);
@@ -572,6 +598,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             } else {
                 updatedCaseData.neitherCompanyNorOrganisation(YES);
             }
+        }
+        if (!ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+        || !TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            updatedCaseData.sameSolicitorSameResponse(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -637,7 +667,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
-            updatedData.sameSolicitorSameResponse(YES).build();
+            //updatedData.sameSolicitorSameResponse(YES).build();
         } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
             if (NO.equals(caseData.getRespondentResponseIsSame())) {
