@@ -376,9 +376,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (YES.equals(caseData.getIsRespondent1()) && caseData.getRespondent1ClaimResponseTypeForSpec()
+        if (YES.equals(caseData.getIsRespondent1()) && (caseData.getRespondent1ClaimResponseTypeForSpec()
             == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION)) {
             updatedData.specFullAdmissionOrPartAdmission(YES);
         } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getRespondent2ClaimResponseTypeForSpec()
             == RespondentResponseTypeSpec.PART_ADMISSION
@@ -602,6 +602,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (!ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
         || !TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
             updatedCaseData.sameSolicitorSameResponse(NO);
+        }
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            updatedCaseData.sameSolicitorSameResponse(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
