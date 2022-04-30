@@ -389,10 +389,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     private final String hearingSelection;
-    // for default judgment specified tab
-    private final DJPaymentTypeSelection paymentTypeSelection;
-    private final RepaymentFrequencyDJ repaymentFrequency;
-    // for default judgment specified tab
+
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
