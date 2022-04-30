@@ -193,6 +193,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            && caseData.getSpecDefenceAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specPartAdmitPaid(NO).build();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+            && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specFullAdmitPaid(NO).build();
+        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
