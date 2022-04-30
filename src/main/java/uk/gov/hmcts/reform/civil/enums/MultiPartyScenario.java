@@ -30,6 +30,11 @@ public enum MultiPartyScenario {
                 || caseData.getRespondent2SameLegalRepresentative().equals(NO))
                 ? ONE_V_TWO_TWO_LEGAL_REP
                 : ONE_V_TWO_ONE_LEGAL_REP;
+        } else if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType()) && caseData.getRespondent2DetailsForClaimDetailsTab() != null) {
+            return (caseData.getRespondent2SameLegalRepresentative() == null
+                || caseData.getRespondent2SameLegalRepresentative().equals(NO))
+                ? ONE_V_TWO_TWO_LEGAL_REP
+                : ONE_V_TWO_ONE_LEGAL_REP;
         }
 
         return ONE_V_ONE;

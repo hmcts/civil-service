@@ -508,7 +508,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
 
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
-            caseData.toBuilder().defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec).build();
+            caseData = caseData.toBuilder().defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec).build();
         }
         return caseData;
     }
