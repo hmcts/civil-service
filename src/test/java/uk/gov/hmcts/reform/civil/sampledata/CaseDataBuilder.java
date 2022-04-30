@@ -247,6 +247,7 @@ public class CaseDataBuilder {
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
+    private RepaymentPlanLRspec respondent2RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2469,6 +2470,9 @@ public class CaseDataBuilder {
         respondent1RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
 
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
         return this;
     }
 
@@ -2639,6 +2643,7 @@ public class CaseDataBuilder {
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
+            .respondent2RepaymentPlan(respondent2RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
