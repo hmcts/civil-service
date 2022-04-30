@@ -248,7 +248,6 @@ public class CaseDataBuilder {
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
-    private RepaymentPlanLRspec respondent2RepaymentPlan;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
