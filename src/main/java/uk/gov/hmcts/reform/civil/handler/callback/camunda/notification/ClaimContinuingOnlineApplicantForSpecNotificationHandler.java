@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,9 +24,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -67,9 +66,13 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
 
         CaseData caseData = callbackParams.getCaseData();
 
+        String emailTemplateID = caseData.getRespondent2() != null
+            ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()
+            : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec();
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec(),
+            emailTemplateID,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -79,17 +82,28 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData),
+
+        Map<String, String> properties = new HashMap<>();
+
+        properties.putAll(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
-        );
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)));
+
+        if (caseData.getRespondent2() != null) {
+            properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
+        } else {
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        }
+
+        return properties;
     }
 
-    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
+    public String getApplicantLegalOrganizationName(CaseData caseData) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
