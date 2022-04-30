@@ -135,6 +135,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData = updateCurrentPage(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.superClaimType(SPEC_CLAIM);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -317,6 +318,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData = updateCurrentPage(caseData);
         CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
@@ -502,6 +504,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    private CaseData updateCurrentPage(CaseData caseData) {
+        caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            caseData.toBuilder().defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec).build();
+        }
+        return caseData;
+    }
+
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
@@ -563,6 +574,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        caseData = updateCurrentPage(caseData);
 
         var updatedCaseData = caseData.toBuilder();
         updatedCaseData.respondentResponseIsSame(NO);
