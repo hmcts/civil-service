@@ -111,4 +111,9 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentSolicitor1DefaultJudgmentReceived;
 
+    @NotEmpty
+    private String breathingSpaceEnterDefendantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceEnterApplicantEmailTemplate;
 }
