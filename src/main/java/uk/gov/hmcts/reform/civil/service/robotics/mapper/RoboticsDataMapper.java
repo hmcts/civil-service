@@ -124,11 +124,12 @@ public class RoboticsDataMapper {
 
     private String buildParticularsOfClaims(CaseData caseData) {
         String particularsOfClaims = null;
-        String detailsOfClaim = caseData.getDetailsOfClaim();
-        if(null != detailsOfClaim) {
-            particularsOfClaims = WordUtils.wrap(detailsOfClaim, MAX_LINE_LENGTH_POC);
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            String detailsOfClaim = caseData.getDetailsOfClaim();
+            if (null != detailsOfClaim) {
+                particularsOfClaims = WordUtils.wrap(detailsOfClaim, MAX_LINE_LENGTH_POC);
+            }
         }
-
         return particularsOfClaims;
     }
 
