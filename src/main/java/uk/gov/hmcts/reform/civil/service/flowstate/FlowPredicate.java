@@ -114,7 +114,8 @@ public class FlowPredicate {
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
-        caseData.getClaimDetailsNotificationDate() != null
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getClaimDetailsNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
             || hasNotifiedClaimDetailsToBoth.test(caseData));
 
@@ -138,8 +139,15 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
-        (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
-            || (caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2ResponseDate() == null);
+        getPredicateForTimeExtension(caseData);
+
+    private static boolean getPredicateForTimeExtension(CaseData caseData) {
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getRespondent1TimeExtensionDate() != null
+                || caseData.getRespondent2TimeExtensionDate() != null;
+        }
+        return caseData.getRespondent1TimeExtensionDate() != null;
+    }
 
     public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
