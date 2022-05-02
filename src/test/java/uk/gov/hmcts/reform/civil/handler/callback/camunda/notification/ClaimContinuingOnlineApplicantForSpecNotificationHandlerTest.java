@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,8 +41,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -73,8 +76,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     @org.junit.Test
     public void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -101,10 +104,14 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
+                caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
-                getNotificationDataMap(caseData),
+                expectedProperties,
                 REFERENCE
             );
         }
@@ -172,26 +179,27 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
+                caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
-                getNotificationDataMap(caseData),
+                expectedProperties,
                 REFERENCE
             );
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>();
 
-            properties.putAll(
-                Map.of(
-                    CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
-                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-                    CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                    formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
-                )
-            );
+            Map<String, String> properties = new HashMap<>(Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+                CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+            ));
 
             if (caseData.getRespondent2() != null) {
                 properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
