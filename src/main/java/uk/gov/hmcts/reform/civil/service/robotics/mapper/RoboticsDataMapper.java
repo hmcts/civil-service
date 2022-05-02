@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.WordUtils;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -32,6 +34,7 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
@@ -49,6 +52,7 @@ public class RoboticsDataMapper {
     public static final String APPLICANT2_ID = "004";
     public static final String RESPONDENT2_SOLICITOR_ID = "003";
 
+    public static final int MAX_LINE_LENGTH_POC = 45;
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
@@ -59,6 +63,7 @@ public class RoboticsDataMapper {
             .header(buildCaseHeader(caseData))
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
+            .particularsOfClaim(buildParticularsOfClaims(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData))
             .build();
@@ -114,6 +119,17 @@ public class RoboticsDataMapper {
                 .ifPresent(solicitorsList::add);
         }
         return solicitorsList;
+    }
+
+
+    private String buildParticularsOfClaims(CaseData caseData) {
+        String particularsOfClaims = null;
+        String detailsOfClaim = caseData.getDetailsOfClaim();
+        if(null != detailsOfClaim) {
+            particularsOfClaims = WordUtils.wrap(detailsOfClaim, MAX_LINE_LENGTH_POC);
+        }
+
+        return particularsOfClaims;
     }
 
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
@@ -216,6 +232,13 @@ public class RoboticsDataMapper {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
 
+        LocalDateTime dateOfService = null;
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            dateOfService = caseData.getIssueDate().atStartOfDay();
+        } else {
+            dateOfService = caseData.getClaimDetailsNotificationDate();
+        }
+
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -224,7 +247,7 @@ public class RoboticsDataMapper {
                 "Claimant",
                 APPLICANT_ID,
                 APPLICANT_SOLICITOR_ID,
-                caseData.getClaimDetailsNotificationDate()
+                dateOfService
             ),
             buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -233,7 +256,7 @@ public class RoboticsDataMapper {
                 "Defendant",
                 RESPONDENT_ID,
                 respondent1SolicitorId,
-                caseData.getClaimDetailsNotificationDate()
+                dateOfService
             )
         ));
 
@@ -245,7 +268,7 @@ public class RoboticsDataMapper {
                 "Claimant",
                 APPLICANT2_ID,
                 APPLICANT_SOLICITOR_ID,
-                caseData.getClaimDetailsNotificationDate()
+                dateOfService
             ));
         }
 
@@ -265,7 +288,7 @@ public class RoboticsDataMapper {
                 "Defendant",
                 RESPONDENT2_ID,
                 respondent2SolicitorId,
-                caseData.getClaimDetailsNotificationDate()
+                dateOfService
             ));
         }
         return respondentParties;
