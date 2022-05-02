@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -20,11 +21,13 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -2344,6 +2347,76 @@ class EventHistoryMapperTest {
                 "receiptOfPartAdmission",
                 "replyToDefence",
                 "consentExtensionFilingDefence"
+            );
+        }
+    }
+
+    @Nested
+    class RespondentDivergentResponseSpec {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondent1v2FullDefence_AdmitPart()
+                .atState1v2DivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                 RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2DQ()
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual()
+                                 .individualDateOfBirth(LocalDate.now().plusDays(1))
+                                 .build())
+                .build();
+
+            String respondent1MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("50")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .eventDetailsText(respondent1MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent1MiscText)
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("defenceFiled").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0),
+                                 expectedMiscellaneousEvents.get(1));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceAndCounterClaim",
+                "replyToDefence",
+                "consentExtensionFilingDefence",
+                "acknowledgementOfServiceReceived"
             );
         }
     }

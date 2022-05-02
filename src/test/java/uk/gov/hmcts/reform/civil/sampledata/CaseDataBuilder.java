@@ -1869,6 +1869,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                       RespondentResponseTypeSpec respondent2Response) {
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2RespondsSpec(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotificationAcknowledged() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
