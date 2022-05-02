@@ -404,7 +404,7 @@ public class EventHistoryMapper {
                          Event.builder()
                              .eventSequence(prepareEventSequence(builder.build()))
                              .eventCode("999")
-                             .dateReceived(caseNote.getCreatedOn().atStartOfDay())
+                             .dateReceived(caseNote.getCreatedOn())
                              .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
                              .eventDetails(EventDetails.builder()
                                                .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
