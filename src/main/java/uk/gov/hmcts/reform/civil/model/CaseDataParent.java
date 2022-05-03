@@ -7,7 +7,9 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+
 import java.time.LocalDate;
+
 @Jacksonized
 @SuperBuilder(toBuilder = true)
 @Data
