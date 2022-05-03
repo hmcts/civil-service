@@ -23,21 +23,16 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -45,10 +40,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
-    private static final String CALL_FEES_SERVICE = "ga-fees";
-    private static final String SET_FEES_FOR_APPLICATION = "ga-set-application-fees";
+    private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
+    private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
-    private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
 
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -59,11 +53,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::getPbaAccounts,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
-            callbackKey(MID, CALL_FEES_SERVICE), this::calculateFee,
-            callbackKey(MID, SET_FEES_FOR_APPLICATION), this::setApplicationFees,
+            callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -72,18 +64,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse getPbaAccounts(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                                                 .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers)).build());
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
     }
 
     private List<String> getPbaAccounts(String authToken) {
@@ -116,49 +96,21 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse calculateFee(CallbackParams callbackParams) {
-
+    private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
+        Fee feeForGA = feesService.getFeeForGA(caseData);
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
                 .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers))
-                .fee(feesService.getFeeForGA(caseData))
+                .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
+                .fee(feeForGA)
                 .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
-    }
-
-    private CallbackResponse setApplicationFees(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        Fee applicationFees = Fee.builder().code("FEE0210").build();
-        boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-            && caseData.getGeneralAppInformOtherParty() != null
-            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
-
-        if (isNotified) {
-            applicationFees.setCalculatedAmountInPence(getFeeInPence(275));
-        } else {
-            applicationFees.setCalculatedAmountInPence(getFeeInPence(108));
-        }
-
-        caseDataBuilder.generalAppPBADetails(pbaDetails.toBuilder().fee(applicationFees).build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .errors(Collections.emptyList())
-            .build();
-    }
-
-    private BigDecimal getFeeInPence(int fee) {
-        return BigDecimal.valueOf(fee).multiply(PENCE_PER_POUND)
-            .setScale(0, RoundingMode.UNNECESSARY);
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

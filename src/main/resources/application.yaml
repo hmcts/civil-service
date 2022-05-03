@@ -205,7 +205,7 @@ feign:
         loggerLevel: full
 fees:
   api:
-    url: http://fees-register-api-aat.service.core-compute-aat.internal
+    url: http://localhost:8765
 
 payments:
   api:
