@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.Map;
@@ -80,7 +81,8 @@ class PaymentTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                                                  "RPA_CONTINUOUS_FEED", false));
+                                                  "RPA_CONTINUOUS_FEED", false,
+                                                  FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 

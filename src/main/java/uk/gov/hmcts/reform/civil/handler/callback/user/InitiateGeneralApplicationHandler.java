@@ -124,7 +124,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(initiateGeneralApplicationService
