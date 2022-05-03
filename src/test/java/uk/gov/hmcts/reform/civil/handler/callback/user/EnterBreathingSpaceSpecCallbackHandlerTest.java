@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -14,7 +15,9 @@ import java.time.LocalDate;
 
 public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
-    private final EnterBreathingSpaceSpecCallbackHandler callbackHandler = new EnterBreathingSpaceSpecCallbackHandler();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final EnterBreathingSpaceSpecCallbackHandler callbackHandler
+        = new EnterBreathingSpaceSpecCallbackHandler(objectMapper);
 
     @Test
     public void canEnterOnce() {

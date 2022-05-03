@@ -5,16 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -51,14 +52,18 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
+@SuperBuilder(toBuilder = true)
+@Jacksonized
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder(toBuilder = true)
-public class CaseData implements MappableObject {
+@SuppressWarnings("unchecked")
+public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final Long ccdCaseReference;
@@ -74,9 +79,16 @@ public class CaseData implements MappableObject {
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
-    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
-    private final List<Element<Document>> generalAppEvidenceDocument;
-    private final List<Element<GeneralApplication>> generalApplications;
+
+    @Builder.Default
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
+
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
@@ -131,7 +143,10 @@ public class CaseData implements MappableObject {
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
-    private final List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+
     private final Document specClaimTemplateDocumentFiles;
     private final Document specClaimDetailsDocumentFiles;
     private final List<Evidence> speclistYourEvidenceList;
@@ -159,7 +174,9 @@ public class CaseData implements MappableObject {
     private final ResponseDocument respondentSharedClaimResponseDocument;
     private final CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
-    private final List<Element<CaseDocument>> defendantResponseDocuments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
 
     private final YesOrNo applicant1ProceedWithClaim;
     private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
@@ -169,7 +186,10 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1ProceedWithClaimRespondent2;
     private final ResponseDocument applicant1DefenceResponseDocument;
     private final ResponseDocument claimantDefenceResDocToDefendant2;
-    private final List<Element<CaseDocument>> claimantResponseDocuments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
     /**
@@ -308,6 +328,8 @@ public class CaseData implements MappableObject {
     private YesOrNo specFullDefenceOrPartAdmission1V1;
     private YesOrNo specFullDefenceOrPartAdmission;
     private YesOrNo specDisputesOrPartAdmission;
+    private YesOrNo specPartAdmitPaid;
+    private YesOrNo specFullAdmitPaid;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -338,7 +360,9 @@ public class CaseData implements MappableObject {
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
-    private final List<IdValue<Bundle>> caseBundles;
+
+    @Builder.Default
+    private final List<IdValue<Bundle>> caseBundles = new ArrayList<>();
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
@@ -358,15 +382,18 @@ public class CaseData implements MappableObject {
     private final String repaymentSuggestion;
     private final String currentDatebox;
     private final LocalDate repaymentDate;
-    private final List<Element<CaseDocument>> defaultJudgmentDocuments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+
     private final String hearingSelection;
-    // for default judgment specified tab
-    private final DJPaymentTypeSelection paymentTypeSelection;
-    private final RepaymentFrequencyDJ repaymentFrequency;
-    // for default judgment specified tab
+
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
+    private final YesOrNo disabilityPremiumPayments;
+    private final YesOrNo severeDisabilityPremiumPayments;
+
     private final String currentDefendant;
     private final YesOrNo claimStarted;
     private final String currentDefendantName;
