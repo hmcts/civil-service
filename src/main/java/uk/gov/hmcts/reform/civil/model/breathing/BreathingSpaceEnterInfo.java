@@ -17,7 +17,5 @@ public class BreathingSpaceEnterInfo {
 
     private final LocalDate expectedEnd;
 
-    private final String event;
-
     private final String eventDescription;
 }
