@@ -5,6 +5,9 @@ import javax.validation.constraints.NotNull;
 public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-00727.docx", "sealed_claim_form_%s.pdf"),
     N2("CV-SPEC-CLM-ENG-00001-v01.docx", "sealed_claim_form_spec%s.pdf"),
+    N2_1V2_DIFFERENT_SOL("CV-SPEC-CLM-ENG-00002.docx", "sealed_claim_form_spec%s.pdf"),
+    N2_1V2_SAME_SOL("CV-SPEC-CLM-ENG-00003.docx", "sealed_claim_form_spec%s.pdf"),
+    N2_2V1("CV-SPEC-CLM-ENG-00004.docx", "sealed_claim_form_spec%s.pdf"),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-00762.docx", "sealed_claim_form_%s.pdf"),
     N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_claim_form_%s.pdf"),

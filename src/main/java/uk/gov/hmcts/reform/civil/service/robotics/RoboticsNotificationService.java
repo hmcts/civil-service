@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -67,11 +68,10 @@ public class RoboticsNotificationService {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
-
             return EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
                 .subject(getSubject(caseData, triggerEvent, isMultiParty))
-                .to(getRoboticsEmailRecipient(isMultiParty))
+                .to(getRoboticsEmailRecipient(isMultiParty, caseData.getSuperClaimType()))
                 .attachments(of(json(roboticsJsonData, fileName)))
                 .build();
         } catch (JsonProcessingException e) {
@@ -91,7 +91,11 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference());
     }
 
-    private String getRoboticsEmailRecipient(boolean isMultiParty) {
+    private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
+        if (SPEC_CLAIM.equals(superClaimType)) {
+            return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        }
         return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
