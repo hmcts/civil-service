@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;

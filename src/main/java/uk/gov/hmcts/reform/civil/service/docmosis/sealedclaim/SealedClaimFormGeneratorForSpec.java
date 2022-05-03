@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
-import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
@@ -29,11 +28,9 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -74,14 +71,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
-    }
-
-    public byte[] downloadDocument(CaseDocument caseDocument, String authorisation) {
-        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
-
-        byte[] file = documentManagementService.downloadDocument(authorisation, documentPath);
-        return file;
-
     }
 
     @NotNull
@@ -208,10 +197,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
-    private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {
+    private List<TimelineOfEventDetails> getTimeLine(CaseData caseData) {
         if (caseData.getTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getTimelineOfEvents();
-            List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
+            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
                     = new TimelineOfEventDetails(
@@ -219,11 +208,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                         .getTimelineDate(),
                     timelineOfEvents.get(index).getValue().getTimelineDescription()
                 );
-                timelineOfEventDetails.add(index, new TimelineEventDetailsDocmosis(timelineOfEventDetail));
+                timelineOfEventDetails.add(index, timelineOfEventDetail);
             }
             return timelineOfEventDetails;
         } else {
-            return Collections.emptyList();
+            return null;
         }
     }
 

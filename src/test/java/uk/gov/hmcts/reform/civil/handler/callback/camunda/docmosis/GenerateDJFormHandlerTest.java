@@ -120,7 +120,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments()).isNull();
+            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
 
         }
 

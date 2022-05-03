@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+
+import java.util.List;
 
 @Setter
 @Data
@@ -23,11 +27,14 @@ public class Respondent2DQ implements DQ {
     private final Document respondent2DQDraftDirections;
     private final RequestedCourt respondent2DQRequestedCourt;
     private final HearingSupport respondent2DQHearingSupport;
+    private final YesOrNo respondent2DQCarerAllowanceCredit;
     private final FurtherInformation respondent2DQFurtherInformation;
     private final WelshLanguageRequirements respondent2DQLanguage;
     private final WelshLanguageRequirements respondent2DQLanguageLRspec;
     private final StatementOfTruth respondent2DQStatementOfTruth;
     private final VulnerabilityQuestions respondent2DQVulnerabilityQuestions;
+    private final List<Element<RecurringIncomeLRspec>> respondent2DQRecurringIncome;
+    private final List<Element<RecurringExpenseLRspec>> respondent2DQRecurringExpenses;
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
