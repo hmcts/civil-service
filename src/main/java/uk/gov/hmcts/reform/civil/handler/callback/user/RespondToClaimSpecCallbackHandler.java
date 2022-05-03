@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -125,7 +126,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
-            .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
@@ -135,7 +137,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.superClaimType(SPEC_CLAIM);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -208,6 +210,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            && caseData.getSpecDefenceAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specPartAdmitPaid(NO).build();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+            && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specFullAdmitPaid(NO).build();
+        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
@@ -250,7 +259,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData =
+        CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
@@ -472,7 +481,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
         }
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
@@ -594,7 +603,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1ResponseDate(responseDate)
             .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
@@ -642,7 +651,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
-            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
             caseData
         );
 
@@ -707,13 +716,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CallbackResponse validateDefendant1RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent1RepaymentPlan());
+    }
+
+    private CallbackResponse validateDefendant2RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent2RepaymentPlan());
+    }
+
+    private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
         List<String> errors;
 
-        if (caseData.getRespondent1RepaymentPlan() != null
-            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+        if (repaymentPlan != null
+            && repaymentPlan.getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
                                                                             .getFirstRepaymentDate());
         } else {
             errors = new ArrayList<>();
