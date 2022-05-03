@@ -186,11 +186,11 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
-                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
+                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .build();
         }
         //for 2v1
@@ -198,7 +198,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataUpdated
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
-                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
@@ -206,6 +205,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent1ClaimResponseIntentionTypeApplicant2(
                     caseData.getRespondent1ClaimResponseIntentionTypeApplicant2())
+                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .build();
         } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData)) {
@@ -217,7 +217,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
-                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent2(updatedRespondent2)
@@ -226,6 +225,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
+                .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .build();
         } else if (caseData.getRespondent1() != null && caseData.getAddRespondent2() != null
             && caseData.getAddRespondent2().equals(YES)
@@ -239,11 +239,11 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadlineRespondent1, caseData.getRespondent2ResponseDeadline())).toLocalDate())
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
-                .isRespondent1(null);
+                .isRespondent1(null)
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadlineRespondent1, caseData.getRespondent2ResponseDeadline())).toLocalDate());
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
@@ -259,11 +259,11 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent2Copy(null)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent2ResponseDeadline(newDeadlineRespondent2)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadlineRespondent2, caseData.getRespondent1ResponseDeadline())).toLocalDate())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .isRespondent1(null)
                 .solicitorReferencesCopy(null)
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadlineRespondent2, caseData.getRespondent1ResponseDeadline())).toLocalDate())
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

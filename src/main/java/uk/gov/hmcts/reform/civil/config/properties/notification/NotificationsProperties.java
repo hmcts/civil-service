@@ -70,6 +70,9 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
+
+    @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
@@ -91,9 +94,26 @@ public class NotificationsProperties {
     private String sdoOrdered;
 
     @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyToProceedSpec;
+
+    @NotEmpty
     private String applicantSolicitor1DefaultJudgmentReceived;
 
     @NotEmpty
     private String respondentSolicitor1DefaultJudgmentReceived;
 
+    @NotEmpty
+    private String breathingSpaceEnterDefendantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceEnterApplicantEmailTemplate;
 }

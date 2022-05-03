@@ -119,13 +119,15 @@ public class StateFlowEngine {
             .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
             .set(flags -> flags.putAll(
                 Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled()
+                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                       FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled()
                 )))
             .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
             .set(flags -> flags.putAll(
                 Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled()
+                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                       FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled()
                 )))
             .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented
                                                       .or(claimSubmittedOnlyOneRespondentRepresented))
@@ -187,15 +189,15 @@ public class StateFlowEngine {
             .transitionTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
             .onlyIf(pastClaimDetailsNotificationDeadline)
             .state(CLAIM_DETAILS_NOTIFIED)
-            .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-            .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)).and(not(allResponsesReceived)))
-            //Acknowledging Claim First
-            .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-            //Direct Response, without Acknowledging
-            .transitionTo(ALL_RESPONSES_RECEIVED)
-            .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
-            .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-            .onlyIf(awaitingResponsesFullDefenceReceived
+                .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
+                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)))
+                //Acknowledging Claim First
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
+                //Direct Response, without Acknowledging
+                .transitionTo(ALL_RESPONSES_RECEIVED)
+                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
+                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                    .onlyIf(awaitingResponsesFullDefenceReceived
                         .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
                         .and(not(caseDismissedAfterDetailNotified)))
             .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)

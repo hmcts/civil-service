@@ -390,6 +390,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+        @Test
+        public void testValidateDefendant2RepaymentDate() {
+            CaseData caseData = CaseDataBuilder.builder().generateDefendant2RepaymentDateForAdmitPartResponse().build();
+            CallbackParams params = callbackParamsOf(caseData, MID,
+                                                     "validate-repayment-plan-2", "DEFENDANT_RESPONSE_SPEC"
+            );
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertEquals("Validation error", response.getErrors().get(0));
+
+        }
     }
 
     @Nested
@@ -417,7 +431,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# You've submitted your response%n## Claim number: %s", claimNumber))
+                    .confirmationHeader(format("# You have submitted your response%n## Claim number: %s", claimNumber))
                     .confirmationBody(body)
                     .build());
         }
