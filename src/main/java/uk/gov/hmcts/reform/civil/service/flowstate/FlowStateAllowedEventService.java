@@ -644,6 +644,29 @@ public class FlowStateAllowedEventService {
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(DISMISS_CLAIM)
+        ),
+        entry(
+            AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC,
+                ACKNOWLEDGE_CLAIM,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION
+            )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC
+            )
         )
     );
 

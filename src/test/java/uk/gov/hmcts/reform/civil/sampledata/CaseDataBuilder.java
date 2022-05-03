@@ -70,6 +70,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -1546,6 +1547,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent2v1FirstFullDefence_SecondPartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
@@ -1573,6 +1580,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent1v2FullDefence_AdmitPart() {
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2AdmintPart_FullDefence() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -1856,6 +1869,15 @@ public class CaseDataBuilder {
         respondent1ClaimResponseType = respondent1Response;
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondent2Responds(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                       RespondentResponseTypeSpec respondent2Response) {
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2RespondsSpec(respondent2Response);
         respondent2ResponseDate = LocalDateTime.now().plusDays(2);
         return this;
     }
@@ -2372,10 +2394,39 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimOneClaimant1ClaimResponseType() {
+        this.claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2Spec() {
+        this.respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build();
         return this;
+    }
+
+    private List<CaseData> get2v1DifferentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party applicant2 = Party.builder().build();
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .applicant2(applicant2)
+                                  .claimant1ClaimResponseTypeForSpec(r1)
+                                  .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
     }
 
     public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
@@ -2661,6 +2712,10 @@ public class CaseDataBuilder {
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
