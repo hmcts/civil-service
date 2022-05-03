@@ -49,13 +49,18 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -68,10 +73,13 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -97,6 +105,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private PostcodeValidator postcodeValidator;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private UserService userService;
+    @Mock
+    private CoreCaseUserService coreCaseUserService;
+    @Mock
+    private StateFlow mockedStateFlow;
+    @Mock
+    private StateFlowEngine stateFlowEngine;
+
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
@@ -114,7 +131,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderSpecGenerators = List.of(
         new SpecResponse1v2DivergentHeaderText(),
         new SpecResponse2v1DifferentHeaderText()
-
     );
 
     @BeforeEach
@@ -407,7 +423,168 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class AboutToSubmitTests {
+
+        @Test
+        void updateRespondent1AddressWhenUpdated() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
+
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+        }
+
+        @Test
+        void updateRespondent2AddressWhenUpdated() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
+
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo("address line 1");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo("address line 2");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo("address line 3");
+        }
+    }
+
+    @Nested
+    class MidEventSetGenericResponseTypeFlagCallback {
+
+        private static final String PAGE_ID = "set-generic-response-type-flag";
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("FULL_DEFENCE");
+            assertThat(response.getData()).extracting("sameSolicitorSameResponse")
+                .isEqualTo("No");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_AdmitAll_OR_Admit_Part_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2AdmitAll_AdmitPart()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_FullDefence_OR_AdmitAll_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2FullDefence_AdmitPart()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondentResponseIsSame(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("FULL_DEFENCE");
+        }
+    }
+
+    @Nested
     class SubmittedCallback {
+
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -725,193 +902,45 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationBody(body.toString())
                     .build());
         }
-    }
-
-    @Test
-    void specificSummary_whenPartialAdmitPaidLess() {
-        BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
-        BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .specDefenceAdmittedRequired(YesOrNo.YES)
-            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
-            .totalClaimAmount(totalClaimAmount)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-        assertThat(response.getConfirmationBody())
-            .contains(caseData.getApplicant1().getPartyName())
-            .contains("The claim will be settled. We'll contact you when they respond.")
-            .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
-                          .toString());
-
-    }
-
-    @Test
-    void specificSummary_whenCounterClaim() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .build().toBuilder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-        assertThat(response.getConfirmationBody())
-            .doesNotContain(caseData.getApplicant1().getPartyName())
-            .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
-    }
-
-    @Nested
-    class AboutToSubmitTests {
 
         @Test
-        void updateRespondent1AddressWhenUpdated() {
-            Address changedAddress = AddressBuilder.maximal().build();
-
+        void specificSummary_whenPartialAdmitPaidLess() {
+            BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YesOrNo.YES)
+                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+                .totalClaimAmount(totalClaimAmount)
                 .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("The claim will be settled. We'll contact you when they respond.")
+                .contains(MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid())
+                              .toString());
 
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
         }
 
         @Test
-        void updateRespondent2AddressWhenUpdated() {
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
-        }
-    }
-
-    @Nested
-    class MidEventSetGenericResponseTypeFlagCallback {
-
-        private static final String PAGE_ID = "set-generic-response-type-flag";
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
+        void specificSummary_whenCounterClaim() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("FULL_DEFENCE");
-            assertThat(response.getData()).extracting("sameSolicitorSameResponse")
-                .isEqualTo("No");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_AdmitAll_OR_Admit_Part_1v2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2AdmitAll_AdmitPart()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
-        }
-
-        @Test
-        void shouldSetMultiPartyResponseTypeFlags_FullDefence_OR_AdmitAll_1v2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2FullDefence_AdmitPart()
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondentResponseIsSame(NO)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("FULL_DEFENCE");
+            assertThat(response.getConfirmationBody())
+                .doesNotContain(caseData.getApplicant1().getPartyName())
+                .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
         }
     }
 }

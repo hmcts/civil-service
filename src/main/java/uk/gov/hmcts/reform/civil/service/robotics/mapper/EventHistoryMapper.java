@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -195,9 +196,18 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                         respondent1ResponseDate, RESPONDENT_ID
-            );
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                RespondentResponseTypeSpec respondent1SpecResponseType =
+                    MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                        ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                        : caseData.getRespondent1ClaimResponseTypeForSpec();
+
+                buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            } else {
+                buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            }
 
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.miscellaneous((Event.builder()
@@ -212,9 +222,14 @@ public class EventHistoryMapper {
         }
 
         if (defendant2ResponseExists.test(caseData)) {
-            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                         respondent2ResponseDate, RESPONDENT2_ID
-            );
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                buildRespondentResponseEventForSpec(builder, caseData,
+                                                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                                                    respondent2ResponseDate, RESPONDENT2_ID);
+            } else {
+                buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                             respondent2ResponseDate, RESPONDENT2_ID);
+            }
 
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.miscellaneous((Event.builder()
@@ -247,6 +262,56 @@ public class EventHistoryMapper {
                         builder, caseData, respondentResponseDate, respondentID,
                         caseData.getRespondent2DQ(), caseData.getRespondent2(), false
                     ));
+                }
+                break;
+            case COUNTER_CLAIM:
+                builder.defenceAndCounterClaim(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case PART_ADMISSION:
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case FULL_ADMISSION:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void buildRespondentResponseEventForSpec(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              RespondentResponseTypeSpec respondentResponseTypeSpec,
+                                              LocalDateTime respondentResponseDate,
+                                              String respondentID) {
+        switch (respondentResponseTypeSpec) {
+            case FULL_DEFENCE:
+                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+                if (respondentID.equals(RESPONDENT_ID)) {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+                } else {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
                 }
                 break;
             case COUNTER_CLAIM:
