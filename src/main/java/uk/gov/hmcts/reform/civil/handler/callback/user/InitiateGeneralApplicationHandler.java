@@ -98,7 +98,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         Fee feeForGA = feesService.getFeeForGA(caseData);
@@ -113,7 +113,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         return caseData.toBuilder();
