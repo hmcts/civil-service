@@ -87,6 +87,7 @@ public class EventHistoryMapper {
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
                 switch (flowState) {
+                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
                         break;

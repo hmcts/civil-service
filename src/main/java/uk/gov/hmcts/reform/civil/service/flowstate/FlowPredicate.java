@@ -457,6 +457,13 @@ public class FlowPredicate {
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getClaimNotificationDate() != null;
 
+    public static final Predicate<CaseData> pastAddLegalRepDeadline = (caseData) ->
+        // when notify change is merged, replace with this code
+        // caseData.getAddLegalRepDeadline() != null && caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
+        caseData.getAddLegalRepDeadline() == null
+            ? true
+            : caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
+
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 

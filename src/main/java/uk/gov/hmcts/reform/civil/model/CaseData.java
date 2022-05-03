@@ -284,7 +284,7 @@ public class CaseData implements MappableObject {
     private final YesOrNo applicant1LitigationFriendRequired;
     private final LitigationFriend applicant1LitigationFriend;
 
-    private final YesOrNo applicant2LitigationFriendRequired;
+//    private final YesOrNo applicant2LitigationFriendRequired;
     private final LitigationFriend applicant2LitigationFriend;
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
@@ -335,6 +335,7 @@ public class CaseData implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
+    private final LocalDateTime addLegalRepDeadline;
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
