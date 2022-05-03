@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -55,7 +56,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (respondent2HasSameLegalRep(caseData) && NO == caseData.getRespondentResponseIsSame()) {
             if (isDefendant1DQResponse(caseData)) {
@@ -75,7 +76,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     private void generateAndSetDQ(CallbackParams callbackParams, CaseData caseData,
-                                  CaseData.CaseDataBuilder caseDataBuilder) {
+                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -97,7 +98,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     private void generateAndSet1V2SameSolDivergentResponsesDQ(CallbackParams callbackParams, CaseData caseData,
-                                                              CaseData.CaseDataBuilder caseDataBuilder,
+                                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                               String defendantIdentifier) {
         CaseDocument directionsQuestionnaire =
             directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
@@ -122,7 +123,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      */
     private CallbackResponse prepareDirectionsQuestionnaireV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (respondent2HasSameLegalRep(caseData)) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -195,7 +196,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      * @param caseData        current case data
      * @param caseDataBuilder builder for the modified case data
      */
-    private void singleResponseFile(String bearerToken, CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void singleResponseFile(String bearerToken, CaseData caseData,
+                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             bearerToken
