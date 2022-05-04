@@ -130,6 +130,35 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
                 "defendant-response-case-handed-offline-applicant-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_when2v1CaseSpec() {
+            when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
+                .thenReturn("template-id");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .multiPartyClaimOneClaimant1ClaimResponseType()
+                .atStateRespondentCounterClaim()
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "defendant-response-case-handed-offline-applicant-notification-000DC001"
+            );
+        }
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
