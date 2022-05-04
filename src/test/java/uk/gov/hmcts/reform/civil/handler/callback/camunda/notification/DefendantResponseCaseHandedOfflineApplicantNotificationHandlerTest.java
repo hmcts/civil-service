@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -163,6 +165,37 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
                 "defendant-response-case-handed-offline-applicant-notification-000DC001"
             );
         }
+
+        @Nested
+        class SpecCounterClaimScenario {
+
+            @Test
+            void shouldNotifyDefendantSolicitor1_when1v1CounterClaimCase() {
+                when(notificationsProperties.getClaimantSolicitorCounterClaimForSpec())
+                    .thenReturn("template-id");
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    .build();
+                caseData = caseData
+                    .toBuilder().superClaimType(SPEC_CLAIM)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId(
+                            "NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE").build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMapSpec(caseData),
+                    "defendant-response-case-handed-offline-applicant-notification-000DC001"
+                );
+            }
+        }
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
@@ -192,5 +225,12 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
+    }
+
+    private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
+        return Map.of(
+            "claimantLR", "Signer Name",
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+        );
     }
 }
