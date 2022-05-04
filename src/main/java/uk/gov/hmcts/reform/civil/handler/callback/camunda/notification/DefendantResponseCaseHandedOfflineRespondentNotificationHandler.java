@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
@@ -85,8 +86,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         }
 
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent2() == null
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
             sendNotificationToSolicitorSpecCounterClaim(caseData, recipient, caseEvent);
         } else {
             sendNotificationToSolicitor(caseData, recipient, templateID);

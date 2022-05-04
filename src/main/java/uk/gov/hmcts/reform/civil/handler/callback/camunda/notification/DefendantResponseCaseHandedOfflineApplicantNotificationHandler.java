@@ -23,6 +23,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Service
@@ -66,8 +67,8 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
             : notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
 
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent2() == null
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
             sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
         } else {
             sendNotificationToSolicitor(caseData, recipient, templateID);
@@ -91,7 +92,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     }
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {
-        String emailTemplate = notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
+        String emailTemplate = notificationsProperties.getClaimantSolicitorCounterClaimForSpec();
         notificationService.sendMail(
             recipient,
             emailTemplate,
