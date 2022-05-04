@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -212,7 +213,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             }
             return timelineOfEventDetails;
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
