@@ -20,12 +20,12 @@ public enum DocmosisTemplates {
     N181_2V1("CV-UNS-HRN-ENG-00970.docx", "%s_directions_questionnaire_form_%s.pdf"),
     N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR("CV-UNS-HRN-ENG-00971.docx",
                                             "%s_directions_questionnaire_form_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC("CV-SPEC-RES-ENG-00001.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01024.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v1(
-        "CV-SPEC-RES-ENG-00002.docx", "%s_response_sealed_form.pdf"
+        "CV-SPC-HRN-ENG-01027.docx", "%s_response_sealed_form.pdf"
     ),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
-        "CV-SPEC-RES-ENG-00003.docx", "%s_response_sealed_form.pdf"
+        "CV-SPC-HRN-ENG-01028.docx", "%s_response_sealed_form.pdf"
     );
 
     private final String template;
