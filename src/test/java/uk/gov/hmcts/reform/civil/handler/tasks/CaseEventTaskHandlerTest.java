@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
@@ -609,10 +610,12 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              "RPA_CONTINUOUS_FEED", false
+                              "RPA_CONTINUOUS_FEED", false,
+                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false
                 );
             }
-            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
+            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
+                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

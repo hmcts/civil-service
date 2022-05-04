@@ -22,7 +22,7 @@ public interface NotificationData {
     String DEFENDANT_NAME_SPEC = "defendantLR";
     String CLAIM_NAME_SPEC = "claimantLR";
 
-    //1v2 Handed Offline Email, we show both respondents + their responses
+    //Optional Multiparty fields for notifications
     String RESPONDENT_ONE_NAME = "defendantOneName";
     String RESPONDENT_TWO_NAME = "defendantTwoName";
     String RESPONDENT_ONE_RESPONSE = "defendantOneResponse";

@@ -104,6 +104,8 @@ reference:
     migration: false
 
 notifications:
+  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
+  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "97ffda16-0d55-49fc-ade4-36f023cdad23"
   respondentSolicitorClaimDetailsEmailTemplateMultiParty: "6cce54b7-4cf0-4770-9dca-db1a38226f1e"
@@ -121,6 +123,7 @@ notifications:
   solicitorCaseTakenOffline: "a2c8a2d4-da8c-4477-b1ed-4399dfbd2424"
   solicitorLitigationFriendAdded: "9fbbd0fd-4d61-439b-9f08-2935687b2791"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
+  claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
