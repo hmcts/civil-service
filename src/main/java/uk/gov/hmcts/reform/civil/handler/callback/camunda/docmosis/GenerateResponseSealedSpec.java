@@ -34,9 +34,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.GENERATE_RESPONSE_SEALED);
 
     private final ObjectMapper objectMapper;
-    private final SealedClaimResponseFormGeneratorForSpec formGenerator;
-
     private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;

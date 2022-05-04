@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
-import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
@@ -25,7 +23,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,26 +48,22 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .statementOfTruth(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth());
 
-        if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            builder.respondent1(getDefendant1v2ds(caseData));
-        } else {
-            builder.respondent1(getSpecifiedParty(
-                caseData.getRespondent1(),
-                representativeService.getRespondent1Representative(caseData)
-            ));
-            Optional.ofNullable(caseData.getRespondent2()).ifPresent(
-                respondent2 ->
-                    builder.respondent2(getSpecifiedParty(
-                        respondent2,
-                        representativeService.getRespondent2Representative(
-                            caseData)
-                    )));
-        }
+        builder.respondent1(getSpecifiedParty(
+            caseData.getRespondent1(),
+            representativeService.getRespondent1Representative(caseData)
+        ));
+        Optional.ofNullable(caseData.getRespondent2()).ifPresent(
+            respondent2 ->
+                builder.respondent2(getSpecifiedParty(
+                    respondent2,
+                    representativeService.getRespondent2Representative(
+                        caseData)
+                )));
 
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(builder::solicitorReferences);
 
-        if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+        if (isRespondent2(caseData) && YesOrNo.NO.equals(caseData.getRespondentResponseIsSame())) {
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
                 .ifPresent(builder::defendantResponse);
@@ -99,38 +92,11 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(response -> builder.poundsPaid(MonetaryConversions
-                                                          .penniesToPounds(response.getHowMuchWasPaid()).toString())
+            .ifPresent(response -> builder.poundsPaid(response.getHowMuchWasPaid().toString())
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
 
         return builder.build();
-    }
-
-    /**
-     * We pass through this method twice, once for each defendant. Each time
-     * we have to set the defendant who just answered.
-     *
-     * @param caseData a case data 1v2 with different solicitors and at least one of the defendants
-     *                 has responded
-     * @return which should be the defendant in the sealed claim form
-     */
-    private SpecifiedParty getDefendant1v2ds(CaseData caseData) {
-        if (caseData.getRespondent1ResponseDate() == null
-            || (caseData.getRespondent2ResponseDate() != null
-            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))) {
-            return getSpecifiedParty(
-                caseData.getRespondent2(),
-                representativeService.getRespondent2Representative(
-                    caseData)
-            );
-        } else {
-            return getSpecifiedParty(
-                caseData.getRespondent1(),
-                representativeService.getRespondent1Representative(
-                    caseData)
-            );
-        }
     }
 
     private String getPaymentMethod(RespondToClaim response) {
@@ -155,10 +121,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         return builder.build();
     }
 
-    private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {
+    private List<TimelineOfEventDetails> getTimeLine(CaseData caseData) {
         if (caseData.getSpecResponseTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getSpecResponseTimelineOfEvents();
-            List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
+            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
                     = new TimelineOfEventDetails(
@@ -166,7 +132,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                         .getTimelineDate(),
                     timelineOfEvents.get(index).getValue().getTimelineDescription()
                 );
-                timelineOfEventDetails.add(index, new TimelineEventDetailsDocmosis(timelineOfEventDetail));
+                timelineOfEventDetails.add(index, timelineOfEventDetail);
             }
             return timelineOfEventDetails;
         } else {

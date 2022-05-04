@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 public class TimelineOfEventDetails {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final LocalDate timelineDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final String timelineDescription;
