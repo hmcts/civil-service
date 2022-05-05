@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -851,6 +852,38 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isNull();
+            assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
+        }
+
+        @Test
         void shouldSetAddLegalRepDeadline_whenInvoked() {
             when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
@@ -859,7 +892,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(response.getData()).extracting("addLegalRepDeadline").isEqualTo(submittedDate.toString());
+            assertThat(response.getData()).extracting("addLegalRepDeadline")
+                .isEqualTo(submittedDate.format(ISO_DATE_TIME));
         }
 
         @Nested

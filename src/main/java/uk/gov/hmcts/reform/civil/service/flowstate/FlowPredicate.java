@@ -590,6 +590,7 @@ public class FlowPredicate {
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && caseData.getRespondentResponseIsSame() != YES
                     && (!RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     && !RespondentResponseTypeSpec.FULL_DEFENCE

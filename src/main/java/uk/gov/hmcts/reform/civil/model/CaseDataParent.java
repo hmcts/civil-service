@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
@@ -25,6 +26,7 @@ public class CaseDataParent implements MappableObject {
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployerRespondent2;
     private final Respondent1DebtLRspec specDefendant2Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant2SelfEmploymentDetails;
+    private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
 
     // for default judgment specified tab
     private final DJPaymentTypeSelection paymentTypeSelection;
