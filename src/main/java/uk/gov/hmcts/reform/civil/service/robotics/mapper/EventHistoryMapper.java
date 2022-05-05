@@ -88,7 +88,6 @@ public class EventHistoryMapper {
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
                 switch (flowState) {
-                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
                         break;
@@ -98,6 +97,14 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
+                    // Notice of change:
+                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT: {
+                        // this would change in CIV-1620
+                        if (featureToggleService.isNoticeOfChangeEnabled()) {
+                            buildClaimIssued(builder, caseData);
+                        }
+                        break;
+                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;

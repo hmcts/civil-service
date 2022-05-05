@@ -175,8 +175,8 @@ public class StateFlowEngine {
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
-            //.transitionTo CLAIM_NOTIFIED when notified or add new state: Change of solicitor???
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+                    .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
             .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)

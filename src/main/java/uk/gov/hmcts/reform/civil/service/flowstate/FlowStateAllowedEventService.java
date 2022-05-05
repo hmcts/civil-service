@@ -115,8 +115,6 @@ public class FlowStateAllowedEventService {
             )
         ),
 
-        // have to add one for notice of change
-
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
             List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION)

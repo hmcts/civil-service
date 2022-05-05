@@ -4797,6 +4797,7 @@ class EventHistoryMapperTest {
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
         Event expectedEvent = Event.builder()
             .eventSequence(1)
             .eventCode("999")

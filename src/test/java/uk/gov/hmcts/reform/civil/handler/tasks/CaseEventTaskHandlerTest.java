@@ -611,11 +611,13 @@ class CaseEventTaskHandlerTest {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false
+                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                              FlowFlag.NOTICE_OF_CHANGE.name(), false
                 );
             }
             return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
-                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false);
+                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                          FlowFlag.NOTICE_OF_CHANGE.name(), false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

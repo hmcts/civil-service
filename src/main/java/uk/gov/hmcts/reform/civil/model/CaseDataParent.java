@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
+import java.time.LocalDateTime;
+
 @Jacksonized
 @SuperBuilder(toBuilder = true)
 @Data
@@ -29,4 +31,5 @@ public class CaseDataParent implements MappableObject {
     private final RepaymentFrequencyDJ repaymentFrequency;
     // for default judgment specified tab
 
+    private final LocalDateTime addLegalRepDeadline;
 }
