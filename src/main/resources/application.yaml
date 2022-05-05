@@ -140,6 +140,9 @@ notifications:
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   respondentSolicitor1DefaultJudgmentReceived: "25fdb679-7f34-4717-ad4d-80f8562bc7b2"
+  claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
+  respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
+
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

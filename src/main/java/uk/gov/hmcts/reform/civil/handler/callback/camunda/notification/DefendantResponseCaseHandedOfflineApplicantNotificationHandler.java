@@ -9,15 +9,21 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Service
@@ -32,6 +38,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,7 +66,13 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
             //1v2 template expects different data
             : notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
 
-        sendNotificationToSolicitor(caseData, recipient, templateID);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
+            sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
+        } else {
+            sendNotificationToSolicitor(caseData, recipient, templateID);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -76,5 +89,30 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
+    }
+
+    private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {
+        String emailTemplate = notificationsProperties.getClaimantSolicitorCounterClaimForSpec();
+        notificationService.sendMail(
+            recipient,
+            emailTemplate,
+            addPropertiesSpec(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
+    public Map<String, String> addPropertiesSpec(CaseData caseData) {
+        return Map.of(
+            CLAIM_NAME_SPEC, getLegalOrganisationName(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+        );
+    }
+
+    private String getLegalOrganisationName(CaseData caseData) {
+        String organisationID;
+        organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
