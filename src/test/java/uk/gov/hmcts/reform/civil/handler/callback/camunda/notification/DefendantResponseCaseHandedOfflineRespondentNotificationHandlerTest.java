@@ -229,6 +229,33 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
             }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2_when1v2CounterClaimCase() {
+                when(notificationsProperties.getRespondentSolicitorCounterClaimForSpec())
+                    .thenReturn("template-id");
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    .build();
+                caseData = caseData
+                    .toBuilder().superClaimType(SPEC_CLAIM)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId(
+                            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE").build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id",
+                    getNotificationDataMapSpec(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
         }
     }
 
