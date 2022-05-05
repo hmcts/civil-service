@@ -116,4 +116,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String breathingSpaceEnterApplicantEmailTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorCounterClaimForSpec;
 }
