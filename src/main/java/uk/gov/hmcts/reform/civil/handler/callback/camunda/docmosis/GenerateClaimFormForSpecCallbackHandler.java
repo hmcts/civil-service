@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM_SPEC);
@@ -66,7 +67,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)

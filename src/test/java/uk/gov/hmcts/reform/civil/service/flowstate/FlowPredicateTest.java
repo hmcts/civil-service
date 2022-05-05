@@ -23,7 +23,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allRespo
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -35,15 +37,21 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNot
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
@@ -53,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -385,12 +394,12 @@ class FlowPredicateTest {
             }
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
                 Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
-                assertFalse(predicate.test(caseData));
+                assertTrue(predicate.test(caseData));
             }
 
             @Test
@@ -418,12 +427,12 @@ class FlowPredicateTest {
         class TransitionClaimDetailsNotifiedTimeExtension {
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+            void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
                     .build();
                 Predicate<CaseData> predicate = respondentTimeExtension.and(allResponsesReceived);
-                assertFalse(predicate.test(caseData));
+                assertTrue(predicate.test(caseData));
             }
 
             @Test
@@ -485,7 +494,7 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
                     .build();
-                Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
+                Predicate<CaseData> predicate = notificationAcknowledged.and(respondentTimeExtension).and(
                     allResponsesReceived);
                 assertTrue(predicate.test(caseData));
             }
@@ -1344,6 +1353,504 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtStateClaimPastClaimDetailsNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimDetailsNotificationDeadline().build();
             assertFalse(claimDismissedByCamunda.test(caseData));
+        }
+    }
+
+    @Test
+    void shouldReturnTrue_whenStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmitted1v2Respondent2OrgNotRegistered()
+            .build();
+        assertTrue(respondent2OrgNotRegistered.test(caseData));
+    }
+
+    @Nested
+    class SpecOneVOneScenarios {
+
+        CaseDataBuilder caseDataBuilder;
+
+        @BeforeEach
+        void setup() {
+            caseDataBuilder = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDefendantResponseFullDefence() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(fullDefenceSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoDefendantResponseFullDefence() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertFalse(fullDefenceSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenDefendantResponseFullAdmission() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(fullAdmissionSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoDefendantResponseFullAdmission() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertFalse(fullAdmissionSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenDefendantResponsePartAdmission() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(partAdmissionSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoDefendantResponsePartAdmission() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertFalse(partAdmissionSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenDefendantResponseCounterClaim() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertTrue(counterClaimSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNoDefendantResponseCounterClaim() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertFalse(counterClaimSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenSuperClaimTypeIsSpec_Claim() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertTrue(specClaim.test(caseData));
+        }
+    }
+
+    @Nested
+    class RespondentFullDefenceSpec {
+
+        @Nested
+        class MultiParty {
+            CaseDataBuilder caseDataBuilder;
+
+            @Nested
+            class TwoVOne {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .setSuperClaimTypeToSpecClaim();
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence2v1() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent2v1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
+                        .build();
+
+                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondWithDQGoOfflineAndOnlyFirstDefendantFullDefence() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent2v1FirstFullDefence_SecondPartAdmission().build().toBuilder()
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondWithDQGoOfflineAndOnlySecondDefendantFullDefence() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent2v1SecondFullDefence_FirstPartAdmission().build().toBuilder()
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondWithDQGoOfflineBothNotFullDefence() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent2v1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
+                        .build();
+
+                    assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondWithDQGoOfflineAndBothFullDefence() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateFullDefenceBothNotFullDefence() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                        .build();
+
+                    assertFalse(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateFullDefenceAndOneFullDefence() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .build();
+
+                    assertFalse(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateFullDefenceAndBothFullDefence() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(fullDefenceSpec.test(caseData));
+                }
+
+            }
+
+            @Nested
+            class OneVTwoWithTwoReps {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .setSuperClaimTypeToSpecClaim();
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_1() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
+                        .respondent2ResponseDate(LocalDateTime.now())
+                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
+                        .build();
+
+                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_2() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
+                        .build();
+
+                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_3() {
+                    LocalDateTime localDateTime = LocalDateTime.now();
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
+                        .respondent2ResponseDate(localDateTime)
+                        .respondent1ResponseDate(localDateTime)
+                        .build();
+
+                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondGoOffline_default() {
+                    CaseData caseData = CaseData.builder().build();
+                    assertFalse(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldGenerateDQAndGoOffline_whenDivergentAndFirstefendantRespondedWithFullDefence() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2FullDefence_AdmitPart().build().toBuilder()
+                        .respondent2ResponseDate(LocalDateTime.now())
+                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldGenerateDQAndGoOffline_whenDivergentAndSecondDefendantRespondedWithFullDefence() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmintPart_FullDefence().build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
+                    CaseData caseData = CaseData.builder().build();
+                    assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothResponded() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingRespondent2ResponsesFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingRespondent1ResponsesFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullDefenceReceivedShouldReturnFalse() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertFalse(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingSecondDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingFirstDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceReceivedShouldReturnFalse() {
+                    CaseData caseData = caseDataBuilder
+                        .build();
+
+                    assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+                }
+            }
+
+            @Nested
+            class OneVTwoWithOneRep {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimOneDefendantSolicitor()
+                        .setSuperClaimTypeToSpecClaim();
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesDivergent() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsOnlyFirstRespondsFullDefenceAndResponsesDivergent() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2FullDefence_AdmitPart().build().toBuilder()
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsOnlySecondRespondsFullDefenceAndResponsesDivergent() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmintPart_FullDefence().build().toBuilder()
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedFullDefenceAndResponsesTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.YES)
+                        .build();
+
+                    assertTrue(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedFullDefenceAndResponsesNotTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedFullAdmissionAndResponsesTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.YES)
+                        .build();
+
+                    assertTrue(fullAdmissionSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedFullAdmissionAndResponsesNotTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(fullAdmissionSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedPartAdmissionAndResponsesTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.YES)
+                        .build();
+
+                    assertTrue(partAdmissionSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenDefendantsBothRespondedFullCounterClaimAndResponsesNotTheSame() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertTrue(counterClaimSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenOnlyOneResponse() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondentResponseIsSame(YesOrNo.NO)
+                        .build();
+
+                    assertFalse(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullDefenceReceivedShouldHitDefault() {
+                    CaseData caseData = caseDataBuilder
+                        .build();
+
+                    assertFalse(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceReceivedShouldHitDefault() {
+                    CaseData caseData = caseDataBuilder
+                        .build();
+
+                    assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+                }
+            }
+
+            @Nested
+            class TwoApplicants {
+
+                @BeforeEach
+                void setup() {
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .setSuperClaimTypeToSpecClaim();
+                }
+
+                @Test
+                void shouldReturnTrue_whenResponsesToBothApplicants() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenDifferentResponses() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .build();
+
+                    assertFalse(fullDefenceSpec.test(caseData));
+                }
+            }
         }
     }
 }

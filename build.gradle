@@ -4,12 +4,12 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.5.12'
-  id 'org.owasp.dependencycheck' version '6.5.2.1'
+  id 'org.owasp.dependencycheck' version '7.1.0.1'
   id 'com.github.ben-manes.versions' version '0.42.0'
   id 'org.sonarqube' version '3.3'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
-  id "org.flywaydb.flyway" version "8.5.2"
+  id "org.flywaydb.flyway" version "8.5.9"
   id 'net.ltgt.apt' version '0.21'
 }
 
@@ -75,11 +75,11 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '31.1-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.0'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.6.21'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.6.21'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.6.21'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.6.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.0'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.6.21'
       // CVE-2020-29582
 
       // CVE-2021-29425
@@ -190,6 +190,14 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
+task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
+}
+
+
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
@@ -202,8 +210,8 @@ task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multipa
   commandLine '/usr/bin/yarn', '--silent', 'test:nightly-multiparty'
 }
 
-task runApiAndEndToEndUnspecTests(type: Exec, description: 'Runs Api and E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:AATFunctional'
+task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:e2e-unspec'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
@@ -222,7 +230,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runApiTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSpecApiTests, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -266,7 +274,7 @@ def versions = [
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.0.0.M2',
   springfoxSwagger   : '2.9.2',
-  lombok             : '1.18.12',
+  lombok             : '1.18.24',
   pact               : '3.5.24'
 ]
 
@@ -279,6 +287,14 @@ ext.libraries = [
     "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
   ]
 ]
+
+configurations.all {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == 'org.projectlombok') {
+      details.useVersion versions.lombok
+    }
+  }
+}
 
 dependencies {
   implementation project(':sendgrid-client')
@@ -294,7 +310,7 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.4'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.27.2'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -323,6 +339,7 @@ dependencies {
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.3'
@@ -330,10 +347,10 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.2'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.4'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.4'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.20'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.3'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.7'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.7'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.22'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -345,7 +362,7 @@ dependencies {
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.67'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.69'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
@@ -355,10 +372,10 @@ dependencies {
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.0'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.0'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.7.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.8.0'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'

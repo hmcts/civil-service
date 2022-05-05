@@ -57,6 +57,8 @@ payments:
   api:
     site_id: AAA7
     service: CIVIL
+    spec_site_id: AAA7
+    spec_service: CIVIL
 
 idam:
   s2s-auth:
@@ -102,23 +104,26 @@ reference:
     migration: false
 
 notifications:
+  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
+  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "97ffda16-0d55-49fc-ade4-36f023cdad23"
   respondentSolicitorClaimDetailsEmailTemplateMultiParty: "6cce54b7-4cf0-4770-9dca-db1a38226f1e"
   solicitorDefendantResponseCaseTakenOffline: "c865678e-66a5-4249-8ab6-65de962c5211"
-  claimantSolicitorDefendantResponseFullDefence: "c6121df1-ce97-48f6-b2d1-f9720ddcf74c"
-  solicitorDefendantResponseCaseTakenOfflineMultiparty: "4b12fa48-4a93-4280-a361-f2f209cbdc72"
+  claimantSolicitorDefendantResponseFullDefence: "64c1ce3c-1b2a-4959-914b-38cceb6ae195"
+  solicitorDefendantResponseCaseTakenOfflineMultiparty: "d6b33ddd-833e-46ed-9887-c86e929d140b"
   respondentSolicitorAcknowledgeClaim: "3ae4b5d8-6e73-4d72-9ae6-ff25f4941cdb"
   failedPayment: "d6a28ba8-7496-4b13-bf1b-b821c61fdae6"
   solicitorClaimDismissed: "b5b38ee3-863b-428d-b893-a440c82b6212"
   claimantSolicitorCaseWillProgressOffline: "f92cc2fa-ede1-40c4-99ff-22d912ab7fe7"
-  claimantSolicitorAgreedExtensionDate: "83cd651c-50ba-4026-b597-d82877644fd2"
+  claimantSolicitorAgreedExtensionDate: "97421dfb-f2d7-43c0-8525-e0d045e17d10"
   claimantSolicitorConfirmsToProceed: "cd08fe4c-24a2-4353-adb0-1aef8e41fbcf"
   claimantSolicitorConfirmsNotToProceed: "2d09dbed-f0d1-4d81-b72a-22c3fbfc649e"
   claimantSolicitorClaimContinuingOnline: "7b30d4cb-c930-4409-aba6-f6d6cf14e376"
   solicitorCaseTakenOffline: "a2c8a2d4-da8c-4477-b1ed-4399dfbd2424"
   solicitorLitigationFriendAdded: "9fbbd0fd-4d61-439b-9f08-2935687b2791"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
+  claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
@@ -129,6 +134,10 @@ notifications:
   claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
+  claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
+  respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
+  claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
+  respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   respondentSolicitor1DefaultJudgmentReceived: "25fdb679-7f34-4717-ad4d-80f8562bc7b2"
 
