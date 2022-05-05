@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocu
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class CivilDocumentStitchingService implements DocumentStitcher {
 
     private final BundleRequestExecutor bundleRequestExecutor;
@@ -105,7 +106,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             );
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<IdValue<Bundle>> idValueList = new ArrayList<>();
         idValueList.add(new IdValue<>(

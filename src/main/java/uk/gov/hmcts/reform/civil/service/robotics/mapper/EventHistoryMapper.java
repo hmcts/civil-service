@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -196,9 +197,18 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                         respondent1ResponseDate, RESPONDENT_ID
-            );
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                RespondentResponseTypeSpec respondent1SpecResponseType =
+                    MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+                        ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                        : caseData.getRespondent1ClaimResponseTypeForSpec();
+
+                buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            } else {
+                buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
+                                             respondent1ResponseDate, RESPONDENT_ID);
+            }
 
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.miscellaneous((Event.builder()
@@ -213,9 +223,14 @@ public class EventHistoryMapper {
         }
 
         if (defendant2ResponseExists.test(caseData)) {
-            buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                         respondent2ResponseDate, RESPONDENT2_ID
-            );
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                buildRespondentResponseEventForSpec(builder, caseData,
+                                                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                                                    respondent2ResponseDate, RESPONDENT2_ID);
+            } else {
+                buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
+                                             respondent2ResponseDate, RESPONDENT2_ID);
+            }
 
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.miscellaneous((Event.builder()
@@ -248,6 +263,56 @@ public class EventHistoryMapper {
                         builder, caseData, respondentResponseDate, respondentID,
                         caseData.getRespondent2DQ(), caseData.getRespondent2(), false
                     ));
+                }
+                break;
+            case COUNTER_CLAIM:
+                builder.defenceAndCounterClaim(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case PART_ADMISSION:
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case FULL_ADMISSION:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void buildRespondentResponseEventForSpec(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              RespondentResponseTypeSpec respondentResponseTypeSpec,
+                                              LocalDateTime respondentResponseDate,
+                                              String respondentID) {
+        switch (respondentResponseTypeSpec) {
+            case FULL_DEFENCE:
+                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+                if (respondentID.equals(RESPONDENT_ID)) {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+                } else {
+                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                        builder, caseData, respondentResponseDate, respondentID,
+                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
                 }
                 break;
             case COUNTER_CLAIM:
@@ -333,58 +398,91 @@ public class EventHistoryMapper {
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
-            List<Event> events = unwrapElements(caseData.getCaseNotes())
-                .stream()
-                .map(caseNote ->
-                         Event.builder()
-                             .eventSequence(prepareEventSequence(builder.build()))
-                             .eventCode("999")
-                             .dateReceived(caseNote.getCreatedOn())
-                             .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
-                             .eventDetails(EventDetails.builder()
-                                               .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
-                                               .build())
-                             .build())
-                .collect(Collectors.toList());
-            builder.miscellaneous(events);
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
+                buildMiscellaneousCaseNotesEvent(builder, caseData);
+            }
+        } else {
+            if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
+                buildMiscellaneousCaseNotesEvent(builder, caseData);
+            }
         }
+
+    }
+
+    private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        List<Event> events = unwrapElements(caseData.getCaseNotes())
+            .stream()
+            .map(caseNote ->
+                     Event.builder()
+                         .eventSequence(prepareEventSequence(builder.build()))
+                         .eventCode(MISCELLANEOUS.getCode())
+                         .dateReceived(caseNote.getCreatedOn())
+                         .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
+                         .eventDetails(EventDetails.builder()
+                                           .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
+                                           .build())
+                         .build())
+            .collect(Collectors.toList());
+        builder.miscellaneous(events);
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()
-            && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-
-            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
+                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
+                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
+            }
+        } else {
+            if (featureToggleService.isRpaContinuousFeedEnabled()
+                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
+                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
+            }
         }
     }
 
-    private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()
-            && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
+    private void buildMiscellaneousRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder,
+                                                                    CaseData caseData) {
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
+    }
 
-            String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
+    private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
+                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
+                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
+            }
+        } else {
+            if (featureToggleService.isRpaContinuousFeedEnabled()
+                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
+                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
+            }
         }
+    }
+
+    private void buildMiscellaneousRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder,
+                                                                    CaseData caseData) {
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -403,8 +501,16 @@ public class EventHistoryMapper {
         }
     }
 
+    private boolean rpaEnabledForClaim(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return featureToggleService.isSpecRpaContinuousFeedEnabled();
+        } else {
+            return featureToggleService.isRpaContinuousFeedEnabled();
+        }
+    }
+
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()) {
+        if (rpaEnabledForClaim(caseData)) {
             String miscText = "Claim issued in CCD.";
             builder.miscellaneous(
                 Event.builder()
@@ -610,10 +716,11 @@ public class EventHistoryMapper {
                                   .dateReceived(applicantDetails.get(index).getResponseDate())
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
-                                        .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                        .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                        .preferredCourtName("")
-                                        .build())
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode(caseData.getCourtLocation()
+                                                                            .getApplicantPreferredCourt())
+                                                    .preferredCourtName("")
+                                                    .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
                                       caseData.getCourtLocation().getApplicantPreferredCourt()
