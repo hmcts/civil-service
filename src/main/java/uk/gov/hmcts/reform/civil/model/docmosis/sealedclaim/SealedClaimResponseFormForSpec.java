@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 
@@ -34,7 +33,7 @@ public class SealedClaimResponseFormForSpec implements MappableObject {
     private final String whyDisputeTheClaim;
     private final boolean timelineUploaded;
     private final String specResponseTimelineDocumentFiles;
-    private final List<TimelineOfEventDetails> timeline;
+    private final List<TimelineEventDetailsDocmosis> timeline;
     private final String respondent1SpecDefenceResponseDocument;
     private final String poundsPaid;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
