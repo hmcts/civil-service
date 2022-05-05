@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
@@ -121,10 +122,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         return builder.build();
     }
 
-    private List<TimelineOfEventDetails> getTimeLine(CaseData caseData) {
+    private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {
         if (caseData.getSpecResponseTimelineOfEvents() != null) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getSpecResponseTimelineOfEvents();
-            List<TimelineOfEventDetails> timelineOfEventDetails = new ArrayList<>();
+            List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail
                     = new TimelineOfEventDetails(
@@ -132,7 +133,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                         .getTimelineDate(),
                     timelineOfEvents.get(index).getValue().getTimelineDescription()
                 );
-                timelineOfEventDetails.add(index, timelineOfEventDetail);
+                timelineOfEventDetails.add(index, new TimelineEventDetailsDocmosis(timelineOfEventDetail));
             }
             return timelineOfEventDetails;
         } else {
