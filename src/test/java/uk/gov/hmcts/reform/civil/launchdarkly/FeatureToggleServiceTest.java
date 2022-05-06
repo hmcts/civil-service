@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -110,5 +111,16 @@ class FeatureToggleServiceTest {
         assertThat(capturedLdUser.getKey()).isEqualTo("civil-service");
         assertThat(ImmutableList.copyOf(capturedLdUser.getCustomAttributes())).extracting("name")
             .containsOnlyOnceElementsOf(customAttributesKeys);
+    }
+
+    @Test
+    public void rpaContinuousFeed_LDTagName() {
+        featureToggleService.isSpecRpaContinuousFeedEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("specified-rpa-continuous-feed"),
+            any(LDUser.class),
+            eq(false)
+        );
     }
 }

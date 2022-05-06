@@ -510,6 +510,33 @@
         }
       },
       "additionalProperties": false
+    },
+    "breathingSpace": {
+      "$id": "#/properties/breathing",
+      "type": [
+        "null",
+        "object"
+      ],
+      "description": "This section contains the information about Breathing Space",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$id": "#/properties/breathing/type",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "MENTAL_HEALTH"
+          ]
+        },
+        "endDate": {
+          "$id": "#/properties/breathing/endDate",
+          "$ref": "#/definitions/formatDateOrNull",
+          "description": ""
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,

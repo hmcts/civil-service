@@ -4,16 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
+import uk.gov.hmcts.reform.civil.model.robotics.RPABreathingSpace;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
@@ -23,6 +27,7 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,25 +55,39 @@ public class RoboticsDataMapperForSpec {
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData) {
         requireNonNull(caseData);
-        return RoboticsCaseDataSpec.builder()
+        RoboticsCaseDataSpec.RoboticsCaseDataSpecBuilder builder = RoboticsCaseDataSpec.builder()
             .header(buildCaseHeader(caseData))
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData))
-            .build();
+            .events(eventHistoryMapper.buildEvents(caseData));
+        if (featureToggleService.isSpecRpaContinuousFeedEnabled()) {
+            Optional.ofNullable(caseData.getBreathing())
+                .map(BreathingSpaceInfo::getEnter)
+                .map(BreathingSpaceEnterInfo::getType)
+                .ifPresent(type -> {
+                    LocalDate endDate = Optional.ofNullable(caseData.getBreathing().getLift())
+                            .map(BreathingSpaceLiftInfo::getExpectedEnd)
+                                .orElse(null);
+                    builder.breathingSpace(RPABreathingSpace.builder()
+                                               .type(type)
+                                               .endDate(endDate)
+                                               .build());
+                });
+        }
+        return builder.build();
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
         BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : null;
+            ? caseData.getTotalInterest() : BigDecimal.ZERO;
+        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         return ClaimDetails.builder()
-            .amountClaimed(claimInterest != null
-                               ? caseData.getTotalClaimAmount().add(claimInterest)
-                               : caseData.getTotalClaimAmount())
+            .amountClaimed(amountClaimedWithInterest)
             .courtFee(ofNullable(caseData.getClaimFee())
                           .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
                           .orElse(null))
@@ -88,19 +107,6 @@ public class RoboticsDataMapperForSpec {
             .preferredCourtCode("")
             .caseAllocatedTo("")
             .build();
-    }
-
-    private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
-        switch (allocatedTrack) {
-            case FAST_CLAIM:
-                return "FAST TRACK";
-            case MULTI_CLAIM:
-                return "MULTI TRACK";
-            case SMALL_CLAIM:
-                return "SMALL CLAIM TRACK";
-            default:
-                return "";
-        }
     }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
