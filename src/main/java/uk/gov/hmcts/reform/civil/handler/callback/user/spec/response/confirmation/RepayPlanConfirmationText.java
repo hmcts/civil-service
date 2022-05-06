@@ -67,7 +67,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             .append(" can either:")
             .append("<ul>")
             .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
-            .append("<li>request a county court judgement against you</li>")
+            .append("<li>request a county court judgment against you</li>")
             .append("</ul>")
 
             .append("<h3 class=\"govuk-heading-m\">If ")
