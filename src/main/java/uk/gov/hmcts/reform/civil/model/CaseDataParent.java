@@ -12,6 +12,16 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,5 +64,18 @@ public class CaseDataParent implements MappableObject {
     private final String caseDocument1Name;
 
 
+
+    // sdo fields
+    private JudgementSum judgementSum;
+    private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
+    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
+    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFact;
+    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
+    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
+    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
+    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private DisposalHearingBundle disposalHearingBundle;
+    private DisposalHearingNotes disposalHearingNotes;
 
 }
