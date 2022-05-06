@@ -19,7 +19,6 @@ public class GeneralAppFeesConfiguration {
     private final String consentedOrWithoutNoticeKeyword;
 
     public GeneralAppFeesConfiguration(
-            //TODO: Change the url in application yml back to what it was.
             @Value("${fees.api.url}") String url,
             @Value("${genApp.fee.endpoint}") String endpoint,
             @Value("${genApp.fee.service}") String service,
