@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -19,19 +17,9 @@ import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representativ
 public class RepresentativeService {
 
     private final OrganisationService organisationService;
-    private final FeatureToggleService featureToggleService;
-
-    private boolean doesOrganisationPolicyExist(OrganisationPolicy organisationPolicy) {
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            return organisationPolicy != null
-                && organisationPolicy.getOrganisation() != null
-                && organisationPolicy.getOrganisation().getOrganisationID() != null;
-        }
-        return organisationPolicy != null;
-    }
 
     public Representative getRespondent1Representative(CaseData caseData) {
-        if (doesOrganisationPolicyExist(caseData.getRespondent1OrganisationPolicy())) {
+        if (caseData.getRespondent1OrganisationPolicy() != null) {
             var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
@@ -55,7 +43,7 @@ public class RepresentativeService {
     }
 
     public Representative getRespondent2Representative(CaseData caseData) {
-        if (doesOrganisationPolicyExist(caseData.getRespondent2OrganisationPolicy())) {
+        if (caseData.getRespondent2OrganisationPolicy() != null) {
             var organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
@@ -83,10 +71,6 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
-        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
-            && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
-            representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
-        }
 
         return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
