@@ -104,8 +104,6 @@ reference:
     migration: false
 
 notifications:
-  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
-  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
   breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
