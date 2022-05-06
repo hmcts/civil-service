@@ -198,7 +198,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
@@ -373,7 +373,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -398,7 +398,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -645,7 +645,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq, CaseData caseData) {
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
             return WelshLanguageRequirements.builder()
