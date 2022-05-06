@@ -379,7 +379,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+                .build();
         }
         return caseData;
     }
