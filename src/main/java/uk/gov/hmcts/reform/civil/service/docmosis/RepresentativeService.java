@@ -52,6 +52,10 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
+            if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+                && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
+                representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
+            }
 
             return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor2EmailAddress())
@@ -71,6 +75,10 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
+        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+            && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
+            representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
+        }
 
         return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
