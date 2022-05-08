@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BundleDocument;
@@ -139,7 +140,9 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
 
         return CaseDetails.builder().id(caseData.getCcdCaseReference())
             .data(caseDataBuilder.build().toMap(
-                objectMapper)).build();
+                objectMapper))
+            .caseTypeId(CaseDefinitionConstants.CASE_TYPE)
+            .jurisdiction(CaseDefinitionConstants.JURISDICTION).build();
     }
 }
 
