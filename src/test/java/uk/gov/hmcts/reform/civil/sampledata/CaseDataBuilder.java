@@ -1571,6 +1571,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_CounterClaimX2() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
