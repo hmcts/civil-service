@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.CaseDetails;
 
-
 @Data
 @Builder(toBuilder = true)
 public class BundleRequest {
