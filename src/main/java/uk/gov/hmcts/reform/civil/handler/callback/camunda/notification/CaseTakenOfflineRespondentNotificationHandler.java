@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -58,6 +59,10 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
         String respondentEmail =  isForRespondentSolicitor1(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (null == respondentEmail && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            respondentEmail = caseData.getRespondentSolicitor1EmailAddress();
+        }
 
         notificationService.sendMail(
             respondentEmail,
