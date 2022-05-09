@@ -52,10 +52,6 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
-            if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
-                && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
-                representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
-            }
 
             return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor2EmailAddress())
