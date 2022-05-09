@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service.stitching;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.model.Bundle;
