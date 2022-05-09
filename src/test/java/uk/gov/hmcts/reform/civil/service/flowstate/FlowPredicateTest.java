@@ -1462,7 +1462,7 @@ class FlowPredicateTest {
                 @Test
                 void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence2v1() {
                     CaseData caseData = caseDataBuilder
-                        .atStateRespondent2v1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
+                        .atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
                         .build();
 
                     assertTrue(divergentRespondGoOfflineSpec.test(caseData));

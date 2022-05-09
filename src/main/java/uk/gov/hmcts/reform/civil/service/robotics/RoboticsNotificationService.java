@@ -49,6 +49,7 @@ public class RoboticsNotificationService {
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
         EmailData emailData = prepareEmailData(caseData, isMultiParty);
+
         sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
     }
 
@@ -59,7 +60,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())  && toggleService.isLrSpecEnabled()) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) && toggleService.isLrSpecEnabled()) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
