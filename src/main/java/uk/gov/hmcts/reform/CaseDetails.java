@@ -17,6 +17,7 @@ public class CaseDetails {
 
     private Long id;
 
+    @JsonProperty("jurisdictionId")
     private String jurisdiction;
 
     private String caseTypeId;
