@@ -76,11 +76,6 @@ public class RepresentativeService {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
         }
 
-        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
-            && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
-            representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
-        }
-
         return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .build();
