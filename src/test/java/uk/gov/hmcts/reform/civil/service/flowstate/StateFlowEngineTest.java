@@ -12,9 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -26,6 +30,8 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -2653,6 +2659,28 @@ class StateFlowEngineTest {
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
+        }
+    }
+
+    @Nested
+    class AmbiguousErrors {
+
+        @Test
+        void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
+            CaseData caseData = CaseData.builder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .applicant1(Party.builder().build())
+                .respondent1(Party.builder().build())
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondentResponseIsSame(YesOrNo.YES)
+                .build();
+            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
+                .isTrue();
+            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
+                .isFalse();
         }
     }
 }
