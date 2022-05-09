@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
@@ -21,14 +23,16 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.LIFT_BREATHING_SPACE_SPEC);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(LIFT_BREATHING_SPACE_SPEC);
 
     private final ObjectMapper objectMapper;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -40,7 +44,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
             callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady,
             callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
         );
     }
@@ -84,12 +88,22 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
+        CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+
+        CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
+            .businessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse buildSubmittedText(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = "<br>We have sent you a confirmation email.";
-
         String header = format("# Breathing Space lifted%n## Claim number%n# %s", claimNumber);
 
         return SubmittedCallbackResponse.builder()
