@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
@@ -532,6 +533,52 @@ class DirectionsQuestionnaireGeneratorTest {
                     .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
+            }
+
+            @Test
+            void whenSmallClaimSpecAndWitnesses() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(witnessesIncludingDefendant);
+            }
+
+            @Test
+            void whenSmallClaimSpecFullAdmission() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .atStateRespondent1v1FullAdmissionSpec()
+                    .setSuperClaimTypeToSpecClaim()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getWitnessesIncludingDefendants()).isNull();
             }
 
             private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
