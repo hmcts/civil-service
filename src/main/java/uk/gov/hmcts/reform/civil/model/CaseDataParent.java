@@ -18,6 +18,7 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo applicantMPClaimExpertSpecRequired;
     private final PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private final PartnerAndDependentsLRspec respondent2PartnerAndDependent;
+    private final YesOrNo applicant1ProceedWithClaimSpec2v1;
 
     private final PaymentUponCourtOrder respondent2CourtOrderPayment;
     private final RepaymentPlanLRspec respondent2RepaymentPlan;

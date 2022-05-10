@@ -189,12 +189,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
-            .respondents(claimantResponseLRspec ? null : getRespondents(caseData, null))
+            .respondents(getRespondents(caseData, null))
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
-        setApplicants(builder, caseData);
+
+        if (!claimantResponseLRspec) {
+            setApplicants(builder, caseData);
+        }
 
         Witnesses witnesses = getWitnesses(dq);
         int witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);

@@ -27,7 +27,7 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
         "CV-SPC-HRN-ENG-01028.docx", "%s_response_sealed_form.pdf"
     ),
-    CLAIMANT_RESPONSE_SPEC("claimants DQ.docx", "%s_directions_questionnaire_form_%s.pdf");
+    CLAIMANT_RESPONSE_SPEC("claimants DQ3.docx", "%s_directions_questionnaire_form_%s.pdf");
 
     private final String template;
     private final String documentTitle;
