@@ -102,7 +102,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
+                "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
                 "case-taken-offline-respondent-notification-000DC001"
