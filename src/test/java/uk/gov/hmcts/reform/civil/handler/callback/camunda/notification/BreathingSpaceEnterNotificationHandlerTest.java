@@ -186,6 +186,56 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
+    public void notifyRespondent2DiffSolicitor_enter() {
+        String recipient = "recipient";
+        String templateId = "templateId";
+        Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
+            .thenReturn(templateId);
+
+        String organisationId = "organisationId";
+        String organisationName = "organisation name";
+        Mockito.when(organisationService.findOrganisationById(organisationId))
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
+                                        .name(organisationName)
+                                        .build()));
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("legacy ref")
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("company name")
+                             .build())
+            .respondentSolicitor2EmailAddress(null)
+            .respondentSolicitor1EmailAddress(recipient)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID(organisationId)
+                                                                 .build())
+                                               .build())
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .build();
+        CallbackParams params = CallbackParams.builder()
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
+                         .build())
+            .build();
+
+        handler.handle(params);
+
+        Mockito.verify(notificationService).sendMail(
+            eq(null),
+            eq(templateId),
+            argThat(
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                    && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
+            argThat(string -> string.contains(caseData.getLegacyCaseReference()))
+        );
+    }
+
+    @Test
     public void notifyApplicant1_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
