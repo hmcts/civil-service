@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -92,6 +93,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithSameSol() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentSolicitor2EmailAddress(null).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_TAKEN_OFFLINE.name()).build()

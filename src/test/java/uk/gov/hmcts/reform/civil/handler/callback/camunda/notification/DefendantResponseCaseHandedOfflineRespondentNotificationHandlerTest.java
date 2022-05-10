@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -173,6 +174,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimOneDefendantSolicitor()
                     .respondentSolicitor2EmailAddress(null)
+                    .respondent2SameLegalRepresentative(YesOrNo.YES)
                     .build();
 
                 CallbackParams params = CallbackParamsBuilder.builder()

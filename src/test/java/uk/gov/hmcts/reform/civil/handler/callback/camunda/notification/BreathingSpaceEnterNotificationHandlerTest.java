@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -161,6 +162,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
                                                                  .organisationID(organisationId)
                                                                  .build())
                                                .build())
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
         CallbackParams params = CallbackParams.builder()
             .type(CallbackType.ABOUT_TO_SUBMIT)
