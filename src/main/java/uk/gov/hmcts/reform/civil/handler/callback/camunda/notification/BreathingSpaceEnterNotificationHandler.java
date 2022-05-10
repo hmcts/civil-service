@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -69,6 +70,11 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
             // TODO tbd in the future, when we include MP in BS, same template for the time being
             templateId = notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate();
             recipient = caseData.getRespondentSolicitor2EmailAddress();
+
+            if (null == recipient && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                recipient = caseData.getRespondentSolicitor1EmailAddress();
+            }
+
             String defendantLR = getOrganisationName(caseData.getRespondent2OrganisationPolicy(), null);
             templateProperties.put(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, defendantLR);
             templateProperties.put("defendantName", caseData.getRespondent2().getPartyName());

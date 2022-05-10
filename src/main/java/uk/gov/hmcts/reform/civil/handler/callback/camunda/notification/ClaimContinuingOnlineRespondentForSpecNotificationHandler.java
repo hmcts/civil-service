@@ -75,10 +75,16 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+        final CaseData.CaseDataBuilder caseDataBuilder
+            = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
         String targetEmail = isRespondent1Event(callbackParams)
+            || caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (null == targetEmail && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            targetEmail = caseData.getRespondentSolicitor1EmailAddress();
+        }
 
         if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
