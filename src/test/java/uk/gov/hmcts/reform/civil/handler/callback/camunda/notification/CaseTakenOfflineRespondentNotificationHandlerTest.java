@@ -89,6 +89,25 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         }
 
         @Test
+        void shouldNotifyRespondentSolicitorTwo_whenInvokedWithSameSol() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondentSolicitor2EmailAddress(null).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_TAKEN_OFFLINE.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "case-taken-offline-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(

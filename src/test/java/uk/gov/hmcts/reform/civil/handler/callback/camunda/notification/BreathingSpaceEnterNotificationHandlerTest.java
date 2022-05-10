@@ -181,4 +181,53 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
     }
+
+    @Test
+    public void notifyApplicant2_enter() {
+        String recipient = "recipient";
+        String templateId = "templateId";
+        Mockito.when(notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate())
+            .thenReturn(templateId);
+
+        String organisationId = "organisationId";
+
+        String solicitorName = "solicitor name";
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("legacy ref")
+            .applicant1(Party.builder()
+                            .type(Party.Type.COMPANY)
+                            .companyName("company name")
+                            .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .email(recipient)
+                                                .build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(organisationId)
+                                                                .build())
+                                              .build())
+            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
+                                                          .name(solicitorName)
+                                                          .build())
+            .respondentSolicitor2EmailAddress(null)
+            .build();
+        CallbackParams params = CallbackParams.builder()
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
+                         .build())
+            .build();
+
+        handler.handle(params);
+
+        Mockito.verify(notificationService).sendMail(
+            eq(recipient),
+            eq(templateId),
+            argThat(
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                    && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
+            argThat(string -> string.contains(caseData.getLegacyCaseReference()))
+        );
+    }
 }
