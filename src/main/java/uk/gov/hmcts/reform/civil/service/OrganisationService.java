@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.prd.model.OrganisationUser;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -34,6 +36,10 @@ public class OrganisationService {
             log.error("User not registered in MO", ex);
             return Optional.empty();
         }
+    }
+
+    public Optional<List<OrganisationUser>> findUsersInOrganisation(String authToken, String orgId) {
+        return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
     }
 
     //WARNING! below function findOrganisationById is being used by both damages and specified claims,
