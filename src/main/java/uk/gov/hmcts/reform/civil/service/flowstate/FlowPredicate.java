@@ -656,7 +656,8 @@ public class FlowPredicate {
             case ONE_V_TWO_ONE_LEGAL_REP:
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                    || YES.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case ONE_V_ONE:
                 predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());

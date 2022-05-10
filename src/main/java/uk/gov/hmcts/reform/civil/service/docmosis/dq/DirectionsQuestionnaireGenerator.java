@@ -80,7 +80,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
         if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
@@ -175,12 +179,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
+        boolean claimantResponseLRspec = false;
+        if (isClaimantResponse(caseData) && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
-            .respondents(getRespondents(caseData, null))
+            .respondents(claimantResponseLRspec ? null : getRespondents(caseData, null))
+            .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
@@ -205,6 +215,21 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .requestedCourt(getRequestedCourt(dq));
 
         return builder.build();
+    }
+
+    private List<Party> getApplicants(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
+        return List.of(Party.builder()
+                           .name(applicant.getPartyName())
+                           .primaryAddress(applicant.getPrimaryAddress())
+                           .representative(respondentRepresentative)
+                           .litigationFriendName(
+                               ofNullable(litigationFriend)
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
@@ -337,8 +362,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
     }
 
-    private boolean isClaimantResponse(CaseData caseData) {
+    public static boolean isClaimantResponse(CaseData caseData) {
         return "CLAIMANT_RESPONSE".equals(ofNullable(caseData.getBusinessProcess())
+                                              .map(BusinessProcess::getCamundaEvent)
+                                              .orElse(null))
+                || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
                                               .map(BusinessProcess::getCamundaEvent)
                                               .orElse(null));
     }
