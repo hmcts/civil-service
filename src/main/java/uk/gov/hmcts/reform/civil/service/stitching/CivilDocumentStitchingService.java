@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
@@ -26,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocu
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class CivilDocumentStitchingService implements DocumentStitcher {
 
@@ -58,17 +61,15 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         if (caseData1 != null) {
             Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
 
+            log.info("stitchedDocument.isPresent()----->" + stitchedDocument.isPresent());
             if (stitchedDocument.isPresent()) {
                 Document document = stitchedDocument.get();
                 String documentUrl = document.getDocumentUrl();
                 String documentBinaryUrl = document.getDocumentBinaryUrl();
                 caseDocument = CaseDocument.builder()
                     .documentLink(Document.builder()
-                                      .documentUrl("http://dm-store:8080/"
-                                                       + documentUrl.substring(documentUrl.indexOf("documents/")))
-                                      .documentBinaryUrl("http://dm-store:8080/"
-                                                             + documentBinaryUrl.substring(documentBinaryUrl.indexOf(
-                                          "documents/")))
+                                      .documentUrl(documentUrl)
+                                      .documentBinaryUrl(documentBinaryUrl)
                                       .documentFileName(document.getDocumentFileName())
                                       .build())
                     .documentName("Stitched document")
@@ -76,8 +77,20 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                     .createdDatetime(LocalDateTime.now())
                     .createdBy(CREATED_BY)
                     .build();
+            } else {
+                log.info("stitchedDocument is not present----------");
             }
+        } else {
+            log.info("Case data is null----------");
         }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            log.info("json- with bundle-----------" + mapper.writeValueAsString(caseDocument));
+
+        } catch (JsonProcessingException jpe) {
+            log.info("-----------in exception------------");
+        }
+
         return caseDocument;
     }
 
