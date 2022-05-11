@@ -142,7 +142,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             .data(caseDataBuilder.build().toMap(
                 objectMapper))
             .caseTypeId(CaseDefinitionConstants.CASE_TYPE)
-            .jurisdiction(CaseDefinitionConstants.JURISDICTION).build();
+            .jurisdictionId(CaseDefinitionConstants.JURISDICTION).build();
     }
 }
 
