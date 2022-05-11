@@ -24,7 +24,7 @@ class Applicant1DQTest extends DQTest {
         assertEquals(furtherInformation(), dq.getFurtherInformation());
         assertEquals(hearing(), dq.getHearing());
         assertEquals(hearingSupport(), dq.getHearingSupport());
-        assertNull(dq.getRequestedCourt());
+        assertEquals(requestedCourt(), dq.getRequestedCourt());
         assertEquals(statementOfTruth(), dq.getStatementOfTruth());
         assertEquals(witnesses(), dq.getWitnesses());
         assertEquals(welshLanguageRequirements(), dq.getWelshLanguageRequirements());
