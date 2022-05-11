@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -161,6 +162,58 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2_when1v2SameSolicitorCase() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .respondentSolicitor2EmailAddress(null)
+                    .respondent2SameLegalRepresentative(YesOrNo.YES)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2_when1v2DifferentSolicitorCase() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .respondentSolicitor2EmailAddress(null)
+                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    null,
                     "template-id-multiparty",
                     getNotificationDataMap(caseData),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
