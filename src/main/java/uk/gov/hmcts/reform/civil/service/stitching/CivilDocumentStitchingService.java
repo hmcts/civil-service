@@ -61,7 +61,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             log.info("-----------in exception------------");
         }
 
-
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
