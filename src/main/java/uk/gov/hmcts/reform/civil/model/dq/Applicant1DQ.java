@@ -5,7 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 @Data
@@ -70,12 +78,54 @@ public class Applicant1DQ implements DQ {
     @Override
     @JsonProperty("applicant1DQHearing")
     public Hearing getHearing() {
-        return getHearing(applicant1DQHearing);
+        if (applicant1DQHearing != null) {
+            return getHearing(applicant1DQHearing);
+        }
+        if (applicant1DQHearingLRspec != null) {
+            return Hearing.builder()
+                .hearingLength(applicant1DQHearingLRspec.getHearingLength())
+                .hearingLengthDays(applicant1DQHearingLRspec.getHearingLengthDays())
+                .hearingLengthHours(applicant1DQHearingLRspec.getHearingLengthHours())
+                .unavailableDatesRequired(applicant1DQHearingLRspec.getUnavailableDatesRequired())
+                .unavailableDates(mapDates(applicant1DQHearingLRspec.getUnavailableDatesLRspec()))
+                .build();
+        }
+        if (applicant1DQSmallClaimHearing != null) {
+            SmallClaimHearing small = getSmallClaimHearing();
+            return Hearing.builder()
+                .unavailableDatesRequired(small.getUnavailableDatesRequired())
+                .unavailableDates(mapDates(small.getSmallClaimUnavailableDate()))
+                .build();
+        }
+        return null;
+    }
+
+    private List<Element<UnavailableDate>> mapDates(List<Element<UnavailableDateLRspec>> lrDates) {
+        if (lrDates == null) {
+            return Collections.emptyList();
+        } else {
+            return lrDates.stream().map(Element::getValue)
+                .map(this::mapDate)
+                .map(ElementUtils::element)
+                .collect(Collectors.toList());
+        }
+    }
+
+    private UnavailableDate mapDate(UnavailableDateLRspec lrSpec) {
+        UnavailableDate.UnavailableDateBuilder builder = UnavailableDate.builder()
+            .who(lrSpec.getWho());
+        if (lrSpec.getDate() != null) {
+            builder.date(lrSpec.getDate());
+        } else {
+            builder.fromDate(lrSpec.getFromDate()).toDate(lrSpec.getToDate());
+        }
+        return builder.build();
     }
 
     @Override
+    @JsonProperty("applicant1DQSmallClaimHearing")
     public SmallClaimHearing getSmallClaimHearing() {
-        return null;
+        return getSmallClaimHearing(applicant1DQSmallClaimHearing);
     }
 
     @Override
@@ -85,7 +135,16 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant1DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
+
+        if (applicant1DQRequestedCourt != null) {
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
+                .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .build();
+        }
         return null;
     }
 
