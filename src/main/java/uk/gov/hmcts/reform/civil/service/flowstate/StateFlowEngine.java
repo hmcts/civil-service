@@ -122,23 +122,37 @@ public class StateFlowEngine {
     public StateFlow build(FlowState.Main initialState) {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(initialState)
-            .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedOneRespondentRepresentative)
-            .set(flags -> flags.putAll(
-                Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                       FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                       FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
-                )))
-            .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedTwoRespondentRepresentatives)
-            .set(flags -> flags.putAll(
-                Map.of(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
-                       FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                       FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                       FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                       FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
-                )))
-            .transitionTo(CLAIM_SUBMITTED).onlyIf(claimSubmittedNoRespondentRepresented
-                                                      .or(claimSubmittedOnlyOneRespondentRepresented))
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(claimSubmittedOneRespondentRepresentative)
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(claimSubmittedTwoRespondentRepresentatives)
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
+                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(claimSubmittedNoRespondentRepresented.or(claimSubmittedOnlyOneRespondentRepresented))
+                .set(flags -> flags.putAll(
+                    // flags for ONE_RESPONDENT_REPRESENTATIVE and TWO_RESPONDENT_REPRESENTATIVES
+                    // might have to change after NOC
+                    Map.of(
+                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
+                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
@@ -150,8 +164,8 @@ public class StateFlowEngine {
             // 1. Both def1 and def2 unrepresented
             // 2. Def1 unrepresented, Def2 registered
             // 3. Def1 registered, Def 2 unrepresented
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT).onlyIf(
-                (respondent1NotRepresented.and(respondent2NotRepresented))
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+                .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
                     .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
                     .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
             // Unregistered
