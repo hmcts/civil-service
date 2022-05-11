@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.dq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.HearingLength;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -41,10 +42,46 @@ class Applicant1DQTest extends DQTest {
     }
 
     @Test
-    void shouldGetVariables_usingInterfaceMethodsHearingLRSpec() {
-        Applicant1DQ dq = buildApplicant1DqHearingLRSpec();
+    void shouldReturnFastClaimHearing_whenHearingNull() {
+        HearingLength length = HearingLength.MORE_THAN_DAY;
+        String lengthDays = "2";
+        String lengthHours = "6";
+        YesOrNo hasUnavailableDates = YES;
+        List<Element<UnavailableDateLRspec>> lrDates = Stream.of(
+            UnavailableDateLRspec.builder()
+                .date(LocalDate.of(2020, 5, 2))
+                .who("who 1")
+                .build(),
+            UnavailableDateLRspec.builder()
+                .fromDate(LocalDate.of(2020, 5, 2))
+                .toDate(LocalDate.of(2020, 6, 2))
+                .who("who 2")
+                .build()
+        ).map(ElementUtils::element).collect(Collectors.toList());
 
-        assertEquals(hearingLRspec(), dq.getHearing());
+        Hearing hearing = buildApplicant1Dq().toBuilder()
+            .applicant1DQHearing(null)
+            .applicant1DQHearingLRspec(HearingLRspec.builder()
+                                               .hearingLength(length)
+                                               .hearingLengthDays(lengthDays)
+                                               .hearingLengthHours(lengthHours)
+                                               .unavailableDatesRequired(hasUnavailableDates)
+                                               .unavailableDatesLRspec(lrDates)
+                                               .build())
+            .build().getHearing();
+
+        assertThat(hearing.getHearingLength()).isEqualTo(length);
+        assertThat(hearing.getHearingLengthDays()).isEqualTo(lengthDays);
+        assertThat(hearing.getHearingLengthHours()).isEqualTo(lengthHours);
+        assertThat(hearing.getUnavailableDatesRequired()).isEqualTo(hasUnavailableDates);
+        for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
+            UnavailableDateLRspec expected = lrDates.get(i).getValue();
+            UnavailableDate actual = hearing.getUnavailableDates().get(i).getValue();
+            assertThat(actual.getWho()).isEqualTo(expected.getWho());
+            assertThat(actual.getDate()).isEqualTo(expected.getDate());
+            assertThat(actual.getFromDate()).isEqualTo(expected.getFromDate());
+            assertThat(actual.getToDate()).isEqualTo(expected.getToDate());
+        }
     }
 
     @Test
