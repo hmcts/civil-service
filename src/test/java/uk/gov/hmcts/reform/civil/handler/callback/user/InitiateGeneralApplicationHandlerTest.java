@@ -91,6 +91,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
+    private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
+    private final BigDecimal fee108 = new BigDecimal("10800");
+    private final BigDecimal fee275 = new BigDecimal("27500");
+    private static final String FEE_CODE = "test_fee_code";
+    private static final String FEE_VERSION = "1";
+
     @Nested
     class MidEventForUrgencyCheck extends GeneralAppSampleDataBuilder {
 
@@ -390,12 +396,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventForSettingFeeAndPBA extends GeneralAppSampleDataBuilder {
 
-        private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
-        private final BigDecimal fee108 = new BigDecimal("10800");
-        private final BigDecimal fee275 = new BigDecimal("27500");
-        private static final String FEE_CODE = "test_fee_code";
-        private static final String FEE_VERSION = "1";
-
         private final Organisation organisation = Organisation.builder()
                 .paymentAccount(List.of("12345", "98765"))
                 .build();
@@ -524,6 +524,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmit extends GeneralAppSampleDataBuilder {
+
+        private final Fee feeFromFeeService = Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
+                .version(FEE_VERSION).build();
+
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -549,8 +553,42 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetAppropriateFees_whenFeesAreUnsetByCCD() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                    .getTestCaseData(CaseData.builder().build());
+            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                    .email(APPLICANT_EMAIL_ID_CONSTANT)
+                    .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                    any(CaseData.class), any(UserDetails.class), anyString()))
+                    .thenReturn(getMockServiceData(caseData));
+
+            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+                    any(CaseData.class), any(UserDetails.class)))
+                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(caseData.getGeneralAppPBADetails()).isNotNull();
+            assertThat(caseData.getGeneralAppPBADetails().getFee()).isNull();
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            GeneralApplication application = unwrapElements(responseCaseData.getGeneralApplications()).get(0);
+            assertThat(application.getGeneralAppPBADetails()).isNotNull();
+            assertThat(application.getGeneralAppPBADetails().getFee()).isNotNull();
+        }
+
+        @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(INITIATE_GENERAL_APPLICATION);
+        }
+
+        private CaseData getMockServiceData(CaseData caseData) {
+            GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeFromFeeService).build();
+            return caseData.toBuilder().generalAppPBADetails(pbaDetails).build();
         }
 
         private void assertResponse(CaseData responseData) {

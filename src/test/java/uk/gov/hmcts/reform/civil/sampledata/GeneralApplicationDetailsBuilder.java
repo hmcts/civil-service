@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static java.time.LocalDate.EPOCH;
@@ -529,6 +531,8 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppPBADetails(GAPbaDetails.builder()
                         .applicantsPbaAccounts(PBA_ACCOUNTS)
                         .pbaReference(STRING_CONSTANT)
+                        .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(10800L))
+                                .version("1").build())
                         .build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .generalAppDetailsOfOrder(STRING_CONSTANT)

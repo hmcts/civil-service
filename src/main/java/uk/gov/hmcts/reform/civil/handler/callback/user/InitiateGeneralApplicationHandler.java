@@ -56,7 +56,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitApplication,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -119,12 +119,19 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return caseData.toBuilder();
     }
 
-    private CallbackResponse submitClaim(CallbackParams callbackParams) {
+    private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+
+        if (caseData.getGeneralAppPBADetails().getFee() == null) {
+            Fee feeForGA = feesService.getFeeForGA(caseData);
+            GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeForGA).build();
+            CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
+            caseData = newCaseData;
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(initiateGeneralApplicationService
