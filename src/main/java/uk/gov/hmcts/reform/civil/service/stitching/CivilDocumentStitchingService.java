@@ -153,9 +153,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
 
         return CaseDetails.builder().id(caseData.getCcdCaseReference())
             .data(caseDataBuilder.build().toMap(
-                objectMapper))
-            .caseTypeId(CaseDefinitionConstants.CASE_TYPE)
-            .jurisdictionId(CaseDefinitionConstants.JURISDICTION).build();
+                objectMapper)).build();
     }
 }
 
