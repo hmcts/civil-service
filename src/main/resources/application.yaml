@@ -66,7 +66,7 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: true
+  secured: ${DOCUMENT_MANAGEMENT_SECURED:true}
 
 bankHolidays:
   api:
