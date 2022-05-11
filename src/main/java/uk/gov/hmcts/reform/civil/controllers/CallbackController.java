@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.GetCaseCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.handler.callback.user.MetadataCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
 import java.util.Optional;
@@ -37,6 +39,7 @@ public class CallbackController {
 
     private final CallbackHandlerFactory callbackHandlerFactory;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final MetadataCallbackHandler metadataCallbackHandler;
 
     @PostMapping(path = {
         "/{callback-type}",
@@ -66,5 +69,21 @@ public class CallbackController {
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);
+    }
+
+    @PostMapping(path = {
+        "/metadataCallback"
+    })
+    public GetCaseCallbackResponse getCaseCallbackResponse(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @NotNull @RequestBody CallbackRequest callback
+    ) {
+        CallbackParams callbackParams = CallbackParams.builder()
+            .request(callback)
+            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
+            .caseData(caseDetailsConverter.toCaseData(callback.getCaseDetails()))
+            .build();
+
+        return metadataCallbackHandler.injectMetaData(callbackParams);
     }
 }
