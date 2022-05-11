@@ -2749,6 +2749,7 @@ public class CaseDataBuilder {
             .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressDetails)
             .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
             .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
+            .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .build();
     }
 }
