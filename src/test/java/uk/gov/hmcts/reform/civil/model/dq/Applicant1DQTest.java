@@ -2,10 +2,19 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -31,6 +40,47 @@ class Applicant1DQTest extends DQTest {
         assertEquals(vulnerabilityQuestions(), dq.getVulnerabilityQuestions());
     }
 
+    @Test
+    void shouldGetVariables_usingInterfaceMethodsHearingLRSpec() {
+        Applicant1DQ dq = buildApplicant1DqHearingLRSpec();
+
+        assertEquals(hearingLRspec(), dq.getHearing());
+    }
+
+    @Test
+    void shouldReturnSmallClaimHearing_whenHearingNull() {
+        YesOrNo hasUnavailableDates = YES;
+        List<Element<UnavailableDateLRspec>> lrDates = Stream.of(
+            UnavailableDateLRspec.builder()
+                .date(LocalDate.of(2020, 5, 2))
+                .who("who 1")
+                .build(),
+            UnavailableDateLRspec.builder()
+                .fromDate(LocalDate.of(2020, 5, 2))
+                .toDate(LocalDate.of(2020, 6, 2))
+                .who("who 2")
+                .build()
+        ).map(ElementUtils::element).collect(Collectors.toList());
+
+        Hearing hearing = buildApplicant1Dq().toBuilder()
+            .applicant1DQHearing(null)
+            .applicant1DQSmallClaimHearing(SmallClaimHearing.builder()
+                                                .unavailableDatesRequired(hasUnavailableDates)
+                                                .smallClaimUnavailableDate(lrDates)
+                                                .build())
+            .build().getHearing();
+
+        assertThat(hearing.getUnavailableDatesRequired()).isEqualTo(hasUnavailableDates);
+        for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
+            UnavailableDateLRspec expected = lrDates.get(i).getValue();
+            UnavailableDate actual = hearing.getUnavailableDates().get(i).getValue();
+            assertThat(actual.getWho()).isEqualTo(expected.getWho());
+            assertThat(actual.getDate()).isEqualTo(expected.getDate());
+            assertThat(actual.getFromDate()).isEqualTo(expected.getFromDate());
+            assertThat(actual.getToDate()).isEqualTo(expected.getToDate());
+        }
+    }
+
     private Applicant1DQ buildApplicant1Dq() {
         return Applicant1DQ.builder()
             .applicant1DQDisclosureOfElectronicDocuments(disclosureOfElectronicDocuments())
@@ -47,6 +97,12 @@ class Applicant1DQTest extends DQTest {
             .applicant1DQWitnesses(witnesses())
             .applicant1DQLanguage(welshLanguageRequirements())
             .applicant1DQVulnerabilityQuestions(vulnerabilityQuestions())
+            .build();
+    }
+
+    private Applicant1DQ buildApplicant1DqHearingLRSpec() {
+        return Applicant1DQ.builder()
+            .applicant1DQHearingLRspec(hearingLRspec())
             .build();
     }
 
