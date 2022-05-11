@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.BundleDocument;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.Value;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -102,10 +103,14 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     ) {
 
         List<IdValue<BundleDocument>> bundleDocuments = new ArrayList<>();
+        List<Value<Document>> caseDocuments = new ArrayList<>();
 
         for (int i = 0; i < documents.size(); i++) {
 
             DocumentMetaData caseDocument = documents.get(i);
+            caseDocuments.add(
+                new Value<>(caseDocument.getDocument().getDocumentFileName(),
+                                caseDocument.getDocument()));
 
             bundleDocuments.add(
                 new IdValue<>(
@@ -147,6 +152,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             )
         );
         caseDataBuilder.caseBundles(idValueList);
+        caseDataBuilder.caseDocuments(caseDocuments);
+        caseDataBuilder.caseDocument1Name(bundleFilename);
 
         Map<String, Object> data = Map.of("case_details", caseDataBuilder.build().toMap(
             objectMapper));

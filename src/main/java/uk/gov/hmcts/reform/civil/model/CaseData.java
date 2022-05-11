@@ -364,6 +364,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<IdValue<Bundle>> caseBundles = new ArrayList<>();
 
+
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
 
