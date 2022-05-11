@@ -53,6 +53,15 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 caseData
             );
 
+        try {
+            ObjectMapper mapper1 = new ObjectMapper();
+            log.info("json- with bundle-----------" + mapper1.writeValueAsString(payload));
+
+        } catch (JsonProcessingException jpe) {
+            log.info("-----------in exception------------");
+        }
+
+
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
