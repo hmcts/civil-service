@@ -100,6 +100,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
         JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
+        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
+        String preferredTelephone = hearingSupportRequirementsDJ != null ?
+            hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
+        String preferredEmail = hearingSupportRequirementsDJ != null ?
+            hearingSupportRequirementsDJ.getHearingPreferredEmail() : "N/A";
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
