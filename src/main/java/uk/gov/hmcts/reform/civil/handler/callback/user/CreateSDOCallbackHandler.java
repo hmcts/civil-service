@@ -13,17 +13,22 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -94,7 +99,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        System.out.println("judgement sum value: " + caseData.getJudgementSum());
+        JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
+        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
+        String preferredTelephone = hearingSupportRequirementsDJ != null ?
+            hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
+        String preferredEmail = hearingSupportRequirementsDJ != null ?
+            hearingSupportRequirementsDJ.getHearingPreferredEmail() : "N/A";
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
@@ -102,6 +112,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
+
+        if (judgementSum != null) {
+            DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
+                DisposalHearingJudgementDeductionValue.builder()
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
+
+            updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue).build();
+        }
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
@@ -168,6 +187,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
+
+        DisposalHearingPreferredTelephone tempDisposalHearingPreferredTelephone = DisposalHearingPreferredTelephone
+            .builder()
+            .telephone(preferredTelephone)
+            .build();
+
+        updatedData.disposalHearingPreferredTelephone(tempDisposalHearingPreferredTelephone).build();
+
+        DisposalHearingPreferredEmail tempDisposalHearingPreferredEmail = DisposalHearingPreferredEmail
+            .builder()
+            .email(preferredEmail)
+            .build();
+
+        updatedData.disposalHearingPreferredEmail(tempDisposalHearingPreferredEmail).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("The claimant must lodge at court at least 7 days before the disposal")

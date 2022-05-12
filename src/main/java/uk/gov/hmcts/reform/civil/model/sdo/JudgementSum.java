@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class JudgementSum {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Integer judgementSum;
+    private final Integer judgementSum;
 
     @JsonCreator
     public JudgementSum(@JsonProperty("judgementSum") Integer judgementSum) { this.judgementSum = judgementSum; }
