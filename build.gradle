@@ -96,10 +96,9 @@ allprojects {
 
   repositories {
     mavenLocal()
-    jcenter()
     mavenCentral()
     maven {
-      url  "http://repo.spring.io/milestone"
+      url "https://jitpack.io"
     }
     maven {
       url  "https://repo.spring.io/libs-milestone"
@@ -107,6 +106,7 @@ allprojects {
     maven {
       url "https://jitpack.io"
     }
+    jcenter()
   }
 }
 
