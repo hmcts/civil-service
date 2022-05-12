@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -27,6 +28,10 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
+            if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+                && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
+                representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
+            }
 
             return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor1EmailAddress())
@@ -58,6 +63,7 @@ public class RepresentativeService {
     }
 
     public Representative getApplicantRepresentative(CaseData caseData) {
+        // all applicants share solicitor
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                   .orElseThrow(RuntimeException::new));
@@ -65,6 +71,10 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
+        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+            && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
+            representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
+        }
 
         return representativeBuilder
             .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())

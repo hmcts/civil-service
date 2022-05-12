@@ -12,12 +12,10 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -330,6 +328,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo specFullDefenceOrPartAdmission1V1;
     private YesOrNo specFullDefenceOrPartAdmission;
     private YesOrNo specDisputesOrPartAdmission;
+    private YesOrNo specPartAdmitPaid;
+    private YesOrNo specFullAdmitPaid;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -387,13 +387,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     private final String hearingSelection;
-    // for default judgment specified tab
-    private final DJPaymentTypeSelection paymentTypeSelection;
-    private final RepaymentFrequencyDJ repaymentFrequency;
-    // for default judgment specified tab
+
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
+    private final YesOrNo disabilityPremiumPayments;
+    private final YesOrNo severeDisabilityPremiumPayments;
 
     private final YesOrNo claimStarted;
 
