@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -356,9 +357,10 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                 .organisationID(STRING_CONSTANT).build())
-                                               .orgPolicyReference(STRING_CONSTANT).build())
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                            .organisationID(STRING_CONSTANT).build())
+                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                    .orgPolicyReference(STRING_CONSTANT).build())
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addApplicant2(YES)
@@ -427,10 +429,12 @@ public class GeneralApplicationDetailsBuilder {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .build();
