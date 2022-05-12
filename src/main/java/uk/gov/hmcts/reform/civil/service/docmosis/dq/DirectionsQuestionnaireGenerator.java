@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -54,7 +55,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -188,7 +189,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         setApplicants(builder, caseData);
 
         Witnesses witnesses = getWitnesses(dq);
-        int witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+
+        Integer witnessesIncludingDefendants = null;
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        if (!(SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && state.equals(FULL_ADMISSION.fullName()))) {
+            witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+        }
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
@@ -199,7 +206,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
@@ -251,7 +258,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
         int witnessesIncludingDefendants;
-        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
                 && caseData.getResponseClaimWitnesses().matches("\\d+")) {
                 witnessesIncludingDefendants = Integer.parseInt(caseData.getResponseClaimWitnesses());
@@ -374,7 +382,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -399,7 +407,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -646,9 +654,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq, CaseData caseData) {
-        var welshLanguageRequirements = SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            ? dq.getWelshLanguageRequirementsLRspec() : dq.getWelshLanguageRequirements();
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
             return WelshLanguageRequirements.builder()
                 .evidence("")

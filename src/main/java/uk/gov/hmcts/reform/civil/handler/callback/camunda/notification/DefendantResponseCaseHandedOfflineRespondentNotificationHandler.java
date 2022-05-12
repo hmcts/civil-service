@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -55,7 +56,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE) ? TASK_ID_RESPONDENT1
+        return isRespondent1(callbackParams,
+                             NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE) ? TASK_ID_RESPONDENT1
             : TASK_ID_RESPONDENT2;
     }
 
@@ -82,6 +84,10 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
             } else {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
+            }
+
+            if (null == recipient && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                recipient = caseData.getRespondentSolicitor1EmailAddress();
             }
         }
 
@@ -110,7 +116,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
-    private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient, CaseEvent caseEvent) {
+    private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData,
+                                                             String recipient, CaseEvent caseEvent) {
         String emailTemplate = notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
         notificationService.sendMail(
             recipient,

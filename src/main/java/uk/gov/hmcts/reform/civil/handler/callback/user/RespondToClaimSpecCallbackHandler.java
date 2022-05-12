@@ -302,6 +302,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondentResponseIsSame().equals(YES)) {
             updatedData.sameSolicitorSameResponse(YES);
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
         } else {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
         }
@@ -379,7 +383,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+                .build();
         }
         return caseData;
     }
