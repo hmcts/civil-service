@@ -454,10 +454,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
             }
         } else {
-            if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(
-                                                        caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+                                                        caseData.getRespondent1ClaimResponseTypeForSpec()))) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
             }
         }
