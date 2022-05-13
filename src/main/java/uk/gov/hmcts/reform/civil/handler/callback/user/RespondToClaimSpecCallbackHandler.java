@@ -298,6 +298,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 updatedData.respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE);
             }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && caseData.getRespondentResponseIsSame().equals(YES)) {
+            updatedData.sameSolicitorSameResponse(YES);
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
         } else {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
         }
@@ -375,7 +383,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+                .build();
         }
         return caseData;
     }
