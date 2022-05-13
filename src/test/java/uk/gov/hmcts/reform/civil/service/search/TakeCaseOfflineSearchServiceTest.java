@@ -9,8 +9,6 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -28,7 +26,7 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
                 .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))))
             .should(boolQuery()
                 .must(rangeQuery("data.addLegalRepDeadline").lt("now"))
-                .must(boolQuery().must(matchQuery("state", "PENDING_CASE_ISSUED"))));
+                .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }

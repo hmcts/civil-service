@@ -12,7 +12,7 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @Service
 public class TakeCaseOfflineSearchService extends ElasticSearchService {
@@ -30,7 +30,7 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                             .must(beState(AWAITING_APPLICANT_INTENTION)))
                 .should(boolQuery()
                             .must(rangeQuery("data.addLegalRepDeadline").lt("now"))
-                            .must(beState(PENDING_CASE_ISSUED))),
+                            .must(beState(CASE_ISSUED))),
             List.of("reference"),
             startIndex
         );
