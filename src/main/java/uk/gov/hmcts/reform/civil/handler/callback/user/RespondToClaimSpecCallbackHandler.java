@@ -111,7 +111,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
-            .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
@@ -127,11 +126,669 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
             .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+            .put(callbackKey(MID, "InitialisingPagesLogic"), this::atInitialisingPagesLogic)
+            .put(callbackKey(MID, "defenceAdmittedPartRoute"), this::atDefenceAdmittedPartRoutePage)
+            .put(callbackKey(MID, "WhenWillClaimBePaid"), this::atWhenWillClaimBePaidPage)
+            .put(callbackKey(MID, "FinancialDetailsPurpose"), this::atFinancialDetailsPurposePage)
+            .put(callbackKey(MID, "FinancialDetailsPurposeRespondent2"), this::atFinancialDetailsPurposeRespondent2Page)
+            .put(callbackKey(MID, "DefendantBankAccounts"), this::atDefendantBankAccountsPage)
+            .put(callbackKey(MID, "DefendantBankAccountsRespondent2"), this::atDefendantBankAccountsRespondent2Page)
+            .put(callbackKey(MID, "DisabilityPremiumPayments"), this::atDisabilityPremiumPaymentsPage)
+            .put(callbackKey(MID, "DisabilityPremiumPaymentsRespondent2"), this::atDisabilityPremiumPaymentsRespondent2Page)
+            .put(callbackKey(MID, "defendantHomeOptions"), this::atDefendantHomeOptionsPage)
+            .put(callbackKey(MID, "defendantHomeOptionsRespondent2"), this::atDefendantHomeOptionsRespondent2Page)
+            .put(callbackKey(MID, "DefendantPartnersAndDependents"), this::atDefendantPartnersAndDependentsPage)
+            .put(callbackKey(MID, "Defendant2PartnersAndDependents"), this::atDefendant2PartnersAndDependentsPage)
+            .put(callbackKey(MID, "EmploymentDeclaration"), this::atEmploymentDeclarationPage)
+            .put(callbackKey(MID, "EmploymentDeclarationRespondent2"), this::atEmploymentDeclarationRespondent2Page)
+            .put(callbackKey(MID, "HowToAddEmploymentDetails"), this::atHowToAddEmploymentDetailsPage)
+            .put(callbackKey(MID, "HowToAddEmploymentDetailsRespondent2"), this::atHowToAddEmploymentDetailsRespondent2Page)
+            .put(callbackKey(MID, "DefendantSelfEmployment"), this::atDefendantSelfEmploymentPage)
+            .put(callbackKey(MID, "DefendantSelfEmploymentRespondent2"), this::atDefendantSelfEmploymentRespondent2Page)
+            .put(callbackKey(MID, "DetailsOfPayingMoneyRepaymentPlan"), this::atDetailsOfPayingMoneyRepaymentPlanPage)
+            .put(callbackKey(MID, "DetailsOfPayingMoneyRepaymentPlanRespondent2"), this::atDetailsOfPayingMoneyRepaymentPlanRespondent2Page)
+            .put(callbackKey(MID, "DefendantDebts"), this::atDefendantDebtsPage)
+            .put(callbackKey(MID, "DefendantDebtsRespondent2"), this::atDefendantDebtsRespondent2Page)
+            .put(callbackKey(MID, "DefendantIncomeExpenses"), this::atDefendantIncomeExpensesPage)
+            .put(callbackKey(MID, "DefendantIncomeExpensesFullAdmission"), this::atDefendantIncomeExpensesFullAdmissionPage)
+            .put(callbackKey(MID, "DefendantIncomeExpensesRespondent2"), this::atDefendantIncomeExpensesRespondent2Page)
+            .put(callbackKey(MID, "DefendantIncomeExpensesFullAdmissionRespondent2"), this::atDefendantIncomeExpensesFullAdmissionRespondent2Page)
+            .put(callbackKey(MID, "WhyDoesNotPayImmediately"), this::atWhyDoesNotPayImmediatelyPage)
+            .put(callbackKey(MID, "WhyDoesNotPayImmediatelyRespondent2"), this::atWhyDoesNotPayImmediatelyRespondent2Page)
+            .put(callbackKey(MID, "RepaymentPlan"), this::atRepaymentPlanPage)
+            .put(callbackKey(MID, "RepaymentPlanRespondent2"), this::atRepaymentPlanRespondent2Page)
+            .put(callbackKey(MID, "RespondentCheckList"), this::atRespondentCheckListPage)
+            .put(callbackKey(MID, "ResponseConfirmNameAddress"), this::atResponseConfirmNameAddressPage)
+            .put(callbackKey(MID, "ResponseConfirmDetails"), this::atResponseConfirmDetailsPage)
+            .put(callbackKey(MID, "SingleResponse2v1"), this::atSingleResponse2v1Page)
+            .put(callbackKey(MID, "SingleResponse"), this::atSingleResponsePage)
+            .put(callbackKey(MID, "RespondentResponseTypeSpec2v1"), this::atRespondentResponseTypeSpec2v1Page)
+            .put(callbackKey(MID, "RespondentResponseTypeSpec"), this::atRespondentResponseTypeSpecPage)
+            .put(callbackKey(MID, "defenceRoute"), this::atDefenceRoutePage)
+            .put(callbackKey(MID, "Upload"), this::atUploadPage)
+            .put(callbackKey(MID, "HowToAddTimeline"), this::atHowToAddTimelinePage)
+            .put(callbackKey(MID, "HowToAddTimelineUpload"), this::atHowToAddTimelineUploadPage)
+            .put(callbackKey(MID, "HowToAddTimelineManual"), this::atHowToAddTimelineManualPage)
+            .put(callbackKey(MID, "Mediation"), this::atMediationPage)
+            .put(callbackKey(MID, "FileDirectionsQuestionnaire"), this::atFileDirectionsQuestionnairePage)
+            .put(callbackKey(MID, "DisclosureOfElectronicDocumentsLRspec"), this::atDisclosureOfElectronicDocumentsLRspecPage)
+            .put(callbackKey(MID, "DisclosureOfNonElectronicDocumentsLRspec"), this::atDisclosureOfNonElectronicDocumentsLRspecPage)
+            .put(callbackKey(MID, "DisclosureReport"), this::atDisclosureReportPage)
+            .put(callbackKey(MID, "Experts"), this::atExpertsPage)
+            .put(callbackKey(MID, "SmallClaimExperts"), this::atSmallClaimExpertsPage)
+            .put(callbackKey(MID, "Witnesses"), this::atWitnessesPage)
+            .put(callbackKey(MID, "SmallClaimWitnesses"), this::atSmallClaimWitnessesPage)
+            .put(callbackKey(MID, "Language"), this::atLanguagePage)
+            .put(callbackKey(MID, "SmaillClaimHearing"), this::atSmaillClaimHearingPage)
+            .put(callbackKey(MID, "HearingLRspec"), this::atHearingLRspecPage)
+            .put(callbackKey(MID, "RequestedCourtLocationLRspec"), this::atRequestedCourtLocationLRspecPage)
+            .put(callbackKey(MID, "HearingSupport"), this::atHearingSupportPage)
+            .put(callbackKey(MID, "VulnerabilityQuestions"), this::atVulnerabilityQuestionsPage)
+            .put(callbackKey(MID, "Applications"), this::atApplicationsPage)
+            .put(callbackKey(MID, "FurtherInformation"), this::atFurtherInformationPage)
+            .put(callbackKey(MID, "StatementOfTruth"), this::atStatementOfTruthPage)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
+
+    /**
+     * Each of the methods with the following format:
+     * atXyzPage will determine what will be the following page to display.
+     */
+
+    private CallbackResponse atInitialisingPagesLogic(CallbackParams callbackParams) {
+        List<String> errors = validateDateOfBirth(callbackParams);
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_ONE:
+                updatedData.defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec);
+                break;
+            default:
+                break;
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse atDefenceAdmittedPartRoutePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atWhenWillClaimBePaidPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atFinancialDetailsPurposePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atFinancialDetailsPurposeRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantBankAccountsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantBankAccountsRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDisabilityPremiumPaymentsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDisabilityPremiumPaymentsRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantHomeOptionsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantHomeOptionsRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantPartnersAndDependentsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendant2PartnersAndDependentsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atEmploymentDeclarationPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atEmploymentDeclarationRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHowToAddEmploymentDetailsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHowToAddEmploymentDetailsRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantSelfEmploymentPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantSelfEmploymentRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDetailsOfPayingMoneyRepaymentPlanPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDetailsOfPayingMoneyRepaymentPlanRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantDebtsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantDebtsRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantIncomeExpensesPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantIncomeExpensesFullAdmissionPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantIncomeExpensesRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefendantIncomeExpensesFullAdmissionRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atWhyDoesNotPayImmediatelyPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atWhyDoesNotPayImmediatelyRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRepaymentPlanPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRepaymentPlanRespondent2Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRespondentCheckListPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atResponseConfirmNameAddressPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atResponseConfirmDetailsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atSingleResponse2v1Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atSingleResponsePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRespondentResponseTypeSpec2v1Page(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRespondentResponseTypeSpecPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        updatedData.defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.defenceRoute);
+        /*switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_ONE:
+                updatedData.defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.defenceRoute);
+                break;
+            default:
+                break;
+        }*/
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDefenceRoutePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atUploadPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHowToAddTimelinePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHowToAddTimelineUploadPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHowToAddTimelineManualPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atMediationPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atFileDirectionsQuestionnairePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDisclosureOfElectronicDocumentsLRspecPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDisclosureOfNonElectronicDocumentsLRspecPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atDisclosureReportPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atExpertsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atSmallClaimExpertsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atWitnessesPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atSmallClaimWitnessesPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atLanguagePage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atSmaillClaimHearingPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHearingLRspecPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atRequestedCourtLocationLRspecPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atHearingSupportPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atVulnerabilityQuestionsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atApplicationsPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atFurtherInformationPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse atStatementOfTruthPage(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData updateCurrentPage(CaseData caseData) {
+        caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_ONE:
+                break;
+            default:
+                break;
+        }
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            caseData = caseData.toBuilder().defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec).build();
+        }
+        return caseData;
+    }
+
+    private DefendantResponseLRspecCurrentPage evaluateOneVOnePage(CaseData caseData) {
+        switch (caseData.getDefendantResponseLRspecCurrentPage()) {
+            case Initialising:
+                break;
+
+        }
+        return DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec;
+    }
+
 
     private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -538,15 +1195,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CaseData updateCurrentPage(CaseData caseData) {
-        caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
-
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
-            caseData = caseData.toBuilder().defendantResponseLRspecCurrentPage(DefendantResponseLRspecCurrentPage.RespondentResponseTypeSpec).build();
-        }
-        return caseData;
-    }
-
     private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
@@ -704,14 +1352,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
+    private List<String> validateDateOfBirth(CallbackParams callbackParams) {
         Party respondent = callbackParams.getCaseData().getRespondent1();
         if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
             respondent = callbackParams.getCaseData().getRespondent2();
         }
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
-        CaseData caseData = callbackParams.getCaseData();
+        /*CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
@@ -729,12 +1377,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.sameSolicitorSameResponse(YES).build();
             }
 
-        }
+        }*/
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .errors(errors)
-            .build();
+        return errors;
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
