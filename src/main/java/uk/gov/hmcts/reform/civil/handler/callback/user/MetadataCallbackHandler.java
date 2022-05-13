@@ -32,32 +32,23 @@ public class MetadataCallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String caseId = caseData.getCcdCaseReference().toString();
         List<CaseViewField> caseViewFields = new ArrayList<>();
-        caseViewFields.add(injectRespondentAssigned(caseId));
+        caseViewFields.add(injectRespondentAssigned(caseData, caseId));
         GetCaseCallbackResponse getCaseCallbackResponse = new GetCaseCallbackResponse();
         getCaseCallbackResponse.setMetadataFields(caseViewFields);
 
         return getCaseCallbackResponse;
     }
 
-    private CaseViewField injectRespondentAssigned(String caseId) {
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-                getCaaAccessToken(),
-                authTokenGenerator.generate(),
-                List.of(caseId)
-        );
-        YesOrNo respondentAssigned = userRoles.getCaseAssignedUserRoles() == null ? NO
-                : userRoles.getCaseAssignedUserRoles().stream().anyMatch(a -> a.getCaseRole() != null
-                && isRespondent(a.getCaseRole()))
-                ? YES : NO;
+    private CaseViewField injectRespondentAssigned(CaseData caseData, String caseId) {
 
         CaseViewField caseViewField = new CaseViewField();
         caseViewField.setId("[INJECTED_DATA.respondentAssigned]");
-        caseViewField.setValue(respondentAssigned);
+        caseViewField.setValue(respondentAssigned(getUserRolesOnCase(caseId), getRespondentCaseRoles(caseData)));
         caseViewField.setMetadata(true);
 
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         fieldTypeDefinition.setId("respondentAssigned");
-        fieldTypeDefinition.setType("YesOrNo");
+        fieldTypeDefinition.setType("Text");
 
         caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
         return caseViewField;
@@ -70,7 +61,31 @@ public class MetadataCallbackHandler {
         );
     }
 
-    private boolean isRespondent(String caseRole) {
-        return caseRole.contains("[RESPONDENTSOLICITORONE]") || caseRole.contains("[RESPONDENTSOLICITORTWO]");
+    private String respondentAssigned(CaseAssignedUserRolesResource userRoles, List<String> respondentCaseRoles) {
+        return userRoles.getCaseAssignedUserRoles() == null ? "No"
+                : userRoles.getCaseAssignedUserRoles().stream().anyMatch(a -> a.getCaseRole() != null
+                && isRespondent(respondentCaseRoles, a.getCaseRole()))
+                ? "Yes" : "No";
+    }
+
+    private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
+        return caseAccessDataStoreApi.getUserRoles(
+                getCaaAccessToken(),
+                authTokenGenerator.generate(),
+                List.of(caseId)
+        );
+    }
+
+    private List<String> getRespondentCaseRoles(CaseData caseData) {
+        List<String> respondentCaseRoles = new ArrayList<>();
+        respondentCaseRoles.add(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        if (caseData.getRespondent2OrganisationPolicy() != null) {
+            respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        }
+        return respondentCaseRoles;
+    }
+
+    private boolean isRespondent(List<String> respondentRoles, String userRole) {
+        return respondentRoles.stream().anyMatch(a -> a.equals(userRole));
     }
 }
