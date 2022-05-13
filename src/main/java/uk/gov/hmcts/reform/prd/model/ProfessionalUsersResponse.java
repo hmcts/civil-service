@@ -11,8 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganisationUser {
+public class ProfessionalUsersResponse {
 
+    private String userIdentifier;
     private String email;
     private String firstName;
     private String idamMessage;
@@ -20,5 +21,4 @@ public class OrganisationUser {
     private String idamStatusCode;
     private String lastName;
     private List<String> roles;
-    private String userIdentifier;
 }

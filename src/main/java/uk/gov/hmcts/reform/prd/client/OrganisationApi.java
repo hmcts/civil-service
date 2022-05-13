@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.OrganisationUser;
-
-import java.util.List;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi.SERVICE_AUTHORIZATION;
@@ -30,7 +28,7 @@ public interface OrganisationApi {
     );
 
     @GetMapping("/refdata/internal/v1/organisations/{orgId}/users")
-    List<OrganisationUser> findUsersByOrganisation(
+    ProfessionalUsersEntityResponse findUsersByOrganisation(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @PathVariable("orgId") String orgId);

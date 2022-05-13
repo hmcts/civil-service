@@ -8,9 +8,8 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.OrganisationUser;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
 
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -38,8 +37,15 @@ public class OrganisationService {
         }
     }
 
-    public Optional<List<OrganisationUser>> findUsersInOrganisation(String authToken, String orgId) {
-        return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
+    public Optional<ProfessionalUsersEntityResponse> findUsersInOrganisation(String orgId) {
+        String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+
+        try {
+            return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
+        } catch (FeignException.NotFound ex) {
+            log.error("Organisation not found", ex);
+            return Optional.empty();
+        }
     }
 
     //WARNING! below function findOrganisationById is being used by both damages and specified claims,
