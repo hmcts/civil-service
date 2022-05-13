@@ -101,7 +101,6 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
                 .build();
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
@@ -114,7 +113,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
         } else {
-            if(caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
                 map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
             } else {
