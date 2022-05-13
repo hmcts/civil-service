@@ -114,8 +114,13 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
         } else {
-            map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
-                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
+            if(caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                    caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
+            } else {
+                map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                    caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
+            }
         }
         return map;
     }
