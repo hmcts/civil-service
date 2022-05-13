@@ -86,6 +86,13 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             targetEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
 
+        notificationService.sendMail(
+            targetEmail,
+            notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
+            addPropertiesWithPostCheck(caseData, callbackParams),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+
         if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         } else if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
@@ -94,12 +101,6 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
                 .build();
         }
 
-        notificationService.sendMail(
-            targetEmail,
-            notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
-            addPropertiesWithPostCheck(caseData, callbackParams),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
