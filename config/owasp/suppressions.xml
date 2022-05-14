@@ -37,6 +37,9 @@
     <cve>CVE-2022-25647</cve>
   </suppress>
   <suppress>
+    <cve>CVE-2022-25647</cve>
+  </suppress>
+  <suppress>
     <notes><![CDATA[
    file name: jackson-databind-2.12.6.jar
    ]]></notes>

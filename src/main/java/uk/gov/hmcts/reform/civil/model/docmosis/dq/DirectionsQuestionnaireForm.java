@@ -43,6 +43,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final Party applicant;
     private final Party applicant2;
     private final List<Party> respondents;
+    private final List<Party> applicants;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;

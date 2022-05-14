@@ -53,6 +53,8 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -82,7 +84,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
         if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
@@ -177,16 +183,25 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
+        boolean claimantResponseLRspec = false;
+        if (isClaimantResponse(caseData) && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
             .respondents(getRespondents(caseData, null))
+            .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
-        setApplicants(builder, caseData);
+
+        if (!claimantResponseLRspec) {
+            setApplicants(builder, caseData);
+        }
 
         Witnesses witnesses = getWitnesses(dq);
 
@@ -213,6 +228,44 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .requestedCourt(getRequestedCourt(dq));
 
         return builder.build();
+    }
+
+    private List<Party> getApplicants(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        var applicant2 = caseData.getApplicant2();
+        var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                return List.of(Party.builder()
+                                   .name(applicant.getPartyName())
+                                   .primaryAddress(applicant.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build(),
+                               Party.builder()
+                                   .name(applicant2.getPartyName())
+                                   .primaryAddress(applicant2.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build());
+            }
+        }
+        return List.of(Party.builder()
+                           .name(applicant.getPartyName())
+                           .primaryAddress(applicant.getPrimaryAddress())
+                           .representative(respondentRepresentative)
+                           .litigationFriendName(
+                               ofNullable(litigationFriend)
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
@@ -346,8 +399,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
     }
 
-    private boolean isClaimantResponse(CaseData caseData) {
+    public static boolean isClaimantResponse(CaseData caseData) {
         return "CLAIMANT_RESPONSE".equals(ofNullable(caseData.getBusinessProcess())
+                                              .map(BusinessProcess::getCamundaEvent)
+                                              .orElse(null))
+                || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
                                               .map(BusinessProcess::getCamundaEvent)
                                               .orElse(null));
     }
@@ -452,6 +508,46 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (isClaimantResponse(caseData)) {
 
             List<Party> respondents = new ArrayList<>();
+
+            if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && YES.equals(caseData.getRespondentResponseIsSame())) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent2().getPartyName())
+                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent2Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent2LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                }
+                return respondents;
+            }
+
             if (isProceedingAgainstRespondent1(caseData)) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent1().getPartyName())

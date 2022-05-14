@@ -287,6 +287,81 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
+            void whenCaseStateIsFullDefence1v1ApplicantProceedsLRSpec_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertEquals(
+                    templateData.getFileDirectionsQuestionnaire(),
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence2v1Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .applicant1ProceedWithClaimSpec2v1(YES)
+                    .addApplicant2(YES)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                verify(representativeService).getRespondent1Representative(caseData);
+                //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertEquals(
+                    templateData.getFileDirectionsQuestionnaire(),
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence1v2_ONE_LR_Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .atStateApplicantRespondToDefenceAndNotProceed_1v2()
+                    .applicant1DQ()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1ProceedWithClaim(YES)
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentResponseIsSame(YES)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertEquals(
+                    templateData.getFileDirectionsQuestionnaire(),
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+            }
+
+            @Test
             void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes1_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()

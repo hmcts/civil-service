@@ -126,7 +126,13 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (respondent2HasSameLegalRep(caseData)) {
+        boolean claimantResponseLRspec = false;
+        if (directionsQuestionnaireGenerator.isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
+        if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if (caseData.getRespondent1DQ() != null
                     && caseData.getRespondent1ClaimResponseTypeForSpec() != null

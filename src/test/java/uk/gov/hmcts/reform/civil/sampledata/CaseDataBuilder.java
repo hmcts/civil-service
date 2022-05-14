@@ -164,6 +164,7 @@ public class CaseDataBuilder {
     protected RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
+    protected YesOrNo applicant1ProceedWithClaimSpec2v1;
     protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
     protected YesOrNo applicant1ProceedWithClaimMultiParty2v1;
     protected YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
@@ -520,6 +521,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1ProceedWithClaim(YesOrNo yesOrNo) {
         this.applicant1ProceedWithClaim = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimSpec2v1(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimSpec2v1 = yesOrNo;
         return this;
     }
 
@@ -2758,6 +2764,7 @@ public class CaseDataBuilder {
             .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
             .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
             .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
+            .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .build();
     }
 }
