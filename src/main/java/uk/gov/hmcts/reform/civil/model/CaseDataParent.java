@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.util.List;
 
@@ -40,5 +41,8 @@ public class CaseDataParent implements MappableObject {
     private final DJPaymentTypeSelection paymentTypeSelection;
     private final RepaymentFrequencyDJ repaymentFrequency;
     // for default judgment specified tab
+    // for witness
+    private final YesOrNo respondent1DQWitnessesRequiredSpec;
+    private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
 }

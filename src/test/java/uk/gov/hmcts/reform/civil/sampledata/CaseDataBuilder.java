@@ -59,6 +59,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -252,6 +253,8 @@ public class CaseDataBuilder {
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
+    private YesOrNo respondent1DQWitnessesRequiredSpec;
+    private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2583,6 +2586,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWitnessesRequiredSpec(YesOrNo respondent1DQWitnessesRequiredSpec) {
+        this.respondent1DQWitnessesRequiredSpec = respondent1DQWitnessesRequiredSpec;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWitnessesDetailsSpec(List<Element<Witness>> respondent1DQWitnessesDetailsSpec) {
+        this.respondent1DQWitnessesDetailsSpec = respondent1DQWitnessesDetailsSpec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -2743,6 +2756,8 @@ public class CaseDataBuilder {
             .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressDetails)
             .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
             .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
+            .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
+            .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
             .build();
     }
 }
