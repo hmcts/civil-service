@@ -78,7 +78,7 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: true
+  secured: ${DOCUMENT_MANAGEMENT_SECURED:true}
 
 bankHolidays:
   api:
@@ -169,6 +169,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
+  enabled: true
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
