@@ -81,15 +81,15 @@ public class NotifyCaseAccessAdmin extends CallbackHandler implements Notificati
         String recipient;
         if (caaEmails.isEmpty()) {
             //no caa defined, use superuser for the firm
-            System.out.print("NO CAA DEFINED");
+            System.out.println("NO CAA DEFINED");
             Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
             recipient = organisation.get().getSuperUser().getEmail();
         } else {
-            System.out.print("TAKING FIRST CAA FROM LIST");
+            System.out.println("TAKING FIRST CAA FROM LIST");
             recipient = caaEmails.get(0);
         }
 
-        System.out.print("About to send email to user: " + recipient);
+        System.out.println("About to send email to user: " + recipient);
 
         notificationService.sendMail(
             recipient,

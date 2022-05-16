@@ -14,11 +14,11 @@ import java.util.List;
 public class ProfessionalUsersResponse {
 
     private String userIdentifier;
-    private String email;
     private String firstName;
-    private String idamMessage;
-    private String idamStatus;
-    private String idamStatusCode;
     private String lastName;
+    private String email;
+    private String idamStatus;
     private List<String> roles;
+    private String idamStatusCode;
+    private String idamMessage;
 }
