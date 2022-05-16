@@ -95,7 +95,7 @@ public class RoboticsNotificationService {
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
         if (SPEC_CLAIM.equals(superClaimType)) {
             return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
-                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+                .getRecipient() : roboticsEmailConfiguration.getRecipient();
         }
         return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();

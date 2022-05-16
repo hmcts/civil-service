@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,6 +29,8 @@ import uk.gov.hmcts.reform.prd.model.DxAddress;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -209,6 +212,8 @@ public class RoboticsDataMapperForSpec {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
+        LocalDate dateOfService = caseData.getIssueDate();
+
         return List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -216,7 +221,8 @@ public class RoboticsDataMapperForSpec {
                 caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
                 APPLICANT_ID,
-                APPLICANT_SOLICITOR_ID
+                APPLICANT_SOLICITOR_ID,
+                dateOfService
             ),
             buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -224,7 +230,8 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                RESPONDENT_SOLICITOR_ID
+                RESPONDENT_SOLICITOR_ID,
+                dateOfService
             )
         );
     }
@@ -235,7 +242,8 @@ public class RoboticsDataMapperForSpec {
         OrganisationPolicy organisationPolicy,
         String type,
         String id,
-        String solicitorId
+        String solicitorId,
+        LocalDate dateOfService
     ) {
         return LitigiousParty.builder()
             .id(id)
@@ -245,6 +253,9 @@ public class RoboticsDataMapperForSpec {
             .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
             .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
             .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
+            .dateOfService(ofNullable(dateOfService)
+                               .map(d -> d.format(ISO_DATE))
+                               .orElse(null))
             .build();
     }
 }

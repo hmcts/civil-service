@@ -50,14 +50,21 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTENTION_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTENTION_TO_PROCEED_STATES_PAID;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -287,6 +294,69 @@ public class EventHistoryMapper {
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case STATES_PAID:
+                builder.statesPaid(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(STATES_PAID.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case BREATHING_SPACE_ENTERED:
+                builder.breathingSpaceEntered(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(BREATHING_SPACE_ENTERED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case BREATHING_SPACE_LIFTED:
+                builder.breathingSpaceEntered(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(BREATHING_SPACE_LIFTED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
+                builder.breathingSpaceMentalHealthEntered(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MENTAL_HEALTH_BREATHING_SPACE_ENTERED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
+                builder.breathingSpaceMentalHealthLifted(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MENTAL_HEALTH_BREATHING_SPACE_LIFTED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case INTENTION_TO_PROCEED:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(INTENTION_TO_PROCEED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
+                break;
+            case INTENTION_TO_PROCEED_STATES_PAID:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(INTENTION_TO_PROCEED_STATES_PAID.getCode())
                         .dateReceived(respondentResponseDate)
                         .litigiousPartyID(respondentID)
                         .build());
