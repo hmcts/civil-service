@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -48,6 +51,9 @@ public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
+    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final UserService userService;
+    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -233,5 +239,41 @@ public class InitiateGeneralApplicationService {
             log.error("User not registered in MO", ex);
             return Optional.empty();
         }
+    }
+
+    public boolean respondentAssigned(CaseData caseData) {
+        String caseId = caseData.getCcdCaseReference().toString();
+        CaseAssignedUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
+
+        for (String respondentCaseRole : respondentCaseRoles) {
+            if (userRoles.getCaseAssignedUserRoles() == null
+                    || userRoles.getCaseAssignedUserRoles().stream()
+                    .noneMatch(a -> a.getCaseRole() != null && respondentCaseRole.equals(a.getCaseRole()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
+        String accessToken = userService.getAccessToken(
+                crossAccessUserConfiguration.getUserName(),
+                crossAccessUserConfiguration.getPassword()
+        );
+        return caseAccessDataStoreApi.getUserRoles(
+                accessToken,
+                authTokenGenerator.generate(),
+                List.of(caseId)
+        );
+    }
+
+    private List<String> getRespondentCaseRoles(CaseData caseData) {
+        List<String> respondentCaseRoles = new ArrayList<>();
+        respondentCaseRoles.add(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        if (caseData.getRespondent2OrganisationPolicy() != null) {
+            respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        }
+        return respondentCaseRoles;
     }
 }
