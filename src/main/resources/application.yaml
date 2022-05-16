@@ -53,6 +53,18 @@ fees:
     channel: default
     event: issue
 
+genApp:
+  fee:
+    endpoint: /fees-register/fees/lookup
+    service: general
+    jurisdiction1: civil
+    jurisdiction2: civil
+    channel: default
+    event: general application
+    keywords:
+      withNotice: GAOnNotice
+      consentedOrWithoutNotice: GeneralAppWithoutNotice
+
 payments:
   api:
     site_id: AAA7

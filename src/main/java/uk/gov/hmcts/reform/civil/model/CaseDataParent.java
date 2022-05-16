@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo applicantMPClaimExpertSpecRequired;
     private final PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private final PartnerAndDependentsLRspec respondent2PartnerAndDependent;
+    private final YesOrNo applicant1ProceedWithClaimSpec2v1;
 
     private final PaymentUponCourtOrder respondent2CourtOrderPayment;
     private final RepaymentPlanLRspec respondent2RepaymentPlan;
@@ -43,6 +45,9 @@ public class CaseDataParent implements MappableObject {
     private final DJPaymentTypeSelection paymentTypeSelection;
     private final RepaymentFrequencyDJ repaymentFrequency;
     // for default judgment specified tab
+    // for witness
+    private final YesOrNo respondent1DQWitnessesRequiredSpec;
+    private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
     @Builder.Default
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
