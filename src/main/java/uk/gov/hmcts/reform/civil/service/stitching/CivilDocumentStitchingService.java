@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.CaseDetails;
+import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BundleDocument;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.Value;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -25,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocu
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class CivilDocumentStitchingService implements DocumentStitcher {
 
@@ -48,6 +53,14 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 caseData
             );
 
+        try {
+            ObjectMapper mapper1 = new ObjectMapper();
+            log.info("json- with bundle-----------" + mapper1.writeValueAsString(payload));
+
+        } catch (JsonProcessingException jpe) {
+            log.info("-----------in exception------------");
+        }
+
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
@@ -57,17 +70,15 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         if (caseData1 != null) {
             Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
 
+            log.info("stitchedDocument.isPresent()----->" + stitchedDocument.isPresent());
             if (stitchedDocument.isPresent()) {
                 Document document = stitchedDocument.get();
                 String documentUrl = document.getDocumentUrl();
                 String documentBinaryUrl = document.getDocumentBinaryUrl();
                 caseDocument = CaseDocument.builder()
                     .documentLink(Document.builder()
-                                      .documentUrl("http://dm-store:8080/"
-                                                       + documentUrl.substring(documentUrl.indexOf("documents/")))
-                                      .documentBinaryUrl("http://dm-store:8080/"
-                                                             + documentBinaryUrl.substring(documentBinaryUrl.indexOf(
-                                          "documents/")))
+                                      .documentUrl(documentUrl)
+                                      .documentBinaryUrl(documentBinaryUrl)
                                       .documentFileName(document.getDocumentFileName())
                                       .build())
                     .documentName("Stitched document")
@@ -75,8 +86,20 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                     .createdDatetime(LocalDateTime.now())
                     .createdBy(CREATED_BY)
                     .build();
+            } else {
+                log.info("stitchedDocument is not present----------");
             }
+        } else {
+            log.info("Case data is null----------");
         }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            log.info("json- with bundle-----------" + mapper.writeValueAsString(caseDocument));
+
+        } catch (JsonProcessingException jpe) {
+            log.info("-----------in exception------------");
+        }
+
         return caseDocument;
     }
 
@@ -88,10 +111,14 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     ) {
 
         List<IdValue<BundleDocument>> bundleDocuments = new ArrayList<>();
+        List<Value<Document>> caseDocuments = new ArrayList<>();
 
         for (int i = 0; i < documents.size(); i++) {
 
             DocumentMetaData caseDocument = documents.get(i);
+            caseDocuments.add(
+                new Value<>(caseDocument.getDocument().getDocumentFileName(),
+                                caseDocument.getDocument()));
 
             bundleDocuments.add(
                 new IdValue<>(
@@ -133,13 +160,17 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             )
         );
         caseDataBuilder.caseBundles(idValueList);
+        caseDataBuilder.caseDocuments(caseDocuments);
+        caseDataBuilder.caseDocument1Name(bundleFilename);
 
         Map<String, Object> data = Map.of("case_details", caseDataBuilder.build().toMap(
             objectMapper));
 
         return CaseDetails.builder().id(caseData.getCcdCaseReference())
             .data(caseDataBuilder.build().toMap(
-                objectMapper)).build();
+                objectMapper))
+            .caseTypeId(CaseDefinitionConstants.CASE_TYPE)
+            .jurisdictionId(CaseDefinitionConstants.JURISDICTION).build();
     }
 }
 

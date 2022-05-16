@@ -141,10 +141,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        caseDataBuilder.bothDefendantsSpec("One");
+        // populate the title of next screen if only one defendant chosen
+        var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
+            .getValue().getLabel() +  " paid some of the amount owed?");
+        var currentDefendantName = (caseData.getDefendantDetailsSpec()
+            .getValue().getLabel());
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            caseDataBuilder.bothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
+            // populate the title of next screen if both defendants chosen
+            currentDefendantString = ("Have the defendants paid some of the amount owed?");
+            currentDefendantName = ("both defendants");
+        }
+        caseDataBuilder.currentDefendant(currentDefendantString);
+        caseDataBuilder.currentDefendantName(currentDefendantName);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -244,8 +256,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
-        StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
-                theOverallTotal).append(", including the claim fee and interest, if applicable, as shown:")
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
+                theOverallTotal);
+        } else {
+            repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
+                .getValue().getLabel() + " to pay £").append(
+                theOverallTotal);
+        }
+
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
             .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {

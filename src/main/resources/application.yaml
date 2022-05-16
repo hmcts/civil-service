@@ -53,6 +53,18 @@ fees:
     channel: default
     event: issue
 
+genApp:
+  fee:
+    endpoint: /fees-register/fees/lookup
+    service: general
+    jurisdiction1: civil
+    jurisdiction2: civil
+    channel: default
+    event: general application
+    keywords:
+      withNotice: GAOnNotice
+      consentedOrWithoutNotice: GeneralAppWithoutNotice
+
 payments:
   api:
     site_id: AAA7
@@ -66,7 +78,7 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: true
+  secured: ${DOCUMENT_MANAGEMENT_SECURED:true}
 
 bankHolidays:
   api:
@@ -104,9 +116,11 @@ reference:
     migration: false
 
 notifications:
-  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
-  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
+  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
+  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
+  breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
+  breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "97ffda16-0d55-49fc-ade4-36f023cdad23"
   respondentSolicitorClaimDetailsEmailTemplateMultiParty: "6cce54b7-4cf0-4770-9dca-db1a38226f1e"
   solicitorDefendantResponseCaseTakenOffline: "c865678e-66a5-4249-8ab6-65de962c5211"
@@ -140,6 +154,9 @@ notifications:
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   respondentSolicitor1DefaultJudgmentReceived: "25fdb679-7f34-4717-ad4d-80f8562bc7b2"
+  claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
+  respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
+
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -152,6 +169,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
+  enabled: true
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
