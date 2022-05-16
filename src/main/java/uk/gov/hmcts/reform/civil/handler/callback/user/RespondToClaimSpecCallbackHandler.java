@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -302,6 +303,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondentResponseIsSame().equals(YES)) {
             updatedData.sameSolicitorSameResponse(YES);
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
         } else {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
         }
@@ -379,7 +384,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+                .build();
         }
         return caseData;
     }
@@ -419,7 +426,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+        CaseData caseData = callbackParams.getCaseData();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                        .build())
+            .build();
+        return validateWitnesses(dq);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
@@ -573,6 +587,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
+                .respondent1DQWitnesses(Witnesses.builder()
+                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                            .build())
                 .build();
 
             updatedData.respondent1DQ(dq);
@@ -639,6 +657,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
             .respondent1DQStatementOfTruth(statementOfTruth)
+            .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                        .build())
             .build();
 
         updatedData.respondent1DQ(dq);
