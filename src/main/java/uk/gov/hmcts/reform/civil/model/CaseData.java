@@ -366,12 +366,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
+    private final String detailsOfDirection;
+
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String bothDefendantsSpec;
     private final String partialPaymentAmount;
     private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
@@ -393,7 +394,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo disabilityPremiumPayments;
     private final YesOrNo severeDisabilityPremiumPayments;
 
+    private final String currentDefendant;
     private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
