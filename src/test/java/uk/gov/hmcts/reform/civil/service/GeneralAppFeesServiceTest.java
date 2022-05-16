@@ -52,7 +52,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getEndpoint()).thenReturn("/fees-register/fees/lookup");
         when(feesConfiguration.getService()).thenReturn("general");
         when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getEvent()).thenReturn("general application");
+        when(feesConfiguration.getEndpoint()).thenReturn("general application");
         when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
@@ -83,8 +83,8 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(1)).getConsentedOrWithoutNoticeKeyword();
         verify(feesConfiguration, never()).getWithNoticeKeyword();
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
-                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice");
+                .isEqualTo("dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
+                        + "jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice");
     }
 
     @Test
@@ -111,8 +111,8 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(1)).getConsentedOrWithoutNoticeKeyword();
         verify(feesConfiguration, never()).getWithNoticeKeyword();
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
-                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice");
+                .isEqualTo("dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
+                        + "jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice");
     }
 
     @Test
@@ -139,8 +139,8 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(1)).getWithNoticeKeyword();
         verify(feesConfiguration, never()).getConsentedOrWithoutNoticeKeyword();
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
-                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GAOnNotice");
+                .isEqualTo("dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
+                        + "jurisdiction2=civil&service=general&keyword=GAOnNotice");
     }
 
     @Test
