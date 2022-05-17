@@ -657,21 +657,36 @@ public class FlowPredicate {
 
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-                break;
-            case ONE_V_ONE:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
-                break;
-            case TWO_V_ONE:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-                break;
-            default:
-                break;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    break;
+                case ONE_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                    break;
+                default:
+                    break;
+            }
         }
         return predicate;
     }

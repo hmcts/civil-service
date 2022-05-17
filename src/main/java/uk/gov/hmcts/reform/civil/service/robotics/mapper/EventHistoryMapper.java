@@ -360,7 +360,9 @@ public class EventHistoryMapper {
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 switch (scenario.equals(TWO_V_ONE)
-                    ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                    ? YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                    ? caseData.getRespondent1ClaimResponseTypeForSpec()
+                    : caseData.getClaimant1ClaimResponseTypeForSpec()
                     : caseData.getRespondent1ClaimResponseTypeForSpec()) {
                     case COUNTER_CLAIM:
                         defaultText = "RPA Reason: Defendant rejects and counter claims.";
