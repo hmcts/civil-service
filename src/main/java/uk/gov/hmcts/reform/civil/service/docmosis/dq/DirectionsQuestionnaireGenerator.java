@@ -681,12 +681,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (isClaimantResponse(caseData)) {
             expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
         }
-
-        Expert expertDetails = Expert.builder()
-            .name(experts.getExpertName())
-            .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
-            .fieldOfExpertise(experts.getFieldofExpertise())
-            .build();
+        Expert expertDetails = null;
+        if (experts != null) {
+            expertDetails = Expert.builder()
+                .name(experts.getExpertName())
+                .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
+                .fieldOfExpertise(experts.getFieldofExpertise())
+                .build();
+        } else {
+            expertDetails = Expert.builder().build();
+        }
 
         return Experts.builder()
             .expertRequired(expertRequired)
