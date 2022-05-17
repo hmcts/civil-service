@@ -54,7 +54,5 @@ public class CaseDataParent implements MappableObject {
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
 
-
-
     private final LocalDateTime addLegalRepDeadline;
 }
