@@ -698,8 +698,12 @@ public class FlowPredicate {
                 predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
                 break;
             case TWO_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                } else {
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                }
                 break;
             default:
                 break;
