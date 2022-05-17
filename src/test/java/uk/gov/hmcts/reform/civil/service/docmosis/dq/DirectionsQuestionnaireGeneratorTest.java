@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -615,10 +616,16 @@ class DirectionsQuestionnaireGeneratorTest {
                 int witnessesIncludingDefendant = 2;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
+                    .setSuperClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                       .respondent1DQExperts(null)
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
                                        .respondent1DQWitnesses(null)
                                        .respondent1DQHearing(null)
                                        .build())
@@ -642,8 +649,13 @@ class DirectionsQuestionnaireGeneratorTest {
                     .setSuperClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                       .respondent1DQExperts(null)
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
                                        .respondent1DQWitnesses(null)
                                        .respondent1DQHearing(null)
                                        .build())

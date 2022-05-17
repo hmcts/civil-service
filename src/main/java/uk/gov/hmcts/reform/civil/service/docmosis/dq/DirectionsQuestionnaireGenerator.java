@@ -212,10 +212,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
         }
 
+        boolean specAndSmallClaim = false;
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
+            witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+            specAndSmallClaim = true;
+        }
+
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
@@ -313,9 +320,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         int witnessesIncludingDefendants;
         if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
             || SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-            if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
-                && caseData.getResponseClaimWitnesses().matches("\\d+")) {
-                witnessesIncludingDefendants = Integer.parseInt(caseData.getResponseClaimWitnesses());
+            String smallClaimNumberOfWitnesses = caseData.getResponseClaimWitnesses();
+            if (isClaimantResponse(caseData)) {
+                smallClaimNumberOfWitnesses = caseData.getApplicant1ClaimWitnesses();
+            }
+            if (StringUtils.isNotBlank(smallClaimNumberOfWitnesses)
+                && smallClaimNumberOfWitnesses.matches("\\d+")) {
+                witnessesIncludingDefendants = Integer.parseInt(smallClaimNumberOfWitnesses);
             } else {
                 witnessesIncludingDefendants = 0;
             }
@@ -664,6 +675,27 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
+    private Experts getSmallClaimExperts(DQ dq, CaseData caseData) {
+        var experts = dq.getSmallClaimExperts();
+        YesOrNo expertRequired = caseData.getResponseClaimExpertSpecRequired();
+        if (isClaimantResponse(caseData)) {
+            expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
+        }
+
+        Expert expertDetails = Expert.builder()
+            .name(experts.getExpertName())
+            .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
+            .fieldOfExpertise(experts.getFieldofExpertise())
+            .build();
+
+        return Experts.builder()
+            .expertRequired(expertRequired)
+            .expertReportsSent(null)
+            .jointExpertSuitable(null)
+            .details(List.of(expertDetails))
+            .build();
+    }
+
     private List<Expert> getExpertsDetails(DQ dq) {
         if (dq.getExperts().getDetails() == null) {
             return Collections.emptyList();
@@ -693,6 +725,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return Witnesses.builder()
             .witnessesToAppear(witnesses.getWitnessesToAppear())
             .details(witnessesList)
+            .build();
+    }
+
+    private Witnesses getWitnessesSmallClaim(Integer witnessesIncludingDefendants) {
+        if (witnessesIncludingDefendants != null
+            && witnessesIncludingDefendants > 0) {
+            return Witnesses.builder().witnessesToAppear(YES)
+                .details(Collections.emptyList())
+                .build();
+        }
+        return Witnesses.builder().witnessesToAppear(NO)
+            .details(Collections.emptyList())
             .build();
     }
 
