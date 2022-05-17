@@ -688,26 +688,38 @@ public class FlowPredicate {
 
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         boolean predicate = false;
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-                break;
-            case ONE_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
-                break;
-            case TWO_V_ONE:
-                if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
                     predicate = NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
-                } else {
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    break;
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
                     predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
                         && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
+
         return predicate;
     }
 }
