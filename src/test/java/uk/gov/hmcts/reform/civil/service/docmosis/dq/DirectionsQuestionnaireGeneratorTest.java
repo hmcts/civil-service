@@ -616,10 +616,16 @@ class DirectionsQuestionnaireGeneratorTest {
                 int witnessesIncludingDefendant = 2;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
+                    .setSuperClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                       .respondent1DQExperts(null)
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
                                        .respondent1DQWitnesses(null)
                                        .respondent1DQHearing(null)
                                        .build())
