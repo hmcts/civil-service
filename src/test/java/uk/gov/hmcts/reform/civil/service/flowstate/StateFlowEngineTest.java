@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
@@ -50,6 +51,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -86,6 +89,7 @@ class StateFlowEngineTest {
     @BeforeEach
     void setup() {
         when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
     }
 
     @Nested
@@ -2681,6 +2685,109 @@ class StateFlowEngineTest {
                 .isTrue();
             assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
                 .isFalse();
+        }
+
+        @Test
+        public void claim1v1_reachFullAdmitProceed() {
+            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+
+            payPBA(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+
+            issuedAndRepresented(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
+
+            issued(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_ISSUED.fullName());
+
+            fullAdmit1v1(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(FULL_ADMISSION.fullName());
+
+            applicantProceeds1v1(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(FULL_ADMIT_PROCEED.fullName());
+        }
+
+        @Test
+        public void claim1v1_reachFullAdmitNoProceed() {
+            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+
+            payPBA(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+
+            issuedAndRepresented(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
+
+            issued(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(CLAIM_ISSUED.fullName());
+
+            fullAdmit1v1(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(FULL_ADMISSION.fullName());
+
+            applicantDoesntProceed1v1(builder);
+
+            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+                .isEqualTo(FULL_ADMIT_NOT_PROCEED.fullName());
+        }
+
+        private CaseData.CaseDataBuilder<?, ?> claim1v1Submitted() {
+            return CaseData.builder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .applicant1(Party.builder().build())
+                .respondent1(Party.builder().build())
+                .submittedDate(LocalDateTime.now());
+        }
+
+        private void payPBA(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder.paymentSuccessfulDate(LocalDateTime.now());
+        }
+
+        private void issuedAndRepresented(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder
+                .issueDate(LocalDate.now())
+                .respondent1Represented(YesOrNo.YES)
+                .respondent1OrgRegistered(YesOrNo.YES);
+        }
+
+        private void issued(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(14));
+        }
+
+        private void fullAdmit1v1(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder.respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        }
+
+        private void applicantProceeds1v1(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder.applicant1ProceedWithClaim(YesOrNo.YES);
+        }
+
+        private void applicantDoesntProceed1v1(CaseData.CaseDataBuilder<?, ?> builder) {
+            builder.applicant1ProceedWithClaim(YesOrNo.NO);
         }
     }
 }
