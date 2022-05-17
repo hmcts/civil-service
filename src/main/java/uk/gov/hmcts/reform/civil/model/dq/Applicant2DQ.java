@@ -17,6 +17,7 @@ public class Applicant2DQ implements DQ {
     private final DisclosureOfNonElectronicDocuments applicant2DQDisclosureOfNonElectronicDocuments;
     private final DisclosureReport applicant2DQDisclosureReport;
     private final Experts applicant2DQExperts;
+    private final ExpertDetails applicant2RespondToClaimExperts;
     private final Witnesses applicant2DQWitnesses;
     private final Hearing applicant2DQHearing;
     private final SmallClaimHearing applicant2DQSmallClaimHearing;
@@ -56,6 +57,11 @@ public class Applicant2DQ implements DQ {
     @JsonProperty("applicant2DQExperts")
     public Experts getExperts() {
         return getExperts(applicant2DQExperts);
+    }
+
+    @JsonProperty("applicant2RespondToClaimExperts")
+    public ExpertDetails getSmallClaimExperts() {
+        return applicant2RespondToClaimExperts;
     }
 
     @Override

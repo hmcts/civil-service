@@ -169,7 +169,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: true
+  enabled: false
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}

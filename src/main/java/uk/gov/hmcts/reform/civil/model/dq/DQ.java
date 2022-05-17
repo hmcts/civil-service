@@ -16,6 +16,8 @@ public interface DQ {
 
     DisclosureReport getDisclosureReport();
 
+    ExpertDetails getSmallClaimExperts();
+
     Experts getExperts();
 
     default Experts getExperts(Experts experts) {
