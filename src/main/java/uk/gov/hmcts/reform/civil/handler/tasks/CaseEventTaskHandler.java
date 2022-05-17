@@ -110,8 +110,12 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
                 case FULL_DEFENCE_PROCEED:
+                case FULL_ADMIT_PROCEED:
+                case PART_ADMIT_PROCEED:
                     return "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
+                case FULL_ADMIT_NOT_PROCEED:
+                case PART_ADMIT_NOT_PROCEED:
                     return "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
