@@ -23,12 +23,14 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -43,6 +45,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
+    private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
+            + "respondent solicitor are assigned to the case.";
 
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -53,6 +57,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
+            callbackKey(ABOUT_TO_START), this::validateEventEnabling,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
@@ -64,6 +69,17 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse validateEventEnabling(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
+            errors.add(RESP_NOT_ASSIGNED_ERROR);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
     }
 
     private List<String> getPbaAccounts(String authToken) {

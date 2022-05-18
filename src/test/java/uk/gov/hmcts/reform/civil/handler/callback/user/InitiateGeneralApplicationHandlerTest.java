@@ -41,6 +41,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -634,6 +635,37 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
+        }
+    }
+
+    @Nested
+    class AboutToStartCallbackHandling extends GeneralAppSampleDataBuilder {
+        private static final String ERROR = "Application cannot be created until all the required respondent "
+                + "solicitor are assigned to the case.";
+
+        @Test
+        void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(ERROR);
         }
     }
 }

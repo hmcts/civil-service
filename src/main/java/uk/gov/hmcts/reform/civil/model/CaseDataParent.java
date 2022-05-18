@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
@@ -9,9 +10,11 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Jacksonized
@@ -48,4 +51,9 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
     private final LocalDateTime addLegalRepDeadline;
+
+    @Builder.Default
+    private final List<Value<Document>> caseDocuments = new ArrayList<>();
+    private final String caseDocument1Name;
+
 }
