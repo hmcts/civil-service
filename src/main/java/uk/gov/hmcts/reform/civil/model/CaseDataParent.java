@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -82,5 +84,13 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingPreferredEmail disposalHearingPreferredEmail;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
+    private final YesOrNo drawDirectionsOrderRequired;
+    private final YesOrNo drawDirectionsOrderSmallClaims;
+    private final ClaimsTrack claimsTrack;
+    private final OrderType orderType;
+
+    // sdo ui flags
+    private final YesOrNo setSmallClaimsFlag;
+    private final YesOrNo setFastTrackFlag;
 
 }
