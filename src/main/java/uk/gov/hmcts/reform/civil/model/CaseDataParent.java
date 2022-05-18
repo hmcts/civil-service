@@ -15,13 +15,17 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,8 +75,9 @@ public class CaseDataParent implements MappableObject {
     private final String respondent2OrganisationIDCopy;
     
     // sdo fields
-    private JudgementSum judgementSum;
+    private final JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
+    private DisposalHearingJudgementDeductionValue disposalHearingJudgementDeductionValue;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
     private DisposalHearingWitnessOfFact disposalHearingWitnessOfFact;
     private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
@@ -80,6 +85,8 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
     private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private DisposalHearingPreferredTelephone disposalHearingPreferredTelephone;
+    private DisposalHearingPreferredEmail disposalHearingPreferredEmail;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
 
