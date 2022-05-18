@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -125,11 +126,18 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (respondent2HasSameLegalRep(caseData)) {
+        boolean claimantResponseLRspec = false;
+        if (directionsQuestionnaireGenerator.isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
+        if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseType() != null
-                    && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                     CaseDocument directionsQuestionnaire =
                         directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
                             caseData,
@@ -147,8 +155,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 }
 
                 if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseType() != null
-                    && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec()
+                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                     CaseDocument directionsQuestionnaire =
                         directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
                             caseData,

@@ -70,12 +70,26 @@ public class Applicant1DQ implements DQ {
     @Override
     @JsonProperty("applicant1DQHearing")
     public Hearing getHearing() {
-        return getHearing(applicant1DQHearing);
+        if (applicant1DQHearing != null) {
+            return getHearing(applicant1DQHearing);
+        }
+        DQUtil util = new DQUtil();
+
+        if (applicant1DQHearingLRspec != null) {
+            return util.buildFastTrackHearing(applicant1DQHearingLRspec);
+        }
+        if (applicant1DQSmallClaimHearing != null) {
+            SmallClaimHearing small = getSmallClaimHearing();
+            return util.buildSmallClaimHearing(small);
+        }
+
+        return null;
     }
 
     @Override
+    @JsonProperty("applicant1DQSmallClaimHearing")
     public SmallClaimHearing getSmallClaimHearing() {
-        return null;
+        return getSmallClaimHearing(applicant1DQSmallClaimHearing);
     }
 
     @Override
@@ -85,7 +99,16 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant1DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
+
+        if (applicant1DQRequestedCourt != null) {
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
+                .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .build();
+        }
         return null;
     }
 
