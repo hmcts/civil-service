@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -77,6 +80,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateDisposalHearingPage)
+            .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -100,11 +104,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
         JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
-        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
-        String preferredTelephone = hearingSupportRequirementsDJ != null ?
-            hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
-        String preferredEmail = hearingSupportRequirementsDJ != null ?
-            hearingSupportRequirementsDJ.getHearingPreferredEmail() : "N/A";
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
@@ -224,6 +223,40 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
+        YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
+        ClaimsTrack claimsTrack = caseData.getClaimsTrack();
+        OrderType orderType = caseData.getOrderType();
+
+        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+            && (claimsTrack == ClaimsTrack.smallClaimsTrack);
+        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
+            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
+        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+            && (claimsTrack == ClaimsTrack.fastTrack);
+        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
+            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
+
+        updatedData.setSmallClaimsFlag(YesOrNo.NO);
+        updatedData.setFastTrackFlag(YesOrNo.NO);
+
+        if (smallClaimsPath1 || smallClaimsPath2) {
+            updatedData.setSmallClaimsFlag(YesOrNo.YES)
+                .build();
+        } else if (fastTrackPath1 || fastTrackPath2) {
+            updatedData.setFastTrackFlag(YesOrNo.YES)
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
