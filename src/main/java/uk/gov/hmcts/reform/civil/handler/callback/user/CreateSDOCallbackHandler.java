@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -82,6 +85,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateDisposalHearingPage)
             .put(callbackKey(MID, "disposal-hearing"), this::fetchLocationData)
+            .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -238,6 +242,40 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
+        YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
+        ClaimsTrack claimsTrack = caseData.getClaimsTrack();
+        OrderType orderType = caseData.getOrderType();
+
+        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+            && (claimsTrack == ClaimsTrack.smallClaimsTrack);
+        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
+            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
+        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+            && (claimsTrack == ClaimsTrack.fastTrack);
+        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
+            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
+
+        updatedData.setSmallClaimsFlag(YesOrNo.NO);
+        updatedData.setFastTrackFlag(YesOrNo.NO);
+
+        if (smallClaimsPath1 || smallClaimsPath2) {
+            updatedData.setSmallClaimsFlag(YesOrNo.YES)
+                .build();
+        } else if (fastTrackPath1 || fastTrackPath2) {
+            updatedData.setFastTrackFlag(YesOrNo.YES)
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

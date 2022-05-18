@@ -15,6 +15,9 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -259,25 +262,94 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
-        private static final String PAGE_ID = "disposal-hearing";
+    class MidEventSetOrderDetailsFlags {
+        private static final String PAGE_ID = "order-details-navigation";
 
         @Test
-        void shouldPrePopulateDisposalHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+        void smallClaimsFlagAndFastTrackFlagSetToNo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("No");
+        }
 
-            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+        @Test
+        void smallClaimsFlagSetToYesPathOne() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
 
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList))
-                .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("No");
+        }
+
+        @Test
+        void smallClaimsFlagSetToYesPathTwo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("No");
+        }
+
+        @Test
+        void fastTrackFlagSetToYesPathOne() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("Yes");
+        }
+
+        @Test
+        void fastTrackFlagSetToYesPathTwo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .orderType(OrderType.DECIDE_DAMAGES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("Yes");
         }
     }
 
