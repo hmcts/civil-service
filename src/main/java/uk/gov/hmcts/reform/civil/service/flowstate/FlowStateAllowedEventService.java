@@ -70,6 +70,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -390,6 +397,34 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM
             )
+        ),
+        entry(
+            TAKEN_OFFLINE_BY_STAFF.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName(),
+            List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
+            List.of(ADD_CASE_NOTE)
         )
     );
 
@@ -609,6 +644,29 @@ public class FlowStateAllowedEventService {
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(DISMISS_CLAIM)
+        ),
+        entry(
+            AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC,
+                ACKNOWLEDGE_CLAIM,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION
+            )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC
+            )
         )
     );
 

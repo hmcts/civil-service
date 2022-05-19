@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -477,7 +476,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimNotified_1v1()
                 .legacyCaseReference("100DC019")
                 .caseNotes(CaseNote.builder()
-                               .createdOn(LocalDate.now())
+                               .createdOn(LocalDateTime.now())
                                .createdBy("createdBy")
                                .note("my note")
                                .build())

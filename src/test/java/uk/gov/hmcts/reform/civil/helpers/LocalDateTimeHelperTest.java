@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,13 +14,17 @@ class LocalDateTimeHelperTest {
         LocalDateTime utcTime = LocalDateTimeHelper.nowInUTC();
         LocalDateTime localTime = LocalDateTimeHelper.nowInLocalZone();
 
-        assertThat(localTime.getHour() - utcTime.getHour()).isEqualTo(1);
+        long difference = ChronoUnit.HOURS.between(utcTime, localTime);
+
+        assertThat(difference).isEqualTo(1);
     }
 
     @Test
     void utcTimeToLocalTimeConversionShouldIncrementByAnHour() {
         LocalDateTime utcTime = LocalDateTimeHelper.nowInUTC();
 
-        assertThat(LocalDateTimeHelper.fromUTC(utcTime).getHour() - utcTime.getHour()).isEqualTo(1);
+        long difference = ChronoUnit.HOURS.between(utcTime, LocalDateTimeHelper.fromUTC(utcTime));
+
+        assertThat(difference).isEqualTo(1);
     }
 }
