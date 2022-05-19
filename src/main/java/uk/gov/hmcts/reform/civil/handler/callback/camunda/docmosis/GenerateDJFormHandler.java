@@ -50,8 +50,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        if (isSpecHandler(callbackParams)) return TASK_ID_SPEC;
-        return TASK_ID;
+        return isSpecHandler(callbackParams) ? TASK_ID_SPEC : TASK_ID;
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
