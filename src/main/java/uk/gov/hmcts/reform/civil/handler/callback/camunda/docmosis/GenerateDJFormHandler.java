@@ -50,13 +50,20 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isSpecHandler(callbackParams) ? TASK_ID_SPEC : TASK_ID;
+        if (isSpecHandler(callbackParams)) return TASK_ID_SPEC;
+        return TASK_ID;
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (ofNullable(caseData.getRespondent2()).isPresent()
+
+        if (isSpecHandler(callbackParams) == true && ofNullable(caseData.getRespondent2()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            buildDocument(callbackParams, caseDataBuilder);
+        }
+
+        if (isSpecHandler(callbackParams) == false && ofNullable(caseData.getRespondent2()).isPresent()
             && caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             buildDocument(callbackParams, caseDataBuilder);
         } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
