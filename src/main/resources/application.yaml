@@ -110,7 +110,7 @@ notifications:
   breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
   breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "97ffda16-0d55-49fc-ade4-36f023cdad23"
-  respondentSolicitorClaimDetailsEmailTemplateMultiParty: "6cce54b7-4cf0-4770-9dca-db1a38226f1e"
+  respondentSolicitorClaimDetailsEmailTemplate: "17151a5a-00b1-48b7-8e45-38a5f20b6ec0"
   solicitorDefendantResponseCaseTakenOffline: "c865678e-66a5-4249-8ab6-65de962c5211"
   claimantSolicitorDefendantResponseFullDefence: "64c1ce3c-1b2a-4959-914b-38cceb6ae195"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "d6b33ddd-833e-46ed-9887-c86e929d140b"
