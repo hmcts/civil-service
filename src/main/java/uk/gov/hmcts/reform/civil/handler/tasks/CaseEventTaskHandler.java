@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SE
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
@@ -174,7 +175,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                          StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
                                          StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
                 case FULL_DEFENCE_PROCEED:
-                    return getDescriptionFullDefenceProceed(caseData);
+                    return !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                        ? getDescriptionFullDefenceProceed(caseData) : null;
                 default:
                     break;
             }
