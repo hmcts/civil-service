@@ -30,7 +30,7 @@
           "$id": "#/properties/header/properties/caseNumber",
           "type": "string",
           "minLength": 8,
-          "maxLength": 8,
+          "maxLength": 9,
           "description": "The case reference number. It should be in CASEMAN format."
         },
         "owningCourtCode": {
