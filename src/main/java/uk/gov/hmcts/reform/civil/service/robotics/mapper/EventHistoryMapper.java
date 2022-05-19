@@ -371,13 +371,13 @@ public class EventHistoryMapper {
             } else {
                 switch (caseData.getRespondent1ClaimResponseType()) {
                     case COUNTER_CLAIM:
-                        defaultText = "RPA Reason: Defendant rejects and counter claims.";
+                        defaultText = "Defendant rejects and counter claims.";
                         break;
                     case FULL_ADMISSION:
-                        defaultText = "RPA Reason: Defendant fully admits.";
+                        defaultText = "Defendant fully admits.";
                         break;
                     case PART_ADMISSION:
-                        defaultText = "RPA Reason: Defendant partial admission.";
+                        defaultText = "Defendant partial admission.";
                         break;
                     default:
                         break;
@@ -389,7 +389,7 @@ public class EventHistoryMapper {
                 paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
-                "RPA Reason: %sDefendant: %s has responded: %s",
+                "%sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
                 getResponseTypeForRespondent(caseData, respondent)
@@ -1099,14 +1099,14 @@ public class EventHistoryMapper {
                 List<Event> events = new ArrayList<>();
                 if (defendant1AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
-                        "RPA Reason: Defendant: %s has acknowledged: %s",
+                        "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent1().getPartyName(),
                         caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                     )));
                 }
                 if (defendant2AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
-                        "RPA Reason: Defendant: %s has acknowledged: %s",
+                        "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent2().getPartyName(),
                         caseData.getRespondent2ClaimResponseIntentionType().getLabel()
                     )));
@@ -1123,7 +1123,7 @@ public class EventHistoryMapper {
                         List.of(
                             buildAcknowledgementOfServiceEvent(
                                 builder, caseData, true, format(
-                                    "RPA Reason: [1 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                    "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent1().getPartyName(),
                                     caseData.getRespondent1ClaimResponseIntentionType().getLabel()
@@ -1131,7 +1131,7 @@ public class EventHistoryMapper {
                             ),
                             buildAcknowledgementOfServiceEvent(
                                 builder, caseData, false, format(
-                                    "RPA Reason: [2 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                    "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
                                     caseData.getRespondent2ClaimResponseIntentionType().getLabel()
@@ -1377,9 +1377,9 @@ public class EventHistoryMapper {
             .format(DateTimeFormatter.ofPattern("dd MM yyyy"));
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return format("RPA Reason: Defendant(s) have agreed extension: %s", extensionDate);
+                return format("Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return format("RPA Reason: Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
+                return format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
                               extensionDate
                 );
             default:

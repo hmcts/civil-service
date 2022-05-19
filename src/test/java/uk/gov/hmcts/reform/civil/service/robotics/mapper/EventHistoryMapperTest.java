@@ -626,9 +626,9 @@ class EventHistoryMapperTest {
         class OneVTwoOneLegalRep {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
+                String expectedMiscText1 = "[1 of 2 - 2020-08-01] "
                     + "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
+                String expectedMiscText2 = "[2 of 2 - 2020-08-01] "
                     + "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -677,9 +677,9 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
                 String expectedMiscText2 =
-                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -723,7 +723,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentOneRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -755,7 +755,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentTwoRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -859,7 +859,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
-                    format("RPA Reason: Defendant: Mr. Sole Trader has agreed extension: %s",
+                    format("Defendant: Mr. Sole Trader has agreed extension: %s",
                            caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -879,7 +879,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent2Data(caseData),
-                    format("RPA Reason: Defendant: Mr. John Rambo has agreed extension: %s",
+                    format("Defendant: Mr. John Rambo has agreed extension: %s",
                            caseData.getRespondentSolicitor2AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -899,7 +899,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
-                    format("RPA Reason: Defendant(s) have agreed extension: %s",
+                    format("Defendant(s) have agreed extension: %s",
                            caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -957,9 +957,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
+                    .eventDetailsText("Defendant fully admits.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
+                                      .miscText("Defendant fully admits.")
                                       .build())
                     .build()
             );
@@ -1040,9 +1040,9 @@ class EventHistoryMapperTest {
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
+                    .eventDetailsText("Defendant fully admits.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
+                                      .miscText("Defendant fully admits.")
                                       .build())
                     .build()
             );
@@ -1421,9 +1421,9 @@ class EventHistoryMapperTest {
                 .eventSequence(2)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
+                .eventDetailsText("[1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
                 .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                  .miscText("[1 of 2 - 2020-08-01] "
                                                 + "Defendant: Mr. Sole Trader has responded: null")
                                   .build())
                 .build();
@@ -1574,9 +1574,9 @@ class EventHistoryMapperTest {
                     .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant partial admission.")
+                    .eventDetailsText("Defendant partial admission.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant partial admission.")
+                                      .miscText("Defendant partial admission.")
                                       .build())
                     .build()
             );
@@ -1643,9 +1643,9 @@ class EventHistoryMapperTest {
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant partial admission.")
+                    .eventDetailsText("Defendant partial admission.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant partial admission.")
+                                      .miscText("Defendant partial admission.")
                                       .build())
                     .build()
             );
@@ -1855,9 +1855,9 @@ class EventHistoryMapperTest {
                     .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
+                    .eventDetailsText("Defendant rejects and counter claims.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant rejects and counter claims.")
+                                      .miscText("Defendant rejects and counter claims.")
                                       .build())
                     .build()
             );
@@ -1924,9 +1924,9 @@ class EventHistoryMapperTest {
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
+                    .eventDetailsText("Defendant rejects and counter claims.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant rejects and counter claims.")
+                                      .miscText("Defendant rejects and counter claims.")
                                       .build())
                     .build()
             );
@@ -2855,9 +2855,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                        .eventDetailsText("Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                            .miscText("Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -2906,9 +2906,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                        .eventDetailsText("Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                            .miscText("Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                                           .build())
                         .build()
                 );
