@@ -2385,16 +2385,7 @@ class EventHistoryMapperTest {
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText(respondent1MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent1MiscText)
-                                      .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(5)
+                    .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .eventDetailsText(respondent2MiscText)
@@ -2410,8 +2401,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2562,15 +2552,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(6)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
                     .build()
             );
 
@@ -2585,8 +2566,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2735,15 +2715,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(6)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
                     .build()
                 );
 
@@ -2758,8 +2729,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
