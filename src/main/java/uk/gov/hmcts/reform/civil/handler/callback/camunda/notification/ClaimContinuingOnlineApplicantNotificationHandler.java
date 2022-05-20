@@ -11,9 +11,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE;
@@ -29,9 +35,11 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE);
     public static final String TASK_ID = "CreateClaimContinuingOnlineNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+    private static final String CASEWORKER_CAA_ROLE = "pui-caa";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -53,8 +61,36 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        //get org ID for respondent 1
+        var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+
+        //get users in this firm
+        Optional<ProfessionalUsersEntityResponse> orgUsers =
+            organisationService.findUsersInOrganisation(organisationId);
+
+        //identify caa users based on user roles
+        List<String> caaEmails = new ArrayList<>();
+        for (ProfessionalUsersResponse user : orgUsers.orElse(null).getUsers()) {
+            if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
+                String email = user.getEmail();
+                caaEmails.add(email);
+            }
+        }
+        System.out.print(caaEmails);
+
+        String recipient;
+        if (caaEmails.isEmpty()) {
+            //no CAA defined, use superuser for the firm
+            System.out.println("NO CAA DEFINED");
+            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
+            recipient = organisation.get().getSuperUser().getEmail();
+        } else {
+            System.out.println("TAKING FIRST CAA FROM LIST");
+            recipient = caaEmails.get(0);
+        }
+
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            recipient,
             notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
