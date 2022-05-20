@@ -57,27 +57,27 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private CallbackResponse notifyAllPartiesInterimJudgmentApproved(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(caseData.getAddRespondent2()!=null && caseData.getAddRespondent2().equals(YesOrNo.YES)){
-            if(BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())
-                && caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.YES)){
+        if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
+            if (BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())
+                && caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.YES)) {
                 notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                              notificationsProperties.getInterimJudgmentRequested2Defendants(),
                                              addProperties2Defendants(caseData),
-                                             String.format(REFERENCE_TEMPLATE_REQUEST
-                                                 ,caseData.getLegacyCaseReference()));
-                }else{
-                if(checkDefendantRequested(caseData, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName())
-                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())){
+                                             String.format(REFERENCE_TEMPLATE_REQUEST,
+                                                           caseData.getLegacyCaseReference()));
+            } else {
+                if (checkDefendantRequested(caseData, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName())
+                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
                     notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                                  notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                                  addProperties(caseData),
-                                                 String.format(REFERENCE_TEMPLATE_REQUEST
-                                                     , caseData.getLegacyCaseReference()));
+                                                 String.format(REFERENCE_TEMPLATE_REQUEST,
+                                                               caseData.getLegacyCaseReference()));
                 }
-                if(checkDefendantRequested(caseData, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName())
-                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())){
-                    notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null ?
-                                                     caseData.getRespondentSolicitor2EmailAddress() :
+                if (checkDefendantRequested(caseData, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName())
+                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
+                    notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
+                                                     ? caseData.getRespondentSolicitor2EmailAddress() :
                                                      caseData.getRespondentSolicitor1EmailAddress(),
                                                  notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                                  addPropertiesDefendant2(caseData),
@@ -86,12 +86,12 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                     );
                 }
             }
-        }else{
+        } else {
             notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                          notificationsProperties.getInterimJudgmentApprovalDefendant(),
                                          addProperties(caseData),
-                                         String.format(REFERENCE_TEMPLATE_APPROVAL
-                                             , caseData.getLegacyCaseReference()));
+                                         String.format(REFERENCE_TEMPLATE_APPROVAL,
+                                                       caseData.getLegacyCaseReference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -130,10 +130,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
 
-    private boolean checkDefendantRequested(final CaseData caseData, String defendantName){
-        if(caseData.getDefendantDetails()!=null){
+    private boolean checkDefendantRequested(final CaseData caseData, String defendantName) {
+        if (caseData.getDefendantDetails() != null) {
             return defendantName.equals(caseData.getDefendantDetails().getValue().getLabel());
-        }else{
+        } else {
             return false;
         }
     }
@@ -142,14 +142,18 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) return organisation.get().getName();
+        if (organisation.isPresent()) {
+            return organisation.get().getName();
+        }
         return caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName();
     }
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) return organisation.get().getName();
+        if (organisation.isPresent()) {
+            return organisation.get().getName();
+        }
         return caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName();
     }
 }

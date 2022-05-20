@@ -38,7 +38,7 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_CLAIMANT);
     private static final String REFERENCE_TEMPLATE_APPROVAL = "interim-judgment-approval-notification-%s";
     private static final String REFERENCE_TEMPLATE_REQUEST = "interim-judgment-requested-notification-%s";
-    private static final String TASK_ID= "NotifyInterimJudgmentClaimant";
+    private static final String TASK_ID = "NotifyInterimJudgmentClaimant";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,15 +54,15 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
 
     private CallbackResponse notifyAllPartiesInterimJudgmentApproved(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if(caseData.getAddRespondent2()!=null &&
-            caseData.getAddRespondent2().equals(YesOrNo.YES)){
+        if (caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getInterimJudgmentRequestedClaimant(),
                 addProperties2Defendants(caseData),
-                String.format(REFERENCE_TEMPLATE_REQUEST
-                    , caseData.getLegacyCaseReference()));
-        }else{
+                String.format(REFERENCE_TEMPLATE_REQUEST,
+                              caseData.getLegacyCaseReference()));
+        } else {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getInterimJudgmentApprovalClaimant(),
@@ -101,7 +101,9 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) return organisation.get().getName();
+        if (organisation.isPresent()) {
+            return organisation.get().getName();
+        }
         return caseData.getApplicant1().getPartyName();
     }
 }
