@@ -5,12 +5,14 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -43,6 +46,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -53,7 +57,9 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -65,6 +71,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -76,10 +83,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -103,6 +112,7 @@ public class CaseDataBuilder {
     // Create Claim
     protected Long ccdCaseReference;
     protected SolicitorReferences solicitorReferences;
+    protected String respondentSolicitor2Reference;
     protected CourtLocation courtLocation;
     protected Party applicant1;
     protected Party applicant2;
@@ -139,18 +149,28 @@ public class CaseDataBuilder {
     // Defendant Response Defendant 1
     protected RespondentResponseType respondent1ClaimResponseType;
     protected ResponseDocument respondent1ClaimResponseDocument;
+    protected ResponseDocument respondentSharedClaimResponseDocument;
     protected Respondent1DQ respondent1DQ;
     protected Respondent2DQ respondent2DQ;
     protected Applicant1DQ applicant1DQ;
+    protected Applicant2DQ applicant2DQ;
     // Defendant Response Defendant 2
     protected RespondentResponseType respondent2ClaimResponseType;
     protected ResponseDocument respondent2ClaimResponseDocument;
     protected YesOrNo respondentResponseIsSame;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    protected RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
+    protected YesOrNo applicant1ProceedWithClaimSpec2v1;
+    protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    protected YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    protected YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    protected YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
     protected ResponseDocument applicant1DefenceResponseDocument;
+    protected ResponseDocument applicant2DefenceResponseDocument;
     protected BusinessProcess businessProcess;
 
     //Case proceeds in caseman
@@ -164,6 +184,7 @@ public class CaseDataBuilder {
     protected OrganisationPolicy respondent1OrganisationPolicy;
     protected OrganisationPolicy respondent2OrganisationPolicy;
     protected YesOrNo addApplicant2;
+    protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
@@ -191,6 +212,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent2ResponseDate;
     protected LocalDateTime applicant1ResponseDeadline;
     protected LocalDateTime applicant1ResponseDate;
+    protected LocalDateTime applicant2ResponseDate;
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
@@ -219,10 +241,21 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
+    private RepaymentPlanLRspec respondent2RepaymentPlan;
+    private YesOrNo applicantsProceedIntention;
+    private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
+    private Address specAoSApplicantCorrespondenceAddressDetails;
+    private YesOrNo specAoSRespondent2HomeAddressRequired;
+    private Address specAoSRespondent2HomeAddressDetails;
+    private YesOrNo respondent1DQWitnessesRequiredSpec;
+    private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -368,6 +401,8 @@ public class CaseDataBuilder {
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
@@ -398,6 +433,8 @@ public class CaseDataBuilder {
             .respondent2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
             .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
@@ -430,6 +467,8 @@ public class CaseDataBuilder {
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
+            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                    .vulnerabilityAdjustmentsRequired(NO).build())
             .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
             .build();
         return this;
@@ -440,8 +479,43 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant2DQ() {
+        applicant2DQ = Applicant2DQ.builder()
+            .applicant2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                         .explainedToClient(List.of("OTHER"))
+                                                         .oneMonthStayRequested(NO)
+                                                         .reactionProtocolCompliedWith(YES)
+                                                         .build())
+            .applicant2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                             .reachedAgreement(YES)
+                                                             .build())
+            .applicant2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                .directionsForDisclosureProposed(NO)
+                                                                .build())
+            .applicant2DQExperts(Experts.builder().expertRequired(NO).build())
+            .applicant2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .applicant2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .applicant2DQLanguage(WelshLanguageRequirements.builder().build())
+            .applicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQ(Applicant2DQ applicant2DQ) {
+        this.applicant2DQ = applicant2DQ;
+        return this;
+    }
+
     public CaseDataBuilder respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails organisationDetails) {
         this.respondentSolicitor1OrganisationDetails = organisationDetails;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails organisationDetails) {
+        this.respondentSolicitor2OrganisationDetails = organisationDetails;
         return this;
     }
 
@@ -450,8 +524,43 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1ProceedWithClaimSpec2v1(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimSpec2v1 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimMultiParty2v1(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimMultiParty2v1 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant2ProceedWithClaimMultiParty2v1(YesOrNo yesOrNo) {
+        this.applicant2ProceedWithClaimMultiParty2v1 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicantsProceedIntention(YesOrNo yesOrNo) {
+        this.applicantsProceedIntention = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = yesOrNo;
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseIntentionType(ResponseIntention responseIntention) {
         this.respondent1ClaimResponseIntentionType = responseIntention;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseIntentionType(ResponseIntention responseIntention) {
+        this.respondent2ClaimResponseIntentionType = responseIntention;
         return this;
     }
 
@@ -545,6 +654,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        this.respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        this.respondent2ClaimResponseTypeForSpec = respondentResponseTypeSpec;
+        return this;
+    }
+
     public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
         this.respondent1LitigationFriendCreatedDate = createdDate;
         return this;
@@ -618,6 +737,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState(FlowState.Main flowState) {
+        return atState(flowState, ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atState(FlowState.Main flowState, MultiPartyScenario mpScenario) {
         switch (flowState) {
             case DRAFT:
                 return atStateClaimDraft();
@@ -650,7 +773,11 @@ public class CaseDataBuilder {
             case NOTIFICATION_ACKNOWLEDGED:
                 return atStateNotificationAcknowledged();
             case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
-                return atStateNotificationAcknowledgedTimeExtension();
+                return atStateNotificationAcknowledgedRespondent1TimeExtension();
+            case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
+                return atStateAwaitingResponseFullDefenceReceived();
+            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                return atStateAwaitingResponseNotFullDefenceReceived();
             case FULL_DEFENCE:
                 return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
             case FULL_ADMISSION:
@@ -660,7 +787,7 @@ public class CaseDataBuilder {
             case COUNTER_CLAIM:
                 return atStateRespondentCounterClaim();
             case FULL_DEFENCE_PROCEED:
-                return atStateApplicantRespondToDefenceAndProceed();
+                return atStateApplicantRespondToDefenceAndProceed(mpScenario);
             case FULL_DEFENCE_NOT_PROCEED:
                 return atStateApplicantRespondToDefenceAndNotProceed();
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
@@ -1055,6 +1182,18 @@ public class CaseDataBuilder {
         addRespondent2 = YES;
         respondent2Represented = YES;
         respondent2SameLegalRepresentative = YES;
+        respondent1OrganisationPolicy =
+            OrganisationPolicy.builder()
+                .organisation(Organisation.builder().organisationID("org1").build())
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                .orgPolicyReference("org1PolicyReference")
+                .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndSameUnregisteredRepresentative() {
+        atStateClaimIssued1v2AndSameRepresentative();
+        respondent1OrgRegistered = NO;
         return this;
     }
 
@@ -1205,6 +1344,30 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
         atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent1DQ();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingResponseNotFullDefenceReceived() {
+        atStateAwaitingResponseNotFullDefenceReceived(RespondentResponseType.FULL_ADMISSION);
+        return this;
+    }
+
+    public CaseDataBuilder atStateAwaitingResponseNotFullDefenceReceived(RespondentResponseType responseType) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = responseType;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
         claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -1248,6 +1411,31 @@ public class CaseDataBuilder {
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDate = null;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension() {
+        atStateClaimDetailsNotified();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = NO;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension() {
+        atStateClaimDetailsNotifiedTimeExtension();
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = YES;
         return this;
     }
 
@@ -1300,7 +1488,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         takenOfflineByStaff();
         takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
         return this;
@@ -1312,6 +1500,119 @@ public class CaseDataBuilder {
             .reason(ReasonForProceedingOnPaper.APPLICATION)
             .build();
         takenOfflineByStaffDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSpec1v1ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        addRespondent2 = NO;
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSpec2v1ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        addRespondent2 = NO;
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        multiPartyClaimTwoApplicants();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSpec1v2ClaimSubmitted() {
+        submittedDate = LocalDateTime.now().plusDays(1);
+        atStatePaymentSuccessful();
+        atStatePendingClaimIssued();
+        atStateClaimIssued();
+        multiPartyClaimOneDefendantSolicitor();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v1FullAdmissionSpec() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v1FullDefenceSpec() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1FullAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1PartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1CounterClaim() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1SecondFullDefence_FirstPartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1FirstFullDefence_SecondPartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_CounterClaimX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2FullAdmission() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2AdmitAll_AdmitPart() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2FullDefence_AdmitPart() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2AdmintPart_FullDefence() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -1327,6 +1628,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
         atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondent2 = PartyBuilder.builder().individual().build();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
@@ -1401,13 +1703,44 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateFullAdmission_1v2_BothRespondentSolicitiorsSubmitFullAdmissionResponse() {
+    public CaseDataBuilder atStateFullAdmission_1v2_BothRespondentSolicitorsSubmitFullAdmissionResponse() {
         atStateRespondentFullAdmission();
         respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses() {
+        atStateRespondentFullDefenceSpec();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant2-defence.pdf").build())
+            .build();
+        respondent2DQ();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceSpec() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
+            .build();
+        respondent1DQ();
+        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        ccdState = AWAITING_APPLICANT_INTENTION;
         return this;
     }
 
@@ -1443,7 +1776,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentFullDefenceAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         //respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1526,6 +1859,56 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBothRespondentsSameResponse(RespondentResponseType respondentResponseType) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = respondentResponseType;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondentResponseType);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType responseType) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = responseType;
+        respondent2ClaimResponseType = responseType;
+        respondentResponseIsSame(YES);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2ResponseDate = respondent1ResponseDate;
+        respondent2ClaimResponseIntentionType = respondent1ClaimResponseIntentionType;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent2Responds(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponse(RespondentResponseType respondent1Response,
+                                                       RespondentResponseType respondent2Response) {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2Responds(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                       RespondentResponseTypeSpec respondent2Response) {
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2RespondsSpec(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotificationAcknowledged() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_ADMISSION);
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1551,7 +1934,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentFullAdmissionAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         ccdState = AWAITING_APPLICANT_INTENTION;
@@ -1580,7 +1963,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentPartAdmissionAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.PART_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1609,7 +1992,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateRespondentCounterClaimAfterAcknowledgementTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
@@ -1652,6 +2035,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePastClaimDismissedDeadline_1v2() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        claimDismissedDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDismissed() {
         atStatePastClaimDismissedDeadline();
         ccdState = CASE_DISMISSED;
@@ -1660,21 +2049,176 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
+        return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario mpScenario) {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
-        applicant1ProceedWithClaim = YES;
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
         applicant1DQ();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-        return this;
+
+        switch (mpScenario) {
+            case ONE_V_TWO_ONE_LEGAL_REP: {
+                respondent2SameLegalRepresentative = YES;
+                return atStateRespondentFullDefenceRespondent2();
+            }
+            case ONE_V_TWO_TWO_LEGAL_REP: {
+                respondent2SameLegalRepresentative = NO;
+                return atStateRespondentFullDefenceRespondent2();
+            }
+            case ONE_V_ONE: {
+                applicant1ProceedWithClaim = YES;
+                return this;
+            }
+            default: {
+                return this;
+            }
+        }
     }
 
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                                       RespondentResponseTypeSpec respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent2RespondsSpec(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2RespondsSpec(RespondentResponseTypeSpec responseType) {
+        this.respondent2ClaimResponseTypeForSpec = responseType;
+        this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = YES;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = NO;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = YES;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_1v2() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = NO;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothApplicantsRespondToDefenceAndProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicant1RespondToDefenceAndProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicant2RespondToDefenceAndProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_2v1() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant2ProceedWithClaimMultiParty2v1 = NO;
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         return this;
     }
@@ -1697,11 +2241,28 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNotificationAcknowledged_1v2_BothDefendants() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent1AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2() {
         atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2Only() {
+        atStateNotificationAcknowledgedRespondent2();
+        respondent1AcknowledgeNotificationDate = null;
         return this;
     }
 
@@ -1713,7 +2274,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension() {
-        atStateNotificationAcknowledgedTimeExtension();
+        atStateNotificationAcknowledgedRespondent1TimeExtension();
         this.claimDismissedDate = respondent1TimeExtensionDate.plusDays(1);
         this.claimDismissedDeadline = LocalDateTime.now().minusDays(1);
         return this;
@@ -1732,12 +2293,42 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateNotificationAcknowledgedTimeExtension() {
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension(int numberOfHoursAfterCurrentDate) {
         atStateNotificationAcknowledged();
-        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(1);
+        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent1TimeExtension() {
+        return atStateNotificationAcknowledgedRespondent1TimeExtension(1);
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedTimeExtension_1v2DS() {
+        atStateNotificationAcknowledged_1v2_BothDefendants();
+        respondent1TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = respondent2AcknowledgeNotificationDate.plusHours(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension(int numberOfHoursAfterCurrentDate) {
+        atStateNotificationAcknowledged();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateNotificationAcknowledgedRespondent2TimeExtension() {
+        return atStateNotificationAcknowledgedRespondent2TimeExtension(5);
     }
 
     public CaseDataBuilder atStatePastApplicantResponseDeadline() {
@@ -1754,6 +2345,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
+        return this;
+    }
+
+    public CaseDataBuilder applicant2ResponseDate(LocalDateTime applicant2ResponseDate) {
+        this.applicant2ResponseDate = applicant2ResponseDate;
         return this;
     }
 
@@ -1814,6 +2410,7 @@ public class CaseDataBuilder {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
         return this;
     }
 
@@ -1824,15 +2421,61 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimOneClaimant1ClaimResponseType() {
+        this.claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2Spec() {
+        this.respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
-        this.applicant2 = PartyBuilder.builder().individual().build();
+        this.applicant2 = PartyBuilder.builder().individual("Jason").build();
+        return this;
+    }
+
+    private List<CaseData> get2v1DifferentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party applicant2 = Party.builder().build();
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .applicant2(applicant2)
+                                  .claimant1ClaimResponseTypeForSpec(r1)
+                                  .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
+    }
+
+    public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
+        this.superClaimType = SPEC_CLAIM;
         return this;
     }
 
     public CaseDataBuilder respondent2Responds(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
         this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2SameSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2Responds1v2DiffSol(RespondentResponseType responseType) {
+        this.respondent2ClaimResponseType = responseType;
+        this.respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
         return this;
     }
 
@@ -1908,12 +2551,54 @@ public class CaseDataBuilder {
         respondent1RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
 
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
-        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
+    public CaseDataBuilder generateDefendant2RepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
+        YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
+        this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressDetails(
+        Address specAoSApplicantCorrespondenceAddressDetails) {
+        this.specAoSApplicantCorrespondenceAddressDetails = specAoSApplicantCorrespondenceAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSRespondent2HomeAddressRequired(YesOrNo specAoSRespondent2HomeAddressRequired) {
+        this.specAoSRespondent2HomeAddressRequired = specAoSRespondent2HomeAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder atSpecAoSRespondent2HomeAddressDetails(Address specAoSRespondent2HomeAddressDetails) {
+        this.specAoSRespondent2HomeAddressDetails = specAoSRespondent2HomeAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWitnessesRequiredSpec(YesOrNo respondent1DQWitnessesRequiredSpec) {
+        this.respondent1DQWitnessesRequiredSpec = respondent1DQWitnessesRequiredSpec;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWitnessesDetailsSpec(List<Element<Witness>> respondent1DQWitnessesDetailsSpec) {
+        this.respondent1DQWitnessesDetailsSpec = respondent1DQWitnessesDetailsSpec;
         return this;
     }
 
@@ -1976,7 +2661,10 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeToApplicant2(respondent1ClaimResponseTypeToApplicant2)
             // Claimant Response
             .applicant1ProceedWithClaim(applicant1ProceedWithClaim)
+            .applicant1ProceedWithClaimMultiParty2v1(applicant1ProceedWithClaimMultiParty2v1)
+            .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
+            .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
 
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
@@ -1990,6 +2678,7 @@ public class CaseDataBuilder {
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .applicant1DQ(applicant1DQ)
+            .applicant2DQ(applicant2DQ)
             .respondent2DQ(respondent2DQ)
             .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
@@ -2024,6 +2713,7 @@ public class CaseDataBuilder {
             .respondent1ResponseDate(respondent1ResponseDate)
             .respondent2ResponseDate(respondent2ResponseDate)
             .applicant1ResponseDate(applicant1ResponseDate)
+            .applicant2ResponseDate(applicant2ResponseDate)
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
@@ -2038,7 +2728,7 @@ public class CaseDataBuilder {
             .caseNotes(caseNotes)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
-            .superClaimType(UNSPEC_CLAIM)
+            .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
             //spec route
@@ -2050,7 +2740,31 @@ public class CaseDataBuilder {
             .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1PartnerAndDependent(respondent1PartnerAndDependent)
+            .respondent2PartnerAndDependent(respondent2PartnerAndDependent)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
+            .respondent2RepaymentPlan(respondent2RepaymentPlan)
+            .applicantsProceedIntention(applicantsProceedIntention)
+            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(
+                applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
+            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
+                applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
+            .respondentSolicitor2Reference(respondentSolicitor2Reference)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
+            .specAoSApplicantCorrespondenceAddressRequired(specAoSApplicantCorrespondenceAddressRequired)
+            .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressDetails)
+            .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
+            .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
+            .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
+            .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
+            .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .build();
     }
 }

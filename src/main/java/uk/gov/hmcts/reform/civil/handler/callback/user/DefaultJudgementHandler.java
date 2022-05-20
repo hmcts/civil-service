@@ -30,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -38,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment util %s";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
         + "%n%n Judgment has been entered and your case will be referred to a judge for directions.";
     public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "
@@ -56,7 +55,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
-            callbackKey(MID, "hearingTypeSelection"), this::populateText,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
             callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -150,18 +148,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-
-    }
-
-    private CallbackResponse populateText(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.detailsOfDirectionDisposal(DISPOSAL_TEXT);
-        caseDataBuilder.detailsOfDirectionTrial(TRIAL_TEXT);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

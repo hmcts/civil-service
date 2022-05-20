@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -386,6 +387,23 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
             return mapper.convertValue(response.getData().get("applicantSolicitor1PbaAccounts"), DynamicList.class);
+        }
+    }
+
+    @Nested
+    class MidEventStartClaimCallback {
+
+        private static final String PAGE_ID = "start-claim";
+
+        @Test
+        void shouldAddClaimStartedFlagToData_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("claimStarted")
+                .isEqualTo("Yes");
         }
     }
 
@@ -817,6 +835,47 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(CREATE_CLAIM.name(), "READY");
         }
 
+        @Test
+        void shouldClearClaimStartedFlag_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .doesNotContainEntry("claimStarted", YES);
+        }
+
+        @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isNull();
+            assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
+        }
+
         @Nested
         class IdamEmail {
 
@@ -914,6 +973,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("name", "role")
                     .containsExactly(null, null);
             }
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(null)
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt(null).build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
     }
 

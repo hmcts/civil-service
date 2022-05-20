@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 
@@ -38,7 +37,7 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final List<SpecifiedParty> applicants;
     private final List<SpecifiedParty> respondents;
     private final String descriptionOfClaim;
-    private final List<TimelineOfEventDetails> timeline;
+    private final List<TimelineEventDetailsDocmosis> timeline;
     private final List<ClaimAmountBreakupDetails> claimAmount;
     private final String sameInterestRate;
     private final String breakdownInterestRate;

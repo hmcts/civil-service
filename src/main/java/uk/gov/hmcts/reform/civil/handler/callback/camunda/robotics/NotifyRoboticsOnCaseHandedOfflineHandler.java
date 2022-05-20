@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
@@ -23,9 +24,16 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
         RoboticsNotificationService roboticsNotificationService,
         JsonSchemaValidationService jsonSchemaValidationService,
         RoboticsDataMapper roboticsDataMapper,
-        RoboticsDataMapperForSpec roboticsDataMapperForSpec
+        RoboticsDataMapperForSpec roboticsDataMapperForSpec,
+        FeatureToggleService toggleService
     ) {
-        super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec);
+        super(
+            roboticsNotificationService,
+            jsonSchemaValidationService,
+            roboticsDataMapper,
+            roboticsDataMapperForSpec,
+            toggleService
+        );
     }
 
     private static final List<CaseEvent> EVENTS = List.of(

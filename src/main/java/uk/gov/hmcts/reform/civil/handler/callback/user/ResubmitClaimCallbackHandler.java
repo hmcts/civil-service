@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -36,6 +37,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -52,24 +54,22 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        if ((callbackParams.getRequest().getEventId() != null
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC"))
-            || (callbackParams.getCaseData().getSuperClaimType() != null
-            && callbackParams.getCaseData().getSuperClaimType().equals(SPEC_CLAIM))) {
-            CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-                .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
-                .build();
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataUpdated.toMap(objectMapper))
-                .build();
+        CaseData caseData = callbackParams.getCaseData();
+        if ("CREATE_CLAIM_SPEC".equals(callbackParams.getRequest().getEventId())
+            || SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (toggleService.isLrSpecEnabled()) {
+                caseData = caseData.toBuilder()
+                    .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
+                    .build();
+            }
         } else {
-            CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            caseData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
                 .build();
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataUpdated.toMap(objectMapper))
-                .build();
         }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

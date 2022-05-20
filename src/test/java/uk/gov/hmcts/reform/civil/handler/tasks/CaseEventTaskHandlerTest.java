@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
@@ -57,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -399,16 +402,220 @@ class CaseEventTaskHandlerTest {
                                + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
         }
 
+        @Nested
+        class FullDefenceProceed {
+            FlowState.Main state = FULL_DEFENCE_PROCEED;
+            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+
+            @BeforeEach
+            void initForFullDefence() {
+                VariableMap variables = Variables.createVariables();
+                variables.putValue(FLOW_STATE, state.fullName());
+                variables.putValue(FLOW_FLAGS, getFlowFlags(state));
+
+                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+            }
+
+            @Nested
+            class OneVOne {
+                @Test
+                void shouldHaveExpectedDescription() {
+                    CaseData caseData = getCaseData(state);
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo(null);
+                }
+            }
+
+            @Nested
+            class OneVTwo {
+                @Test
+                void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstBothDefendants() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                        .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                                       + "and proceed against defendant: Mr. John Rambo");
+                }
+
+                @Test
+                void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstFirstDefendantOnly() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                        .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                                       + "and not proceed against defendant: Mr. John Rambo");
+                }
+
+                @Test
+                void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstSecondDefendantOnly() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                        .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant has provided intention: not proceed against defendant: Mr. Sole Trader "
+                                       + "and proceed against defendant: Mr. John Rambo");
+                }
+            }
+
+            @Nested
+            class TwoVOne {
+                @Test
+                void shouldHaveExpectedDescription_WhenBothClaimaintsProceed() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant: Mr. John Rambo has provided intention: proceed. "
+                                       + "Claimant: Mr. Jason Rambo has provided intention: proceed.");
+                }
+
+                @Test
+                void shouldHaveExpectedDescription_WhenOnlyFirstClaimantProceeds() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .atStateApplicant1RespondToDefenceAndProceed_2v1()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant: Mr. John Rambo has provided intention: proceed. "
+                                       + "Claimant: Mr. Jason Rambo has provided intention: not proceed.");
+                }
+
+                @Test
+                void shouldHaveExpectedDescription_WhenOnlySecondClaimantProceeds() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoApplicants()
+                        .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                        .businessProcess(businessProcess)
+                        .build();
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                    assertThat(event.getDescription())
+                        .isEqualTo("Claimant: Mr. John Rambo has provided intention: not proceed. "
+                                       + "Claimant: Mr. Jason Rambo has provided intention: proceed.");
+                }
+            }
+
+        }
+
         @NotNull
         private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
             if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              "RPA_CONTINUOUS_FEED", false
+                              "RPA_CONTINUOUS_FEED", false,
+                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false
                 );
             }
-            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false);
+            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
+                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

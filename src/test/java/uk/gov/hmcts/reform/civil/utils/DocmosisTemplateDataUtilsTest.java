@@ -236,23 +236,32 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesIsNull() {
-            SolicitorReferences solicitorReferences = null;
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(null)
+                .respondentSolicitor2Reference(null)
+                .build();
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences not provided",
                 () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
             SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .respondentSolicitor2Reference(null)
+                .build();
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences not provided",
                 () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
 
@@ -263,12 +272,17 @@ class DocmosisTemplateDataUtilsTest {
                 .applicantSolicitor1Reference("Applicant ref")
                 .respondentSolicitor1Reference("Respondent ref")
                 .build();
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .respondentSolicitor2Reference("Respondent 2 ref")
+                .build();
 
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences provided",
                 () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Respondent ref", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Respondent ref", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Respondent 2 ref", result.getRespondentSolicitor2Reference())
             );
         }
 
@@ -278,13 +292,17 @@ class DocmosisTemplateDataUtilsTest {
                 .builder()
                 .applicantSolicitor1Reference("Applicant ref")
                 .build();
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .build();
 
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
 
             assertAll(
                 "SolicitorReferences one is provided",
                 () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
     }

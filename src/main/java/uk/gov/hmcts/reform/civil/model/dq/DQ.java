@@ -16,6 +16,8 @@ public interface DQ {
 
     DisclosureReport getDisclosureReport();
 
+    ExpertDetails getSmallClaimExperts();
+
     Experts getExperts();
 
     default Experts getExperts(Experts experts) {
@@ -65,5 +67,9 @@ public interface DQ {
 
     WelshLanguageRequirements getWelshLanguageRequirements();
 
+    WelshLanguageRequirements getWelshLanguageRequirementsLRspec();
+
     StatementOfTruth getStatementOfTruth();
+
+    VulnerabilityQuestions getVulnerabilityQuestions();
 }

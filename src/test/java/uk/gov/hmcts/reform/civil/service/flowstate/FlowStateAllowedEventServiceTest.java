@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
@@ -74,6 +77,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -239,6 +249,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -249,12 +260,14 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT
                     }
                 ),
                 of(
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     new CaseEvent[]{
+                        ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -265,7 +278,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        DEFAULT_JUDGEMENT
                     }
                 ),
                 of(
@@ -286,7 +300,7 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
+                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
                     new CaseEvent[]{
                         DEFENDANT_RESPONSE,
                         ACKNOWLEDGE_CLAIM,
@@ -384,7 +398,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION
@@ -392,7 +406,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                    new CaseEvent[] {
+                    new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION
@@ -424,6 +438,48 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_BY_STAFF,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE
                     }
                 )
             );
@@ -477,6 +533,8 @@ class FlowStateAllowedEventServiceTest {
                 of(CREATE_CLAIM, new String[]{DRAFT.fullName()}),
                 of(RESUBMIT_CLAIM, new String[]{CLAIM_ISSUED_PAYMENT_FAILED.fullName()}),
                 of(ACKNOWLEDGE_CLAIM, new String[]{CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
@@ -583,6 +641,16 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.getAllowedStates(caseEvent))
                 .containsExactlyInAnyOrder(flowStates);
         }
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
+        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
+            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
+                .isEmpty();
+            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
+                .isNotEmpty();
+        }
     }
 
     static class GetAllowedStatesForCaseDetailsArguments implements ArgumentsProvider {
@@ -656,6 +724,21 @@ class FlowStateAllowedEventServiceTest {
                 of(false, CaseDetailsBuilder.builder().atStateProceedsOffline().build(), AMEND_PARTY_DETAILS),
                 of(true, CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build(),
                    AMEND_PARTY_DETAILS
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateFullDefenceSpec().build(),
+                    CLAIMANT_RESPONSE_SPEC
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStatePartAdmitSpec().build(),
+                    CLAIMANT_RESPONSE_SPEC
+                ),
+                of(
+                    true,
+                    CaseDetailsBuilder.builder().atStateFullAdmitSpec().build(),
+                    CLAIMANT_RESPONSE_SPEC
                 )
             );
         }
@@ -663,6 +746,11 @@ class FlowStateAllowedEventServiceTest {
 
     @Nested
     class IsEventAllowedOnCaseDetails {
+
+        @BeforeEach
+        void enableSpec() {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        }
 
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
@@ -678,6 +766,19 @@ class FlowStateAllowedEventServiceTest {
                 expected = false;
             }
             //work around ends.
+
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
+                .isEqualTo(expected);
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
+        void shouldReturnValidStates_whenCaseEventIsGiven_spec(
+            boolean expected,
+            CaseDetails caseDetails,
+            CaseEvent caseEvent
+        ) {
+            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
 
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);

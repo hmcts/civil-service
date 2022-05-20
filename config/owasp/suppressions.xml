@@ -26,4 +26,24 @@
     <cve>CVE-2018-1272</cve>
     <cve>CVE-2020-5421</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2013-4152</cve>
+    <cve>CVE-2013-7315</cve>
+    <cve>CVE-2014-0054</cve>
+    <cve>CVE-2022-22965</cve>
+    <cve>CVE-2022-22968</cve>
+    <cve>CVE-2022-25647</cve>
+    <cve>CVE-2016-1000027</cve>
+    <cve>CVE-2022-25647</cve>
+  </suppress>
+  <suppress>
+    <cve>CVE-2022-25647</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: jackson-databind-2.12.6.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cve>CVE-2020-36518</cve>
+  </suppress>
 </suppressions>

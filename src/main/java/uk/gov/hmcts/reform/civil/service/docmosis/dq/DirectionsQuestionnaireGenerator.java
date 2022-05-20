@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -42,6 +44,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -50,16 +53,20 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -71,14 +78,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
-    private String currentDefendantFor1v2SingleSolIndividualResponse = null;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
         if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
@@ -95,14 +105,29 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
+        DocmosisTemplates templateId = N181;
         switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
+                    templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
+                }
+                break;
+                //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return N181_MULTIPARTY_SAME_SOL;
+                if (!isClaimantResponse(caseData)
+                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
+                    templateId = N181_MULTIPARTY_SAME_SOL;
+                }
+                break;
             case TWO_V_ONE:
-                return N181_2V1;
+                if (!isClaimantResponse(caseData)
+                    || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
+                    templateId = N181_2V1;
+                }
+                break;
             default:
-                return N181;
         }
+        return templateId;
     }
 
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
@@ -113,11 +138,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
-            currentDefendantFor1v2SingleSolIndividualResponse = "ONE";
-            templateData = getRespondent1TemplateData(caseData);
+            templateData = getRespondent1TemplateData(caseData, "ONE");
         } else if (respondent.equals("TWO")) {
-            currentDefendantFor1v2SingleSolIndividualResponse = "TWO";
-            templateData = getRespondent2TemplateData(caseData);
+            templateData = getRespondent2TemplateData(caseData, "TWO");
         } else {
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
@@ -136,34 +159,70 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
+    private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+                                     CaseData caseData) {
+        if (isClaimantResponse(caseData)) {
+            if (onlyApplicant2IsProceeding(caseData)) {
+                builder.submittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
+                return caseData.getApplicant2DQ();
+            } else {
+                builder.submittedOn(caseData.getApplicant1ResponseDate().toLocalDate());
+                return caseData.getApplicant1DQ();
+            }
+        } else {
+            if (isRespondent2(caseData)) {
+                builder.submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
+                return caseData.getRespondent2DQ();
+            } else {
+                builder.submittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
+                return caseData.getRespondent1DQ();
+            }
+        }
+    }
+
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-        DQ dq = isRespondentState(caseData) ? caseData.getRespondent1DQ() : caseData.getApplicant1DQ();
+
+        boolean claimantResponseLRspec = false;
+        if (isClaimantResponse(caseData) && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils
-                                     .fetchSolicitorReferences(caseData.getSolicitorReferences()))
-            .applicant(getApplicant(caseData))
-            .respondents(getRespondents(caseData))
+                                     .fetchSolicitorReferences(caseData))
+            .respondents(getRespondents(caseData, null))
+            .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
-        if (isRespondent2(caseData)) {
-            dq = caseData.getRespondent2DQ();
-            builder.submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
-        } else {
-            builder.submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-                .applicant2(TWO_V_ONE.equals(MultiPartyScenario
-                                                 .getMultiPartyScenario(caseData)) ? getApplicant2(caseData) : null);
+        DQ dq = getDQAndSetSubmittedOn(builder, caseData);
+
+        if (!claimantResponseLRspec) {
+            setApplicants(builder, caseData);
         }
 
         Witnesses witnesses = getWitnesses(dq);
-        int witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+
+        Integer witnessesIncludingDefendants = null;
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        if (!(SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && state.equals(FULL_ADMISSION.fullName()))) {
+            witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+        }
+
+        boolean specAndSmallClaim = false;
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
+            witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+            specAndSmallClaim = true;
+        }
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
@@ -172,17 +231,102 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq));
 
         return builder.build();
     }
 
+    private List<Party> getApplicants(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        var applicant2 = caseData.getApplicant2();
+        var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                return List.of(Party.builder()
+                                   .name(applicant.getPartyName())
+                                   .primaryAddress(applicant.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build(),
+                               Party.builder()
+                                   .name(applicant2.getPartyName())
+                                   .primaryAddress(applicant2.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build());
+            }
+        }
+        return List.of(Party.builder()
+                           .name(applicant.getPartyName())
+                           .primaryAddress(applicant.getPrimaryAddress())
+                           .representative(respondentRepresentative)
+                           .litigationFriendName(
+                               ofNullable(litigationFriend)
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
+    }
+
+    private Party getApplicant2DQParty(CaseData caseData) {
+
+        var applicant = caseData.getApplicant2();
+        return Party.builder()
+            .name(applicant.getPartyName())
+            .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant2LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .build();
+    }
+
+    private Party getApplicant1DQParty(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+
+        return Party.builder()
+            .name(applicant.getPartyName())
+            .primaryAddress(applicant.getPrimaryAddress())
+            .litigationFriendName(
+                ofNullable(caseData.getApplicant1LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .build();
+    }
+
+    private void setApplicants(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+                               CaseData caseData) {
+        if (TWO_V_ONE.equals(MultiPartyScenario
+                                 .getMultiPartyScenario(caseData))) {
+            if (onlyApplicant2IsProceeding(caseData)) {
+                builder.applicant(getApplicant2DQParty(caseData));
+            } else {
+                builder.applicant(getApplicant1DQParty(caseData));
+                builder.applicant2(getApplicant2DQParty(caseData));
+            }
+        } else {
+            builder.applicant(getApplicant1DQParty(caseData));
+        }
+    }
+
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
         int witnessesIncludingDefendants;
-        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
-            if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
-                && caseData.getResponseClaimWitnesses().matches("\\d+")) {
-                witnessesIncludingDefendants = Integer.parseInt(caseData.getResponseClaimWitnesses());
+        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            String smallClaimNumberOfWitnesses = caseData.getResponseClaimWitnesses();
+            if (isClaimantResponse(caseData)) {
+                smallClaimNumberOfWitnesses = caseData.getApplicant1ClaimWitnesses();
+            }
+            if (StringUtils.isNotBlank(smallClaimNumberOfWitnesses)
+                && smallClaimNumberOfWitnesses.matches("\\d+")) {
+                witnessesIncludingDefendants = Integer.parseInt(smallClaimNumberOfWitnesses);
             } else {
                 witnessesIncludingDefendants = 0;
             }
@@ -266,16 +410,37 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
     }
 
-    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData) {
+    public static boolean isClaimantResponse(CaseData caseData) {
+        return "CLAIMANT_RESPONSE".equals(ofNullable(caseData.getBusinessProcess())
+                                              .map(BusinessProcess::getCamundaEvent)
+                                              .orElse(null))
+                || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
+                                              .map(BusinessProcess::getCamundaEvent)
+                                              .orElse(null));
+    }
+
+    private boolean isClaimantMultipartyProceed(CaseData caseData) {
+        return (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) // 2v1 scenario
+            || (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()) // 1v2 scenario
+                    && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()));
+    }
+
+    private boolean onlyApplicant2IsProceeding(CaseData caseData) {
+        return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+    }
+
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier) {
         DQ dq = caseData.getRespondent2DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
-            .applicant(getApplicant(caseData))
-            .respondents(getRespondents(caseData))
+            .applicant(getApplicant1DQParty(caseData))
+            .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
@@ -286,20 +451,21 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
 
-    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData) {
+    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier) {
         DQ dq = caseData.getRespondent1DQ();
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
-            .applicant(getApplicant(caseData))
-            .respondents(getRespondents(caseData))
+            .applicant(getApplicant1DQParty(caseData))
+            .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
@@ -310,11 +476,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
             .build();
     }
 
     private Boolean isRespondentState(CaseData caseData) {
+        if (isClaimantResponse(caseData)) {
+            return false;
+        }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
 
         return SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
@@ -323,30 +493,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
             || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName());
-    }
-
-    private Party getApplicant(CaseData caseData) {
-        var applicant = caseData.getApplicant1();
-        return Party.builder()
-            .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
-            .litigationFriendName(
-                ofNullable(caseData.getApplicant1LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
-    }
-
-    private Party getApplicant2(CaseData caseData) {
-        var applicant = caseData.getApplicant2();
-        return Party.builder()
-            .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
-            .litigationFriendName(
-                ofNullable(caseData.getApplicant2LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
     }
 
     private boolean isRespondent2(CaseData caseData) {
@@ -358,9 +504,87 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return false;
     }
 
-    private List<Party> getRespondents(CaseData caseData) {
-        var respondent = caseData.getRespondent1();
-        var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
+    private boolean isProceedingAgainstRespondent1(CaseData caseData) {
+        return YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2());
+    }
+
+    private boolean isProceedingAgainstRespondent2(CaseData caseData) {
+        return YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+    }
+
+    private List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
+        if (isClaimantResponse(caseData)) {
+
+            List<Party> respondents = new ArrayList<>();
+
+            if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && YES.equals(caseData.getRespondentResponseIsSame())) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent2().getPartyName())
+                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent2Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent2LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                }
+                return respondents;
+            }
+
+            if (isProceedingAgainstRespondent1(caseData)) {
+                respondents.add(Party.builder()
+                                    .name(caseData.getRespondent1().getPartyName())
+                                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                    .representative(representativeService
+                                                        .getRespondent1Representative(caseData))
+                                    .litigationFriendName(
+                                        ofNullable(caseData.getRespondent1LitigationFriend())
+                                            .map(LitigationFriend::getFullName)
+                                            .orElse(""))
+                                    .build());
+            }
+            if (isProceedingAgainstRespondent2(caseData)) {
+                respondents.add(Party.builder()
+                                    .name(caseData.getRespondent2().getPartyName())
+                                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                                    .representative(representativeService
+                                                        .getRespondent2Representative(caseData))
+                                    .litigationFriendName(
+                                        ofNullable(caseData.getRespondent2LitigationFriend())
+                                            .map(LitigationFriend::getFullName)
+                                            .orElse(""))
+                                    .build());
+            }
+            return respondents;
+        }
 
         if (respondent2HasSameLegalRep(caseData)) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
@@ -379,14 +603,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                         .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                         .representative(representativeService.getRespondent2Representative(caseData))
                         .litigationFriendName(
-                            ofNullable(caseData.getRespondent1LitigationFriend())
+                            ofNullable(caseData.getRespondent2LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
                         .build()
                 );
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                if (currentDefendantFor1v2SingleSolIndividualResponse.equals("ONE")) {
-                    // TODO remove the variable use as class variable and add specific test to check below party
+                if ("ONE".equals(defendantIdentifier)) {
+                    // TODO add specific test to check below party
                     return List.of(Party.builder()
                                        .name(caseData.getRespondent1().getPartyName())
                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
@@ -396,31 +620,33 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                .map(LitigationFriend::getFullName)
                                                .orElse(""))
                                        .build());
-                } else if (currentDefendantFor1v2SingleSolIndividualResponse.equals("TWO")) {
+                } else if ("TWO".equals(defendantIdentifier)) {
                     return List.of(Party.builder()
                                        .name(caseData.getRespondent2().getPartyName())
                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                                        .representative(representativeService.getRespondent1Representative(caseData))
                                        .litigationFriendName(
-                                           ofNullable(caseData.getRespondent1LitigationFriend())
+                                           ofNullable(caseData.getRespondent2LitigationFriend())
                                                .map(LitigationFriend::getFullName)
                                                .orElse(""))
                                        .build());
                 }
             }
         }
-
+        var respondent = caseData.getRespondent1();
+        var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
         if (isRespondent2(caseData)) {
             respondent = caseData.getRespondent2();
             respondentRepresentative = representativeService.getRespondent2Representative(caseData);
+            litigationFriend = caseData.getRespondent2LitigationFriend();
         }
-
         return List.of(Party.builder()
                            .name(respondent.getPartyName())
                            .primaryAddress(respondent.getPrimaryAddress())
                            .representative(respondentRepresentative)
                            .litigationFriendName(
-                               ofNullable(caseData.getRespondent1LitigationFriend())
+                               ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
                            .build());
@@ -446,6 +672,31 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .orElse(""))
             .jointExpertSuitable(experts.getJointExpertSuitable())
             .details(getExpertsDetails(dq))
+            .build();
+    }
+
+    private Experts getSmallClaimExperts(DQ dq, CaseData caseData) {
+        var experts = dq.getSmallClaimExperts();
+        YesOrNo expertRequired = caseData.getResponseClaimExpertSpecRequired();
+        if (isClaimantResponse(caseData)) {
+            expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
+        }
+        Expert expertDetails = null;
+        if (experts != null) {
+            expertDetails = Expert.builder()
+                .name(experts.getExpertName())
+                .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
+                .fieldOfExpertise(experts.getFieldofExpertise())
+                .build();
+        } else {
+            expertDetails = Expert.builder().build();
+        }
+
+        return Experts.builder()
+            .expertRequired(expertRequired)
+            .expertReportsSent(null)
+            .jointExpertSuitable(null)
+            .details(List.of(expertDetails))
             .build();
     }
 
@@ -478,6 +729,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return Witnesses.builder()
             .witnessesToAppear(witnesses.getWitnessesToAppear())
             .details(witnessesList)
+            .build();
+    }
+
+    private Witnesses getWitnessesSmallClaim(Integer witnessesIncludingDefendants) {
+        if (witnessesIncludingDefendants != null
+            && witnessesIncludingDefendants > 0) {
+            return Witnesses.builder().witnessesToAppear(YES)
+                .details(Collections.emptyList())
+                .build();
+        }
+        return Witnesses.builder().witnessesToAppear(NO)
+            .details(Collections.emptyList())
             .build();
     }
 

@@ -9,11 +9,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.aos.AcknowledgementOfClaimGeneratorForSpec;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_ACKNOWLEDGEMENT_OF_CLAIM_SPEC);
@@ -31,6 +34,7 @@ public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends Callba
 
     private final AcknowledgementOfClaimGeneratorForSpec acknowledgementOfClaimGenerator;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService toggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -44,12 +48,16 @@ public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends Callba
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse prepareAcknowledgementOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument acknowledgementOfClaim = acknowledgementOfClaimGenerator.generate(
             caseData,

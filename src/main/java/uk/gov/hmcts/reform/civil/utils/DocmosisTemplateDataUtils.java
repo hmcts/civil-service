@@ -69,16 +69,19 @@ public class DocmosisTemplateDataUtils {
         return applicantNameBuilder.toString();
     }
 
-    public static SolicitorReferences fetchSolicitorReferences(SolicitorReferences solicitorReferences) {
+    public static SolicitorReferences fetchSolicitorReferences(CaseData caseData) {
         return SolicitorReferences
             .builder()
             .applicantSolicitor1Reference(
-                ofNullable(solicitorReferences)
+                ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
                     .orElse(REFERENCE_NOT_PROVIDED))
             .respondentSolicitor1Reference(
-                ofNullable(solicitorReferences)
+                ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                    .orElse(REFERENCE_NOT_PROVIDED))
+            .respondentSolicitor2Reference(
+                ofNullable(caseData.getRespondentSolicitor2Reference())
                     .orElse(REFERENCE_NOT_PROVIDED))
             .build();
     }

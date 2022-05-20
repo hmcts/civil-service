@@ -11,8 +11,9 @@ public class RoboticsCaseDataSpec implements ToJsonString {
 
     private CaseHeader header;
     private List<LitigiousParty> litigiousParties;
-    private List<SolicitorSpec> solicitors;
+    private List<Solicitor> solicitors;
     private String particularsOfClaim;
     private ClaimDetails claimDetails;
     private EventHistory events;
+    private RPABreathingSpace breathingSpace;
 }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -91,10 +92,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the defendant "
-        + "of the claim.%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. "
-        + "The exact date when you must notify the claim details will be provided when you first notify "
-        + "the defendant of the claim.";
+        + "receive an email. The email will also include the date that the defendants have to respond.";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
@@ -118,6 +116,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final ValidateEmailService validateEmailService;
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -160,7 +159,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
@@ -355,6 +358,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
         }
+
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

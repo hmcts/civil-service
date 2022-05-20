@@ -95,9 +95,13 @@ public class PartyBuilder {
     }
 
     public PartyBuilder individual() {
+        return individual("John");
+    }
+
+    public PartyBuilder individual(String firstName) {
         type = INDIVIDUAL;
         individualTitle = "Mr.";
-        individualFirstName = "John";
+        individualFirstName = firstName;
         individualLastName = "Rambo";
         individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;

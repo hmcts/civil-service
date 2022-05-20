@@ -15,22 +15,26 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateDJFormHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_DJ_FORM);
+    private static final List<CaseEvent> EVENTS = List.of(
+        CaseEvent.GENERATE_DJ_FORM,
+        CaseEvent.GENERATE_DJ_FORM_SPEC
+    );
     private static final String TASK_ID = "GenerateDJForm";
+    private static final String TASK_ID_SPEC = "GenerateDJFormSpec";
+
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     private final ObjectMapper objectMapper;
 
@@ -46,13 +50,14 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return isSpecHandler(callbackParams) ? TASK_ID_SPEC : TASK_ID;
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             buildDocument(callbackParams, caseDataBuilder);
         } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             buildDocument(callbackParams, caseDataBuilder);
@@ -66,7 +71,8 @@ public class GenerateDJFormHandler extends CallbackHandler {
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
         List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generate(
             callbackParams.getCaseData(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            callbackParams.getRequest().getEventId()
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
@@ -74,5 +80,10 @@ public class GenerateDJFormHandler extends CallbackHandler {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
         }
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
+    }
+
+    private boolean isSpecHandler(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(CaseEvent.GENERATE_DJ_FORM_SPEC.name());
     }
 }

@@ -64,7 +64,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
         return AcknowledgementOfClaimForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData.getSolicitorReferences()))
+            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
             .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))

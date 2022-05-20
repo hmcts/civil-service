@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
@@ -114,6 +116,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse startClaim(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(CaseData.builder().claimStarted(YES).build().toMap(objectMapper)).build();
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
@@ -257,20 +264,30 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
-            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
-                .organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
+            if (caseData.getRespondent1OrgRegistered() == YES) {
+                OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                    .build();
+            }
 
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]");
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        List<String> validationErrors = validateCaseData(caseData);
+        if (validationErrors.size() > 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validationErrors)
+                .build();
+        }
+
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
@@ -294,6 +311,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
+
+        dataBuilder.claimStarted(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -364,5 +383,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private List<String> validateCaseData(CaseData caseData) {
+        List<String> errorsMessages = new ArrayList<>();
+        // Tactical fix. We have an issue where null courtLocation is being submitted.
+        // We are validating it exists on submission if not we return an error to the user.
+        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+            errorsMessages.add("Court location code is required");
+        }
+        return errorsMessages;
     }
 }
