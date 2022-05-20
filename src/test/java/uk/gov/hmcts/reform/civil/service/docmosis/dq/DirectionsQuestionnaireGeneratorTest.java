@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -611,7 +612,7 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenSmallClaimSpecAndWitnesses() {
+            void whenSmallClaimSpecAndWitnessesNoExperts() {
                 int witnessesIncludingDefendant = 2;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -634,7 +635,36 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenSmallClaimSpecFullAdmission() {
+            void whenSmallClaimSpecAndWitnesses() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .setSuperClaimTypeToSpecClaim()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getRequestedCourt()).isNotNull()
+                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getWitnessesIncludingDefendants())
+                    .isEqualTo(witnessesIncludingDefendant);
+            }
+
+            @Test
+            void whenSmallClaimSpecFullAdmissionNoExperts() {
                 int witnessesIncludingDefendant = 2;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -644,6 +674,34 @@ class DirectionsQuestionnaireGeneratorTest {
                 caseData = caseData.toBuilder()
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondent1DQExperts(null)
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getWitnessesIncludingDefendants()).isNull();
+            }
+
+            @Test
+            void whenSmallClaimSpecFullAdmission() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .atStateRespondent1v1FullAdmissionSpec()
+                    .setSuperClaimTypeToSpecClaim()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
                                        .respondent1DQWitnesses(null)
                                        .respondent1DQHearing(null)
                                        .build())
