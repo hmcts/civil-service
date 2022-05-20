@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE = "claim-details-respondent-notification-000DC001";
-
+    public static final String templateId = "17151a5a-00b1-48b7-8e45-38a5f20b6ec0";
     @MockBean
     private NotificationService notificationService;
 
@@ -56,8 +56,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class AboutToSubmitCallback {
 
-        String templateId = "17151a5a-00b1-48b7-8e45-38a5f20b6ec0";
-
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
@@ -67,9 +65,9 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder()
-                    .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS.name()).build()).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                    .request(CallbackRequest.builder()
+                                    .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS.name()).build()).build();
 
             handler.handle(params);
 
