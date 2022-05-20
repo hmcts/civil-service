@@ -241,6 +241,19 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedSameSolicitor() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+    }
+
+    @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .respondent2(PartyBuilder.builder().company().build())

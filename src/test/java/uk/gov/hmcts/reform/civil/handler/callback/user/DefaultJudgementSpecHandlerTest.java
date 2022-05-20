@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -95,6 +96,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedTwoDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
@@ -112,19 +114,122 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "showCertifyStatementSpec";
 
         @Test
-        void shouldReturnDefendantDetails_whenShowCertifyStatementSpecIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder()
+        void shouldReturnBoth_whenHaveTwoDefendants() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Both")
+                                                 .build())
+                                      .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("Both");
+        }
+
+        @Test
+        void shouldReturnOne_whenHaveOneDefendants() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("One");
+        }
+
+        @Test
+        void shouldReturnOneDefendantText_whenOneDefendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
-                                                     .label("NameUser SurnameUser")
+                                                     .label("Test User")
                                                      .build())
                                           .build())
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+            assertThat(response.getData().get("currentDefendant"))
+                .isEqualTo("Has Test User paid some of the amount owed?");
+        }
+
+        @Test
+        void shouldReturnBothDefendantText_whenTwoDefendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .label("Test User2")
+                                                     .label("Both Defendants")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("currentDefendant"))
+                .isEqualTo("Have the defendants paid some of the amount owed?");
+        }
+
+        @Test
+        void shouldReturnBothDefendant_whenTwoDefendantSelected() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .label("Test User2")
+                                                     .label("Both Defendants")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("currentDefendantName"))
+                .isEqualTo("both defendants");
+        }
+
+        @Test
+        void shouldReturnDefendantName_whenOneDefendantSelected() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Steve Rodgers")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("currentDefendantName"))
+                .isEqualTo("Steve Rodgers");
         }
     }
 
@@ -330,11 +435,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(1010))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £1222.00, including the claim fee and"
+                String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
+                    + " to pay £1222.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £1010.00\n"
@@ -374,11 +484,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(499))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £681.00, including the claim fee and"
+                String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
+                    + " to pay £681.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £499.00\n"
@@ -417,10 +532,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .totalClaimAmount(BigDecimal.valueOf(999))
                     .paymentConfirmationDecisionSpec(YesOrNo.YES)
                     .partialPayment(YesOrNo.YES)
-
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-                String test = "The judgment will order the defendant to pay £1201.00, including the claim fee and"
+                String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
+                    + " to pay £1201.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £999.00\n"
@@ -458,10 +578,62 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .paymentSetDate(LocalDate.now().minusDays(15))
                     .partialPaymentAmount("100")
                     .totalClaimAmount(BigDecimal.valueOf(5001))
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .build())
+                                              .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                String test = "The judgment will order the defendant to pay £5001.00, including the claim fee and"
+                String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
+                    + " to pay £5001.00, including the claim fee and"
+                    + " interest, if applicable, as shown:\n"
+                    + "### Claim amount \n"
+                    + " £5001.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £5002.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £5001.00";
+                assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            }
+
+            @Test
+            void shouldReturnFixedAmount_whenClaimAmountGreaterthan5000And1v2() {
+                when(interestCalculator.calculateInterest(any()))
+                    .thenReturn(BigDecimal.valueOf(0)
+                    );
+                when(feesService.getFeeDataByTotalClaimAmount(any()))
+                    .thenReturn(Fee.builder()
+                                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                    .version("1")
+                                    .code("CODE")
+                                    .build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .partialPayment(YesOrNo.YES)
+                    .paymentSetDate(LocalDate.now().minusDays(15))
+                    .partialPaymentAmount("100")
+                    .totalClaimAmount(BigDecimal.valueOf(5001))
+                    .defendantDetailsSpec(DynamicList.builder()
+                                              .value(DynamicListElement.builder()
+                                                         .label("Test User")
+                                                         .label("Test User2")
+                                                         .label("Both Defendants")
+                                                         .build())
+                                              .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                String test = "The judgment will order the defendants to pay £5001.00, including the claim fee and"
                     + " interest, if applicable, as shown:\n"
                     + "### Claim amount \n"
                     + " £5001.00\n"
