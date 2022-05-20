@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -64,6 +65,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
+            callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -93,6 +95,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateApplicantExperts(CallbackParams callbackParams) {
         return validateExperts(callbackParams.getCaseData().getApplicant1DQ());
+    }
+
+    private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        var updatedCaseData = caseData.toBuilder();
+        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+            && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
+            updatedCaseData.applicant1ProceedWithClaim(YES);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
