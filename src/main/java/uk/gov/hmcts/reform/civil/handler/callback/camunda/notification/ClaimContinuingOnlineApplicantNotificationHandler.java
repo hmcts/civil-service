@@ -70,7 +70,9 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
         //identify caa users based on user roles
         List<String> caaEmails = new ArrayList<>();
-        for (ProfessionalUsersResponse user : orgUsers.orElse(null).getUsers()) {
+
+        assert orgUsers.orElse(null) != null;
+        for (ProfessionalUsersResponse user : orgUsers.get().getUsers()) {
             if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
                 String email = user.getEmail();
                 caaEmails.add(email);
@@ -79,14 +81,23 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
         System.out.print(caaEmails);
 
         String recipient;
-        if (caaEmails.isEmpty()) {
+        if (! caaEmails.isEmpty()) {
+            System.out.println("TAKING FIRST CAA FROM LIST");
+            recipient = caaEmails.get(0);
+        } else {
             //no CAA defined, use superuser for the firm
             System.out.println("NO CAA DEFINED");
             Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
-            recipient = organisation.get().getSuperUser().getEmail();
-        } else {
-            System.out.println("TAKING FIRST CAA FROM LIST");
-            recipient = caaEmails.get(0);
+
+            if (organisation.isPresent()) {
+                recipient = organisation.get().getSuperUser().getEmail();
+            } else {
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of("Firm does not have CAA or Admin configured"))
+                    .build();
+            }
+
         }
 
         notificationService.sendMail(
