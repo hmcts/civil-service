@@ -394,7 +394,7 @@ public class EventHistoryMapper {
                 paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
-                "%sDefendant: %s has responded: %s",
+                "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
                 getResponseTypeForRespondent(caseData, respondent)

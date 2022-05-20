@@ -1421,9 +1421,9 @@ class EventHistoryMapperTest {
                 .eventSequence(2)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText("[1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
+                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
                 .eventDetails(EventDetails.builder()
-                                  .miscText("[1 of 2 - 2020-08-01] "
+                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
                                                 + "Defendant: Mr. Sole Trader has responded: null")
                                   .build())
                 .build();
@@ -2825,9 +2825,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -2876,9 +2876,9 @@ class EventHistoryMapperTest {
                         .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getRespondent1ResponseDate())
-                        .eventDetailsText("Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                        .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                                           .build())
                         .build()
                 );
