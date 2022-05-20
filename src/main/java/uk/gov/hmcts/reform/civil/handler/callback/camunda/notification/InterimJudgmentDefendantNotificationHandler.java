@@ -41,7 +41,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private static final String REFERENCE_TEMPLATE_REQUEST = "interim-judgment-requested-notification-def-%s";
     private static final String TASK_ID = "NotifyInterimJudgmentDefendant";
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -124,11 +123,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         return Map.of(
             LEGAL_REP_DEF, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME,caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName(),
-            DEFENDANT2_NAME,caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName(),
+            DEFENDANT2_NAME, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName()
         );
     }
-
 
     private boolean checkDefendantRequested(final CaseData caseData, String defendantName) {
         if (caseData.getDefendantDetails() != null) {
@@ -147,6 +145,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         }
         return caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName();
     }
+
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
