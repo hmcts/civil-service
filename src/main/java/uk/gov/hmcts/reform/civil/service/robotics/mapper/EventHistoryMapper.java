@@ -376,13 +376,13 @@ public class EventHistoryMapper {
             } else {
                 switch (caseData.getRespondent1ClaimResponseType()) {
                     case COUNTER_CLAIM:
-                        defaultText = "Defendant rejects and counter claims.";
+                        defaultText = "RPA Reason: Defendant rejects and counter claims.";
                         break;
                     case FULL_ADMISSION:
-                        defaultText = "Defendant fully admits.";
+                        defaultText = "RPA Reason: Defendant fully admits.";
                         break;
                     case PART_ADMISSION:
-                        defaultText = "Defendant partial admission.";
+                        defaultText = "RPA Reason: Defendant partial admission.";
                         break;
                     default:
                         break;
