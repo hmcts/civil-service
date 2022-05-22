@@ -68,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
@@ -462,7 +463,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
-        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData);
+        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -478,21 +479,50 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private void retainSolicitorReferences(Map<String, Object> beforeCaseData,
-                                           CaseData.CaseDataBuilder<?, ?> updatedData) {
+                                           CaseData.CaseDataBuilder<?, ?> updatedData,
+                                           CaseData caseData) {
+
         @SuppressWarnings("unchecked")
         Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
             .map(refs -> objectMapper.convertValue(refs, HashMap.class))
                 .orElse(null);
         SolicitorReferences solicitorReferences = ofNullable(solicitorRefs)
-            .map(refMap -> SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(refMap.getOrDefault("applicantSolicitor1Reference", null))
-                    .respondentSolicitor1Reference(refMap.getOrDefault("respondentSolicitor1Reference", null))
-                    .respondentSolicitor2Reference(refMap.getOrDefault("respondentSolicitor2Reference", null))
-                    .build())
-                .orElse(null);
+            .map(refMap -> {
+
+                // collect data from recent form - defendantSolicitorRef1
+                String defendantSolicitorRef1 = null;
+                if (caseData.getSolicitorReferences() != null
+                    && caseData.getSolicitorReferences().getRespondentSolicitor1Reference() != null) {
+                    defendantSolicitorRef1 = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+                }
+
+                return SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(
+                        refMap.getOrDefault("applicantSolicitor1Reference", null))
+                    // if solicitor reference recently changed in defendant response then use defendantSolicitorRef1
+                    // else use data before it's updated
+                    .respondentSolicitor1Reference(
+                        ofNullable(defendantSolicitorRef1)
+                            .orElse(refMap.getOrDefault("respondentSolicitor1Reference", null)))
+                    .respondentSolicitor2Reference(
+                        refMap.getOrDefault("respondentSolicitor2Reference", null))
+                    .build();
+            })
+            .orElse(null);
+
         updatedData.solicitorReferences(solicitorReferences);
-        updatedData.respondentSolicitor2Reference(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
-            .map(Object::toString).orElse(null));
+
+        String respondentSolicitor2Reference = ofNullable(caseData.getRespondentSolicitor2Reference())
+            .orElse(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
+                        .map(Object::toString).orElse(null));
+
+        updatedData
+            .solicitorReferences(solicitorReferences)
+            .respondentSolicitor2Reference(respondentSolicitor2Reference)
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
+                solicitorReferences != null ? ofNullable(solicitorReferences.getRespondentSolicitor1Reference())
+                    .map(Object::toString).orElse(null) : null,
+                respondentSolicitor2Reference));
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {

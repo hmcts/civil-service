@@ -915,6 +915,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
+                .removeSolicitorReferences()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, Map.of());
@@ -925,6 +926,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isNull();
             assertThat(response.getData())
                 .extracting("respondentSolicitor2Reference")
+                .isNull();
+            assertThat(response.getData())
+                .extracting("caseListDisplayDefendantSolicitorReferences")
                 .isNull();
         }
 
@@ -956,6 +960,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondentSolicitor2Reference")
                 .asString()
                 .contains("01234");
+            assertThat(response.getData())
+                .extracting("caseListDisplayDefendantSolicitorReferences")
+                .asString()
+                .contains("6789, 01234");
         }
 
         @Test

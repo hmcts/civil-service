@@ -2604,6 +2604,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder removeSolicitorReferences() {
+        this.solicitorReferences = null;
+        this.respondentSolicitor2Reference = null;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }

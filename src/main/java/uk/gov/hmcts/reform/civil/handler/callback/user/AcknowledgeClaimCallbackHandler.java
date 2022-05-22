@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -191,6 +192,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .build();
         }
         //for 2v1
@@ -206,6 +208,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ClaimResponseIntentionTypeApplicant2(
                     caseData.getRespondent1ClaimResponseIntentionTypeApplicant2())
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .build();
         } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData)) {
@@ -226,6 +229,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .build();
         } else if (caseData.getRespondent1() != null && caseData.getAddRespondent2() != null
             && caseData.getAddRespondent2().equals(YES)
@@ -242,8 +246,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .isRespondent1(null)
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadlineRespondent1, caseData.getRespondent2ResponseDeadline())).toLocalDate());
+                    Arrays.asList(newDeadlineRespondent1, caseData.getRespondent2ResponseDeadline())).toLocalDate())
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
+                    caseData.getSolicitorReferencesCopy() != null
+                        ? caseData.getSolicitorReferencesCopy().getRespondentSolicitor1Reference() : null,
+                    caseData.getRespondentSolicitor2Reference()));
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
@@ -264,6 +273,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .solicitorReferencesCopy(null)
                 .nextDeadline(deadlinesCalculator.nextDeadline(
                     Arrays.asList(newDeadlineRespondent2, caseData.getRespondent1ResponseDeadline())).toLocalDate())
+                .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
+                    caseData.getSolicitorReferencesCopy() != null
+                        ? caseData.getSolicitorReferencesCopy().getRespondentSolicitor1Reference() : null,
+                    caseData.getRespondentSolicitor2Reference()))
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

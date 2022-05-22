@@ -13,10 +13,9 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.time.LocalDate;
 
 @Jacksonized
 @SuperBuilder(toBuilder = true)
@@ -55,8 +54,8 @@ public class CaseDataParent implements MappableObject {
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
 
-
-
     private final LocalDate nextDeadline;
     private final String allPartyNames;
+    private final String caseListDisplayDefendantSolicitorReferences;
+    private final String unassignedCaseListDisplayOrganisationReferences;
 }

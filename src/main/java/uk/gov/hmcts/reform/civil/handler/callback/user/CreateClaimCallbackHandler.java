@@ -58,6 +58,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -303,12 +305,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+        dataBuilder
+            .uiStatementOfTruth(StatementOfTruth.builder().build())
+            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
-        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        dataBuilder.allPartyNames(getAllPartyNames(caseData));
+        // data for case list and unassigned list
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .nextDeadline(LocalDate.now().plusDays(112))
+            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
@@ -328,7 +335,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                           ? ", " + caseData.getApplicant2().getPartyName() : "",
                       caseData.getRespondent1().getPartyName(),
                       YES.equals(caseData.getAddRespondent2())
-                          ? ", " + caseData.getRespondent2().getPartyName() : "");
+                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

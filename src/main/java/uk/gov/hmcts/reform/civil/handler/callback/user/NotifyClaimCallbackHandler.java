@@ -124,9 +124,13 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         if (claimDetailsNotificationDeadline.isAfter(claimNotificationDeadline)) {
             LocalDateTime notificationDeadlineAt4pm = claimNotificationDeadline.toLocalDate()
                 .atTime(END_OF_BUSINESS_DAY);
-            caseDataBuilder.claimDetailsNotificationDeadline(notificationDeadlineAt4pm);
+            caseDataBuilder
+                .claimDetailsNotificationDeadline(notificationDeadlineAt4pm)
+                .nextDeadline(notificationDeadlineAt4pm.toLocalDate());
         } else {
-            caseDataBuilder.claimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
+            caseDataBuilder
+                .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
+                .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
