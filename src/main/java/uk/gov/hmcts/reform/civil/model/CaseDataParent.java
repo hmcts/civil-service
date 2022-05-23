@@ -6,16 +6,19 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
-import java.util.ArrayList;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Jacksonized
@@ -114,6 +117,5 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
-    private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
 
 }

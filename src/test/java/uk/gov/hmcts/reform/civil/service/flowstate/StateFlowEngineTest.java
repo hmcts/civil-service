@@ -12,27 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -51,8 +44,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -2298,9 +2289,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2329,9 +2321,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2360,9 +2353,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2392,9 +2386,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2423,9 +2418,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2455,9 +2451,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2488,9 +2485,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2521,9 +2519,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2552,9 +2551,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2584,9 +2584,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(2).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry("RPA_CONTINUOUS_FEED", true)
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false)
                 );
             }
 
@@ -2614,9 +2615,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2645,9 +2647,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("RPA_CONTINUOUS_FEED", true),
+                    entry("SPEC_RPA_CONTINUOUS_FEED", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }

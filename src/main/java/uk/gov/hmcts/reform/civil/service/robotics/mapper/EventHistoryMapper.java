@@ -351,56 +351,6 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildRespondentResponseEventForSpec(EventHistory.EventHistoryBuilder builder,
-                                              CaseData caseData,
-                                              RespondentResponseTypeSpec respondentResponseTypeSpec,
-                                              LocalDateTime respondentResponseDate,
-                                              String respondentID) {
-        switch (respondentResponseTypeSpec) {
-            case FULL_DEFENCE:
-                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
-                if (respondentID.equals(RESPONDENT_ID)) {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
-                } else {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
-                }
-                break;
-            case COUNTER_CLAIM:
-                builder.defenceAndCounterClaim(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case PART_ADMISSION:
-                builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case FULL_ADMISSION:
-                builder.receiptOfAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            default:
-                break;
-        }
-    }
-
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText = "";

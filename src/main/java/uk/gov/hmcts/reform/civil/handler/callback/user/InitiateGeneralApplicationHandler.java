@@ -135,11 +135,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private BigDecimal getFeeInPence(int fee) {
-        return BigDecimal.valueOf(fee).multiply(PENCE_PER_POUND)
-            .setScale(0, RoundingMode.UNNECESSARY);
-    }
-
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback

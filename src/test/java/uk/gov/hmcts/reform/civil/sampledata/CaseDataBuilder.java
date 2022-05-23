@@ -254,7 +254,6 @@ public class CaseDataBuilder {
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
-    private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo respondent1DQWitnessesRequiredSpec;
     private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
@@ -1566,12 +1565,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent2v1SecondFullDefence_FirstPartAdmission() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
-        return this;
-    }
-
-    public CaseDataBuilder atStateRespondent2v1FirstFullDefence_SecondPartAdmission() {
-        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
-        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         return this;
     }
 
