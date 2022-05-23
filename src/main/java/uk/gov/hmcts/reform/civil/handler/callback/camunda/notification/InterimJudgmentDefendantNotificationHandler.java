@@ -65,7 +65,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                              String.format(REFERENCE_TEMPLATE_REQUEST,
                                                            caseData.getLegacyCaseReference()));
             } else {
-                if (checkDefendantRequested(caseData, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName())
+                if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                     || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
                     notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                                  notificationsProperties.getInterimJudgmentRequestedDefendant(),
@@ -73,7 +73,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                                  String.format(REFERENCE_TEMPLATE_REQUEST,
                                                                caseData.getLegacyCaseReference()));
                 }
-                if (checkDefendantRequested(caseData, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName())
+                if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
                     || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
                     notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
                                                      ? caseData.getRespondentSolicitor2EmailAddress() :
@@ -107,7 +107,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         return Map.of(
             LEGAL_REP_DEF, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 
@@ -115,7 +115,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         return Map.of(
             LEGAL_REP_DEF, getLegalOrganizationNameDefendant2(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent2().getPartyName()
         );
     }
 
@@ -123,8 +123,8 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         return Map.of(
             LEGAL_REP_DEF, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName(),
-            DEFENDANT2_NAME, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            DEFENDANT2_NAME, caseData.getRespondent2().getPartyName()
         );
     }
 
@@ -143,7 +143,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
-        return caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName();
+        return caseData.getRespondent1().getPartyName();
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
@@ -153,7 +153,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
-        return caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName();
+        return caseData.getRespondent2().getPartyName();
     }
 }
 

@@ -84,7 +84,7 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
         return Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 
@@ -92,8 +92,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
         return Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1DetailsForClaimDetailsTab().getPartyName(),
-            DEFENDANT2_NAME, caseData.getRespondent2DetailsForClaimDetailsTab().getPartyName()
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            DEFENDANT2_NAME, caseData.getRespondent2().getPartyName()
         );
     }
 
