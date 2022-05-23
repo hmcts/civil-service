@@ -94,40 +94,40 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData)+"test",
-            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test",
-            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()+"test",
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
+                                                          .getOrganisation()
+                                                          .getOrganisationID(), caseData),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
-                                                         .getOrganisationID(), caseData)+"test2"
+                                                         .getOrganisationID(), caseData)
         );
     }
 
     public Map<String, String> addProperties1v2FirstDefendant(CaseData caseData) {
         return Map.of(
-            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData)+"test2",
-            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test2",
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())+"test2",
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
+                                                          .getOrganisation()
+                                                          .getOrganisationID(), caseData),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)+"test2"
+                                                          .getOrganisationID(), caseData)
         );
     }
 
     public Map<String, String> addProperties1v2SecondDefendant(CaseData caseData) {
         return Map.of(
-            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                               .getOrganisation()
-                                                              .getOrganisationID(), caseData)+"test3",
-            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test3",
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())+"test3",
+                                                              .getOrganisationID(), caseData),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)+"test3"
+                                                          .getOrganisationID(), caseData)
         );
     }
 

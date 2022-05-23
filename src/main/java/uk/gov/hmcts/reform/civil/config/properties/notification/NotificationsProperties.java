@@ -131,4 +131,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentSolicitor1DefaultJudgmentRequested;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentRequested;
 }

@@ -53,6 +53,18 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         return TASK_ID;
     }
 
+    private String identifyTemplate(CaseData caseData){
+        String template;
+        if(ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+            "Both")){
+            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
+        } else{
+            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
+        }
+        return template;
+    }
+
     private CallbackResponse notifyApplicantSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
@@ -62,20 +74,20 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             "Both")) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived(),
+                identifyTemplate(caseData),
                 addProperties1v2FirstDefendant(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived(),
+                identifyTemplate(caseData),
                 addProperties1v2SecondDefendant(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived(),
+                identifyTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -86,7 +98,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+            LEGAL_ORG_SPECIFIED2, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                                         .getOrganisation()
                                                                         .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
