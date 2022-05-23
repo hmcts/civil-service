@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -90,6 +91,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
@@ -366,12 +369,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
+    private final String detailsOfDirection;
+
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String bothDefendantsSpec;
     private final String partialPaymentAmount;
     private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
@@ -393,7 +397,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo disabilityPremiumPayments;
     private final YesOrNo severeDisabilityPremiumPayments;
 
+    private final String currentDefendant;
     private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;

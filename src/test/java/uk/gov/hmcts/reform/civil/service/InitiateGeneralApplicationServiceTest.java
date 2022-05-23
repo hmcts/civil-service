@@ -135,6 +135,7 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                 .build();
 
+        /* 1V1 scenarios */
         @Test
         void shouldReturnTrue_whenRespondent1SolIsAssigned_1V1() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -144,20 +145,6 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
-
-            assertThat(service.respondentAssigned(caseData)).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenRespondent1Respondent2SolIsAssigned_1V2() {
-            CaseData caseData = CaseDataBuilder.builder()
-                    .caseReference(1L)
-                    .respondent1OrganisationPolicy(respondent1Organization)
-                    .respondent2OrganisationPolicy(respondent2Organization)
-                    .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData)).isTrue();
         }
@@ -175,10 +162,89 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
             assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
+        /* 1V2 Same defendant org scenarios */
         @Test
-        void shouldReturnFalse_whenRespondentSolicitorsIsNotAssigned_1V2() {
+        void shouldReturnTrue_whenR1SolicitorsIsAssigned_1V2_SAME() {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseReference(1L)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1OrganisationPolicy(respondent1Organization)
+                    .respondent2OrganisationPolicy(respondent2Organization)
+                    .build();
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
+
+            assertThat(service.respondentAssigned(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenR1AndR2AreAssigned_1V2_SAME() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseReference(1L)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1OrganisationPolicy(respondent1Organization)
+                    .respondent2OrganisationPolicy(respondent2Organization)
+                    .build();
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
+
+            assertThat(service.respondentAssigned(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondent1SolOnlyIsAssigned_1V2_SAME() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseReference(1L)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1OrganisationPolicy(respondent1Organization)
+                    .respondent2OrganisationPolicy(respondent2Organization)
+                    .build();
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+
+            assertThat(service.respondentAssigned(caseData)).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondent1SolOnlyIsAssigned_1V2_SAME() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseReference(1L)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1OrganisationPolicy(respondent1Organization)
+                    .respondent2OrganisationPolicy(respondent2Organization)
+                    .build();
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+
+            assertThat(service.respondentAssigned(caseData)).isFalse();
+        }
+
+        /* 1V2 Different defendant org scenarios */
+
+        @Test
+        void shouldReturnTrue_whenR1R2SolsAreAssigned_1V2_DIFF() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseReference(1L)
+                    .respondent2SameLegalRepresentative(NO)
+                    .respondent1OrganisationPolicy(respondent1Organization)
+                    .respondent2OrganisationPolicy(respondent2Organization)
+                    .build();
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
+
+            assertThat(service.respondentAssigned(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenR1R2SolsAreNotAssigned_1V2_DIFF() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseReference(1L)
+                    .respondent2SameLegalRepresentative(NO)
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
@@ -190,9 +256,10 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         }
 
         @Test
-        void shouldReturnFalse_whenRespondent2SolicitorIsNotAssigned_1V2() {
+        void shouldReturnFalse_whenR1AssignedButR2NotAssigned_1V2_DIFF() {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseReference(1L)
+                    .respondent2SameLegalRepresentative(NO)
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
@@ -204,9 +271,10 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
         }
 
         @Test
-        void shouldReturnFalse_whenRespondent1SolicitorIsNotAssigned_1V2() {
+        void shouldReturnFalse_whenR2AssignedButR1NotAssigned_1V2_DIFF() {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseReference(1L)
+                    .respondent2SameLegalRepresentative(NO)
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();

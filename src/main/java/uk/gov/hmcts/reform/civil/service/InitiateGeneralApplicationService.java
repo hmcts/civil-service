@@ -271,7 +271,8 @@ public class InitiateGeneralApplicationService {
     private List<String> getRespondentCaseRoles(CaseData caseData) {
         List<String> respondentCaseRoles = new ArrayList<>();
         respondentCaseRoles.add(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole());
-        if (caseData.getRespondent2OrganisationPolicy() != null) {
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && caseData.getRespondent2OrganisationPolicy() != null) {
             respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
         }
         return respondentCaseRoles;
