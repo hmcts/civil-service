@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -49,25 +50,84 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         return TASK_ID;
     }
 
+    private String identifyTemplate(CaseData caseData){
+        String template;
+        if(ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+            "Both")){
+            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
+        } else{
+            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
+        }
+        return template;
+    }
+
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        // Send email to respondent solicitor
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        //Send email to applicant solicitor
+        if(ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+            "Both")) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                identifyTemplate(caseData),
+                addProperties1v2FirstDefendant(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                identifyTemplate(caseData),
+                addProperties1v2SecondDefendant(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                identifyTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
-                                                              .getOrganisation().getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                              .getOrganisation()
+                                                              .getOrganisationID(), caseData)+"test",
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test",
+            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()+"test",
+            CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                         .getOrganisation()
+                                                         .getOrganisationID(), caseData)+"test2"
+        );
+    }
+
+    public Map<String, String> addProperties1v2FirstDefendant(CaseData caseData) {
+        return Map.of(
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                              .getOrganisation()
+                                                              .getOrganisationID(), caseData)+"test2",
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test2",
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())+"test2",
+            CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                          .getOrganisation()
+                                                          .getOrganisationID(), caseData)+"test2"
+        );
+    }
+
+    public Map<String, String> addProperties1v2SecondDefendant(CaseData caseData) {
+        return Map.of(
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                              .getOrganisation()
+                                                              .getOrganisationID(), caseData)+"test3",
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()+"test3",
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())+"test3",
+            CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+                                                          .getOrganisation()
+                                                          .getOrganisationID(), caseData)+"test3"
         );
     }
 
