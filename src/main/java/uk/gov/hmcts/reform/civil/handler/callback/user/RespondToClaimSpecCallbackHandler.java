@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -129,7 +131,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
             .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
-            .put(callbackKey(MID, "validate-repayment-plan"), this::validateRepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
+            .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
@@ -262,6 +265,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
         }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            && caseData.getSpecDefenceAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specPartAdmitPaid(NO).build();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+            && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+            caseData = caseData.toBuilder().specFullAdmitPaid(NO).build();
+        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return populateAllocatedTrack(caseData);
         }
@@ -318,6 +328,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         //this logic to be removed when ccd supports AND-OR combinations
         if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
             } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
@@ -343,6 +354,36 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO);
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE);
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && caseData.getRespondentResponseIsSame().equals(YES)) {
+            updatedData.sameSolicitorSameResponse(YES);
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
+        } else {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+        }
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            if (coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                RESPONDENTSOLICITORTWOSPEC
+            )) {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+            } else {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(
+                    caseData.getRespondent1ClaimResponseTypeForSpec());
+            }
+
         }
 
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
@@ -497,7 +538,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData = caseData.toBuilder()
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+                .build();
         }
 
         if (YES.equals(caseData.getIsRespondent2())) {
@@ -600,7 +643,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+        CaseData caseData = callbackParams.getCaseData();
+        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                        .build())
+            .build();
+        return validateWitnesses(dq);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
@@ -641,7 +691,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
-            updatedData.sameSolicitorSameResponse(YES).build();
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                //work around: treat this as if it was a 1v2 same solicitor single response
+                updatedData.sameSolicitorSameResponse(NO).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(YES).build();
+            }
         } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
             if (NO.equals(caseData.getRespondentResponseIsSame())) {
@@ -752,6 +807,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
+                .respondent1DQWitnesses(Witnesses.builder()
+                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                            .build())
                 .build();
 
             updatedData.respondent1DQ(dq);
@@ -818,6 +877,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
             .respondent1DQStatementOfTruth(statementOfTruth)
+            .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                        .build())
             .build();
 
         updatedData.respondent1DQ(dq);
@@ -868,7 +931,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
-            () -> format("# You've submitted your response%n## Claim number: %s", claimNumber),
+            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
             caseData
         );
 
@@ -933,13 +996,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse validateRepaymentPlan(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CallbackResponse validateDefendant1RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent1RepaymentPlan());
+    }
+
+    private CallbackResponse validateDefendant2RepaymentPlan(CallbackParams callbackParams) {
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent2RepaymentPlan());
+    }
+
+    private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
         List<String> errors;
 
-        if (caseData.getRespondent1RepaymentPlan() != null
-            && caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(caseData.getRespondent1RepaymentPlan()
+        if (repaymentPlan != null
+            && repaymentPlan.getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
                                                                             .getFirstRepaymentDate());
         } else {
             errors = new ArrayList<>();

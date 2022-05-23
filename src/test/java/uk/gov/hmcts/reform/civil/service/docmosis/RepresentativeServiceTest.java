@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -155,6 +156,41 @@ class RepresentativeServiceTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)
+                .build();
+
+            Representative representative = representativeService.getRespondent1Representative(caseData);
+
+            verify(organisationService).findOrganisationById(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+            assertThat(representative).extracting("organisationName").isEqualTo(respondentOrganisation.getName());
+            assertThat(representative).extracting("dxAddress").isEqualTo(
+                respondentContactInformation.getDxAddress().get(0).getDxNumber());
+            assertThat(representative).extracting("emailAddress").isEqualTo(
+                caseData.getRespondentSolicitor1EmailAddress());
+            assertThat(representative).extracting("serviceAddress").extracting(
+                "AddressLine1",
+                "AddressLine2",
+                "AddressLine3",
+                "County",
+                "Country",
+                "PostCode"
+            ).containsExactly(
+                respondentSolicitorServiceAddress.getAddressLine1(),
+                respondentSolicitorServiceAddress.getAddressLine2(),
+                respondentSolicitorServiceAddress.getAddressLine3(),
+                respondentSolicitorServiceAddress.getCounty(),
+                respondentSolicitorServiceAddress.getCountry(),
+                respondentSolicitorServiceAddress.getPostCode()
+            );
+        }
+
+        @Test
+        void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddressSpec() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .specRespondentCorrespondenceAddressdetails(respondentSolicitorServiceAddress)
                 .build();
 
             Representative representative = representativeService.getRespondent1Representative(caseData);

@@ -1,12 +1,20 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
+import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -17,14 +25,35 @@ public class CaseDataParent implements MappableObject {
 
     private final SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private final YesOrNo applicantMPClaimExpertSpecRequired;
-    private final String respondent1PartnerAndDependent; //marked as string (Kenneth will change them to object type)
-    private final String respondent2PartnerAndDependent; //marked as string (Kenneth will change them to object type)
+    private final PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private final PartnerAndDependentsLRspec respondent2PartnerAndDependent;
+    private final YesOrNo applicant1ProceedWithClaimSpec2v1;
 
     private final PaymentUponCourtOrder respondent2CourtOrderPayment;
     private final RepaymentPlanLRspec respondent2RepaymentPlan;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployerRespondent2;
     private final Respondent1DebtLRspec specDefendant2Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant2SelfEmploymentDetails;
+    private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
+    private final YesOrNo respondent1CourtOrderPaymentOption;
+    private final List<Element<Respondent1CourtOrderDetails>> respondent1CourtOrderDetails;
+    private final YesOrNo respondent2CourtOrderPaymentOption;
+    private final List<Element<Respondent2CourtOrderDetails>> respondent2CourtOrderDetails;
+    private final YesOrNo respondent1LoanCreditOption;
+    private final List<Element<Respondent1LoanCreditDetails>> respondent1LoanCreditDetails;
+    private final YesOrNo respondent2LoanCreditOption;
+    private final List<Element<Respondent2LoanCreditDetails>> respondent2LoanCreditDetails;
+    // for default judgment specified tab
+    private final DJPaymentTypeSelection paymentTypeSelection;
+    private final RepaymentFrequencyDJ repaymentFrequency;
+    // for default judgment specified tab
+    // for witness
+    private final YesOrNo respondent1DQWitnessesRequiredSpec;
+    private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
+
+    @Builder.Default
+    private final List<Value<Document>> caseDocuments = new ArrayList<>();
+    private final String caseDocument1Name;
 
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;
@@ -86,4 +115,5 @@ public class CaseDataParent implements MappableObject {
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
     private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
+
 }

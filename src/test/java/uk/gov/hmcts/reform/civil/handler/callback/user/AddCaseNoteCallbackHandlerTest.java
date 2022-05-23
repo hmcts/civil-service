@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,9 +62,9 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    private CaseNote caseNote(LocalDate date, String createdBy, String note) {
+    private CaseNote caseNote(LocalDateTime timeStamp, String createdBy, String note) {
         return CaseNote.builder()
-            .createdOn(date)
+            .createdOn(timeStamp)
             .createdBy(createdBy)
             .note(note)
             .build();
@@ -76,8 +76,9 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseNoteToList_whenInvoked() {
 
-            CaseNote caseNote = caseNote(LocalDate.of(2021, 7, 5), "John Doe", "Existing case note");
-            CaseNote expectedCaseNote = caseNote(LocalDate.now(), "John Smith", "Example case note");
+            CaseNote caseNote = caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
+                                         "John Doe", "Existing case note");
+            CaseNote expectedCaseNote = caseNote(LocalDateTime.now(), "John Smith", "Example case note");
             List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
             CaseData caseData = CaseData.builder()
@@ -118,7 +119,7 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnEmptyResponse_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                .caseNotes(caseNote(LocalDate.of(2021, 7, 5),
+                .caseNotes(caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
                                     "John Doe", "Existing case note"
                 ))
                 .build();

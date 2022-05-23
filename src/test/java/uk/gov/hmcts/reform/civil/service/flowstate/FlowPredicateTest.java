@@ -1462,7 +1462,7 @@ class FlowPredicateTest {
                 @Test
                 void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence2v1() {
                     CaseData caseData = caseDataBuilder
-                        .atStateRespondent2v1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
+                        .atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2().build().toBuilder()
                         .build();
 
                     assertTrue(divergentRespondGoOfflineSpec.test(caseData));
@@ -1538,6 +1538,39 @@ class FlowPredicateTest {
                     assertTrue(fullDefenceSpec.test(caseData));
                 }
 
+                @Test
+                void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_Proceed() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atStateApplicantRespondToDefenceAndProceed()
+                        .setSuperClaimTypeToSpecClaim()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
+                        .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                        .build();
+                    assertTrue(fullDefenceProceed.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2SameSol_or1v1_Proceed() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atStateApplicantRespondToDefenceAndProceed()
+                        .setSuperClaimTypeToSpecClaim()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .applicant1ProceedWithClaim(YesOrNo.YES)
+                        .build();
+                    assertTrue(fullDefenceProceed.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenCaseDataAtStateFullDefenceTwo_v_one_Proceed() {
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .atStateApplicantRespondToDefenceAndProceed()
+                        .setSuperClaimTypeToSpecClaim()
+                        .multiPartyClaimTwoApplicants()
+                        .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+                        .build();
+                    assertTrue(fullDefenceProceed.test(caseData));
+                }
             }
 
             @Nested

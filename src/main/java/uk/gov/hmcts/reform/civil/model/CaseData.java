@@ -12,12 +12,10 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -37,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -92,6 +91,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
@@ -330,6 +331,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo specFullDefenceOrPartAdmission1V1;
     private YesOrNo specFullDefenceOrPartAdmission;
     private YesOrNo specDisputesOrPartAdmission;
+    private YesOrNo specPartAdmitPaid;
+    private YesOrNo specFullAdmitPaid;
 
     // dates
     private final LocalDateTime submittedDate;
@@ -366,13 +369,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+    private final String detailsOfDirection;
 
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String bothDefendantsSpec;
     private final String partialPaymentAmount;
     private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
@@ -387,15 +390,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     private final String hearingSelection;
-    // for default judgment specified tab
-    private final DJPaymentTypeSelection paymentTypeSelection;
-    private final RepaymentFrequencyDJ repaymentFrequency;
-    // for default judgment specified tab
+
     private final YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
+    private final YesOrNo disabilityPremiumPayments;
+    private final YesOrNo severeDisabilityPremiumPayments;
 
+    private final String currentDefendant;
     private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
