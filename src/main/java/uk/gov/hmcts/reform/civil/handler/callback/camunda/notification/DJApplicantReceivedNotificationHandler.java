@@ -55,13 +55,15 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
 
     private String identifyTemplate(CaseData caseData){
         String template;
-        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
+            .isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
-        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
+            .isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
@@ -76,7 +78,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private CallbackResponse notifyApplicantSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
+            .isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
             notificationService.sendMail(
@@ -92,7 +95,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
+            .isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
             notificationService.sendMail(
