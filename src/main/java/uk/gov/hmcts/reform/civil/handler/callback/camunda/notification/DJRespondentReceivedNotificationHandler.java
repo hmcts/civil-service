@@ -75,7 +75,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        //Send email to applicant solicitor
+
         if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {

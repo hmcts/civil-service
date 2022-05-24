@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
@@ -24,8 +23,6 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -79,8 +76,6 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private CallbackResponse notifyApplicantSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-
-        //Send email to applicant solicitor
         if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
@@ -125,7 +120,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                                                                .getOrganisation()
                                                                .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 
