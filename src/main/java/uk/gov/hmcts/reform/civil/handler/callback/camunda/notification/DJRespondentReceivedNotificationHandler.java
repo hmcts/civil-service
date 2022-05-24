@@ -119,7 +119,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 
