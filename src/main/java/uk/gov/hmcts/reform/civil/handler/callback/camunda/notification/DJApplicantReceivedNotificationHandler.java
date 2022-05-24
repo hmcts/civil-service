@@ -53,7 +53,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         return TASK_ID;
     }
 
-    private String identifyTemplate(CaseData caseData){
+    private String identifyTemplate(CaseData caseData) {
         String template;
         if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
             .isPresent()
