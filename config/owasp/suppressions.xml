@@ -36,6 +36,8 @@
     <cve>CVE-2016-1000027</cve>
     <cve>CVE-2022-25647</cve>
     <cve>CVE-2022-29885</cve>
+    <cve>CVE-2022-22971</cve>
+    <cve>CVE-2022-22970</cve>
   </suppress>
   <suppress>
     <cve>CVE-2022-25647</cve>
