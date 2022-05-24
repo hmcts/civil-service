@@ -16,12 +16,14 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -54,9 +56,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -634,7 +638,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
+            .respondent1Copy(caseData.getRespondent1())
+            .showConditionFlags(getInitialShowTags(callbackParams));
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
@@ -646,6 +651,36 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private Set<DefendantResponseShowTag> getInitialShowTags(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
+        Set<DefendantResponseShowTag> set = new HashSet<>();
+        switch (mpScenario) {
+            case ONE_V_ONE:
+            case TWO_V_ONE:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+                List<String> roles = coreCaseUserService.getUserCaseRoles(
+                    callbackParams.getCaseData().getCcdCaseReference().toString(),
+                    userInfo.getUid()
+                );
+                if (roles.contains(RESPONDENTSOLICITORONESPEC.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                }
+                if (roles.contains(RESPONDENTSOLICITORTWOSPEC.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                }
+                break;
+        }
+        return set;
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
