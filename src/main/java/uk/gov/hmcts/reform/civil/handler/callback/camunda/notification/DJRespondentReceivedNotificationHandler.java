@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -30,7 +31,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     public static final String TASK_ID = "NotifyRespondentSolicitorDJReceived";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED);
-    private static final String REFERENCE_TEMPLATE = "default-judgment-respondent-received-notification-%s";
+    private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-respondent-received-notification-%s";
+    private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-respondent-requested-notification-%s";
+    private String templateReference;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
@@ -52,12 +55,20 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private String identifyTemplate(CaseData caseData){
         String template;
-        if(ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")){
+            "Both")) {
             template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
-        } else{
+            templateReference = REFERENCE_TEMPLATE_RECEIVED;
+        }
+        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+            "Both")) {
             template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
+            templateReference = REFERENCE_TEMPLATE_REQUESTED;
+        } else {
+            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
+            templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         return template;
     }
@@ -65,27 +76,37 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         //Send email to applicant solicitor
-        if(ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 identifyTemplate(caseData),
                 addProperties1v2FirstDefendant(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                String.format(templateReference, caseData.getLegacyCaseReference())
             );
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 identifyTemplate(caseData),
                 addProperties1v2SecondDefendant(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                String.format(templateReference, caseData.getLegacyCaseReference())
             );
-        } else {
+        }
+        if(caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+            "Both")) {
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                identifyTemplate(caseData),
+                addProperties2(caseData),
+                String.format(templateReference, caseData.getLegacyCaseReference())
+            );
+        } else if(caseData.getAddRespondent2().equals(YesOrNo.NO)) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 identifyTemplate(caseData),
                 addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -93,6 +114,16 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        return Map.of(
+            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
+                                                          .getOrganisation()
+                                                          .getOrganisationID(), caseData),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()
+        );
+    }
+
+    public Map<String, String> addProperties2(CaseData caseData) {
         return Map.of(
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
