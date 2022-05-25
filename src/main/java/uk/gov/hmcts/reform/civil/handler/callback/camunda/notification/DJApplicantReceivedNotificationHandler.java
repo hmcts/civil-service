@@ -113,7 +113,6 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        System.out.println(identifyTemplate(caseData));
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
