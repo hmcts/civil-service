@@ -69,8 +69,8 @@ payments:
   api:
     site_id: AAA7
     service: CIVIL
-    spec_site_id: AAA7
-    spec_service: CIVIL
+    spec_site_id: AAA6
+    spec_service: SPEC
 
 idam:
   s2s-auth:
@@ -169,7 +169,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: true
+  enabled: ${STITCHING_API_ENABLED:true}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
