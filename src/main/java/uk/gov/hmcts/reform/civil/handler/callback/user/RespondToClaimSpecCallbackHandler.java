@@ -207,6 +207,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    // called on full_admit
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
