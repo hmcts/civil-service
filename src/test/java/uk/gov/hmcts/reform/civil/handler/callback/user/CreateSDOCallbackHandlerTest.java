@@ -131,7 +131,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "order-details";
 
         @Test
-        void shouldPrePopulateDisposalHearingPage() {
+        void shouldPrePopulateOrderDetailsPages() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -213,6 +213,108 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("N/A");
             assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
                 .isEqualTo("N/A");
+
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input1")
+                .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage "
+                               + "or any other relevant matters");
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input2")
+                .isEqualTo("The column headings will be as follows: Item; Alleged Defect; claimant's Costing; "
+                               + "defendant's Response; defendant's Costing; Reserved for Judge's Use");
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input3")
+                .isEqualTo("The claimant must serve the Scott Schedule with the relevant columns completed by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input4")
+                .isEqualTo("The defendant must file and serve the Scott Schedule with the relevant columns "
+                               + "in response completed by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+
+            assertThat(response.getData()).extracting("fastTrackClinicalNegligence").extracting("input1")
+                .isEqualTo("Documents are to be retained as follows:");
+            assertThat(response.getData()).extracting("fastTrackClinicalNegligence").extracting("input2")
+                .isEqualTo("the parties must retain all electronically stored documents relating to the issues "
+                               + "in this Claim.");
+            assertThat(response.getData()).extracting("fastTrackClinicalNegligence").extracting("input3")
+                .isEqualTo("the defendant must retain the original clinical notes relating to the issues in this Claim."
+                               + " The defendant must give facilities for inspection by the claimant, the claimant's"
+                               + " legal advisers and experts of these original notes on 7 days written notice.");
+            assertThat(response.getData()).extracting("fastTrackClinicalNegligence").extracting("input4")
+                .isEqualTo("Legible copies of the medical and educational records of the claimant / Deceased / "
+                               + "claimant's Mother are to be placed in a separate paginated bundle by the "
+                               + "claimant's Solicitors and kept up to date. All references to medical notes are to be "
+                               + "made by reference to the pages in that bundle.");
+
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
+                .isEqualTo("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                               + "claimant's disclosure as ordered earlier in this order must include:\n"
+                               + "a. Evidence of all income from all sources for a period of 3 months prior to the "
+                               + "commencement of hire until the earlier of i) 3 months after cessation of hire or ii) "
+                               + "the repair/replacement of the claimant's vehicle;\n"
+                               + "b. Copy statements of all blank, credit care and savings accounts for a period of "
+                               + "3 months prior to the commencement of hire until the earlier of i) 3 months after "
+                               + "cessation of hire or ii) the repair/replacement of the claimant's vehicle;\n"
+                               + "c. Evidence of any loan, overdraft or other credit facilities available to the "
+                               + "claimant");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
+                .isEqualTo("The claimant must file and serve a witness statement addressing, (a) need to hire a "
+                               + "replacement vehicle and (b) impecuniosity no later than 4pm on");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
+                .isEqualTo("Failure to comply with the paragraph above will result in the claimant being debarred from "
+                               + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                               + "save with permission of the Trial Judge.");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
+                .isEqualTo("4. The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                               + "later than 4pm on.");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
+                .isEqualTo("5. If the parties fail to agree rates subject to liability and/or other issues pursuant to "
+                               + "the paragraph above, each party may rely upon written evidence by way of witness "
+                               + "statement of one witness to provide evidence of basic hire rates available within "
+                               + "the claimant's geographical location, from a mainstream (or, if none available, a "
+                               + "local reputable) supplier. The defendant's evidence to be served by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
+                .isEqualTo("and the claimant's evidence in reply if so advised to be served by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
+                .isEqualTo(LocalDate.now().plusWeeks(14).toString());
+            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
+                .isEqualTo("This witness statement is limited to 10 pages per party (to include any appendices).");
+
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
+                .isEqualTo("The claimant must prepare a Scott Schedule of the items of disrepair");
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
+                .isEqualTo("The column headings will be as follows: Item; Alleged disrepair; "
+                               + "Defendant's Response; Reserved for Judge's Use");
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input3")
+                .isEqualTo("The claimant must serve the Scott Schedule with the relevant columns completed by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString()); // placeholder date for now. tbc
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input4")
+                .isEqualTo("The Defendant must file and serve the Scott Schedule with the relevant column "
+                               + "in response completed by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString()); // placeholder date for now, tbc
+
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input1")
+                .isEqualTo("1. The claimant has permission to rely on the written expert evidence annexed to the "
+                               + "Particulars of Claim. Defendant may raise written questions of the expert by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
+                .isEqualTo("which must be answered by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
+                .isEqualTo("No other permission is given for expert evidence.");
+
+            assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
+                .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
+                               + "agreed by the parties.");
         }
 
         @Test
