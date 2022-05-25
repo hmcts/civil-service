@@ -836,7 +836,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private Set<DefendantResponseShowTag> getInitialShowTags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
-        Set<DefendantResponseShowTag> set = new HashSet<>();
+        Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
         switch (mpScenario) {
             case ONE_V_ONE:
             case TWO_V_ONE:
