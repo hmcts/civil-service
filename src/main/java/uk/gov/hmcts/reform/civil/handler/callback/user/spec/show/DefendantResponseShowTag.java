@@ -8,5 +8,10 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.show;
  */
 public enum DefendantResponseShowTag {
     CAN_ANSWER_RESPONDENT_1,
-    CAN_ANSWER_RESPONDENT_2
+    CAN_ANSWER_RESPONDENT_2,
+    ONLY_RESPONDENT_1_DISPUTES,
+    ONLY_RESPONDENT_2_DISPUTES,
+    BOTH_RESPONDENTS_DISPUTE,
+    RESPONDENT_1_PAID_LESS,
+    RESPONDENT_2_PAID_LESS
 }
