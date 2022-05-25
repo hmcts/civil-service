@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -1031,13 +1030,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    .build())
                 .build();
 
-            LocalDate nextDeadline = now().plusDays(112);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(response.getData())
-                .containsEntry("nextDeadline", nextDeadline.toString());
             assertThat(response.getData())
                 .containsEntry("unassignedCaseListDisplayOrganisationReferences",
                                "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");

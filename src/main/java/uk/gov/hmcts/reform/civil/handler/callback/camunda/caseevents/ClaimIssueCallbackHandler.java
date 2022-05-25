@@ -37,14 +37,15 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadline);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadlineAndNextDeadline);
     }
 
-    private CallbackResponse addClaimNotificationDeadline(CallbackParams callbackParams) {
+    private CallbackResponse addClaimNotificationDeadlineAndNextDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
         CaseData caseDataUpdated = caseData.toBuilder()
             .claimNotificationDeadline(deadline)
+            .nextDeadline(deadline.toLocalDate())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
