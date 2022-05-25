@@ -84,6 +84,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -553,6 +555,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     /**
      * Returns the flags that should be active because part admission has been chosen.
+     *
      * @param caseData the claim info
      * @return flags to describe who disputes because a response is part admission
      */
@@ -562,23 +565,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         switch (mpScenario) {
             case ONE_V_ONE:
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES);
+                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
                 break;
             case TWO_V_ONE:
                 if (caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                     || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES);
+                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    if (// TODO check this condition, we also have caseData.getSameSolicitorSameResponse()
-                        caseData.getRespondentResponseIsSame() == YES
-                            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                    if (caseData.getDefendantSingleResponseToBothClaimants() == YES
+                        || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                         tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
                     } else {
-                        tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES);
+                        tags.add(ONLY_RESPONDENT_1_DISPUTES);
                     }
                 } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
@@ -587,7 +589,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                     && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES);
+                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 } else if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
@@ -610,24 +612,47 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     caseData.getDefenceRouteRequired(),
                     caseData.getRespondToClaim(),
                     caseData.getTotalClaimAmount(),
-                    DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+                    ONLY_RESPONDENT_1_DISPUTES,
                     DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
                 ).ifPresent(bcoPartAdmission::add);
                 break;
             case TWO_V_ONE:
-                if (!bcoPartAdmission.contains(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES)) {
+                if (!bcoPartAdmission.contains(ONLY_RESPONDENT_1_DISPUTES)) {
                     fullDefenceAndPaidLess(
                         caseData.getClaimant1ClaimResponseTypeForSpec(),
                         caseData.getDefenceRouteRequired(),
                         caseData.getRespondToClaim(),
                         caseData.getTotalClaimAmount(),
-                        DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+                        ONLY_RESPONDENT_1_DISPUTES,
                         DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
                     ).ifPresent(bcoPartAdmission::add);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                // TODO check same response
+                fullDefenceAndPaidLess(
+                    caseData.getRespondent1ClaimResponseTypeForSpec(),
+                    caseData.getDefenceRouteRequired(),
+                    caseData.getRespondToClaim(),
+                    caseData.getTotalClaimAmount(),
+                    ONLY_RESPONDENT_1_DISPUTES,
+                    DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                );
+                fullDefenceAndPaidLess(
+                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                    caseData.getDefenceRouteRequired2(),
+                    caseData.getRespondToClaim2(),
+                    caseData.getTotalClaimAmount(),
+                    DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
+                    DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
+                ).ifPresent(bcoPartAdmission::add);
+                EnumSet<DefendantResponseShowTag> bothOnlyDisputes = EnumSet.of(
+                    DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+                    DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES
+                );
+                if (bcoPartAdmission.containsAll(bothOnlyDisputes)) {
+                    bcoPartAdmission.removeAll(bothOnlyDisputes);
+                    bcoPartAdmission.add(BOTH_RESPONDENTS_DISPUTE);
+                }
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)) {
@@ -636,7 +661,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         caseData.getDefenceRouteRequired(),
                         caseData.getRespondToClaim(),
                         caseData.getTotalClaimAmount(),
-                        DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+                        ONLY_RESPONDENT_1_DISPUTES,
                         DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
                     ).ifPresent(bcoPartAdmission::add);
                 } else if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)) {
@@ -657,7 +682,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private void removeWhoDisputesAndWhoPaidLess(Set<DefendantResponseShowTag> tags) {
         tags.removeIf(EnumSet.of(
-            DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+            ONLY_RESPONDENT_1_DISPUTES,
             DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
             DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
             DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
