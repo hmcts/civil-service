@@ -37,23 +37,23 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private static final String DEFENDANT_NAME = "Defendant Name";
     private static final String DEFENDANT2_NAME = "Defendant2 Name";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_DEFENDANT);
-    private static final String REFERENCE_TEMPLATE_APPROVAL = "interim-judgment-approval-notification-def-%s";
-    private static final String REFERENCE_TEMPLATE_REQUEST = "interim-judgment-requested-notification-def-%s";
-    private static final String TASK_ID = "NotifyInterimJudgmentDefendant";
+    private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
+    private static final String REFERENCE_TEMPLATE_REQUEST_DEF = "interim-judgment-requested-notification-def-%s";
+    private static final String TASK_ID_DEF = "NotifyInterimJudgmentDefendant";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyAllPartiesInterimJudgmentApproved
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyAllPartiesInterimJudgmentApprovedDefendant
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return TASK_ID_DEF;
     }
 
-    private CallbackResponse notifyAllPartiesInterimJudgmentApproved(CallbackParams callbackParams) {
+    private CallbackResponse notifyAllPartiesInterimJudgmentApprovedDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
@@ -62,7 +62,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                 notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                              notificationsProperties.getInterimJudgmentRequested2Defendants(),
                                              addProperties2Defendants(caseData),
-                                             String.format(REFERENCE_TEMPLATE_REQUEST,
+                                             String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
                                                            caseData.getLegacyCaseReference()));
             } else {
                 if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
@@ -70,7 +70,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                     notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                                  notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                                  addProperties(caseData),
-                                                 String.format(REFERENCE_TEMPLATE_REQUEST,
+                                                 String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
                                                                caseData.getLegacyCaseReference()));
                 }
                 if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
@@ -80,7 +80,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                                      caseData.getRespondentSolicitor1EmailAddress(),
                                                  notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                                  addPropertiesDefendant2(caseData),
-                                                 String.format(REFERENCE_TEMPLATE_REQUEST,
+                                                 String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
                                                                caseData.getLegacyCaseReference())
                     );
                 }
@@ -89,7 +89,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
             notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                          notificationsProperties.getInterimJudgmentApprovalDefendant(),
                                          addProperties(caseData),
-                                         String.format(REFERENCE_TEMPLATE_APPROVAL,
+                                         String.format(REFERENCE_TEMPLATE_APPROVAL_DEF,
                                                        caseData.getLegacyCaseReference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

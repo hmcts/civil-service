@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,23 +37,23 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
     private static final String DEFENDANT_NAME = "Defendant Name";
     private static final String DEFENDANT2_NAME = "Defendant2 Name";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_CLAIMANT);
-    private static final String REFERENCE_TEMPLATE_APPROVAL = "interim-judgment-approval-notification-%s";
-    private static final String REFERENCE_TEMPLATE_REQUEST = "interim-judgment-requested-notification-%s";
-    private static final String TASK_ID = "NotifyInterimJudgmentClaimant";
+    private static final String REFERENCE_TEMPLATE_APPROVAL_CLAIMANT = "interim-judgment-approval-notification-%s";
+    private static final String REFERENCE_TEMPLATE_REQUEST_CLAIMANT = "interim-judgment-requested-notification-%s";
+    private static final String TASK_ID_CLAIMANT = "NotifyInterimJudgmentClaimant";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyAllPartiesInterimJudgmentApproved
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyAllPartiesInterimJudgmentApprovedClaimant
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return TASK_ID_CLAIMANT;
     }
 
-    private CallbackResponse notifyAllPartiesInterimJudgmentApproved(CallbackParams callbackParams) {
+    private CallbackResponse notifyAllPartiesInterimJudgmentApprovedClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getAddRespondent2() != null
             && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
@@ -60,14 +61,14 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getInterimJudgmentRequestedClaimant(),
                 addProperties2Defendants(caseData),
-                String.format(REFERENCE_TEMPLATE_REQUEST,
+                String.format(REFERENCE_TEMPLATE_REQUEST_CLAIMANT,
                               caseData.getLegacyCaseReference()));
         } else {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getInterimJudgmentApprovalClaimant(),
                 addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE_APPROVAL, caseData.getLegacyCaseReference()));
+                String.format(REFERENCE_TEMPLATE_APPROVAL_CLAIMANT, caseData.getLegacyCaseReference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -81,20 +82,17 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return Map.of(
+        return new HashMap<>(Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName()
-        );
+        ));
     }
 
     public Map<String, String> addProperties2Defendants(final CaseData caseData) {
-        return Map.of(
-            LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            DEFENDANT2_NAME, caseData.getRespondent2().getPartyName()
-        );
+        Map<String, String> propertiesMap = new HashMap<>(addProperties(caseData));
+        propertiesMap.put(DEFENDANT2_NAME, caseData.getRespondent2().getPartyName());
+        return propertiesMap;
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {

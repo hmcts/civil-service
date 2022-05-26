@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -46,6 +49,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
         void setup() {
             when(notificationsProperties.getInterimJudgmentRequestedDefendant()).thenReturn("template-id-req");
             when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
+            when(notificationsProperties.getInterimJudgmentRequested2Defendants()).thenReturn("template-id-req2");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
@@ -64,11 +68,53 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             );
         }
 
+        @Test
+        void shouldNotifyClaimantSolicitor2Defendants_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(notificationService, times(2)).sendMail(
+                anyString(),
+                eq("template-id-req"), anyMap(),
+                eq("interim-judgment-requested-notification-def-000DC001"));
+        }
+
+        @Test
+        void shouldNotifyClaimantSolicitor2DefendantsSameRep_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateClaimIssued1v2AndSameRepresentative()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id-req2",
+                getNotificationDataMap2Def(),
+                "interim-judgment-requested-notification-def-000DC001"
+            );
+        }
+
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "Legal Rep Defendant", "Test Org Name",
                 "Claim number", "000DC001",
                 "Defendant Name", "Mr. Sole Trader"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMap2Def() {
+            return Map.of(
+                "Legal Rep Defendant", "Test Org Name",
+                "Claim number", "000DC001",
+                "Defendant Name", "Mr. Sole Trader",
+                "Defendant2 Name", "Mr. John Rambo"
             );
         }
     }
