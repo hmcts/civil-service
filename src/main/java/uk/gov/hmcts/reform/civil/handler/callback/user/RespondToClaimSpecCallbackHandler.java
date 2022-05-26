@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -86,7 +85,10 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -166,8 +168,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .errors(errors)
                 .build();
         }
-        caseData = caseData.toBuilder().showConditionFlags(whoDisputesFullDefence(caseData))
-            .build();
+        CaseData.CaseDataBuilder<?, ?> updatedCase = caseData.toBuilder();
+        updatedCase.showConditionFlags(whoDisputesFullDefence(caseData));
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
             if (caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
@@ -176,9 +178,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
                 || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+                updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(YES);
             } else {
-                caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+                updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(NO);
             }
             if (YES.equals(caseData.getIsRespondent2())) {
                 if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
@@ -186,9 +188,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
                     || caseData.getRespondent2ClaimResponseTypeForSpec()
                     == RespondentResponseTypeSpec.PART_ADMISSION)) {
-                    caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+                    updatedCase.specDisputesOrPartAdmission(YES);
                 } else {
-                    caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
+                    updatedCase.specDisputesOrPartAdmission(NO);
                 }
             } else {
                 if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
@@ -196,15 +198,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
                     || caseData.getRespondent1ClaimResponseTypeForSpec()
                     == RespondentResponseTypeSpec.PART_ADMISSION)) {
-                    caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+                    updatedCase.specDisputesOrPartAdmission(YES);
                 } else {
-                    caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
+                    updatedCase.specDisputesOrPartAdmission(NO);
                 }
             }
-            return populateAllocatedTrack(caseData);
+            AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
+            updatedCase.responseClaimTrack(allocatedTrack.name());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .data(updatedCase.build().toMap(objectMapper))
             .build();
     }
 
@@ -218,75 +221,81 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .errors(errors)
                 .build();
         }
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
-            caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(YES).build();
+            updatedCaseData.fullAdmissionAndFullAmountPaid(YES);
         } else if (YES.equals(caseData.getIsRespondent1())
             && YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
-            caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(YES).build();
+            updatedCaseData.fullAdmissionAndFullAmountPaid(YES);
         } else {
-            caseData = caseData.toBuilder().fullAdmissionAndFullAmountPaid(NO).build();
+            updatedCaseData.fullAdmissionAndFullAmountPaid(NO);
         }
 
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
-            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(
-                caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).build();
+            updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
         } else if (YES.equals(caseData.getIsRespondent2())
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
-            caseData = caseData.toBuilder().defenceAdmitPartPaymentTimeRouteGeneric(
-                caseData.getDefenceAdmitPartPaymentTimeRouteRequired2()).build();
+            updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
         }
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
-            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(YES).build();
+            updatedCaseData.partAdmittedByEitherRespondents(YES);
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(YES).build();
+            updatedCaseData.partAdmittedByEitherRespondents(YES);
         } else {
-            caseData = caseData.toBuilder().partAdmittedByEitherRespondents(NO).build();
+            updatedCaseData.partAdmittedByEitherRespondents(NO);
         }
 
         if (YES.equals(caseData.getDefenceAdmitPartEmploymentTypeRequired())) {
-            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
-                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec()).build();
+            updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
+                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec());
         }
         if (YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
-            caseData = caseData.toBuilder().respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
-                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2()).build();
+            updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
+                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
         }
         if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
             BigDecimal valuePounds = MonetaryConversions
                 .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
-            caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(valuePounds)
-                .build();
+            updatedCaseData.respondToAdmittedClaimOwingAmountPounds(valuePounds);
         }
         if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
             == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
             || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
             || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
-            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(YES).build();
+            updatedCaseData.specPaidLessAmountOrDisputesOrPartAdmission(YES);
         } else {
-            caseData = caseData.toBuilder().specPaidLessAmountOrDisputesOrPartAdmission(NO).build();
+            updatedCaseData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
         }
         if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
             != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
             && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
             || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
-            caseData = caseData.toBuilder().specDisputesOrPartAdmission(YES).build();
+            updatedCaseData.specDisputesOrPartAdmission(YES);
         } else {
-            caseData = caseData.toBuilder().specDisputesOrPartAdmission(NO).build();
+            updatedCaseData.specDisputesOrPartAdmission(NO);
         }
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
             && caseData.getSpecDefenceAdmittedRequired() == NO) {
-            caseData = caseData.toBuilder().specPartAdmitPaid(NO).build();
+            updatedCaseData.specPartAdmitPaid(NO);
         } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
             && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
-            caseData = caseData.toBuilder().specFullAdmitPaid(NO).build();
+            updatedCaseData.specFullAdmitPaid(NO);
+        }
+        if (mustWhenWillClaimBePaidBeShown(caseData)) {
+            Set<DefendantResponseShowTag> flags = caseData.getShowConditionFlags();
+            flags.add(WHEN_WILL_CLAIM_BE_PAID);
+            updatedCaseData.showConditionFlags(flags);
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            return populateAllocatedTrack(caseData);
+            AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
+            updatedCaseData.responseClaimTrack(allocatedTrack.name());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
@@ -764,14 +773,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return caseData;
     }
 
-    private CallbackResponse populateAllocatedTrack(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(
+    private AllocatedTrack getAllocatedTrack(CaseData caseData) {
+        return AllocatedTrack.getAllocatedTrack(
             caseData.getTotalClaimAmount(),
             null
         );
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().responseClaimTrack(allocatedTrack.name()).build().toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
@@ -1249,5 +1255,32 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    /**
+     * WhenWillClaimBePaid has to be shown if the respondent admits (full or part) and say they didn't pay.
+     * At the moment of writing, full admit doesn't ask for how much the respondent paid (if they say they paid)
+     * and part admit doesn't ask when will the amount be paid even if paid less.
+     *
+     * @param caseData claim data
+     * @return true if pageId WhenWillClaimBePaid must be shown
+     */
+    public boolean mustWhenWillClaimBePaidBeShown(CaseData caseData) {
+        // 1v1 or 1v2 dif sol
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_1)) {
+            // admit part not pay or admit full not pay
+            if (caseData.getSpecDefenceFullAdmittedRequired() == NO
+                || caseData.getSpecDefenceAdmittedRequired() == NO) {
+                return true;
+            }
+        } else if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)) {
+            // admit part not pay or admit full not pay
+            if (caseData.getSpecDefenceFullAdmitted2Required() == NO
+                || caseData.getSpecDefenceAdmitted2Required() == NO) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

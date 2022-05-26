@@ -13,5 +13,9 @@ public enum DefendantResponseShowTag {
     ONLY_RESPONDENT_2_DISPUTES,
     BOTH_RESPONDENTS_DISPUTE,
     RESPONDENT_1_PAID_LESS,
-    RESPONDENT_2_PAID_LESS
+    RESPONDENT_2_PAID_LESS,
+    /**
+     * pageId WhenWillClaimBePaid must be shown
+     */
+    WHEN_WILL_CLAIM_BE_PAID
 }
