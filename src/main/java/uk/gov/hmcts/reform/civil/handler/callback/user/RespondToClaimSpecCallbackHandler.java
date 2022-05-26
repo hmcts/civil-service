@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -207,7 +208,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    // called on full_admit
+    // called on full_admit, also called after whenWillClaimBePaid
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
@@ -491,14 +492,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.showHowToAddTimeLinePage(YES);
         }
 
-        if (YES.equals(caseData.getIsRespondent1())
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            updatedData.showHowToAddTimeLinePage(NO);
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        } else if (YES.equals(caseData.getIsRespondent2())
-            && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.showHowToAddTimeLinePage(NO);
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        if (YES.equals(caseData.getIsRespondent1())) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (RespondentResponseTypeSpec.FULL_ADMISSION
+                .equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+            }
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (RespondentResponseTypeSpec.FULL_ADMISSION
+                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+            }
         }
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
@@ -528,7 +537,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             //workaround
             updatedData.defenceAdmitPartPaymentTimeRouteGeneric(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+                IMMEDIATELY);
         }
 
         updatedData.showConditionFlags(whoDisputesPartAdmission(caseData));
