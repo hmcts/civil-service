@@ -12,15 +12,16 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -28,13 +29,13 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.time.LocalDate.EPOCH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -85,67 +86,17 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     protected IdamClient idamClient;
 
-    private static final String STRING_CONSTANT = "this is a string";
-    private static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
-    private static final LocalDate APP_DATE_EPOCH = EPOCH;
+    @MockBean
+    protected GeneralAppFeesService feesService;
+
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
-    @Nested
-    class AboutToStartCallback extends GeneralAppSampleDataBuilder {
-
-        private final Organisation organisation = Organisation.builder()
-                .paymentAccount(List.of("12345", "98765"))
-                .build();
-
-        @Test
-        void shouldCalculateClaimFeeAndAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            DynamicList dynamicList = getDynamicList(response);
-            List<String> actualPbas = dynamicList.getListItems().stream()
-                    .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
-
-            assertThat(actualPbas).containsOnly("12345", "98765");
-            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
-        }
-
-        @Test
-        void shouldCalculateClaimFee_whenCalledAndOrgDoesNotExistInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(getDynamicList(response))
-                    .isEqualTo(DynamicList.builder()
-                            .value(DynamicListElement.builder().code(null).label(null).build())
-                            .listItems(Collections.<DynamicListElement>emptyList()).build());
-        }
-
-        @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-        }
-
-        private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            return responseCaseData.getGeneralAppPBADetails().getApplicantsPbaAccounts();
-        }
-    }
+    private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
+    private final BigDecimal fee108 = new BigDecimal("10800");
+    private final BigDecimal fee275 = new BigDecimal("27500");
+    private static final String FEE_CODE = "test_fee_code";
+    private static final String FEE_VERSION = "1";
 
     @Nested
     class MidEventForUrgencyCheck extends GeneralAppSampleDataBuilder {
@@ -444,45 +395,119 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventForSettingFee extends GeneralAppSampleDataBuilder {
+    class MidEventForSettingFeeAndPBA extends GeneralAppSampleDataBuilder {
 
-        private static final String SET_FEES_FOR_APPLICATION = "ga-set-application-fees";
+        private final Organisation organisation = Organisation.builder()
+                .paymentAccount(List.of("12345", "98765"))
+                .build();
 
         @Test
-        void shouldSet108Fees_whenApplicationIsConsented() {
-            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
-                    CaseDataBuilder.builder().build(), true, false);
-            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+        void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
+                            .version(FEE_VERSION).build());
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
+            DynamicList dynamicList = getDynamicList(response);
+            List<String> actualPbas = dynamicList.getListItems().stream()
+                    .map(DynamicListElement::getLabel)
+                    .collect(Collectors.toList());
+
+            assertThat(actualPbas).containsOnly("12345", "98765");
+            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
+        }
+
+        @Test
+        void shouldNotResultInErrors_whenCalledAndOrgDoesNotExistInPrd() {
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee108)
+                            .version(FEE_VERSION).build());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(getDynamicList(response))
+                    .isEqualTo(DynamicList.builder()
+                            .value(DynamicListElement.builder().code(null).label(null).build())
+                            .listItems(Collections.<DynamicListElement>emptyList()).build());
+        }
+
+        @Test
+        void shouldReturnNoError_whenNoOrgDetailsObtained() {
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee108)
+                            .version(FEE_VERSION).build());
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldSet108Fees_whenApplicationIsConsented() {
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee108)
+                            .version(FEE_VERSION).build());
+
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                    CaseDataBuilder.builder().build(), true, false);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
             assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
         }
 
         @Test
         void shouldSet108Fees_whenApplicationIsUnConsentedWithoutNotice() {
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee108)
+                            .version(FEE_VERSION).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, false);
-            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
             assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
         }
 
         @Test
         void shouldSet275Fees_whenApplicationIsUnConsentedWithNotice() {
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee275)
+                            .version(FEE_VERSION).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, true);
-            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_FOR_APPLICATION);
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
             assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
         }
@@ -491,10 +516,19 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getGeneralAppPBADetails();
         }
+
+        private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getGeneralAppPBADetails().getApplicantsPbaAccounts();
+        }
     }
 
     @Nested
     class AboutToSubmit extends GeneralAppSampleDataBuilder {
+
+        private final Fee feeFromFeeService = Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
+                .version(FEE_VERSION).build();
+
         @Test
         void shouldAddNewApplicationToList_whenInvoked() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -520,8 +554,42 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetAppropriateFees_whenFeesAreUnsetByCCD() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                    .getTestCaseData(CaseData.builder().build());
+            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                    .email(APPLICANT_EMAIL_ID_CONSTANT)
+                    .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                    any(CaseData.class), any(UserDetails.class), anyString()))
+                    .thenReturn(getMockServiceData(caseData));
+
+            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+                    any(CaseData.class), any(UserDetails.class)))
+                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(caseData.getGeneralAppPBADetails()).isNotNull();
+            assertThat(caseData.getGeneralAppPBADetails().getFee()).isNull();
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            GeneralApplication application = unwrapElements(responseCaseData.getGeneralApplications()).get(0);
+            assertThat(application.getGeneralAppPBADetails()).isNotNull();
+            assertThat(application.getGeneralAppPBADetails().getFee()).isNotNull();
+        }
+
+        @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(INITIATE_GENERAL_APPLICATION);
+        }
+
+        private CaseData getMockServiceData(CaseData caseData) {
+            GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeFromFeeService).build();
+            return caseData.toBuilder().generalAppPBADetails(pbaDetails).build();
         }
 
         private void assertResponse(CaseData responseData) {
@@ -567,6 +635,37 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
+        }
+    }
+
+    @Nested
+    class AboutToStartCallbackHandling extends GeneralAppSampleDataBuilder {
+        private static final String ERROR = "Application cannot be created until all the required respondent "
+                + "solicitor are assigned to the case.";
+
+        @Test
+        void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(ERROR);
         }
     }
 }

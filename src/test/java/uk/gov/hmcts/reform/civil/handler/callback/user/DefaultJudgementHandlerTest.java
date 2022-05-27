@@ -137,48 +137,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventHearingTypeSelection {
-
-        private static final String PAGE_ID = "hearingTypeSelection";
-
-        @Test
-        void shouldReturnDisposalText_whenHearingTypeSelectionDisposal() {
-            String disposalText = "will be disposal hearing provided text";
-            //text that will populate text area when the hearing type selected is disposal
-            //dummy text for now until proper text provided.
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .detailsOfDirectionDisposal(disposalText)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("detailsOfDirectionDisposal")).isEqualTo(disposalText);
-        }
-
-        @Test
-        void shouldReturnTrialText_whenHearingTypeSelectionTrial() {
-            String trialText = "will be trial hearing provided text";
-            //text that will populate text area when the hearing type selected is trial
-            //dummy text for now until proper text provided.
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .detailsOfDirectionDisposal(trialText)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("detailsOfDirectionTrial")).isEqualTo(trialText);
-        }
-    }
-
-    @Nested
     class MidEventHearingSupportCallback {
 
         private static final String PAGE_ID = "HearingSupportRequirementsDJ";

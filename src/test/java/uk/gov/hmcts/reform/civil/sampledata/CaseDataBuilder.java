@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -58,6 +59,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -69,6 +71,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -155,12 +158,14 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent2ClaimResponseType;
     protected ResponseDocument respondent2ClaimResponseDocument;
     protected YesOrNo respondentResponseIsSame;
+    protected DynamicList defendantDetails;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
     protected RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     // Claimant Response
     protected YesOrNo applicant1ProceedWithClaim;
+    protected YesOrNo applicant1ProceedWithClaimSpec2v1;
     protected YesOrNo applicant2ProceedWithClaimMultiParty2v1;
     protected YesOrNo applicant1ProceedWithClaimMultiParty2v1;
     protected YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
@@ -241,12 +246,17 @@ public class CaseDataBuilder {
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
+    private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
+    private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
     private Address specAoSRespondent2HomeAddressDetails;
+    private YesOrNo respondent1DQWitnessesRequiredSpec;
+    private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -512,6 +522,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1ProceedWithClaim(YesOrNo yesOrNo) {
         this.applicant1ProceedWithClaim = yesOrNo;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ProceedWithClaimSpec2v1(YesOrNo yesOrNo) {
+        this.applicant1ProceedWithClaimSpec2v1 = yesOrNo;
         return this;
     }
 
@@ -1168,6 +1183,25 @@ public class CaseDataBuilder {
         addRespondent2 = YES;
         respondent2Represented = YES;
         respondent2SameLegalRepresentative = YES;
+        respondent1OrganisationPolicy =
+            OrganisationPolicy.builder()
+                .organisation(Organisation.builder().organisationID("org1").build())
+                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                .orgPolicyReference("org1PolicyReference")
+                .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndSameUnregisteredRepresentative() {
+        atStateClaimIssued1v2AndSameRepresentative();
+        respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
+        defendantDetails = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Both Defendants").build())
+            .build();
         return this;
     }
 
@@ -1524,6 +1558,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent2v1FullDefence() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent2v1PartAdmission() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
@@ -1542,9 +1582,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent2v1FirstFullDefence_SecondPartAdmission() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent2v1BothNotFullDefence_PartAdmissionX2() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
         return this;
     }
 
@@ -1569,6 +1621,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent1v2FullDefence_AdmitPart() {
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1v2AdmintPart_FullDefence() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -1852,6 +1910,15 @@ public class CaseDataBuilder {
         respondent1ClaimResponseType = respondent1Response;
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondent2Responds(respondent2Response);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                       RespondentResponseTypeSpec respondent2Response) {
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent2RespondsSpec(respondent2Response);
         respondent2ResponseDate = LocalDateTime.now().plusDays(2);
         return this;
     }
@@ -2368,10 +2435,39 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimOneClaimant1ClaimResponseType() {
+        this.claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ClaimResponseTypeToApplicant2Spec() {
+        this.respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build();
         return this;
+    }
+
+    private List<CaseData> get2v1DifferentResponseCase() {
+        Party applicant1 = Party.builder().build();
+        Party applicant2 = Party.builder().build();
+        List<CaseData> cases = new ArrayList<>();
+        for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
+            for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
+                if (!r1.equals(r2)) {
+                    cases.add(CaseData.builder()
+                                  .applicant1(applicant1)
+                                  .applicant2(applicant2)
+                                  .claimant1ClaimResponseTypeForSpec(r1)
+                                  .claimant2ClaimResponseTypeForSpec(r2)
+                                  .build());
+                }
+            }
+        }
+        return cases;
     }
 
     public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
@@ -2469,12 +2565,22 @@ public class CaseDataBuilder {
         respondent1RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
 
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
         return this;
     }
 
-    public CaseDataBuilder atStateRespondentRespondToClaimUnemployedComplexTypeLRspec(
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec) {
-        this.respondToClaimAdmitPartUnemployedLRspec = respondToClaimAdmitPartUnemployedLRspec;
+    public CaseDataBuilder generateDefendant2RepaymentDateForAdmitPartResponse() {
+        atStateRespondentRespondToClaimFastTrack(RespondentResponseType.PART_ADMISSION);
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+
+        respondent2RepaymentPlan = RepaymentPlanLRspec.builder().paymentAmount(BigDecimal.valueOf(9000))
+            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH).firstRepaymentDate(FUTURE_DATE).build();
+
         return this;
     }
 
@@ -2497,6 +2603,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atSpecAoSRespondent2HomeAddressDetails(Address specAoSRespondent2HomeAddressDetails) {
         this.specAoSRespondent2HomeAddressDetails = specAoSRespondent2HomeAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWitnessesRequiredSpec(YesOrNo respondent1DQWitnessesRequiredSpec) {
+        this.respondent1DQWitnessesRequiredSpec = respondent1DQWitnessesRequiredSpec;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWitnessesDetailsSpec(List<Element<Witness>> respondent1DQWitnessesDetailsSpec) {
+        this.respondent1DQWitnessesDetailsSpec = respondent1DQWitnessesDetailsSpec;
         return this;
     }
 
@@ -2563,6 +2679,7 @@ public class CaseDataBuilder {
             .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
+            .defendantDetails(defendantDetails)
 
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
@@ -2638,12 +2755,19 @@ public class CaseDataBuilder {
             .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+            .respondent1PartnerAndDependent(respondent1PartnerAndDependent)
+            .respondent2PartnerAndDependent(respondent2PartnerAndDependent)
             .respondent1RepaymentPlan(respondent1RepaymentPlan)
+            .respondent2RepaymentPlan(respondent2RepaymentPlan)
             .applicantsProceedIntention(applicantsProceedIntention)
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(
                 applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2)
+            .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
+            .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
+            .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
+            .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
@@ -2653,6 +2777,9 @@ public class CaseDataBuilder {
             .specAoSApplicantCorrespondenceAddressdetails(specAoSApplicantCorrespondenceAddressDetails)
             .specAoSRespondent2HomeAddressRequired(specAoSRespondent2HomeAddressRequired)
             .specAoSRespondent2HomeAddressDetails(specAoSRespondent2HomeAddressDetails)
+            .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
+            .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
+            .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .build();
     }
 }

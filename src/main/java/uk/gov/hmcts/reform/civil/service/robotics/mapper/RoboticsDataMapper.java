@@ -107,10 +107,8 @@ public class RoboticsDataMapper {
         ofNullable(buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID))
             .ifPresent(solicitorsList::add);
 
-        if (caseData.getRespondent2Represented() == YES) {
-            String respondent2SolicitorId = caseData.getRespondent2SameLegalRepresentative() == YES
-                ? RESPONDENT_SOLICITOR_ID : RESPONDENT2_SOLICITOR_ID;
-            ofNullable(buildRespondent2Solicitor(caseData, respondent2SolicitorId))
+        if (YES == caseData.getRespondent2Represented() && YES != caseData.getRespondent2SameLegalRepresentative()) {
+            ofNullable(buildRespondent2Solicitor(caseData, RESPONDENT2_SOLICITOR_ID))
                 .ifPresent(solicitorsList::add);
         }
         return solicitorsList;

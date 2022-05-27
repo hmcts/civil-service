@@ -142,6 +142,7 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
