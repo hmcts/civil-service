@@ -79,7 +79,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String recipient = getRecipientEmail(caseData, caseEvent);
-        String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
+        String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty();
 
         notificationService.sendMail(
             recipient,
@@ -119,18 +119,9 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONSE_DEADLINE, formatLocalDate(caseData
-                                                                     .getRespondent1ResponseDeadline()
-                                                                     .toLocalDate(), DATE),
-            RESPONSE_DEADLINE_PLUS_28, formatLocalDate(caseData
-                                                                             .getRespondent1ResponseDeadline()
-                                                                             .toLocalDate()
-                                                                             .plusDays(28)
-                                                                             .atTime(23, 59)
-                                                                             .toLocalDate(), DATE),
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getIssueDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
