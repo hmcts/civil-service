@@ -156,6 +156,12 @@ notifications:
   respondentSolicitor1DefaultJudgmentReceived: "25fdb679-7f34-4717-ad4d-80f8562bc7b2"
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
+  interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
+  interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
+  interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
+  interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
+  interimJudgmentRequested2Defendants: "64584bf4-f17d-416f-9f1b-91b3aa39a69b"
+
 
 
 sendgrid:
