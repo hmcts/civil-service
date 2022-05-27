@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +94,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(response -> builder.poundsPaid(response.getHowMuchWasPaid().toString())
+            .ifPresent(response -> builder.poundsPaid(MonetaryConversions
+                                                          .penniesToPounds(response.getHowMuchWasPaid()).toString())
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
 

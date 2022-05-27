@@ -38,6 +38,7 @@ public class GeneralApplication implements MappableObject {
     private final CaseLink caseLink;
     private final LocalDateTime generalAppSubmittedDateGAspec;
     private final IdamUserDetails civilServiceUserRoles;
+    private final String applicantPartyName;
     private final String claimant1PartyName;
     private final String claimant2PartyName;
     private final String defendant1PartyName;
@@ -66,6 +67,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("caseLink") CaseLink caseLink,
                        @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec,
                        @JsonProperty("civilServiceUserRoles") IdamUserDetails civilServiceUserRoles,
+                       @JsonProperty("applicantPartyName") String applicantPartyName,
                        @JsonProperty("claimant1PartyName") String claimant1PartyName,
                        @JsonProperty("claimant2PartyName") String claimant2PartyName,
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
@@ -90,6 +92,7 @@ public class GeneralApplication implements MappableObject {
         this.caseLink = caseLink;
         this.generalAppSubmittedDateGAspec = generalAppSubmittedDateGAspec;
         this.civilServiceUserRoles = civilServiceUserRoles;
+        this.applicantPartyName = applicantPartyName;
         this.claimant1PartyName = claimant1PartyName;
         this.claimant2PartyName = claimant2PartyName;
         this.defendant1PartyName = defendant1PartyName;

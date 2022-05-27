@@ -17,7 +17,7 @@ public class CaseDetails {
 
     private Long id;
 
-    private String jurisdiction;
+    private String jurisdictionId;
 
     private String caseTypeId;
 
