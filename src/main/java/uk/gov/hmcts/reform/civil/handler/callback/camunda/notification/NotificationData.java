@@ -11,6 +11,7 @@ public interface NotificationData {
     String ISSUED_ON = "issuedOn";
     String CLAIM_NOTIFICATION_DEADLINE = "claimNotificationDeadline";
     String CLAIM_DETAILS_NOTIFICATION_DEADLINE = "claimDetailsNotificationDeadline";
+    String RESPONSE_DEADLINE_PLUS_28 = "responseDeadlinePlus28";
     String RESPONSE_DEADLINE = "responseDeadline";
     String NOTIFICATION_DEADLINE = "notificationDeadline";
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
