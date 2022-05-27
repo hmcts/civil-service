@@ -20,10 +20,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -70,15 +67,16 @@ public class InterimJudgmentClaimantNotificationHandlerTest extends BaseCallback
         @Test
         void shouldNotifyClaimantSolicitorWith2Defendants_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
-            verify(notificationService, times(2)).sendMail(
-                anyString(),
-                eq("template-id-app"), anyMap(),
-                eq("interim-judgment-approval-notification-000DC001"));
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id-req",
+                getNotificationDataMap2Defendants(),
+                "interim-judgment-requested-notification-000DC001"
+            );
         }
 
         private Map<String, String> getNotificationDataMap() {
@@ -86,6 +84,15 @@ public class InterimJudgmentClaimantNotificationHandlerTest extends BaseCallback
                 "Legal Rep Claimant", "Test Org Name",
                 "Claim number", "000DC001",
                 "Defendant Name", "Mr. Sole Trader"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMap2Defendants() {
+            return Map.of(
+                "Legal Rep Claimant", "Test Org Name",
+                "Claim number", "000DC001",
+                "Defendant Name", "Mr. Sole Trader",
+                "Defendant2 Name", "Mr. John Rambo"
             );
         }
     }
