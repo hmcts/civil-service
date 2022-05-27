@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -71,6 +72,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
+            callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
             callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
             callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
@@ -159,6 +161,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.currentDefendantName(currentDefendantName);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse acceptCPRSpec(CallbackParams callbackParams) {
+        List<String> listErrors = new ArrayList<>();
+
+        var acceptance2DefSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
+        var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
+        if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
+            listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(listErrors)
             .build();
     }
 
