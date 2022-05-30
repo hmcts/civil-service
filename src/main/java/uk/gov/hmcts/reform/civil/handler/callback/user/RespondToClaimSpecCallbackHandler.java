@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -96,6 +97,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -306,6 +308,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             financialDetails.addAll(caseData.getShowConditionFlags());
             updatedCaseData.showConditionFlags(financialDetails);
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -328,6 +331,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (scenario == ONE_V_TWO_TWO_LEGAL_REP) {
                 if (needFinancialInfo21v2ds(caseData)) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
+                }
+
+                if (caseData.getRespondentClaimResponseTypeForSpecGeneric()!=COUNTER_CLAIM
+                && caseData.getRespondentClaimResponseTypeForSpecGeneric()!=FULL_DEFENCE
+                && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() !=IMMEDIATELY
+                && caseData.getSpecDefenceFullAdmitted2Required()!=YES
+                && caseData.getSpecDefenceAdmitted2Required()!=YES) {
+                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
                 }
             } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP) {
                 necessary.add(NEED_FINANCIAL_DETAILS_1);
