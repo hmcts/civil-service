@@ -20,13 +20,13 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataExceptio
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
@@ -50,7 +50,19 @@ public class RoboticsNotificationService {
         requireNonNull(caseData);
         EmailData emailData = prepareEmailData(caseData, isMultiParty);
 
-        sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType()) || canSendEmailSpec()) {
+            sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
+        }
+    }
+
+    private boolean canSendEmailSpec() {
+        try {
+            return toggleService.isLrSpecEnabled()
+                && toggleService.isSpecRpaContinuousFeedEnabled();
+        } catch (Exception e) {
+            log.error("Exception on launchdarkly check", e);
+            return false;
+        }
     }
 
     private EmailData prepareEmailData(CaseData caseData, boolean isMultiParty) {
@@ -60,7 +72,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) && toggleService.isLrSpecEnabled()) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) && canSendEmailSpec()) {
                 RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
@@ -82,14 +94,20 @@ public class RoboticsNotificationService {
 
     private String getMessage(CaseData caseData, boolean isMultiParty) {
         return isMultiParty ? String.format("Multiparty claim data for %s - %s", caseData.getLegacyCaseReference(),
-            caseData.getCcdState()) : String.format("Robotics case data JSON is attached for %s",
-                caseData.getLegacyCaseReference());
+                                            caseData.getCcdState()
+        ) : String.format(
+            "Robotics case data JSON is attached for %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
-            caseData.getCcdState(), triggerEvent) : String.format("Robotics case data for %s",
-                caseData.getLegacyCaseReference());
+                                            caseData.getCcdState(), triggerEvent
+        ) : String.format(
+            "Robotics case data for %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
@@ -108,10 +126,10 @@ public class RoboticsNotificationService {
         List<Event> lastMiscellaneousEvent = events.stream()
             .filter(event ->
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
-                        && event.getEventCode().equals(MISCELLANEOUS.getCode()))
+                            && event.getEventCode().equals(MISCELLANEOUS.getCode()))
             .collect(Collectors.toList());
 
-        return lastMiscellaneousEvent.size() == 1 ?  lastMiscellaneousEvent.get(0).getEventDetailsText()
+        return lastMiscellaneousEvent.size() == 1 ? lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
     }
 
