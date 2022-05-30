@@ -22,11 +22,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     AssignCaseToUserHandler.class,
@@ -40,6 +49,10 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
+
+    @MockBean
+    private OrganisationService organisationService;
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,6 +84,8 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator() {
+        when(organisationService.findUsersInOrganisation("OrgId2"))
+            .thenReturn(Optional.of(buildPrdResponse()));
 
         assignCaseToUserHandler.handle(params);
 
@@ -79,6 +94,13 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             caseData.getApplicantSolicitor1UserDetails().getId(),
             "OrgId1",
             CaseRole.APPLICANTSOLICITORONE
+        );
+
+        verify(coreCaseUserService).assignCase(
+            caseData.getCcdCaseReference().toString(),
+            "12345678",
+            "OrgId2",
+            CaseRole.RESPONDENTSOLICITORONE
         );
 
         verify(coreCaseUserService).removeCreatorRoleCaseAssignment(
@@ -90,10 +112,39 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldRemoveSubmitterIdAfterCaseAssignment() {
+        when(organisationService.findUsersInOrganisation(anyString()))
+            .thenReturn(Optional.of(buildPrdResponse()));
+
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
 
         CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
         assertThat(data.getApplicantSolicitor1UserDetails().getId()).isNull();
+    }
+
+    private ProfessionalUsersEntityResponse buildPrdResponse() {
+        List<ProfessionalUsersResponse> users = new ArrayList<>();
+            users.add(ProfessionalUsersResponse.builder()
+                          .userIdentifier("12345678")
+                          .email("hmcts.civil+organisation.2.CAA@gmail.com")
+                          .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
+                          .build());
+
+        users.add(ProfessionalUsersResponse.builder()
+                      .email("hmcts.civil+organisation.2.superuser@gmail.com")
+                      .userIdentifier("abcdefg")
+                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-organisation-manager"))
+                      .build());
+
+        users.add(ProfessionalUsersResponse.builder()
+                      .email("hmcts.civil+organisation.2.solicitor.1@gmail.com")
+                      .userIdentifier("a1b2c3")
+                      .roles(Arrays.asList("caseworker", "caseworker-civil", "caseworker-civil-solicitor"))
+                      .build());
+
+        return ProfessionalUsersEntityResponse.builder()
+            .organisationIdentifier("OrgId2")
+            .users(users)
+            .build();
     }
 }
