@@ -54,21 +54,22 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     }
 
     private String identifyTemplate(CaseData caseData) {
-        String template;
-        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
-            .isPresent()
+        String template = null;
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")) {
+            "Both")))) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
-        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
-            .isPresent()
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")) {
+            "Both")))) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_REQUESTED;
-        } else {
+        }
+        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -78,10 +79,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private CallbackResponse notifyApplicantSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
-            .isPresent()
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")) {
+            "Both")))) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
@@ -95,17 +96,18 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        if (caseData.getAddRespondent2().equals(YesOrNo.YES) && ofNullable(caseData.getDefendantDetailsSpec())
-            .isPresent()
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")) {
+            "Both")))) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
                 addProperties2(caseData),
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
-        } else if (caseData.getAddRespondent2().equals(YesOrNo.NO)) {
+        }
+        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
