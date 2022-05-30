@@ -332,20 +332,34 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 if (needFinancialInfo21v2ds(caseData)) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
+            } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP
+                && (needFinancialInfo21v2ds(caseData)
+                || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
+                necessary.add(NEED_FINANCIAL_DETAILS_2);
+            }
 
-                if (caseData.getRespondentClaimResponseTypeForSpecGeneric()!=COUNTER_CLAIM
-                && caseData.getRespondentClaimResponseTypeForSpecGeneric()!=FULL_DEFENCE
-                && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() !=IMMEDIATELY
-                && caseData.getSpecDefenceFullAdmitted2Required()!=YES
-                && caseData.getSpecDefenceAdmitted2Required()!=YES) {
-                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
-                }
-            } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP) {
-                necessary.add(NEED_FINANCIAL_DETAILS_1);
+            if (respondent2doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
             }
         }
 
         return necessary;
+    }
+
+    private boolean respondent2doesNotPayImmediately(CaseData caseData, MultiPartyScenario scenario) {
+        if (caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
+            && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE) {
+            if (scenario == ONE_V_TWO_ONE_LEGAL_REP && caseData.getRespondentResponseIsSame() == YES) {
+                return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
+                    && caseData.getSpecDefenceFullAdmittedRequired() != YES
+                    && caseData.getSpecDefenceAdmittedRequired() != YES;
+            } else if (caseData.getRespondentResponseIsSame() != null || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+                return caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != IMMEDIATELY
+                    && caseData.getSpecDefenceFullAdmitted2Required() != YES
+                    && caseData.getSpecDefenceAdmitted2Required() != YES;
+            }
+        }
+        return false;
     }
 
     /**
