@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -66,26 +65,24 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
     }
 
     private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.respondent1OrganisationPolicy(
-            OrganisationPolicy.builder()
-                .organisation(Organisation.builder()
-                                  .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                  .build())
-                .orgPolicyReference(caseData.getRespondent1OrganisationPolicy().getOrgPolicyReference())
-                .orgPolicyCaseAssignedRole(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole())
-                .build());
+        if (caseData.getRespondent1OrganisationIDCopy() != null) {
+            caseDataBuilder.respondent1OrganisationPolicy(
+                caseData.getRespondent1OrganisationPolicy().toBuilder()
+                    .organisation(Organisation.builder()
+                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
+                                      .build())
+                    .build()
+            );
+        }
 
-        if(caseData.getRespondent2OrganisationIDCopy() != null){
+        if (caseData.getRespondent2OrganisationIDCopy() != null) {
             caseDataBuilder.respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
+                caseData.getRespondent2OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent2OrganisationIDCopy())
                                       .build())
-                    .orgPolicyReference(caseData.getRespondent2OrganisationPolicy().getOrgPolicyReference())
-                    .orgPolicyCaseAssignedRole(caseData
-                                                   .getRespondent2OrganisationPolicy()
-                                                   .getOrgPolicyCaseAssignedRole())
-                    .build());
+                    .build()
+            );
         }
     }
 

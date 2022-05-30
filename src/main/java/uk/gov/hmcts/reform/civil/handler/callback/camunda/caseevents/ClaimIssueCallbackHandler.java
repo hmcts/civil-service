@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 @Service
 @RequiredArgsConstructor
 public class ClaimIssueCallbackHandler extends CallbackHandler {
@@ -56,19 +57,21 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
     }
 
     private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.respondent1OrganisationIDCopy(
-            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+        if (YES.equals(caseData.getRespondent1OrgRegistered())) {
+            caseDataBuilder.respondent1OrganisationIDCopy(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
 
-        caseDataBuilder.respondent1OrganisationPolicy(
-            caseData
-                .getRespondent1OrganisationPolicy()
-                .toBuilder()
-                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
-                .build()
-        );
+            caseDataBuilder.respondent1OrganisationPolicy(
+                caseData
+                    .getRespondent1OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+        }
 
         if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
-            && YES.equals(caseData.getRespondent2OrgRegistered())){
+            && YES.equals(caseData.getRespondent2OrgRegistered())) {
             caseDataBuilder.respondent2OrganisationIDCopy(
                 caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
 
