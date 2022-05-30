@@ -261,6 +261,7 @@ class RoboticsNotificationServiceTest {
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         service.notifyRobotics(caseData, multiPartyScenario);
@@ -276,7 +277,7 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
     }
 
     @Test
