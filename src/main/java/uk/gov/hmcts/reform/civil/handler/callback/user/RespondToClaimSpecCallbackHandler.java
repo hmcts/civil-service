@@ -88,7 +88,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -551,7 +553,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 IMMEDIATELY);
         }
 
-        updatedData.showConditionFlags(whoDisputesPartAdmission(caseData));
+        Set<DefendantResponseShowTag> updatedShowConditions = whoDisputesPartAdmission(caseData);
+        EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
+            RespondentResponseTypeSpec.PART_ADMISSION,
+            RespondentResponseTypeSpec.FULL_ADMISSION
+        );
+        if (anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            updatedShowConditions.add(RESPONDENT_1_ADMITS_PART_OR_FULL);
+            if (caseData.getRespondentResponseIsSame() == YES) {
+                updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
+            }
+        }
+        if (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
+        }
+        updatedData.showConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
