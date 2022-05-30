@@ -48,45 +48,46 @@ public class RoboticsNotificationService {
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
-        EmailData emailData = prepareEmailData(caseData, isMultiParty);
-
-        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType()) || canSendEmailSpec()) {
-            sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
-        }
+        Optional<EmailData> emailData = prepareEmailData(caseData, isMultiParty);
+        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
     private boolean canSendEmailSpec() {
         try {
             return toggleService.isLrSpecEnabled()
                 && toggleService.isSpecRpaContinuousFeedEnabled();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Exception on launchdarkly check", e);
             return false;
         }
     }
 
-    private EmailData prepareEmailData(CaseData caseData, boolean isMultiParty) {
+    private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty) {
 
         byte[] roboticsJsonData;
         try {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) && canSendEmailSpec()) {
-                RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
-                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                if (canSendEmailSpec()) {
+                    RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
+                    roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                } else {
+                    return Optional.empty();
+                }
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
-            return EmailData.builder()
+            return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
                 .subject(getSubject(caseData, triggerEvent, isMultiParty))
                 .to(getRoboticsEmailRecipient(isMultiParty, caseData.getSuperClaimType()))
                 .attachments(of(json(roboticsJsonData, fileName)))
-                .build();
+                .build());
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }

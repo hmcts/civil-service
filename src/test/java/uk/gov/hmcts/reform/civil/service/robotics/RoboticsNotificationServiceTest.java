@@ -48,6 +48,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -278,6 +279,33 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+    }
+
+    @Test
+    void shouldFailGracefully_whenLDException() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder().miscellaneous(
+                Event.builder().eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build()
+            ).build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+        when(featureToggleService.isLrSpecEnabled()).thenThrow(new RuntimeException());
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        service.notifyRobotics(caseData, multiPartyScenario);
+
+        verifyNoInteractions(sendGridClient);
     }
 
     @Test
