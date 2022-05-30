@@ -22,5 +22,7 @@ public enum DefendantResponseShowTag {
      * when r1 chose admits part or admits full
      */
     RESPONDENT_1_ADMITS_PART_OR_FULL,
-    RESPONDENT_2_ADMITS_PART_OR_FULL
+    RESPONDENT_2_ADMITS_PART_OR_FULL,
+    NEED_FINANCIAL_DETAILS_1,
+    NEED_FINANCIAL_DETAILS_2
 }
