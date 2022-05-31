@@ -713,7 +713,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    if (caseData.getDefendantSingleResponseToBothClaimants() == YES
+                    if (caseData.getRespondentResponseIsSame() == YES
                         || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                         tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
                     } else {
@@ -724,10 +724,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
+                if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                     && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                } else if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
+                } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
                 }
