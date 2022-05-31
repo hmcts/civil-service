@@ -1036,17 +1036,45 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-            .respondent1DQWitnesses(Witnesses.builder()
-                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                        .build())
-            .build();
-        return validateWitnesses(dq);
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
+        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
         return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+    }
+
+    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        return caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
