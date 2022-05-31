@@ -187,6 +187,29 @@ class GeneralAppLocationRefDataServiceTest {
     }
 
     @Test
+    void shouldReturnLocations_whenLRDReturnsNullBody() {
+        when(authTokenGenerator.generate()).thenReturn("service_token");
+        when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(null);
+
+        List<String> courtLocations = refDataService.getCourtLocations("user_token");
+
+        assertThat(courtLocations.size()).isEqualTo(0);
+        verify(lrdConfiguration, times(1)).getUrl();
+        verify(lrdConfiguration, times(1)).getEndpoint();
+        assertThat(uriCaptor.getValue().toString())
+                .isEqualTo("dummy_url/fees-register/fees/lookup?is_hearing_location=Y&location_type=Court");
+        assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
+        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
+        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
+                .isEqualTo("service_token");
+    }
+
+    @Test
     void shouldReturnEmptyList_whenLRDThrowsException() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
         when(restTemplate.exchange(

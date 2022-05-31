@@ -32,20 +32,18 @@ public class GeneralAppLocationRefDataService {
     private final AuthTokenGenerator authTokenGenerator;
 
     public List<String> getCourtLocations(String authToken) {
-        List<LocationRefData> locationRefData = new ArrayList<>();
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
                     buildURI(),
                     HttpMethod.GET,
                     getHeaders(authToken),
                     new ParameterizedTypeReference<List<LocationRefData>>() {});
-            locationRefData = responseEntity.getBody();
+            return onlyEnglandAndWalesLocations(responseEntity.getBody());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
             //throw new RuntimeException(e);
         }
-
-        return onlyEnglandAndWalesLocations(locationRefData);
+        return new ArrayList<>();
     }
 
     private URI buildURI() {
@@ -64,7 +62,9 @@ public class GeneralAppLocationRefDataService {
     }
 
     private List<String> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
-        return locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
+        return locationRefData == null
+                ? new ArrayList<>()
+                : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
                 .map(this::getDisplayEntry).collect(Collectors.toList());
     }
 
