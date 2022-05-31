@@ -45,8 +45,6 @@ public class Respondent2DQ implements DQ {
     //private final DisclosureOfNonElectronicDocumentsLRspec specRespondent2DQDisclosureOfNonElectronicDocuments;
     //private final DisclosureOfElectronicDocumentsLRspec specRespondent2DQDisclosureOfElectronicDocuments;
     //private final xyz specApplicant2DQDisclosureOfNonElectronicDocuments;
-    //private final xyz respondent2DQRecurringIncomeFA;
-    //private final xyz respondent2DQRecurringExpensesFA;
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
