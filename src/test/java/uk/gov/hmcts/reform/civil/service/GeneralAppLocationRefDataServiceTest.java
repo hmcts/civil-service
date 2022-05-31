@@ -194,7 +194,7 @@ class GeneralAppLocationRefDataServiceTest {
                 httpMethodCaptor.capture(),
                 httpEntityCaptor.capture(),
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
-                .thenReturn(null);
+                .thenReturn(new ResponseEntity<List<LocationRefData>>(OK));
 
         List<String> courtLocations = refDataService.getCourtLocations("user_token");
 
