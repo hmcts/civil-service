@@ -335,7 +335,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         necessary.add(NEED_FINANCIAL_DETAILS_2);
                     }
                 } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP
-                    && (needFinancialInfo21v2ds(caseData)
+                    && ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData))
                     || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
