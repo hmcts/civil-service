@@ -54,7 +54,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
-    public static final String BREATHING_SPACE = "default judgment cannot be applied while claim is in breathing space";
+    public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
+        + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
@@ -128,7 +129,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if(caseData.getBreathing().getLift() != null && caseData.getBreathing().getLift()
             .getExpectedEnd().isBefore(LocalDate.now())) {
             errors.remove(BREATHING_SPACE);
-            System.out.println("breathing removed");
         }
 
         List<String> listData = new ArrayList<>();
