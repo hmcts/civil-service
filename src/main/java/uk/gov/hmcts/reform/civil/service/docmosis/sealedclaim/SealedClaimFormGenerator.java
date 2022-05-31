@@ -108,6 +108,8 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         var respondent1Representative = representativeService.getRespondent1Representative(caseData);
         var respondentParties = new ArrayList<>(List.of(
             Party.builder()
+                .type(respondent.getType().getDisplayValue())
+                .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
                 .name(respondent.getPartyName())
                 .primaryAddress(respondent.getPrimaryAddress())
                 .representative(respondent1Representative)
@@ -116,6 +118,9 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
+                                      .type(respondent2.getType().getDisplayValue())
+                                      .soleTraderTradingAs(
+                                          DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
                                       .representative(respondent1Representative)
@@ -123,6 +128,9 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         } else if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
+                                      .type(respondent2.getType().getDisplayValue())
+                                      .soleTraderTradingAs(
+                                          DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
                                       .name(respondent2.getPartyName())
                                       .primaryAddress(respondent2.getPrimaryAddress())
                                       .representative(representativeService.getRespondent2Representative(caseData))
@@ -137,6 +145,8 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
         var applicantParties = new ArrayList<>(List.of(
             Party.builder()
+                .type(applicant.getType().getDisplayValue())
+                .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
                 .name(applicant.getPartyName())
                 .primaryAddress(applicant.getPrimaryAddress())
                 .litigationFriendName(
@@ -149,6 +159,8 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
         if (multiPartyScenario == TWO_V_ONE) {
             var applicant2 = caseData.getApplicant2();
             applicantParties.add(Party.builder()
+                                     .type(applicant2.getType().getDisplayValue())
+                                     .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
                                      .name(applicant2.getPartyName())
                                      .primaryAddress(applicant2.getPrimaryAddress())
                                      .litigationFriendName(
