@@ -15,19 +15,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.prd.model.SuperUser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -51,9 +41,6 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
-    @MockBean
-    private OrganisationService organisationService;
-
     @Autowired
     private ClaimContinuingOnlineApplicantNotificationHandler handler;
 
@@ -66,42 +53,14 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldNotifyCAAUser_whenInvoked() {
-            when(organisationService.findUsersInOrganisation(anyString()))
-                .thenReturn(Optional.of(buildPrdResponse(true)));
-
+        void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "hmcts.civil+organisation.2.CAA@gmail.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "claim-continuing-online-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyAdminUser_whenInvoked() {
-            when(organisationService.findUsersInOrganisation(anyString()))
-                .thenReturn(Optional.of(buildPrdResponse(false)));
-
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .superUser(SuperUser.builder()
-                                                           .email("hmcts.civil+organisation.2.superuser@gmail.com")
-                                                           .build())
-                                            .build()));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "hmcts.civil+organisation.2.superuser@gmail.com",
+                "applicantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
                 "claim-continuing-online-notification-000DC001"
@@ -116,32 +75,6 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
                 NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
                 PARTY_REFERENCES, buildClaimantReference(caseData)
             );
-        }
-
-        private ProfessionalUsersEntityResponse buildPrdResponse(Boolean withCaaUser) {
-            List<ProfessionalUsersResponse> users = new ArrayList<>();
-
-            if (withCaaUser) {
-                users.add(ProfessionalUsersResponse.builder()
-                              .email("hmcts.civil+organisation.2.CAA@gmail.com")
-                              .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
-                              .build());
-            }
-
-            users.add(ProfessionalUsersResponse.builder()
-                          .email("hmcts.civil+organisation.2.superuser@gmail.com")
-                          .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-organisation-manager"))
-                          .build());
-
-            users.add(ProfessionalUsersResponse.builder()
-                          .email("hmcts.civil+organisation.2.solicitor.1@gmail.com")
-                          .roles(Arrays.asList("caseworker", "caseworker-civil", "caseworker-civil-solicitor"))
-                          .build());
-
-            return ProfessionalUsersEntityResponse.builder()
-                    .organisationIdentifier("12345")
-                    .users(users)
-                    .build();
         }
     }
 }
